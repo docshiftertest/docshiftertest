@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+ <name>PDF Transformation</name>
+   <description>PDF Transformation, with security options</description>
+   <type>Transformation</type>
+   <classname>com.docbyte.docshifter.receiver.operations.aspose.PdfTransformation</classname>
+   <parameters>
+    <parameter>
+	    <name>RestrictPermissions</name>
+	    <description>RestrictPermissions (true/false), false leads to a normal, unsecured pdf file</description>
+	    <type>BOOLEAN</type>
+	</parameter>
+	<parameter>
+	    <name>Pdfa</name>
+	    <description>generate a pdfa file (true/false), if true, this will disable all other security options</description>
+	    <type>BOOLEAN</type>
+	</parameter>
+	<parameter>
+	    <name>UsePasswords</name>
+	    <description>0: don't use passwords/ 1: use permission password only/ 2: use both permission and open file password</description>
+	    <type>INTEGER</type>
+	</parameter>
+	<parameter>
+	    <name>PermissionPassword</name>
+	    <description>Password to regain permissions</description>
+	    <type>STRING</type>
+	</parameter>
+	<parameter>
+	    <name>OpenFilePassword</name>
+	    <description>set the password to open the pdf file</description>
+	    <type>STRING</type>
+	</parameter>
+	<parameter>
+	    <name>Printing</name>
+	    <description>Restrict printing: 0: Not permitted / 1: Only Low resolution / 2: Allow High resolution</description>
+	    <type>INTEGER</type>
+	</parameter>
+	<parameter>
+	    <name>Changes</name>
+	    <description>Restrict changes: 0: Not permitted / 1: Allow Inserting, deleting and rotating pages / 2: Allow Commenting, filling in form fields / 3: Any except extracting pages</description>
+	    <type>INTEGER</type>
+	</parameter>
+	<parameter>
+	    <name>EnableCopyingOfContent</name>
+	    <description>Enable Copying Of Content (true/false)</description>
+	    <type>BOOLEAN</type>
+	</parameter>
+   </parameters>
+</module>

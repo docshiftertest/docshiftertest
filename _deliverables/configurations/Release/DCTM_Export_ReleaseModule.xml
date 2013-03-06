@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+   <name>DCTM Export</name>
+   <description>Documentum release (creates a new document in the docbase)</description>
+   <type>Release</type>
+   <classname>com.docbyte.docshifter.receiver.operations.dctm.DCTMExport</classname>
+   <parameters>
+	<parameter>
+	    <name>docbase</name>
+	    <description>Repository Name</description>
+	    <type>STRING</type>
+	</parameter>
+	<parameter>
+	    <name>username</name>
+	    <description>Repository (technical)User</description>
+	    <type>STRING</type>
+	</parameter>
+	<parameter>
+	    <name>password</name>
+	    <description>Repository Password</description>
+	    <type>STRING</type>
+	</parameter>
+	<parameter>
+	    <name>destfolder</name>
+	    <description>Destination folderpath in the docbase</description>
+	    <type>STRING</type>
+	</parameter>
+	<parameter>
+	    <name>objecttype</name>
+	    <description>The target document object type</description>
+	    <type>STRING</type>
+	</parameter>
+	<parameter>
+	    <name>createFolders</name>
+	    <description>Create folders under the destination folder (values: true/false)</description>
+	    <type>BOOLEAN</type>
+	</parameter>
+	<parameter>
+	    <name>foldertype</name>
+	    <description>The target document folder type for the to be created folders</description>
+	    <type>STRING</type>
+	</parameter>
+   </parameters>
+</module>

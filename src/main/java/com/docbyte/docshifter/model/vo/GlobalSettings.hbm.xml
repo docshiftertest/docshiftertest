@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+        
+<hibernate-mapping>
+    <class name="com.docbyte.docshifter.model.vo.GlobalSettings" table="GLOBALSETTINGS">
+        <id name="id" column="ID">
+            <generator class="native"/>
+        </id>
+        
+        <property name="jmsSystem"/>
+        <property name="jmsURL"/>
+        <property name="jmsQueue"/>
+        <property name="jmsUser"/>
+        <property name="jmsUserPassword"/>
+        
+        <property name="defaultOpenOfficeHost"/>
+        <property name="defaultOpenOfficePort"/>
+        
+        <property name="defaultTempFolder"/>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+ <name>Thumbnail Transformation</name>
+   <description>Thumbnail generation (in PNG)</description>
+   <type>Transformation</type>
+   <classname>com.docbyte.docshifter.receiver.operations.thumbnail.ThumbnailTransformation</classname>
+   <parameters>
+	<parameter>
+	    <name>MaxHeight</name>
+	    <description>Maximum height in pixels</description>
+	    <type>INTEGER</type>
+	</parameter>
+	<parameter>
+	    <name>MaxWidth</name>
+	    <description>Maximum width in pixels</description>
+	    <type>INTEGER</type>
+	</parameter>
+	<name>ffmpegPath</name>
+	    <description>path to the ffmpeg exe, ie: C:/ffmpeg/bin/</description>
+	<type>STRING</type>
+   </parameters>
+</module>

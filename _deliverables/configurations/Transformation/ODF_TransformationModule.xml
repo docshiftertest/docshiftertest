@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+   <name>ODF Transformation</name>
+   <description>ODF Transformation</description>
+   <type>Transformation</type>
+   <classname>com.docbyte.docshifter.receiver.operations.odf.OdfTransformation</classname>
+</module>

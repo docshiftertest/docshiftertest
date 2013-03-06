@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+ <name>Document Transformation</name>
+   <description>Document Transformation</description>
+   <type>Transformation</type>
+   <classname>com.docbyte.docshifter.receiver.operations.aspose.WordsTransformation</classname>
+   <parameters>
+      	<parameter>
+	    <name>OutputFileType</name>
+	    <description>doc, docx, html, pdf, rtf, html, ...</description>
+	    <type>String</type>
+	</parameter>
+   </parameters>
+</module>

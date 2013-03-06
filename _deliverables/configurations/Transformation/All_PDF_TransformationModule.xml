@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+ <name>All To PDF Transformation</name>
+   <description>Transform every document (text, sreadsheet, presentation, image) to a PDF file</description>
+   <type>Transformation</type>
+   <classname>com.docbyte.docshifter.receiver.operations.pdf.AllToPdfTransformation</classname>
+   <parameters>
+      <parameter>
+         <name>pdfa</name>
+	 <description>pdfa format required (true/false)</description>
+	 <type>STRING</type>
+      </parameter>
+   </parameters>
+</module>

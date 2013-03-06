@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+ <name>SWF Transformation</name>
+   <description>SWF with all the pages</description>
+   <type>Transformation</type>
+   <classname>com.docbyte.docshifter.receiver.operations.swf.SwfTransformation</classname>
+   <parameters>
+	<parameter>
+	    <name>ExecutablePath</name>
+	    <description>Path to the pdf2swf executable</description>
+	    <type>STRING</type>
+	</parameter>
+   </parameters>
+</module>
