@@ -1,6 +1,7 @@
 package com.docbyte.docshifter.config;
 
 import java.io.Serializable;
+import java.util.HashMap;
 /**
  * Value object which represents a dmi_queue_item object.
  * 
@@ -19,6 +20,7 @@ public class Task implements Serializable {
 	protected String item_id="";	//unique file identifier: default from dctm= objectid
 	protected String request="";	//transformation request: default from dctm= "rendition_req_ps_pdf"
 	protected String sent_by="";	//user requesting the transformation: default from dctm= "dm_autorender_win31"
+	protected HashMap<String, String> parameters;
 	public Task(){
 		
 	}
@@ -80,6 +82,15 @@ public class Task implements Serializable {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	
+	
+	public HashMap<String, String> getParameters() {
+		return parameters;
+	}
+	public void setParameters(HashMap<String, String> parameters) {
+		this.parameters = parameters;
 	}
 	//temp to show sending a task through jms works (ObjectMessage)
 	public String toString(){
