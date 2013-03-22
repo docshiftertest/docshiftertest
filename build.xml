@@ -3,8 +3,8 @@
 	<property name="releases" location="_deliverables" />
 	<property name="target" location="target\classes" />
 	<property name="project-name" value="DocShifterBeans-3.0" />
-	<property name="izpack_home.dir" location="C:\Program Files\IzPack" />
-	<property name="izpack.dir" value="izpack" />
+	<!-- property name="izpack_home.dir" location="C:\Program Files\IzPack" />
+	<property name="izpack.dir" value="izpack" /-->
 
 	<path id="toolslib">
 		<path location="lib/tools/hibernate-tools.jar" />
@@ -76,10 +76,11 @@
 		</copy>
 	</target>
 
-	<taskdef name="izpack" 
+	
+	<!--  Don't forget to add compiler.jar or standalone-compiler.jar to the classpath of the Ant process.-->
+	<!--taskdef name="izpack" 
 	    classpath="${izpack_home.dir}/lib/standalone-compiler.jar" 
 	    classname="com.izforge.izpack.ant.IzPackTask"/>
-	<!--  Don't forget to add compiler.jar or standalone-compiler.jar to the classpath of the Ant process.-->
 		
 	<target name="installer" depends="releases">
 	    <echo message="Makes the Installer using IzPack"/>
@@ -90,5 +91,5 @@
 	     	basedir="${izpack.dir}" 
 	     	izpackdir="${izpack_home.dir}" />
 		
-	</target>
+	</target-->
 </project>
