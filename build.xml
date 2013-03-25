@@ -92,4 +92,21 @@
 	     	izpackdir="${izpack_home.dir}" />
 		
 	</target-->
+	
+	<!-- Put all files needed for installer in a zip. This is used by Jenkins -->
+	<target name="zip-releases" depends="jar">
+	   <!-- Installation files should be updated somewhere -->
+	    <zip destfile="docShifterCore.zip">
+	        <zipfileset dir="${releases}" prefix="lib">
+	            <exclude name="${releases}/configurations"/>
+	            <exclude name="${releases}/work"/>
+	        </zipfileset>
+	        <zipfileset dir="${releases}/work" prefix="work">
+	            <include name="dummy.file"/>
+	        </zipfileset>
+	        <zipfileset dir="${releases}/configurations" prefix="configurations"/>
+	        <zipfileset dir="lib" prefix="lib"/>
+	   	</zip>
+	    
+	</target>
 </project>
