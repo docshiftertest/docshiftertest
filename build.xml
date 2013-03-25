@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="DocShifterBeans" default="releases">
+<project name="DocShifterBeans" default="zip-releases">
 	<property name="releases" location="_deliverables" />
 	<property name="target" location="target\classes" />
 	<property name="project-name" value="DocShifterBeans-3.0" />
@@ -94,7 +94,7 @@
 	</target-->
 	
 	<!-- Put all files needed for installer in a zip. This is used by Jenkins -->
-	<target name="zip-releases" depends="jar">
+	<target name="zip-releases" depends="releases">
 	   <!-- Installation files should be updated somewhere -->
 	    <zip destfile="docShifterCore.zip">
 	        <zipfileset dir="${releases}" prefix="lib">
