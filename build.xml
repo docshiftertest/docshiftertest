@@ -98,14 +98,13 @@
 	   <!-- Installation files should be updated somewhere -->
 	    <zip destfile="docShifterCore.zip">
 	        <zipfileset dir="${releases}" prefix="lib">
-	            <exclude name="${releases}/configurations"/>
-	            <exclude name="${releases}/work"/>
+	            <exclude name="configurations"/>
+	            <exclude name="work"/>
 	        </zipfileset>
 	        <zipfileset dir="${releases}/work" prefix="work">
 	            <include name="dummy.file"/>
 	        </zipfileset>
 	        <zipfileset dir="${releases}/configurations" prefix="configurations"/>
-	        <zipfileset dir="lib" prefix="lib"/>
 	   	</zip>
 	    
 	</target>
