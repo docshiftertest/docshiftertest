@@ -54,7 +54,7 @@
 			</fileset>
 		</delete>
 		
-		<jar destfile="${releases}/${project-name}.jar">
+		<jar destfile="${releases}/docShifter-Core-all-libs.jar">
 			<fileset dir="${target}">
 				<include name="**/**.class" />
 				<include name="**/**.hbm.xml" />
