@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
-<project name="DocShifterBeans" default="releases">
+<project name="DocShifterBeans" default="zip-releases">
 	<property name="releases" location="_deliverables" />
 	<property name="target" location="target\classes" />
 	<property name="project-name" value="DocShifterBeans-3.0" />
-	<property name="izpack_home.dir" location="C:\Program Files (x86)\IzPack" />
-	<property name="izpack.dir" value="izpack" />
+	<!-- property name="izpack_home.dir" location="C:\Program Files\IzPack" />
+	<property name="izpack.dir" value="izpack" /-->
 
 	<path id="toolslib">
 		<path location="lib/tools/hibernate-tools.jar" />
@@ -54,7 +54,7 @@
 			</fileset>
 		</delete>
 		
-		<jar destfile="${releases}/${project-name}.jar">
+		<jar destfile="${releases}/docShifter-Core-all-libs.jar">
 			<fileset dir="${target}">
 				<include name="**/**.class" />
 				<include name="**/**.hbm.xml" />
@@ -76,12 +76,36 @@
 		</copy>
 	</target>
 
-	<taskdef name="izpack" classpath="${izpack_home.dir}/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask"/>
+	
+	<!--  Don't forget to add compiler.jar or standalone-compiler.jar to the classpath of the Ant process.-->
+	<!--taskdef name="izpack" 
+	    classpath="${izpack_home.dir}/lib/standalone-compiler.jar" 
+	    classname="com.izforge.izpack.ant.IzPackTask"/>
 		
 	<target name="installer" depends="releases">
 	    <echo message="Makes the Installer using IzPack"/>
-	    <izpack input="${izpack.dir}/install.xml" output="${releases}/installer.jar" installertype="standard" 
-	     		basedir="${izpack.dir}" izpackdir="${izpack_home.dir}" />
+	    <izpack 
+	        input="${izpack.dir}/install.xml" 
+	        output="${releases}/installer.jar" 
+	        installertype="standard" 
+	     	basedir="${izpack.dir}" 
+	     	izpackdir="${izpack_home.dir}" />
 		
+	</target-->
+	
+	<!-- Put all files needed for installer in a zip. This is used by Jenkins -->
+	<target name="zip-releases" depends="releases">
+	   <!-- Installation files should be updated somewhere -->
+	    <zip destfile="docShifterCore.zip">
+	        <zipfileset dir="${releases}" prefix="lib">
+	            <exclude name="configurations"/>
+	            <exclude name="work"/>
+	        </zipfileset>
+	        <zipfileset dir="${releases}/work" prefix="work">
+	            <include name="dummy.file"/>
+	        </zipfileset>
+	        <zipfileset dir="${releases}/configurations" prefix="configurations"/>
+	   	</zip>
+	    
 	</target>
 </project>
