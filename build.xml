@@ -97,9 +97,7 @@
 	<target name="zip-releases" depends="releases">
 	   <!-- Installation files should be updated somewhere -->
 	    <zip destfile="docShifterCore.zip">
-	        <zipfileset dir="${releases}" prefix="lib">
-	            <exclude name="configurations"/>
-	            <exclude name="work"/>
+	        <zipfileset dir="lib" prefix="lib">
 	        </zipfileset>
 	        <zipfileset dir="${releases}/work" prefix="work">
 	            <include name="dummy.file"/>
@@ -109,19 +107,4 @@
 	    
 	</target>
 	
-	<!-- Put all files needed for installer in a zip. This is used by Jenkins -->
-	<target name="zip-releases" depends="releases">
-	   <!-- Installation files should be updated somewhere -->
-	    <zip destfile="docShifterCore.zip">
-	        <zipfileset dir="${releases}" prefix="lib">
-	            <exclude name="configurations"/>
-	            <exclude name="work"/>
-	        </zipfileset>
-	        <zipfileset dir="${releases}/work" prefix="work">
-	            <include name="dummy.file"/>
-	        </zipfileset>
-	        <zipfileset dir="${releases}/configurations" prefix="configurations"/>
-	   	</zip>
-	    
-	</target>
 </project>
