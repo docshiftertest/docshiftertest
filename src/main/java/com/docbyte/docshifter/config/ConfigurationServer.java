@@ -96,8 +96,8 @@ public class ConfigurationServer {
 	
 	
 	//TODO throw exception if the configuration is not found
-	public static ModuleConfiguration getModuleConfiguration(Module module){
-		return moduleConfigurationDAO.get(module).get(0);
+	public static List<ModuleConfiguration> getModuleConfiguration(Module module){
+		return moduleConfigurationDAO.get(module);
 	}
 
 	//TODO throw exception if the module is not found
