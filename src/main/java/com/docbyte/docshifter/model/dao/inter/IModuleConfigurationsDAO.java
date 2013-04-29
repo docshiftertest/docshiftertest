@@ -7,12 +7,13 @@ import com.docbyte.docshifter.model.vo.ModuleConfiguration;
 
 public interface IModuleConfigurationsDAO
 {
-	public ModuleConfiguration get(Long id);
+	public ModuleConfiguration get(int id);
 	public ModuleConfiguration get(String name);
 
-	public void save(ModuleConfiguration moduleConfiguration);
+	public void insert(ModuleConfiguration moduleConfiguration) throws IllegalArgumentException;
+	public void update(ModuleConfiguration moduleConfiguration) throws IllegalArgumentException;
 	
-	public void delete(ModuleConfiguration moduleConfiguration) throws UnsupportedOperationException;
+	public void delete(ModuleConfiguration moduleConfiguration) throws IllegalArgumentException;
 	
 	public List<ModuleConfiguration> get(Module module);
 	public List<ModuleConfiguration> getByType(String type);

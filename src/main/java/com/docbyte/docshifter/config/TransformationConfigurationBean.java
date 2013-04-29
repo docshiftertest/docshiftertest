@@ -1,11 +1,14 @@
 package com.docbyte.docshifter.config;
 
+import java.util.Set;
+
 import com.docbyte.docshifter.model.vo.ChainConfiguration;
+import com.docbyte.docshifter.model.vo.ReceiverConfiguration;
 
 public class TransformationConfigurationBean {
 
 	private SenderConfigurationBean sender;
-	private ReceiverConfigurationBean receiver;
+	private Set<ReceiverConfigurationBean> receivers;
 	private long id;
 	private String queueName;
 	private String printerName;
@@ -14,12 +17,13 @@ public class TransformationConfigurationBean {
 	public TransformationConfigurationBean() { }
 
 	public TransformationConfigurationBean(ChainConfiguration config){		
-		this.sender = new SenderConfigurationBean(config.getSenderConfiguration());
-		this.receiver = new ReceiverConfigurationBean(config.getReceiverConfiguration());
-		this.id = config.getId();
-		this.queueName = config.getQueueName();
-		this.printerName = config.getPrinterName();
-		this.enabled = config.isEnabled();
+			this.sender = new SenderConfigurationBean(config.getSenderConfiguration());
+			for(ReceiverConfiguration receiverconfig:config.getReceiverConfiguration())
+				receivers.add(new ReceiverConfigurationBean(receiverconfig));
+			this.id = config.getId();
+			this.queueName = config.getQueueName();
+			this.printerName = config.getPrinterName();
+			this.enabled = config.isEnabled();
 	}
 
 	public SenderConfigurationBean getSender() {
@@ -30,12 +34,12 @@ public class TransformationConfigurationBean {
 		this.sender = sender;
 	}
 
-	public ReceiverConfigurationBean getReceiver() {
-		return receiver;
+	public Set<ReceiverConfigurationBean> getReceivers() {
+		return receivers;
 	}
 
-	public void setReceiver(ReceiverConfigurationBean receiver) {
-		this.receiver = receiver;
+	public void setReceivers(Set<ReceiverConfigurationBean> receivers) {
+		this.receivers = receivers;
 	}
 
 	public long getId() {

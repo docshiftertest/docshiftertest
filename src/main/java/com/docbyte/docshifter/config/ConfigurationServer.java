@@ -66,7 +66,7 @@ public class ConfigurationServer {
 	 * @param long uid			a long representing the UID of the requested SenderConfiguration.
 	 */	
 	public static SenderConfigurationBean getSenderConfiguration(long uid){
-		return new SenderConfigurationBean(senderConfigurationDAO.get(uid));
+		return new SenderConfigurationBean(senderConfigurationDAO.get((int) uid));
 	}
 	
 	/**
@@ -85,6 +85,6 @@ public class ConfigurationServer {
 	}
 
 	public static TransformationConfigurationBean getTransformationConfiguration(long uid) {
-		return new TransformationConfigurationBean(chainConfigurationDAO.get(uid));
+		return new TransformationConfigurationBean(chainConfigurationDAO.get((int) uid));
 	}
 }

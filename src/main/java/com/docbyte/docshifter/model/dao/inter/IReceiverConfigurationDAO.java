@@ -12,7 +12,9 @@ public interface IReceiverConfigurationDAO
 
 	public List<ReceiverConfiguration> find(String name);
 	
-	public void save(ReceiverConfiguration receiverConfiguration);
+	public ReceiverConfiguration insert(ReceiverConfiguration receiverConfiguration) throws Exception;
+	public ReceiverConfiguration update(ReceiverConfiguration receiverConfiguration);
 	
 	public void delete(ReceiverConfiguration receiverConfiguration); 
+
 }
