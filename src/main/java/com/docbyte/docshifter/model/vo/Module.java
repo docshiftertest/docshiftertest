@@ -10,17 +10,19 @@ public class Module implements Serializable
 {
 	private static final long serialVersionUID = -2605744674300941605L;
 	
-	private long id;
+	private int id;
 	private String name;
 	private String classname;
 	private String description;
 	private String type;
+	private String inputFiletype;
+	private String outputFileType;
 	
 	private Set<Parameter> parameters = new HashSet<Parameter>();
 	
 	public Module() {}
 	
-	public Module(long id, String description, String name, String classname, String type, Set<Parameter> parameters)
+	public Module(int id, String description, String name, String classname, String type, Set<Parameter> parameters)
 	{
 		this.id = id;
 		this.description = description;
@@ -53,7 +55,7 @@ public class Module implements Serializable
 		return description;
 	}
 
-	public long getId()
+	public int getId()
 	{
 		return id;
 	}
@@ -96,7 +98,7 @@ public class Module implements Serializable
 		this.description = description;
 	}
 	
-	public void setId(long id)
+	public void setId(int id)
 	{
 		this.id = id;
 	}
@@ -124,14 +126,31 @@ public class Module implements Serializable
 		this.classname = classname;
 	}
 
+	public String getInputFiletype() {
+		return inputFiletype;
+	}
+
+	public void setInputFiletype(String inputFiletype) {
+		this.inputFiletype = inputFiletype;
+	}
+
+	public String getOutputFileType() {
+		return outputFileType;
+	}
+
+	public void setOutputFileType(String outputFileType) {
+		this.outputFileType = outputFileType;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
 				+ ((classname == null) ? 0 : classname.hashCode());
-		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result
+				+ ((parameters == null) ? 0 : parameters.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
@@ -150,12 +169,15 @@ public class Module implements Serializable
 				return false;
 		} else if (!classname.equals(other.classname))
 			return false;
-		if (id != other.id)
-			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
+			return false;
+		if (parameters == null) {
+			if (other.parameters != null)
+				return false;
+		} else if (!parameters.equals(other.parameters))
 			return false;
 		if (type == null) {
 			if (other.type != null)
@@ -164,4 +186,5 @@ public class Module implements Serializable
 			return false;
 		return true;
 	}
+
 }

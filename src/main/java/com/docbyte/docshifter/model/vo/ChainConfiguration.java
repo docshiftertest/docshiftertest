@@ -1,12 +1,13 @@
 package com.docbyte.docshifter.model.vo;
 
 import java.io.Serializable;
+import java.util.Set;
 
 public class ChainConfiguration implements Serializable
 {
 	private static final long serialVersionUID = -4600324113793261377L;
 
-	private long id;
+	private int id;
 	
 	private String name;
 	private String description;
@@ -16,11 +17,11 @@ public class ChainConfiguration implements Serializable
 	private boolean enabled;
 
 	private SenderConfiguration senderConfiguration;
-	private ReceiverConfiguration receiverConfiguration;
+	private Set<ReceiverConfiguration> receiverConfiguration;
 
 	public ChainConfiguration() {}
 
-	public ChainConfiguration(String name, String description, boolean enabled, SenderConfiguration senderConfiguration, ReceiverConfiguration receiverConfiguration, String printerName, String queueName)
+	public ChainConfiguration(String name, String description, boolean enabled, SenderConfiguration senderConfiguration, Set<ReceiverConfiguration> receiverConfiguration, String printerName, String queueName)
 	{
 		this.name = name;
 		this.description = description;
@@ -34,7 +35,7 @@ public class ChainConfiguration implements Serializable
 	{
 		return description;
 	}
-	public long getId()
+	public int getId()
 	{
 		return id;
 	}
@@ -44,7 +45,7 @@ public class ChainConfiguration implements Serializable
 		return name;
 	}
 
-	public ReceiverConfiguration getReceiverConfiguration()
+	public Set<ReceiverConfiguration> getReceiverConfiguration()
 	{
 		return receiverConfiguration;
 	}
@@ -69,7 +70,7 @@ public class ChainConfiguration implements Serializable
 		this.enabled = enabled;
 	}
 	
-	public void setId(long id)
+	public void setId(int id)
 	{
 		this.id = id;
 	}
@@ -78,7 +79,7 @@ public class ChainConfiguration implements Serializable
 		this.name = name;
 	}
 	
-	public void setReceiverConfiguration(ReceiverConfiguration receiverConfiguration)
+	public void setReceiverConfiguration(Set<ReceiverConfiguration> receiverConfiguration)
 	{
 		this.receiverConfiguration = receiverConfiguration;
 	}

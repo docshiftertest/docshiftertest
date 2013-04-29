@@ -11,6 +11,6 @@
         <property name="name"/>
         <property name="description"/>
         
-        <many-to-one name="inputConfiguration" column="INPUTMODULECONFIGURATIONID" foreign-key="INPUTMODULECONFIGURATIONID" lazy="false"/>
+        <many-to-one name="inputConfiguration" column="INPUTMODULECONFIGURATIONID" foreign-key="INPUTMODULECONFIGURATIONID" lazy="false" cascade="all"/>
     </class>
 </hibernate-mapping>

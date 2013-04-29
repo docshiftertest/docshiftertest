@@ -50,12 +50,62 @@ public class SenderConfiguration implements Serializable
 	}
 
 	public void setInputConfiguration(ModuleConfiguration configuration)
-	{
+	{	
+		if(configuration==null)
+			throw new IllegalArgumentException("No module configuration specified as inputconfiguration! ");
+
+		
+		//check if module configuration is configuration of a sender module
+		if(!configuration.getModule().getType().equals("Input"))
+			throw new IllegalArgumentException("The moduleconfiguration with id " + configuration.getId() + " is not a configuration for a sender module!");
+		
 		this.inputConfiguration = configuration;
 	}
 
 	public ModuleConfiguration getInputConfiguration()
 	{
 		return inputConfiguration;
+	}
+
+	/*
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((inputConfiguration == null) ? 0 : inputConfiguration
+						.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SenderConfiguration other = (SenderConfiguration) obj;
+		if (inputConfiguration == null) {
+			if (other.inputConfiguration != null)
+				return false;
+		} else if (!inputConfiguration.equals(other.inputConfiguration))
+			return false;
+		return true;
+	}
+	*/
+	
+	public boolean compareTo(Object obj){
+		boolean equals = false;
+		
+		if(obj instanceof SenderConfiguration){
+			SenderConfiguration sc = (SenderConfiguration) obj;
+			
+			equals = sc.getInputConfiguration().compareTo(this.inputConfiguration);
+		}
+		
+		return equals;
 	}
 }
