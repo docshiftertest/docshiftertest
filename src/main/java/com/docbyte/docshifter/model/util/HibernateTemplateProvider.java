@@ -93,4 +93,12 @@ public class HibernateTemplateProvider{
 		
 		return list;
 	}
+
+	public void merge(Object o) {
+		Session session = factory.openSession();
+		Transaction tx = session.beginTransaction();
+		session.merge(o);
+		tx.commit();
+		session.close();
+	}
 }

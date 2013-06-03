@@ -4,11 +4,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ModuleConfiguration implements Serializable {
+public class ModuleConfiguration implements Serializable{
 
 	private static final long serialVersionUID = 7666888692582226276L;
 	
-	private long id;
+	private int id;
 	private Module module;
 	private String name;
 	private String description;
@@ -16,12 +16,22 @@ public class ModuleConfiguration implements Serializable {
 	
 	public ModuleConfiguration() {}
 	
-	public void setId(long id)
+	public ModuleConfiguration(int id, Module module, String name,
+			String description, Map<Parameter, String> parameterValues) {
+		super();
+		this.id = id;
+		this.module = module;
+		this.name = name;
+		this.description = description;
+		this.parameterValues = parameterValues;
+	}
+
+	public void setId(int id)
 	{
 		this.id = id;
 	}
 
-	public long getId()
+	public int getId()
 	{
 		return id;
 	}
@@ -54,7 +64,7 @@ public class ModuleConfiguration implements Serializable {
 	{
 		return parameterValues;
 	}
-	
+		
 	public void addParameterValue(Parameter param, String value)
 	{
 		this.getParameterValues().put(param, value);
@@ -74,5 +84,54 @@ public class ModuleConfiguration implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	/*
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((module == null) ? 0 : module.hashCode());
+		result = prime * result
+				+ ((parameterValues == null) ? 0 : parameterValues.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ModuleConfiguration other = (ModuleConfiguration) obj;
+		if (module == null) {
+			if (other.module != null)
+				return false;
+		} else if (!module.equals(other.module))
+			return false;
+		if (parameterValues == null) {
+			if (other.parameterValues != null)
+				return false;
+		} else if (!parameterValues.equals(other.parameterValues))
+			return false;
+		return true;
+	}
+	*/
+	
+
+	public boolean compareTo(Object obj) {
+		ModuleConfiguration moduleConf = (ModuleConfiguration) obj;
+
+		boolean equals = true;
+		
+		for(Parameter param : this.parameterValues.keySet()){
+			if(!parameterValues.get(param).equals(moduleConf.getParameterValues().get(param))){
+				equals = false;
+			}
+		}
+		
+		return equals && this.module.equals(moduleConf.getModule());
 	}
 }

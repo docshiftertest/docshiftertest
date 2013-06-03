@@ -4,6 +4,7 @@ import java.util.List;
 import com.docbyte.docshifter.model.dao.inter.IChainConfigurationDAO;
 import com.docbyte.docshifter.model.util.HibernateTemplateProvider;
 import com.docbyte.docshifter.model.vo.ChainConfiguration;
+import com.docbyte.docshifter.model.vo.ReceiverConfiguration;
 
 public class ChainConfigurationDAO implements IChainConfigurationDAO{
 	
@@ -18,7 +19,7 @@ public class ChainConfigurationDAO implements IChainConfigurationDAO{
 		hibernateTemplate.delete(config);
 	}
 
-	public ChainConfiguration get(Long id)
+	public ChainConfiguration get(int id)
 	{
 		return (ChainConfiguration) hibernateTemplate.get(ChainConfiguration.class, id);
 	}
@@ -36,8 +37,20 @@ public class ChainConfigurationDAO implements IChainConfigurationDAO{
 			return null; 
 	}
 
-	public void save(ChainConfiguration config)
+	@SuppressWarnings("unchecked")
+	public void save(ChainConfiguration config) throws Exception
 	{
+		if(exists(config)){
+			throw new Exception("A workflow with the same configurations already exists! The workflow cannot be saved.");
+		}
+		else if(config.getQueueName().trim().length() > 0){
+			List<ChainConfiguration> list = (List<ChainConfiguration>) hibernateTemplate.find("from ChainConfiguration c fetch all properties " +
+				"where lower(c.queueName) = '" + config.getQueueName().toLowerCase() + "' and c.id != " +config.getId());
+			
+			if(list.size() > 0){
+				throw new Exception("A transformation configuration with queue name '" + config.getQueueName() +"' already exists. The configuration connot be saved.");
+			}
+		}
 		hibernateTemplate.saveOrUpdate(config);
 	}
 
@@ -45,7 +58,26 @@ public class ChainConfigurationDAO implements IChainConfigurationDAO{
 	public List<ChainConfiguration> get() {
 		return (List<ChainConfiguration>) hibernateTemplate.find("from ChainConfiguration c");
 	}
-
+	
+	private boolean exists(ChainConfiguration config){
+		List<ChainConfiguration> list = get();
+		boolean exists = false;
+		
+		if(config.getId() == 0){
+			for(ChainConfiguration c : list){
+				for(ReceiverConfiguration rec:c.getReceiverConfiguration())
+					if(c.getSenderConfiguration().compareTo(config.getSenderConfiguration()) && 
+						rec.compareTo(config.getReceiverConfiguration())){
+						
+						exists = true;
+						break;
+				}
+			}
+		}
+		
+		return exists;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public ChainConfiguration getPrintserviceTransformation(String queueName) {
 		List<ChainConfiguration> list = (List<ChainConfiguration>) hibernateTemplate.find(

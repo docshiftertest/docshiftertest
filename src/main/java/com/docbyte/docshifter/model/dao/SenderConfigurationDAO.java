@@ -23,7 +23,7 @@ public class SenderConfigurationDAO implements ISenderConfigurationDAO
 		List<ChainConfiguration> list = (List<ChainConfiguration>) hibernateTemplate.find("from ChainConfiguration c where c.senderConfiguration.id = " +senderConfiguration.getId());
 		
 		if(list.size() == 0){
-			delete(senderConfiguration);
+			hibernateTemplate.delete(senderConfiguration);
 		}
 		else{
 			String message = "Sender configuration '" +senderConfiguration.getName() +"' is being used by the following transformation configurations and cannot be deleted:\n";
@@ -46,7 +46,7 @@ public class SenderConfigurationDAO implements ISenderConfigurationDAO
 			return null;
 	}
 
-	public SenderConfiguration get(Long id)
+	public SenderConfiguration get(int id)
 	{
 		return (SenderConfiguration) hibernateTemplate.get(SenderConfiguration.class, id);
 	}
@@ -62,22 +62,34 @@ public class SenderConfigurationDAO implements ISenderConfigurationDAO
 			return null;
 	}
 
-	public void save(SenderConfiguration senderConfiguration)
+	public SenderConfiguration insert(SenderConfiguration senderConfiguration) throws Exception
+	{
+		if(exists(senderConfiguration)){
+			System.out.println("sender-config: already exists");
+			throw new Exception("A sender configuration with input configuration '" +senderConfiguration.getInputConfiguration().getName() 
+					+"' already exists. The configuration cannot be saved.");
+		}
+		hibernateTemplate.saveOrUpdate(senderConfiguration);
+		return senderConfiguration;
+	}
+	
+	public SenderConfiguration update(SenderConfiguration senderConfiguration)
 	{
 		hibernateTemplate.saveOrUpdate(senderConfiguration);
+		return senderConfiguration;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<SenderConfiguration> get() {
 		return (List<SenderConfiguration>) hibernateTemplate.find("from SenderConfiguration s");
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<SenderConfiguration> getEnabled() {
 		//return (List<SenderConfiguration>) hibernateTemplate.find("from SenderConfiguration s WHERE s.");
 		return (List<SenderConfiguration>) hibernateTemplate.find("SELECT c.senderConfiguration from ChainConfiguration c WHERE c.enabled=true");
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	public List<SenderConfiguration> getByClassName(String className) {
 		List<SenderConfiguration> list = hibernateTemplate.find("SELECT c FROM SenderConfiguration c WHERE c.inputConfiguration.module.classname = '"+className +"'");
@@ -105,5 +117,22 @@ public class SenderConfigurationDAO implements ISenderConfigurationDAO
 		}
 		
 		return returnConfig;
+	}
+	
+	private boolean exists(SenderConfiguration config){
+		boolean exists = false;
+		
+		if(config.getId() == 0){
+			List<SenderConfiguration> list = get();
+			
+			for(SenderConfiguration c : list){
+				if(c.getInputConfiguration().compareTo(config.getInputConfiguration())){
+					exists = true;
+					break;
+				}
+			}
+		}
+		
+		return exists;
 	}
 }

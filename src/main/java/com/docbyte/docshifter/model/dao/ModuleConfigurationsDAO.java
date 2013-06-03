@@ -20,12 +20,13 @@ public class ModuleConfigurationsDAO implements IModuleConfigurationsDAO
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void delete(ModuleConfiguration moduleConfiguration) throws UnsupportedOperationException
+	public void delete(ModuleConfiguration moduleConfiguration) throws IllegalArgumentException
 	{
 		//check if a sender uses the module configuration
 		List<SenderConfiguration> senderList = (List<SenderConfiguration>) hibernateTemplate.find("from SenderConfiguration c where c.inputConfiguration.id = " +moduleConfiguration.getId());
 		
 		//check if a receiver uses the module configuration
+		//TODO: check if still correct
 		List<ReceiverConfiguration> receiverList = new ArrayList<ReceiverConfiguration>();
 		receiverList.addAll((List<ReceiverConfiguration>) hibernateTemplate.find("from ReceiverConfiguration c where c.transformationConfiguration.id = " +moduleConfiguration.getId()));
 		receiverList.addAll((List<ReceiverConfiguration>) hibernateTemplate.find("SELECT c FROM ReceiverConfiguration c, ModuleConfiguration mc WHERE mc IN ELEMENTS(c.releaseConfiguration) AND mc.id = " +moduleConfiguration.getId()));
@@ -42,11 +43,11 @@ public class ModuleConfigurationsDAO implements IModuleConfigurationsDAO
 				message += (" - " +r.getName() +"\n");
 			}
 			
-			throw new UnsupportedOperationException(message);
+			throw new IllegalArgumentException(message);
 		}
 	}
 	
-	public ModuleConfiguration get(Long id)
+	public ModuleConfiguration get(int id)
 	{
 		return (ModuleConfiguration) hibernateTemplate.get(ModuleConfiguration.class, id);
 	}
@@ -74,8 +75,16 @@ public class ModuleConfigurationsDAO implements IModuleConfigurationsDAO
 		return list;
 	}
 	
-	public void save(ModuleConfiguration moduleConfiguration)
+	public void insert(ModuleConfiguration moduleConfiguration) throws IllegalArgumentException
 	{		
+		if(exists(moduleConfiguration)){
+			throw new IllegalArgumentException("A configuration with the same name or parameter values already exists. The configuration cannot be saved.");
+		}
+		hibernateTemplate.saveOrUpdate(moduleConfiguration);
+	}
+	
+	public void update(ModuleConfiguration moduleConfiguration) throws IllegalArgumentException
+	{	
 		hibernateTemplate.saveOrUpdate(moduleConfiguration);
 	}
 
@@ -94,5 +103,23 @@ public class ModuleConfigurationsDAO implements IModuleConfigurationsDAO
 				"from ModuleConfiguration mc fetch all properties");
 		
 		return list;
+	}
+	
+	private boolean exists(ModuleConfiguration config){		
+		if(config.getId() == 0){
+			List<ModuleConfiguration> list = get();
+			
+			for(ModuleConfiguration c : list){
+				if((c.getParameterValues().equals(config.getParameterValues()) 
+						&& c.getModule().equals(config.getModule())) || (c.getName().equals(config.getName()))){
+					//exists = true;
+					//break;
+					
+					return true;
+				}
+			}
+			
+		}
+		return false;
 	}
 }

@@ -30,7 +30,7 @@ public class ModuleDAO implements IModuleDAO
 			return null;
 	}
 	
-	public Module get(Long id)
+	public Module get(int id)
 	{
 		return (Module) hibernateTemplate.get(Module.class, id);
 	}
@@ -46,8 +46,18 @@ public class ModuleDAO implements IModuleDAO
 			return null; 
 	}
 
-	public Long save(Module module)
+	public int insert(Module module) throws IllegalArgumentException
 	{
+		if(exists(module)){
+			throw new IllegalArgumentException("A module with class name '" +module.getClassname() +"' already exists. The module cannot be saved.");
+		}
+		
+		hibernateTemplate.saveOrUpdate(module);
+		return module.getId();
+	}
+	
+	public int update(Module module) throws IllegalArgumentException
+	{		
 		hibernateTemplate.saveOrUpdate(module);
 		return module.getId();
 	}
@@ -60,5 +70,17 @@ public class ModuleDAO implements IModuleDAO
 	@SuppressWarnings("unchecked")
 	public List<Module> getModulesByType(String type) {
 		return (List<Module>) hibernateTemplate.find("from Module m fetch all properties where m.type = '" + type + "'");
+	}
+	
+	@SuppressWarnings("unchecked")
+	private boolean exists(Module module){
+		if(module.getId() == 0){
+			List<Module> list = (List<Module>) hibernateTemplate.find("from Module m fetch all properties where m.classname = '" + module.getClassname() + "'");
+		
+			return (list.size() != 0);
+		}
+		else{
+			return false;
+		}
 	}
 }

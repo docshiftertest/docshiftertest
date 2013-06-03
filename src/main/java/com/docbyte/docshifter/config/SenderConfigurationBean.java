@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import com.docbyte.docshifter.model.dao.ChainConfigurationDAO;
 import com.docbyte.docshifter.model.vo.ChainConfiguration;
+import com.docbyte.docshifter.model.vo.ReceiverConfiguration;
 import com.docbyte.docshifter.model.vo.SenderConfiguration;
 
 /**
@@ -38,7 +39,8 @@ public class SenderConfigurationBean {
 		
 		for(ChainConfiguration c : transformationConfigs){
 			if(c.isEnabled() && c.getSenderConfiguration().getId() == id){
-				list.add(new ReceiverConfigurationBean(c.getReceiverConfiguration()));
+				for(ReceiverConfiguration rc:c.getReceiverConfiguration())
+					list.add(new ReceiverConfigurationBean(rc));
 			}
 		}
 		
