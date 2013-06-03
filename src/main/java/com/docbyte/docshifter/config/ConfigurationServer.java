@@ -6,8 +6,12 @@ import java.util.List;
 import java.util.Set;
 
 import com.docbyte.docshifter.model.dao.ChainConfigurationDAO;
+import com.docbyte.docshifter.model.dao.ModuleConfigurationsDAO;
+import com.docbyte.docshifter.model.dao.ModuleDAO;
 import com.docbyte.docshifter.model.dao.SenderConfigurationDAO;
 import com.docbyte.docshifter.model.vo.ChainConfiguration;
+import com.docbyte.docshifter.model.vo.Module;
+import com.docbyte.docshifter.model.vo.ModuleConfiguration;
 import com.docbyte.docshifter.model.vo.SenderConfiguration;
 
 /**
@@ -21,6 +25,8 @@ import com.docbyte.docshifter.model.vo.SenderConfiguration;
 public class ConfigurationServer {
 	private static SenderConfigurationDAO senderConfigurationDAO = new SenderConfigurationDAO();
 	private static ChainConfigurationDAO chainConfigurationDAO = new ChainConfigurationDAO();
+	private static ModuleConfigurationsDAO moduleConfigurationDAO = new ModuleConfigurationsDAO();
+	private static ModuleDAO moduleDAO = new ModuleDAO();
 	
 	/**
 	 * Method that provides a Set of SenderConfigurationBean objects representing all the enabled configurations for this ConfigurationServer.
@@ -86,5 +92,16 @@ public class ConfigurationServer {
 
 	public static TransformationConfigurationBean getTransformationConfiguration(long uid) {
 		return new TransformationConfigurationBean(chainConfigurationDAO.get(uid));
+	}
+	
+	
+	//TODO throw exception if the configuration is not found
+	public static List<ModuleConfiguration> getModuleConfiguration(Module module){
+		return moduleConfigurationDAO.get(module);
+	}
+
+	//TODO throw exception if the module is not found
+	public static Module getModule(String name) {
+		return moduleDAO.get(name);
 	}
 }
