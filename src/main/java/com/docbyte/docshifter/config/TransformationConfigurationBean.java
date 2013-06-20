@@ -1,5 +1,6 @@
 package com.docbyte.docshifter.config;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.docbyte.docshifter.model.vo.ChainConfiguration;
@@ -16,7 +17,8 @@ public class TransformationConfigurationBean {
 	
 	public TransformationConfigurationBean() { }
 
-	public TransformationConfigurationBean(ChainConfiguration config){		
+	public TransformationConfigurationBean(ChainConfiguration config){	
+			receivers = new HashSet<ReceiverConfigurationBean>();
 			this.sender = new SenderConfigurationBean(config.getSenderConfiguration());
 			for(ReceiverConfiguration receiverconfig:config.getReceiverConfiguration())
 				receivers.add(new ReceiverConfigurationBean(receiverconfig));

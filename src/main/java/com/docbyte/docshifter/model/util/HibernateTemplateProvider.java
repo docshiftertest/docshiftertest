@@ -62,6 +62,17 @@ public class HibernateTemplateProvider{
 	}
 	
 	@SuppressWarnings("unchecked")
+	public Object get(Class c, int id){
+		Session session = factory.openSession();
+		Transaction tx = session.beginTransaction();
+		Object o = session.get(c, id);
+		tx.commit();
+		session.close();
+		
+		return o;
+	}
+	
+	@SuppressWarnings("unchecked")
 	public List find(String query){
 		Session session = factory.openSession();
 		Transaction tx = session.beginTransaction();
