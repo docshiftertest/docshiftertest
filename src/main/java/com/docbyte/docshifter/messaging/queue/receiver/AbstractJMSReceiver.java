@@ -6,6 +6,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
+import javax.management.JMException;
+import javax.management.remote.JMXConnector;
 
 import com.docbyte.docshifter.config.ConfigurationServer;
 import com.docbyte.docshifter.config.Constants;
@@ -21,6 +23,7 @@ public abstract class AbstractJMSReceiver extends AbstractJMSConnection implemen
 	protected Session session = null;
 	protected Destination destination = null;
 	protected Connection connection = null;
+	protected JMXConnector adminConnection = null;
 	protected MessageConsumer consumer = null;
 
 
@@ -61,6 +64,7 @@ public abstract class AbstractJMSReceiver extends AbstractJMSConnection implemen
 			try {
 				IConnectionFactory connectionFactory = MessagingConnectionFactory.getConnectionFactory(user, password, url);
 				connection = connectionFactory.createConnection();
+				adminConnection = connectionFactory.createAdminConnection();
 				connection.setExceptionListener(this);
 				
 				session = connection.createSession(false, ackMode);
@@ -73,6 +77,9 @@ public abstract class AbstractJMSReceiver extends AbstractJMSConnection implemen
 			} catch (JMSException e){
 				//try again in 5 min
 				retry(e);
+			} catch (JMException e) {
+				// TODO Auto-generated catch block
+				retry(e);
 			}
 		}else {
 			Logger.error("Could not start docShifter Receiver, config error",null);
@@ -84,10 +91,18 @@ public abstract class AbstractJMSReceiver extends AbstractJMSConnection implemen
 	public Connection getConnection() {
 		return connection;
 	}
+	
+	public JMXConnector getAdminConnection(){
+		return adminConnection;
+	}
 
 
 	public void setConnection(Connection connection) {
 		this.connection = connection;
+	}
+	
+	public MessageConsumer getConsumer(){
+		return consumer;
 	}
 	
 	

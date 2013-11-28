@@ -3,6 +3,8 @@ package com.docbyte.docshifter.messaging.factory;
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.TopicConnection;
+import javax.management.JMException;
+import javax.management.remote.JMXConnector;
 
 public interface IConnectionFactory {
 	
@@ -10,4 +12,5 @@ public interface IConnectionFactory {
 
 	public TopicConnection createTopicConnection() throws JMSException;
 
+	public JMXConnector createAdminConnection() throws JMException;
 }

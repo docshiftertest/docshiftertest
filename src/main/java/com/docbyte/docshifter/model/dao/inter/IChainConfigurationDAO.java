@@ -14,4 +14,6 @@ public interface IChainConfigurationDAO
 	public void delete(ChainConfiguration config);
 	public List<ChainConfiguration> get();
 	public ChainConfiguration getPrintserviceTransformation(String queueName);
+	boolean chainExists(ChainConfiguration chainConfiguration);
+	void importChain(ChainConfiguration chain);
 }

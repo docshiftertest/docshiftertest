@@ -12,14 +12,23 @@ public class Parameter implements Serializable
 	private String name;
 	private String description;
 	private String type;
+	private Boolean required;
 	
+	public Boolean getRequired() {
+		return required;
+	}
+
+	public void setRequired(Boolean required) {
+		this.required = required;
+	}
 	public Parameter() {}
 	
-	public Parameter(String name, String description, ParameterTypes type) 
+	public Parameter(String name, String description, ParameterTypes type, Boolean required) 
 	{
 		this.name = name;
 		this.description = description;
 		this.type = type.toString();
+		this.required = required;
 	}
 	
 	public void setId(long id)

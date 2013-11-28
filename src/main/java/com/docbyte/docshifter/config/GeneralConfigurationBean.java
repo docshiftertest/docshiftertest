@@ -29,7 +29,7 @@ public class GeneralConfigurationBean {
 		params = new HashMap<String, String>();
 		
 		GlobalSettings config = globalSettingsDAO.get();
-		
+
 		if(config != null){
 			params.put("jms_system", config.getJmsSystem());
 			params.put("jms_url", config.getJmsURL());

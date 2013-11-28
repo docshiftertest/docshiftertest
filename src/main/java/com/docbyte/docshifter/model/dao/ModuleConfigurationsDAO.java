@@ -1,6 +1,7 @@
 package com.docbyte.docshifter.model.dao;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import com.docbyte.docshifter.model.dao.inter.IModuleConfigurationsDAO;
 import com.docbyte.docshifter.model.util.HibernateTemplateProvider;
@@ -122,4 +123,34 @@ public class ModuleConfigurationsDAO implements IModuleConfigurationsDAO
 		}
 		return false;
 	}
+	public ModuleConfiguration canImport(ModuleConfiguration config)
+	{
+		if(config.getId() == 0){
+			List<ModuleConfiguration> list = get(config.getModule());
+			
+			for(ModuleConfiguration c : list){
+				//parameters equal always use the one from database
+				if((c.getParameterValues().equals(config.getParameterValues()) && c.getModule().equals(config.getModule()))){
+					return c;
+					
+				}
+				//Same name save change configname to random new name but do not return, same parameter still possible
+				
+			}
+			
+			if(this.get(config.getName()) != null)
+			{
+				config.setName("cConfig"+ (new Date()).getTime());
+			}
+			
+		}
+		return config;		
+	}
+	
+	public void importConfiguration(ModuleConfiguration config)
+	{
+		hibernateTemplate.saveOrUpdate(config);
+	}
+	
+
 }

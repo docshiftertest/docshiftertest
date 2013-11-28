@@ -50,7 +50,7 @@ public class HibernateTemplateProvider{
 		session.close();
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object get(Class c, long id){
 		Session session = factory.openSession();
 		Transaction tx = session.beginTransaction();
@@ -61,7 +61,7 @@ public class HibernateTemplateProvider{
 		return o;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object get(Class c, int id){
 		Session session = factory.openSession();
 		Transaction tx = session.beginTransaction();
@@ -72,7 +72,7 @@ public class HibernateTemplateProvider{
 		return o;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes" })
 	public List find(String query){
 		Session session = factory.openSession();
 		Transaction tx = session.beginTransaction();
@@ -94,7 +94,7 @@ public class HibernateTemplateProvider{
 		session.close();
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public List loadAll(Class c){
 		Session session = factory.openSession();
 		Transaction tx = session.beginTransaction();
@@ -103,6 +103,10 @@ public class HibernateTemplateProvider{
 		session.close();
 		
 		return list;
+	}
+	
+	public void load () {
+		instance.load();
 	}
 
 	public void merge(Object o) {

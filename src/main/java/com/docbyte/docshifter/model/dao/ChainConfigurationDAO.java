@@ -91,4 +91,17 @@ public class ChainConfigurationDAO implements IChainConfigurationDAO{
 			return null;
 		}
 	}
+	
+	public boolean chainExists(ChainConfiguration chainConfiguration) {
+		return this.exists(chainConfiguration);
+	}
+
+	public void importChain(ChainConfiguration chain) {
+		hibernateTemplate.merge(chain);
+	}
+	public ChainConfiguration load(int id)
+	{
+		return (ChainConfiguration) hibernateTemplate.get(ChainConfiguration.class, id);
+	}
+
 }

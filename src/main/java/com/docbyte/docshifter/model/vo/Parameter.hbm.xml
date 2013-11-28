@@ -11,5 +11,6 @@
         <property name="name"/>
         <property name="description"/>
         <property name="type"/>
+        <property name="required"/>
     </class>
 </hibernate-mapping>
