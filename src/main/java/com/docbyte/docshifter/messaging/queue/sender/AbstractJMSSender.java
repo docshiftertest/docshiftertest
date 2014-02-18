@@ -48,29 +48,34 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 	 * @see com.docbyte.docshifter.messaging.queue.JMSSenderOrPublisher#close()
 	 */
 	public void close() {
-		Logger.debug("Being asked to close Connection"+(nrStarted--), null);
-	//	if(nrStarted<=0){
-	//		nrStarted=0;
+		//Logger.debug("Being asked to close Connection"+(nrStarted--), null);
+		//if(nrStarted<=0){
+			//nrStarted=0;
 			Logger.debug("Closing Connection"+(nrStarted), null);
 			try{
-				if (producer != null)
+				if (producer != null){
 					producer.close();
+					Logger.info("Producer closed", null);}
 			} catch (Exception ex){
 				Logger.warn("Exception while closing producer from connection"+(nrStarted), ex);
 			}
 			try{
-				if (session != null)
+				if (session != null){
 					session.close();
+					Logger.info("session closed", null);}
 			} catch (Exception ex){
 				Logger.warn("Exception while closing session from connection"+(nrStarted), ex);
 			}
 			try{
-				if (connection != null)
+				if (connection != null){
 					connection.close();
+					Logger.info("connection closed", null);}
 			} catch (Exception ex){
 				Logger.warn("Exception while closing connection"+(nrStarted), ex);
 			}
-	//	}
+			nrStarted--;
+			Logger.info("nrStarted = " + nrStarted, null);
+//		}
 //		try{
 //			if (connection != null)
 //				connection.close();
@@ -113,9 +118,11 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 			IConnectionFactory connectionFactory = MessagingConnectionFactory.getConnectionFactory(user, password, url);
 			connection = connectionFactory.createConnection();
 			connection.start();
-			Logger.debug("Started Connection"+(++nrStarted), null);
+			nrStarted++;
+			Logger.debug("Started Connection"+(nrStarted), null);
 			try{
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			Logger.info("session started", null);
 			}catch(JMSException e){
 				close();
 				retry(e);
@@ -129,9 +136,11 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 			producer.setDeliveryMode(DeliveryMode.PERSISTENT);
 
 		} catch (JMSException e){
+			Logger.info("Error closing connection", null);
 			close();
 			retry(e);
 			/*
+			 * 
 			Logger.error("JMSSender: JMS Exception occured, make sure the JMS provider is running correctly. Shutting down docShifter ...", e);
 			//System.exit(1);
 			*/
