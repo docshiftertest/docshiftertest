@@ -46,7 +46,7 @@ public class SenderConfigurationDAO implements ISenderConfigurationDAO
 			return null;
 	}
 
-	public SenderConfiguration get(int id)
+	public SenderConfiguration get(long id)
 	{
 		return (SenderConfiguration) hibernateTemplate.get(SenderConfiguration.class, id);
 	}
@@ -134,5 +134,13 @@ public class SenderConfigurationDAO implements ISenderConfigurationDAO
 		}
 		
 		return exists;
+	}
+
+	public HibernateTemplateProvider getHibernateTemplate() {
+		return hibernateTemplate;
+	}
+
+	public void setHibernateTemplate(HibernateTemplateProvider hibernateTemplate) {
+		this.hibernateTemplate = hibernateTemplate;
 	}
 }

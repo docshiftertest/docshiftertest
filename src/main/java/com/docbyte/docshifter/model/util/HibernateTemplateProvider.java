@@ -51,7 +51,7 @@ public class HibernateTemplateProvider{
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public Object get(Class c, long id){
+	public Object get(Class c, int id){
 		Session session = factory.openSession();
 		Transaction tx = session.beginTransaction();
 		Object o = session.get(c, id);
@@ -62,7 +62,7 @@ public class HibernateTemplateProvider{
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public Object get(Class c, int id){
+	public Object get(Class c, long id){
 		Session session = factory.openSession();
 		Transaction tx = session.beginTransaction();
 		Object o = session.get(c, id);

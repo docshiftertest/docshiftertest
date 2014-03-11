@@ -72,7 +72,7 @@ public class ConfigurationServer {
 	 * @param long uid			a long representing the UID of the requested SenderConfiguration.
 	 */	
 	public static SenderConfigurationBean getSenderConfiguration(long uid){
-		return new SenderConfigurationBean(senderConfigurationDAO.get((int) uid));
+		return new SenderConfigurationBean(senderConfigurationDAO.get(uid));
 	}
 	
 	/**

@@ -106,4 +106,12 @@ public class ReceiverConfigurationDAO implements IReceiverConfigurationDAO
 		
 		return exists;
 }
+
+	public HibernateTemplateProvider getHibernateTemplate() {
+		return hibernateTemplate;
+	}
+
+	public void setHibernateTemplate(HibernateTemplateProvider hibernateTemplate) {
+		this.hibernateTemplate = hibernateTemplate;
+	}
 }

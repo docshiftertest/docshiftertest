@@ -1,8 +1,13 @@
 package com.docbyte.docshifter.model.vo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 public class ModuleConfiguration implements Serializable{
 
@@ -13,6 +18,9 @@ public class ModuleConfiguration implements Serializable{
 	private String name;
 	private String description;
 	private Map<Parameter, String> parameterValues = new HashMap<Parameter, String>();
+	
+	
+	
 	
 	public ModuleConfiguration() {}
 	
@@ -60,6 +68,7 @@ public class ModuleConfiguration implements Serializable{
 		}
 	}
 
+	@JsonIgnore
 	public Map<Parameter, String> getParameterValues()
 	{
 		return parameterValues;
@@ -119,7 +128,21 @@ public class ModuleConfiguration implements Serializable{
 		return true;
 	}
 	*/
-	
+	@SuppressWarnings("rawtypes")
+	@JsonProperty("parameters")
+	public List<Map> jsonParameterValues()
+	{
+		List<Map> parameters = new ArrayList<Map>();
+		Map<String, String> parameter = null;
+		for(java.util.Map.Entry<Parameter, String> entry: parameterValues.entrySet())
+		{
+		parameter = new HashMap<String, String>();
+		parameter.put("id",String.valueOf(entry.getKey().getId()));
+		parameter.put("value",entry.getValue());
+		parameters.add(parameter);
+		}
+		return parameters;
+	}
 
 	public boolean compareTo(Object obj) {
 		ModuleConfiguration moduleConf = (ModuleConfiguration) obj;

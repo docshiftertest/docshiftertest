@@ -69,4 +69,12 @@ public class ParameterDAO implements IParameterDAO
 			this.save(param);
 		}
 	}
+
+	public HibernateTemplateProvider getHibernateTemplate() {
+		return hibernateTemplate;
+	}
+
+	public void setHibernateTemplate(HibernateTemplateProvider hibernateTemplate) {
+		this.hibernateTemplate = hibernateTemplate;
+	}
 }

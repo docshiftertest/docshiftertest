@@ -151,6 +151,14 @@ public class ModuleConfigurationsDAO implements IModuleConfigurationsDAO
 	{
 		hibernateTemplate.saveOrUpdate(config);
 	}
+
+	public HibernateTemplateProvider getHibernateTemplate() {
+		return hibernateTemplate;
+	}
+
+	public void setHibernateTemplate(HibernateTemplateProvider hibernateTemplate) {
+		this.hibernateTemplate = hibernateTemplate;
+	}
 	
 
 }

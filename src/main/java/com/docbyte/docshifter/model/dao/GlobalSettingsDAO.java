@@ -29,4 +29,13 @@ public class GlobalSettingsDAO implements IGlobalSettingsDAO {
 	public void save(GlobalSettings config) {
 		hibernateTemplate.saveOrUpdate(config);
 	}
+
+		public HibernateTemplateProvider getHibernateTemplate() {
+		return hibernateTemplate;
+	}
+
+	public void setHibernateTemplate(HibernateTemplateProvider hibernateTemplate) {
+		this.hibernateTemplate = hibernateTemplate;
+	}
+	
 }

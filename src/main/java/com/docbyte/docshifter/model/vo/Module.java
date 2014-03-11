@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 public class Module implements Serializable
 {
 	private static final long serialVersionUID = -2605744674300941605L;
@@ -70,6 +72,7 @@ public class Module implements Serializable
 		return parameters;
 	}
 
+	@JsonIgnore
 	public List<Parameter> getParametersAsList()
 	{
 		return new ArrayList<Parameter>(this.getParameters());

@@ -5,7 +5,7 @@ import com.docbyte.docshifter.model.vo.SenderConfiguration;
 
 public interface ISenderConfigurationDAO
 {
-	public SenderConfiguration get(int id);
+	public SenderConfiguration get(long id);
 	public SenderConfiguration get(String name);
 	public List<SenderConfiguration> getByClassName(String className);
 	

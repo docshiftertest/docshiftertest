@@ -104,4 +104,11 @@ public class ChainConfigurationDAO implements IChainConfigurationDAO{
 		return (ChainConfiguration) hibernateTemplate.get(ChainConfiguration.class, id);
 	}
 
+	public HibernateTemplateProvider getHibernateTemplate() {
+		return hibernateTemplate;
+	}
+
+	public void setHibernateTemplate(HibernateTemplateProvider hibernateTemplate) {
+		this.hibernateTemplate = hibernateTemplate;
+	}
 }
