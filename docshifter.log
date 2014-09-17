@@ -1405,3 +1405,165 @@
 18:06:52,989 DEBUG SchemaExport:252 - import file not found: /import.sql
 18:06:52,989  INFO SchemaExport:257 - writing generated schema to file: /home/docbyte.com/michiel.vandriessche/workspaces/ds/docshifterbeans/_deliverables/sql.ddl
 18:06:52,990  INFO SchemaExport:281 - schema export complete
+19:29:53,985 DEBUG BasicTypeRegistry:147 - Adding type registration boolean -> org.hibernate.type.BooleanType@6fb1d085
+19:29:53,987 DEBUG BasicTypeRegistry:147 - Adding type registration boolean -> org.hibernate.type.BooleanType@6fb1d085
+19:29:53,987 DEBUG BasicTypeRegistry:147 - Adding type registration java.lang.Boolean -> org.hibernate.type.BooleanType@6fb1d085
+19:29:53,989 DEBUG BasicTypeRegistry:147 - Adding type registration numeric_boolean -> org.hibernate.type.NumericBooleanType@6fccaf14
+19:29:53,990 DEBUG BasicTypeRegistry:147 - Adding type registration true_false -> org.hibernate.type.TrueFalseType@10e7e3ef
+19:29:53,991 DEBUG BasicTypeRegistry:147 - Adding type registration yes_no -> org.hibernate.type.YesNoType@30e2742a
+19:29:53,993 DEBUG BasicTypeRegistry:147 - Adding type registration byte -> org.hibernate.type.ByteType@74439682
+19:29:53,994 DEBUG BasicTypeRegistry:147 - Adding type registration byte -> org.hibernate.type.ByteType@74439682
+19:29:53,994 DEBUG BasicTypeRegistry:147 - Adding type registration java.lang.Byte -> org.hibernate.type.ByteType@74439682
+19:29:53,996 DEBUG BasicTypeRegistry:147 - Adding type registration character -> org.hibernate.type.CharacterType@19d29ed8
+19:29:53,997 DEBUG BasicTypeRegistry:147 - Adding type registration char -> org.hibernate.type.CharacterType@19d29ed8
+19:29:53,997 DEBUG BasicTypeRegistry:147 - Adding type registration java.lang.Character -> org.hibernate.type.CharacterType@19d29ed8
+19:29:54,000 DEBUG BasicTypeRegistry:147 - Adding type registration short -> org.hibernate.type.ShortType@35b793ee
+19:29:54,001 DEBUG BasicTypeRegistry:147 - Adding type registration short -> org.hibernate.type.ShortType@35b793ee
+19:29:54,001 DEBUG BasicTypeRegistry:147 - Adding type registration java.lang.Short -> org.hibernate.type.ShortType@35b793ee
+19:29:54,003 DEBUG BasicTypeRegistry:147 - Adding type registration integer -> org.hibernate.type.IntegerType@de5770f
+19:29:54,003 DEBUG BasicTypeRegistry:147 - Adding type registration int -> org.hibernate.type.IntegerType@de5770f
+19:29:54,004 DEBUG BasicTypeRegistry:147 - Adding type registration java.lang.Integer -> org.hibernate.type.IntegerType@de5770f
+19:29:54,007 DEBUG BasicTypeRegistry:147 - Adding type registration long -> org.hibernate.type.LongType@10285172
+19:29:54,007 DEBUG BasicTypeRegistry:147 - Adding type registration long -> org.hibernate.type.LongType@10285172
+19:29:54,007 DEBUG BasicTypeRegistry:147 - Adding type registration java.lang.Long -> org.hibernate.type.LongType@10285172
+19:29:54,010 DEBUG BasicTypeRegistry:147 - Adding type registration float -> org.hibernate.type.FloatType@4a8e91eb
+19:29:54,011 DEBUG BasicTypeRegistry:147 - Adding type registration float -> org.hibernate.type.FloatType@4a8e91eb
+19:29:54,011 DEBUG BasicTypeRegistry:147 - Adding type registration java.lang.Float -> org.hibernate.type.FloatType@4a8e91eb
+19:29:54,013 DEBUG BasicTypeRegistry:147 - Adding type registration double -> org.hibernate.type.DoubleType@4f2ae86c
+19:29:54,013 DEBUG BasicTypeRegistry:147 - Adding type registration double -> org.hibernate.type.DoubleType@4f2ae86c
+19:29:54,014 DEBUG BasicTypeRegistry:147 - Adding type registration java.lang.Double -> org.hibernate.type.DoubleType@4f2ae86c
+19:29:54,016 DEBUG BasicTypeRegistry:147 - Adding type registration big_decimal -> org.hibernate.type.BigDecimalType@15def7ff
+19:29:54,016 DEBUG BasicTypeRegistry:147 - Adding type registration java.math.BigDecimal -> org.hibernate.type.BigDecimalType@15def7ff
+19:29:54,018 DEBUG BasicTypeRegistry:147 - Adding type registration big_integer -> org.hibernate.type.BigIntegerType@26ffab3f
+19:29:54,018 DEBUG BasicTypeRegistry:147 - Adding type registration java.math.BigInteger -> org.hibernate.type.BigIntegerType@26ffab3f
+19:29:54,019 DEBUG BasicTypeRegistry:147 - Adding type registration string -> org.hibernate.type.StringType@484ac01
+19:29:54,020 DEBUG BasicTypeRegistry:147 - Adding type registration java.lang.String -> org.hibernate.type.StringType@484ac01
+19:29:54,021 DEBUG BasicTypeRegistry:147 - Adding type registration url -> org.hibernate.type.UrlType@50b5f5f6
+19:29:54,021 DEBUG BasicTypeRegistry:147 - Adding type registration java.net.URL -> org.hibernate.type.UrlType@50b5f5f6
+19:29:54,023 DEBUG BasicTypeRegistry:147 - Adding type registration date -> org.hibernate.type.DateType@1f0e5b38
+19:29:54,024 DEBUG BasicTypeRegistry:147 - Adding type registration java.sql.Date -> org.hibernate.type.DateType@1f0e5b38
+19:29:54,026 DEBUG BasicTypeRegistry:147 - Adding type registration time -> org.hibernate.type.TimeType@18f47d52
+19:29:54,026 DEBUG BasicTypeRegistry:147 - Adding type registration java.sql.Time -> org.hibernate.type.TimeType@18f47d52
+19:29:54,028 DEBUG BasicTypeRegistry:147 - Adding type registration timestamp -> org.hibernate.type.TimestampType@68e825fe
+19:29:54,029 DEBUG BasicTypeRegistry:147 - Adding type registration java.sql.Timestamp -> org.hibernate.type.TimestampType@68e825fe
+19:29:54,029 DEBUG BasicTypeRegistry:147 - Adding type registration java.util.Date -> org.hibernate.type.TimestampType@68e825fe
+19:29:54,032 DEBUG BasicTypeRegistry:147 - Adding type registration dbtimestamp -> org.hibernate.type.DbTimestampType@57e44e
+19:29:54,033 DEBUG BasicTypeRegistry:147 - Adding type registration calendar -> org.hibernate.type.CalendarType@78d5cfd6
+19:29:54,033 DEBUG BasicTypeRegistry:147 - Adding type registration java.util.Calendar -> org.hibernate.type.CalendarType@78d5cfd6
+19:29:54,034 DEBUG BasicTypeRegistry:147 - Adding type registration java.util.GregorianCalendar -> org.hibernate.type.CalendarType@78d5cfd6
+19:29:54,035 DEBUG BasicTypeRegistry:147 - Adding type registration calendar_date -> org.hibernate.type.CalendarDateType@8e89bed
+19:29:54,036 DEBUG BasicTypeRegistry:147 - Adding type registration locale -> org.hibernate.type.LocaleType@1d268062
+19:29:54,036 DEBUG BasicTypeRegistry:147 - Adding type registration java.util.Locale -> org.hibernate.type.LocaleType@1d268062
+19:29:54,037 DEBUG BasicTypeRegistry:147 - Adding type registration currency -> org.hibernate.type.CurrencyType@462eab5b
+19:29:54,037 DEBUG BasicTypeRegistry:147 - Adding type registration java.util.Currency -> org.hibernate.type.CurrencyType@462eab5b
+19:29:54,038 DEBUG BasicTypeRegistry:147 - Adding type registration timezone -> org.hibernate.type.TimeZoneType@3dfa7a45
+19:29:54,039 DEBUG BasicTypeRegistry:147 - Adding type registration java.util.TimeZone -> org.hibernate.type.TimeZoneType@3dfa7a45
+19:29:54,040 DEBUG BasicTypeRegistry:147 - Adding type registration class -> org.hibernate.type.ClassType@417858a9
+19:29:54,040 DEBUG BasicTypeRegistry:147 - Adding type registration java.lang.Class -> org.hibernate.type.ClassType@417858a9
+19:29:54,042 DEBUG BasicTypeRegistry:147 - Adding type registration uuid-binary -> org.hibernate.type.UUIDBinaryType@59bb3453
+19:29:54,042 DEBUG BasicTypeRegistry:147 - Adding type registration java.util.UUID -> org.hibernate.type.UUIDBinaryType@59bb3453
+19:29:54,043 DEBUG BasicTypeRegistry:147 - Adding type registration uuid-char -> org.hibernate.type.UUIDCharType@582b0e7b
+19:29:54,044 DEBUG BasicTypeRegistry:147 - Adding type registration pg-uuid -> org.hibernate.type.PostgresUUIDType@2c4055ba
+19:29:54,045 DEBUG BasicTypeRegistry:147 - Adding type registration binary -> org.hibernate.type.BinaryType@4e588b9b
+19:29:54,045 DEBUG BasicTypeRegistry:147 - Adding type registration byte[] -> org.hibernate.type.BinaryType@4e588b9b
+19:29:54,046 DEBUG BasicTypeRegistry:147 - Adding type registration [B -> org.hibernate.type.BinaryType@4e588b9b
+19:29:54,047 DEBUG BasicTypeRegistry:147 - Adding type registration wrapper-binary -> org.hibernate.type.WrapperBinaryType@5d3f1d87
+19:29:54,047 DEBUG BasicTypeRegistry:147 - Adding type registration Byte[] -> org.hibernate.type.WrapperBinaryType@5d3f1d87
+19:29:54,047 DEBUG BasicTypeRegistry:147 - Adding type registration [Ljava.lang.Byte; -> org.hibernate.type.WrapperBinaryType@5d3f1d87
+19:29:54,048 DEBUG BasicTypeRegistry:147 - Adding type registration image -> org.hibernate.type.ImageType@1758ba40
+19:29:54,050 DEBUG BasicTypeRegistry:147 - Adding type registration characters -> org.hibernate.type.CharArrayType@4748dc72
+19:29:54,050 DEBUG BasicTypeRegistry:147 - Adding type registration char[] -> org.hibernate.type.CharArrayType@4748dc72
+19:29:54,050 DEBUG BasicTypeRegistry:147 - Adding type registration [C -> org.hibernate.type.CharArrayType@4748dc72
+19:29:54,051 DEBUG BasicTypeRegistry:147 - Adding type registration wrapper-characters -> org.hibernate.type.CharacterArrayType@4babdf23
+19:29:54,052 DEBUG BasicTypeRegistry:147 - Adding type registration [Ljava.lang.Character; -> org.hibernate.type.CharacterArrayType@4babdf23
+19:29:54,052 DEBUG BasicTypeRegistry:147 - Adding type registration Character[] -> org.hibernate.type.CharacterArrayType@4babdf23
+19:29:54,053 DEBUG BasicTypeRegistry:147 - Adding type registration text -> org.hibernate.type.TextType@7a66a85d
+19:29:54,060 DEBUG BasicTypeRegistry:147 - Adding type registration blob -> org.hibernate.type.BlobType@23b3d342
+19:29:54,060 DEBUG BasicTypeRegistry:147 - Adding type registration java.sql.Blob -> org.hibernate.type.BlobType@23b3d342
+19:29:54,061 DEBUG BasicTypeRegistry:147 - Adding type registration materialized_blob -> org.hibernate.type.MaterializedBlobType@6abbfce0
+19:29:54,062 DEBUG BasicTypeRegistry:147 - Adding type registration wrapper_materialized_blob -> org.hibernate.type.WrappedMaterializedBlobType@739ffd2f
+19:29:54,067 DEBUG BasicTypeRegistry:147 - Adding type registration clob -> org.hibernate.type.ClobType@57177af9
+19:29:54,067 DEBUG BasicTypeRegistry:147 - Adding type registration java.sql.Clob -> org.hibernate.type.ClobType@57177af9
+19:29:54,068 DEBUG BasicTypeRegistry:147 - Adding type registration materialized_clob -> org.hibernate.type.MaterializedClobType@5b76d3e1
+19:29:54,069 DEBUG BasicTypeRegistry:147 - Adding type registration wrapper_characters_clob -> org.hibernate.type.CharacterArrayClobType@45c5082a
+19:29:54,069 DEBUG BasicTypeRegistry:147 - Adding type registration characters_clob -> org.hibernate.type.PrimitiveCharacterArrayClobType@4233871a
+19:29:54,070 DEBUG BasicTypeRegistry:147 - Adding type registration serializable -> org.hibernate.type.SerializableType@2a4a89a
+19:29:54,073 DEBUG BasicTypeRegistry:147 - Adding type registration object -> org.hibernate.type.ObjectType@22a42ab9
+19:29:54,074 DEBUG BasicTypeRegistry:147 - Adding type registration java.lang.Object -> org.hibernate.type.ObjectType@22a42ab9
+19:29:54,074 DEBUG BasicTypeRegistry:147 - Adding type registration imm_date -> org.hibernate.type.AdaptedImmutableType@701fd0d1
+19:29:54,075 DEBUG BasicTypeRegistry:147 - Adding type registration imm_time -> org.hibernate.type.AdaptedImmutableType@70b891ad
+19:29:54,075 DEBUG BasicTypeRegistry:147 - Adding type registration imm_timestamp -> org.hibernate.type.AdaptedImmutableType@1434108e
+19:29:54,075 DEBUG BasicTypeRegistry:147 - Adding type registration imm_dbtimestamp -> org.hibernate.type.AdaptedImmutableType@a201419
+19:29:54,075 DEBUG BasicTypeRegistry:147 - Adding type registration imm_calendar -> org.hibernate.type.AdaptedImmutableType@2afb8a57
+19:29:54,076 DEBUG BasicTypeRegistry:147 - Adding type registration imm_calendar_date -> org.hibernate.type.AdaptedImmutableType@e865388
+19:29:54,076 DEBUG BasicTypeRegistry:147 - Adding type registration imm_binary -> org.hibernate.type.AdaptedImmutableType@70fa8cbc
+19:29:54,076 DEBUG BasicTypeRegistry:147 - Adding type registration imm_serializable -> org.hibernate.type.AdaptedImmutableType@13c57d7d
+19:29:54,094  INFO Version:37 - Hibernate Commons Annotations 3.2.0.Final
+19:29:54,099  INFO Environment:603 - Hibernate 3.6.10.Final
+19:29:54,101  INFO Environment:636 - hibernate.properties not found
+19:29:54,104  INFO Environment:814 - Bytecode provider name : javassist
+19:29:54,107  INFO Environment:695 - using JDK 1.4 java.sql.Timestamp handling
+19:29:54,151 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [uuid2] -> [class org.hibernate.id.UUIDGenerator]
+19:29:54,151 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [guid] -> [class org.hibernate.id.GUIDGenerator]
+19:29:54,152 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [uuid] -> [class org.hibernate.id.UUIDHexGenerator]
+19:29:54,152 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [uuid.hex] -> [class org.hibernate.id.UUIDHexGenerator]
+19:29:54,154 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [hilo] -> [class org.hibernate.id.TableHiLoGenerator]
+19:29:54,155 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [assigned] -> [class org.hibernate.id.Assigned]
+19:29:54,156 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [identity] -> [class org.hibernate.id.IdentityGenerator]
+19:29:54,156 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [select] -> [class org.hibernate.id.SelectGenerator]
+19:29:54,157 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [sequence] -> [class org.hibernate.id.SequenceGenerator]
+19:29:54,157 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [seqhilo] -> [class org.hibernate.id.SequenceHiLoGenerator]
+19:29:54,158 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [increment] -> [class org.hibernate.id.IncrementGenerator]
+19:29:54,159 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [foreign] -> [class org.hibernate.id.ForeignGenerator]
+19:29:54,159 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [sequence-identity] -> [class org.hibernate.id.SequenceIdentityGenerator]
+19:29:54,160 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [enhanced-sequence] -> [class org.hibernate.id.enhanced.SequenceStyleGenerator]
+19:29:54,161 DEBUG DefaultIdentifierGeneratorFactory:100 - Registering IdentifierGenerator strategy [enhanced-table] -> [class org.hibernate.id.enhanced.TableGenerator]
+19:29:54,163  INFO Configuration:2214 - configuring from file: hibernate.cfg.xml
+19:29:54,185 DEBUG DTDEntityResolver:67 - trying to resolve system-id [http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd]
+19:29:54,185  WARN DTDEntityResolver:73 - recognized obsolete hibernate namespace http://hibernate.sourceforge.net/. Use namespace http://www.hibernate.org/dtd/ instead. Refer to Hibernate 3.6 Migration Guide!
+19:29:54,186 DEBUG DTDEntityResolver:77 - attempting to resolve on classpath under org/hibernate/
+19:29:54,186 DEBUG DTDEntityResolver:109 - located [http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd] in classpath
+19:29:54,201 DEBUG Configuration:2118 - dialect=org.hibernate.dialect.HSQLDialect
+19:29:54,202 DEBUG Configuration:2118 - connection.driver_class=org.hsqldb.jdbcDriver
+19:29:54,202 DEBUG Configuration:2118 - connection.url=jdbc:hsqldb:hsql://localhost:9001/docshifter
+19:29:54,202 DEBUG Configuration:2118 - connection.username=DS_USER
+19:29:54,202 DEBUG Configuration:2118 - connection.password=DS_USER
+19:29:54,202 DEBUG Configuration:2118 - default_schema=docshifter
+19:29:54,203  INFO Configuration:2297 - Configured SessionFactory: null
+19:29:54,203 DEBUG Configuration:2298 - properties: {hibernate.connection.password=DS_USER, java.runtime.name=Java(TM) SE Runtime Environment, hibernate.default_schema=docshifter, sun.boot.library.path=/opt/java/jdk1.7.0_40/jre/lib/amd64, java.vm.version=24.0-b56, hibernate.connection.username=DS_USER, ant.library.dir=/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib, java.vm.vendor=Oracle Corporation, java.vendor.url=http://java.oracle.com/, path.separator=:, java.vm.name=Java HotSpot(TM) 64-Bit Server VM, file.encoding.pkg=sun.io, user.country=GB, sun.java.launcher=SUN_STANDARD, sun.os.patch.level=unknown, java.vm.specification.name=Java Virtual Machine Specification, user.dir=/home/docbyte.com/michiel.vandriessche/workspaces/ds/docshifterbeans, java.runtime.version=1.7.0_40-b43, java.awt.graphicsenv=sun.awt.X11GraphicsEnvironment, java.endorsed.dirs=/opt/java/jdk1.7.0_40/jre/lib/endorsed, os.arch=amd64, java.io.tmpdir=/tmp, line.separator=
+, java.vm.specification.vendor=Oracle Corporation, default_schema=docshifter, os.name=Linux, ant.home=/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030, sun.jnu.encoding=UTF-8, java.library.path=/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib:/home/docbyte.com/michiel.vandriessche/.eclipse/org.eclipse.platform_4.3.0_1473617060_linux_gtk_x86_64/configuration/org.eclipse.osgi/bundles/1234/1/.cp, java.specification.name=Java Platform API Specification, java.class.version=51.0, sun.management.compiler=HotSpot 64-Bit Tiered Compilers, os.version=3.13.9-200.fc20.x86_64, connection.password=DS_USER, user.home=/home/docbyte.com/michiel.vandriessche, user.timezone=Europe/Brussels, connection.username=DS_USER, java.awt.printerjob=sun.print.PSPrinterJob, file.encoding=UTF-8, java.specification.version=1.7, hibernate.connection.driver_class=org.hsqldb.jdbcDriver, java.class.path=/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-antlr.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-apache-bcel.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-apache-bsf.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-apache-log4j.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-apache-oro.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-apache-regexp.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-apache-resolver.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-apache-xalan2.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-commons-logging.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-commons-net.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-jai.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-javamail.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-jdepend.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-jmf.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-jsch.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-junit.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-junit4.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-launcher.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-netrexx.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-swing.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant-testutil.jar:/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030/lib/ant.jar:/home/docbyte.com/michiel.vandriessche/.eclipse/org.eclipse.platform_4.3.0_1473617060_linux_gtk_x86_64/configuration/org.eclipse.osgi/bundles/63/1/.cp/lib/antdebug.jar:/home/docbyte.com/michiel.vandriessche/.eclipse/org.eclipse.platform_4.3.0_1473617060_linux_gtk_x86_64/configuration/org.eclipse.osgi/bundles/63/1/.cp/lib/remote.jar:/home/docbyte.com/michiel.vandriessche/.eclipse/org.eclipse.platform_4.3.0_1473617060_linux_gtk_x86_64/configuration/org.eclipse.osgi/bundles/64/1/.cp/lib/remoteAnt.jar:/opt/java/jdk1.7.0_40/lib/tools.jar:/opt/eclipse/plugins/org.eclipse.swt.gtk.linux.x86_64_3.102.1.v20130827-2048.jar, user.name=michiel.vandriessche@docbyte.com, hibernate.bytecode.use_reflection_optimizer=false, java.vm.specification.version=1.7, sun.java.command=org.eclipse.ant.internal.launching.remote.InternalAntRunner -Dorg.eclipse.ant.core.ANT_PROCESS_ID=1398187793354 -Declipse.connect.port=33000 -Declipse.pdebuild.home=/opt/eclipse/plugins/org.eclipse.pde.build_3.8.100.v20130514-1028/.// -Declipse.pdebuild.scripts=/opt/eclipse/plugins/org.eclipse.pde.build_3.8.100.v20130514-1028/scripts// -Declipse.pdebuild.templates=/opt/eclipse/plugins/org.eclipse.pde.build_3.8.100.v20130514-1028/templates// -Dant.home=/opt/eclipse/plugins/org.apache.ant_1.8.4.v201303080030 -logger org.eclipse.ant.internal.launching.remote.logger.RemoteAntBuildLogger -inputhandler org.eclipse.ant.internal.ui.antsupport.inputhandler.ProxyInputHandler -buildfile /home/docbyte.com/michiel.vandriessche/workspaces/ds/docshifterbeans/build.xml, java.home=/opt/java/jdk1.7.0_40/jre, sun.arch.data.model=64, hibernate.connection.url=jdbc:hsqldb:hsql://localhost:9001/docshifter, hibernate.dialect=org.hibernate.dialect.HSQLDialect, user.language=en, java.specification.vendor=Oracle Corporation, awt.toolkit=sun.awt.X11.XToolkit, java.vm.info=mixed mode, java.version=1.7.0_40, java.ext.dirs=/opt/java/jdk1.7.0_40/jre/lib/ext:/usr/java/packages/lib/ext, sun.boot.class.path=/opt/java/jdk1.7.0_40/jre/lib/resources.jar:/opt/java/jdk1.7.0_40/jre/lib/rt.jar:/opt/java/jdk1.7.0_40/jre/lib/sunrsasign.jar:/opt/java/jdk1.7.0_40/jre/lib/jsse.jar:/opt/java/jdk1.7.0_40/jre/lib/jce.jar:/opt/java/jdk1.7.0_40/jre/lib/charsets.jar:/opt/java/jdk1.7.0_40/jre/lib/jfr.jar:/opt/java/jdk1.7.0_40/jre/classes, java.vendor=Oracle Corporation, connection.driver_class=org.hsqldb.jdbcDriver, file.separator=/, java.vendor.url.bug=http://bugreport.sun.com/bugreport/, sun.io.unicode.encoding=UnicodeLittle, sun.cpu.endian=little, sun.desktop=gnome, connection.url=jdbc:hsqldb:hsql://localhost:9001/docshifter, dialect=org.hibernate.dialect.HSQLDialect, sun.cpu.isalist=}
+19:29:54,228 DEBUG Configuration:3995 - Processing hbm.xml files
+19:29:54,228 DEBUG Configuration:4025 - Process annotated classes
+19:29:54,229 DEBUG Configuration:1466 - processing fk mappings (*ToOne and JoinedSubclass)
+19:29:54,230 DEBUG Configuration:1708 - processing extends queue
+19:29:54,230 DEBUG Configuration:1762 - processing extends queue
+19:29:54,231 DEBUG Configuration:1711 - processing collection mappings
+19:29:54,231 DEBUG Configuration:1721 - processing native query and ResultSetMapping mappings
+19:29:54,231 DEBUG Configuration:1729 - processing association property references
+19:29:54,231 DEBUG Configuration:1751 - processing foreign key constraints
+19:29:54,235  INFO Configuration:1676 - Hibernate Validator not found: ignoring
+19:29:54,255 DEBUG Hbm2DDLExporter:138 - org.hibernate.tool.hbm2x.Hbm2DDLExporter outputdir:/home/docbyte.com/michiel.vandriessche/workspaces/ds/docshifterbeans/_deliverables path: []
+19:29:54,299  INFO Version:15 - Hibernate Tools 3.2.4.GA
+19:29:54,310  INFO Dialect:136 - Using dialect: org.hibernate.dialect.HSQLDialect
+19:29:54,329 DEBUG Configuration:3995 - Processing hbm.xml files
+19:29:54,330 DEBUG Configuration:4025 - Process annotated classes
+19:29:54,330 DEBUG Configuration:1466 - processing fk mappings (*ToOne and JoinedSubclass)
+19:29:54,330 DEBUG Configuration:1708 - processing extends queue
+19:29:54,330 DEBUG Configuration:1762 - processing extends queue
+19:29:54,331 DEBUG Configuration:1711 - processing collection mappings
+19:29:54,331 DEBUG Configuration:1721 - processing native query and ResultSetMapping mappings
+19:29:54,331 DEBUG Configuration:1729 - processing association property references
+19:29:54,331 DEBUG Configuration:1751 - processing foreign key constraints
+19:29:54,333 DEBUG Configuration:3995 - Processing hbm.xml files
+19:29:54,333 DEBUG Configuration:4025 - Process annotated classes
+19:29:54,334 DEBUG Configuration:1466 - processing fk mappings (*ToOne and JoinedSubclass)
+19:29:54,334 DEBUG Configuration:1708 - processing extends queue
+19:29:54,334 DEBUG Configuration:1762 - processing extends queue
+19:29:54,334 DEBUG Configuration:1711 - processing collection mappings
+19:29:54,334 DEBUG Configuration:1721 - processing native query and ResultSetMapping mappings
+19:29:54,335 DEBUG Configuration:1729 - processing association property references
+19:29:54,335 DEBUG Configuration:1751 - processing foreign key constraints
+19:29:54,338  INFO SchemaExport:234 - Running hbm2ddl schema export
+19:29:54,339 DEBUG SchemaExport:252 - import file not found: /import.sql
+19:29:54,339  INFO SchemaExport:257 - writing generated schema to file: /home/docbyte.com/michiel.vandriessche/workspaces/ds/docshifterbeans/_deliverables/sql.ddl
+19:29:54,339  INFO SchemaExport:281 - schema export complete

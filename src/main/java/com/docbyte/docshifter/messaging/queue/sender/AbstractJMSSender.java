@@ -121,8 +121,8 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 			nrStarted++;
 			Logger.debug("Started Connection"+(nrStarted), null);
 			try{
-			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			Logger.info("session started", null);
+				session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+				Logger.info("session started", null);
 			}catch(JMSException e){
 				close();
 				retry(e);
@@ -136,7 +136,7 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 			producer.setDeliveryMode(DeliveryMode.PERSISTENT);
 
 		} catch (JMSException e){
-			Logger.info("Error closing connection", null);
+			Logger.info("Error, closing connection", null);
 			close();
 			retry(e);
 			/*

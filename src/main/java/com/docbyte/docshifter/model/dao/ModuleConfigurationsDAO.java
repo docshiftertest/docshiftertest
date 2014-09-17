@@ -123,12 +123,12 @@ public class ModuleConfigurationsDAO implements IModuleConfigurationsDAO {
 		if (config.getId() == 0) {
 			List<ModuleConfiguration> list = get();
 
-			for (ModuleConfiguration c : list) {
-				if ((c.getParameterValues().equals(config.getParameterValues()) && c
-						.getModule().equals(config.getModule()))
-						|| (c.getName().equals(config.getName()))) {
-					// exists = true;
-					// break;
+			
+			for(ModuleConfiguration c : list){
+				if(/*(c.getParameterValues().equals(config.getParameterValues()) 
+						&& c.getModule().equals(config.getModule())) || */(c.getName().equals(config.getName()))){
+					//exists = true;
+					//break;
 
 					return true;
 				}
