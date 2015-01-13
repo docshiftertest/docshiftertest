@@ -27,7 +27,7 @@
 
     <property
         name="minor"
-        value="1" />
+        value="2" />
 
     <property
         name="patch"
@@ -39,7 +39,7 @@
 
     <property
         name="project-name"
-        value="DocShifterBeans-5.1" />
+        value="DocShifterBeans-${version}" />
     <!--
     property name="izpack_home.dir" location="C:\Program Files\IzPack" />
 	<property name="izpack.dir" value="izpack" /

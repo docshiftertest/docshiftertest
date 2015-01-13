@@ -22,7 +22,7 @@ public class Task implements Serializable {
 	protected String request="";	//transformation request: default from dctm= "rendition_req_ps_pdf"
 	protected String sent_by="";	//user requesting the transformation: default from dctm= "dm_autorender_win31"
 	protected HashMap<String, String> parameters;
-	protected HashMap<String, Object> data;
+	protected Map<String, Object> data;
 	
 	public Task(){
 		
@@ -113,10 +113,10 @@ public class Task implements Serializable {
 	}
 	
 	
-	public HashMap<String, Object> getData() {
+	public Map<String, Object> getData() {
 		return data;
 	}
-	public void setData(HashMap<String, Object> map) {
+	public void setData(Map<String, Object> map) {
 		this.data = map;
 	}
 }
