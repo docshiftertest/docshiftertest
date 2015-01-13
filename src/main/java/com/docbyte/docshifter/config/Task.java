@@ -113,7 +113,7 @@ public class Task implements Serializable {
 	}
 	
 	
-	public HashMap<String, Object> getData() {
+	public Map<String, Object> getData() {
 		return data;
 	}
 	public void setData(HashMap<String, Object> map) {
