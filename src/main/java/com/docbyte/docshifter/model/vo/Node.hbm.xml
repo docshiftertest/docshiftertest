@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.docbyte.docshifter.model.vo.Node"
+		table="NODE">
+		<id name="id" column="ID">
+			<generator class="native" />
+		</id>
+
+		<many-to-one name="parentNode" column="PARENTNODE"/>
+		<many-to-one name="moduleConfiguration" column="MODULECONFIGURATION" class="ModuleConfiguration"/>
+
+      	<set name="childNodes" table="NODE">
+        	<key column="PARENTNODE"/>
+        	<one-to-many class="Node"/>
+        </set>
+        
+	</class>
+</hibernate-mapping>

@@ -6,7 +6,7 @@ import java.util.List;
 import com.docbyte.docshifter.model.dao.inter.IChainConfigurationDAO;
 import com.docbyte.docshifter.model.util.HibernateTemplateProvider;
 import com.docbyte.docshifter.model.vo.ChainConfiguration;
-import com.docbyte.docshifter.model.vo.ReceiverConfiguration;
+import com.docbyte.docshifter.model.vo.Node;
 import com.docbyte.docshifter.util.Logger;
 
 public class ChainConfigurationDAO implements IChainConfigurationDAO {
@@ -63,18 +63,12 @@ public class ChainConfigurationDAO implements IChainConfigurationDAO {
 
 	@SuppressWarnings("unchecked")
 	public void deleteUnusedConfigs() {
-		List<ReceiverConfiguration> unusedReceiverConfs = new ArrayList<ReceiverConfiguration>();
-		unusedReceiverConfs
-				.addAll(hibernateTemplate
-						.find("select c from ReceiverConfiguration c where c not in(select rc from ChainConfiguration cc inner join cc.receiverConfiguration rc)"));
-
-		if (unusedReceiverConfs.size() > 0) {
-			for (ReceiverConfiguration receiverConf : unusedReceiverConfs) {
-				receiverConf.getReleaseConfiguration().clear();
-				receiverConf.getTransformationConfiguration().clear();
-				hibernateTemplate.saveOrUpdate(receiverConf);
-				hibernateTemplate.delete(receiverConf);
-			}
+		List<Node> unusedNodes = new ArrayList<Node>();
+		unusedNodes.addAll(hibernateTemplate.find("select n from Node n where n.parentNode is null AND n not in (select rn from ChainConfiguration cc inner join cc.rootNode rn)"));
+		for(Node n : unusedNodes){
+			n.clearAllChildNodes();
+			hibernateTemplate.saveOrUpdate(n);
+			hibernateTemplate.delete(n);
 		}
 	}
 
@@ -86,22 +80,14 @@ public class ChainConfigurationDAO implements IChainConfigurationDAO {
 
 	private boolean exists(ChainConfiguration config) {
 		List<ChainConfiguration> list = get();
-		boolean exists = false;
-
 		if (config.getId() == 0) {
 			for (ChainConfiguration c : list) {
-				for (ReceiverConfiguration rec : c.getReceiverConfiguration())
-					if (c.getSenderConfiguration().compareTo(
-							config.getSenderConfiguration())
-							&& rec.compareTo(config.getReceiverConfiguration())) {
-
-						exists = true;
-						break;
-					}
+				if(c.getRootNode().compareTo(config.getRootNode())){
+					return true;
+				}
 			}
 		}
-
-		return exists;
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
