@@ -1,6 +1,9 @@
 package com.docbyte.docshifter.model.vo;
 
 import java.util.Set;
+import java.util.concurrent.Callable;
+
+import com.docbyte.docshifter.config.test.NodeCallable;
 
 public class Node {
 	
@@ -78,5 +81,26 @@ public class Node {
 			
 		}
 		return false;
+	}
+	
+	public void iterateOverNode(NodeCallable func){
+		func.call(this);
+		if(childNodes.size() > 0){
+			func.enteringChildNodes();
+			for(Node n : childNodes)
+				func.call(n);
+			func.exitingChildNodes();
+		}
+	}
+	
+	public int getTotalChildNodesCount(){
+		if(childNodes.size() == 0)
+			return 0;
+		else{
+			int i = 0;
+			for(Node n : childNodes)
+				i += n.getTotalChildNodesCount();
+			return i;
+		}
 	}
 }

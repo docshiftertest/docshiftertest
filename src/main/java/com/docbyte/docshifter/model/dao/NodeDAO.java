@@ -1,12 +1,15 @@
 package com.docbyte.docshifter.model.dao;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.docbyte.docshifter.model.dao.inter.INodeDAO;
 import com.docbyte.docshifter.model.util.HibernateTemplateProvider;
 import com.docbyte.docshifter.model.vo.ChainConfiguration;
 import com.docbyte.docshifter.model.vo.ModuleConfiguration;
 import com.docbyte.docshifter.model.vo.Node;
+import com.docbyte.docshifter.model.vo.Parameter;
 
 public class NodeDAO implements INodeDAO
 {
@@ -86,8 +89,35 @@ public class NodeDAO implements INodeDAO
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Node> getEnabledSenderNodes() {
+	public List<Node> getEnabledSenderConfigurations() {
 		List<Node> nodes = (List<Node>)hibernateTemplate.find("select n from Node n inner join n.moduleConfiguration mc inner join mc.module m where m.type = 'sender'");
 		return nodes;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Node> getSendersByClassName(String className) {
+		List<Node> list = (List<Node>)hibernateTemplate.find("select n from Node n where n.moduleConfiguration.module.classname = '" + className + "'");
+		
+		return list;
+	}
+
+	public Node getSenderByClassNameAndParamValue(String className, String paramValue) {
+		List<Node> list = getSendersByClassName(className);
+		Node node = null;
+		Iterator<Node> senderIterator = list.iterator();
+		
+		while(senderIterator.hasNext() && node == null){
+			Node n = senderIterator.next();
+			Map<Parameter, String> params = n.getModuleConfiguration().getParameterValues();
+			Iterator<Parameter> it = params.keySet().iterator();
+			
+			while(it.hasNext() && node == null){
+				if(params.get(it.next()).equals(paramValue)){
+					node = n;
+				}
+			}
+		}
+		return node;
+		
 	}
 }

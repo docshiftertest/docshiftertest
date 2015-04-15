@@ -1,14 +1,11 @@
 package com.docbyte.docshifter.config.test;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import com.docbyte.docshifter.config.ConfigurationServer;
 import com.docbyte.docshifter.config.GeneralConfigurationBean;
-import com.docbyte.docshifter.config.ModuleBean;
-import com.docbyte.docshifter.config.ReceiverConfigurationBean;
-import com.docbyte.docshifter.config.SenderConfigurationBean;
+import com.docbyte.docshifter.model.vo.Node;
 
 public class Test {
 
@@ -18,29 +15,38 @@ public class Test {
 	}
 
 	private static void testConfigurationBeans(){
-		Set<SenderConfigurationBean> configs = ConfigurationServer.getEnabledSenderConfigurations();
+		Set<Node> configs = ConfigurationServer.getEnabledSenderConfigurations();
 		System.out.println("# enabled sender configs: " +configs.size());
 		
-		List<SenderConfigurationBean> senders = ConfigurationServer.getSenderConfiguration("inputmoduleClass");
+		List<Node> senders = ConfigurationServer.getSenderConfiguration("inputmoduleClass");
 		
-		for(SenderConfigurationBean config : senders){
-			System.out.println("sender: " +config.getName());
+		for(Node config : senders){
 			
-			List<ReceiverConfigurationBean> receivers = config.getApplicableReceiverConfigBeans();
-			System.out.println("# applicable receivers for sender: " +receivers.size());
+			System.out.println("# applicable receivers for sender: " + config.getTotalChildNodesCount());
 			
-			for(ReceiverConfigurationBean bean : receivers){
-				System.out.println("Release modules for receiver: " +bean.getName());
-				Iterator<ModuleBean> it = bean.getReleaseModules();
+
+			config.iterateOverNode(new NodeCallable(){
+				int amountOfTabs = 0;
 				
-				while(it.hasNext()){
-					System.out.println(it.next().getName());
+				public void call(Node n){
+					for(int i = 0; i < amountOfTabs; i++)
+						System.out.print("\t");
+					System.out.println(" - " + n.getTotalChildNodesCount());
 				}
-			}
+				
+				public void enteringChildNodes(){
+					amountOfTabs++;
+				}
+				
+				public void exitingChildNodes(){
+					amountOfTabs--;
+				}
+			});
+			
 		}
 		
-		SenderConfigurationBean ws_sender = ConfigurationServer.getSenderConfigurationWS("com.docbyte.docshifter.sender.webservice.WebServiceSender", "pdf");
-		System.out.println(ws_sender.getName());
+		Node ws_sender = ConfigurationServer.getSenderConfigurationWS("com.docbyte.docshifter.sender.webservice.WebServiceSender", "pdf");
+		System.out.println(ws_sender.getModuleConfiguration().getName());
 	}
 	
 	private static void testGeneralConfigurationBean(){
