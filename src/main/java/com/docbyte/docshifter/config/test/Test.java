@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.docbyte.docshifter.config.ConfigurationServer;
 import com.docbyte.docshifter.config.GeneralConfigurationBean;
+import com.docbyte.docshifter.config.SenderConfigurationBean;
 import com.docbyte.docshifter.model.vo.Node;
 
 public class Test {
@@ -15,17 +16,17 @@ public class Test {
 	}
 
 	private static void testConfigurationBeans(){
-		Set<Node> configs = ConfigurationServer.getEnabledSenderConfigurations();
+		Set<SenderConfigurationBean> configs = ConfigurationServer.getEnabledSenderConfigurations();
 		System.out.println("# enabled sender configs: " +configs.size());
 		
-		List<Node> senders = ConfigurationServer.getSenderConfiguration("inputmoduleClass");
+		List<SenderConfigurationBean> senders = ConfigurationServer.getSenderConfiguration("inputmoduleClass");
 		
-		for(Node config : senders){
+		for(SenderConfigurationBean config : senders){
 			
-			System.out.println("# applicable receivers for sender: " + config.getTotalChildNodesCount());
+			System.out.println("# applicable receivers for sender: " + config.getNode().getTotalChildNodesCount());
 			
-
-			config.iterateOverNode(new NodeCallable(){
+			
+			config.getNode().iterateOverNode(new NodeCallable(){
 				int amountOfTabs = 0;
 				
 				public void call(Node n){
@@ -45,8 +46,8 @@ public class Test {
 			
 		}
 		
-		Node ws_sender = ConfigurationServer.getSenderConfigurationWS("com.docbyte.docshifter.sender.webservice.WebServiceSender", "pdf");
-		System.out.println(ws_sender.getModuleConfiguration().getName());
+		SenderConfigurationBean ws_sender = ConfigurationServer.getSenderConfigurationWS("com.docbyte.docshifter.sender.webservice.WebServiceSender", "pdf");
+		System.out.println(ws_sender.getModuleBean().getName());
 	}
 	
 	private static void testGeneralConfigurationBean(){

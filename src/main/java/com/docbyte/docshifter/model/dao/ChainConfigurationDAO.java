@@ -124,4 +124,16 @@ public class ChainConfigurationDAO implements IChainConfigurationDAO {
 	public void setHibernateTemplate(HibernateTemplateProvider hibernateTemplate) {
 		this.hibernateTemplate = hibernateTemplate;
 	}
+
+	@SuppressWarnings("unchecked")
+	public ChainConfiguration getByNode(Node n) {
+		List<ChainConfiguration> list = (List<ChainConfiguration>) hibernateTemplate
+				.find("from ChainConfiguration c where c.rootNode.id = " + n.getId());
+
+		if (list.size() >= 0) {
+			return list.get(0);
+		} else {
+			return null;
+		}
+	}
 }

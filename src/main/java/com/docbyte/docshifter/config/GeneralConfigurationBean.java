@@ -65,4 +65,8 @@ public class GeneralConfigurationBean {
 	public int getInt(String name){
 		return Integer.parseInt((String)params.get(name));
 	}
+	
+	public Map<String, String> getParams() {
+		return params;
+	}
 }

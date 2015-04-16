@@ -1,7 +1,6 @@
 package com.docbyte.docshifter.model.vo;
 
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import com.docbyte.docshifter.config.test.NodeCallable;
 
@@ -102,5 +101,9 @@ public class Node {
 				i += n.getTotalChildNodesCount();
 			return i;
 		}
+	}
+	
+	public boolean isLeaf(){
+		return childNodes.size() != 0;
 	}
 }

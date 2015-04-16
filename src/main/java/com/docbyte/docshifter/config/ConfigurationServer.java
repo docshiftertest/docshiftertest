@@ -37,16 +37,17 @@ public class ConfigurationServer {
 	 * Typically each SenderConfigurationBean will correspond with 1 type of
 	 * sender (1 input method).
 	 */
-	public static Set<Node> getEnabledSenderConfigurations() {
-		HashSet<Node> set = new HashSet<Node>();
+	public static Set<SenderConfigurationBean> getEnabledSenderConfigurations() {
+		HashSet<SenderConfigurationBean> set = new HashSet<SenderConfigurationBean>();
 		List<Node> list = nodeDAO.getEnabledSenderConfigurations();
-		set.addAll(list);
+		for(Node n : list)
+			set.add(new SenderConfigurationBean(n));
 		return set;
 	}
 
-	public static Node getSenderConfigurationWS(
+	public static SenderConfigurationBean getSenderConfigurationWS(
 			String className, String paramValue) {
-		Node sender = nodeDAO.getSenderByClassNameAndParamValue(className, paramValue);
+		SenderConfigurationBean sender = new SenderConfigurationBean(nodeDAO.getSenderByClassNameAndParamValue(className, paramValue));
 		return sender;
 	}
 
@@ -72,10 +73,10 @@ public class ConfigurationServer {
 	 * @param long uid a long representing the UID of the requested
 	 *        SenderConfiguration.
 	 */
-	public static Node getSenderConfiguration(long uid) {
+	public static SenderConfigurationBean getSenderConfiguration(long uid) {
 		// return new SenderConfigurationBean(senderConfigurationDAO.get((int)
 		// uid));
-		return nodeDAO.get(uid);
+		return new SenderConfigurationBean(nodeDAO.get(uid));
 	}
 
 	/**
@@ -86,10 +87,13 @@ public class ConfigurationServer {
 	 *            className a string representing the class name of the
 	 *            requested SenderConfiguration.
 	 */
-	public static List<Node> getSenderConfiguration(
+	public static List<SenderConfigurationBean> getSenderConfiguration(
 			String className) {
-		List<Node> senders = nodeDAO.getSendersByClassName(className);
-
+		List<Node> nodes = nodeDAO.getSendersByClassName(className);
+		List<SenderConfigurationBean> senders = new ArrayList<SenderConfigurationBean>();
+		for(Node n : nodes)
+			senders.add(new SenderConfigurationBean(n));
+		
 		return senders;
 	}
 
