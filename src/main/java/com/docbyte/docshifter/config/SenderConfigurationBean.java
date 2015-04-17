@@ -13,6 +13,10 @@ public class SenderConfigurationBean extends NodeBean {
 		super(n);
 	}
 	
+	public SenderConfigurationBean() {
+		super();
+	}
+
 	public List<ReceiverConfigurationBean> getApplicableReceiverConfigBeans(){
 		final List<ReceiverConfigurationBean> list = new ArrayList<ReceiverConfigurationBean>();
 		

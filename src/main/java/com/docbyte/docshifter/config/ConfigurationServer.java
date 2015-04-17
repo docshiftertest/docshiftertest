@@ -59,7 +59,7 @@ public class ConfigurationServer {
 	}
 
 	/**
-	 * Method that returns the GeneralConfigurationBean assosiated with this
+	 * Method that returns the GeneralConfigurationBean associated with this
 	 * ConfigurationServer.
 	 */
 	public static GeneralConfigurationBean getGeneralConfiguration() {
@@ -67,7 +67,7 @@ public class ConfigurationServer {
 	}
 
 	/**
-	 * Method that returns the SenderConfigurationBean assosiated with the given
+	 * Method that returns the SenderConfigurationBean associated with the given
 	 * Configuration UID.
 	 * 
 	 * @param long uid a long representing the UID of the requested
@@ -80,7 +80,7 @@ public class ConfigurationServer {
 	}
 
 	/**
-	 * Method that returns the SenderConfigurationBean assosiated with the given
+	 * Method that returns the SenderConfigurationBean associated with the given
 	 * class name
 	 * 
 	 * @param String

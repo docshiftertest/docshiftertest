@@ -32,6 +32,8 @@ public abstract class NodeBean {
 		this.moduleBean = new ModuleBean(n.getModuleConfiguration());
 	}
 	
+	public NodeBean() {}
+
 	public Node getNode(){
 		return node;
 	}
