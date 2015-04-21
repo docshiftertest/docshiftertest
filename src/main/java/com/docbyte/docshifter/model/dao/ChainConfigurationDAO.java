@@ -21,7 +21,7 @@ public class ChainConfigurationDAO implements IChainConfigurationDAO {
 		hibernateTemplate.delete(config);
 	}
 
-	public ChainConfiguration get(int id) {
+	public ChainConfiguration get(long id) {
 		return (ChainConfiguration) hibernateTemplate.get(
 				ChainConfiguration.class, id);
 	}

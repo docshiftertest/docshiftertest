@@ -20,8 +20,11 @@ public abstract class NodeBean {
 		this.node = n;
 		ChainConfigurationDAO dao = new ChainConfigurationDAO();
 		Node rootNode = n;
-		while(rootNode.getParentNode() != null)
-			rootNode = rootNode.getParentNode();
+		if(n!=null)
+		{
+			while(rootNode.getParentNode() != null)
+				rootNode = rootNode.getParentNode();
+		}
 		chainConfiguration = dao.getByNode(rootNode);
 		
 		this.configurationId = chainConfiguration.getId();
@@ -42,7 +45,7 @@ public abstract class NodeBean {
 		return chainConfiguration;
 	}
 	
-	public long getId() {
+	public long getID() {
 		return configurationId;
 	}
 

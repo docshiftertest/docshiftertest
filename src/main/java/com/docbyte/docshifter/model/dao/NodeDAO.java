@@ -10,6 +10,7 @@ import com.docbyte.docshifter.model.vo.ChainConfiguration;
 import com.docbyte.docshifter.model.vo.ModuleConfiguration;
 import com.docbyte.docshifter.model.vo.Node;
 import com.docbyte.docshifter.model.vo.Parameter;
+import com.docbyte.docshifter.util.Logger;
 
 public class NodeDAO implements INodeDAO
 {
@@ -34,7 +35,7 @@ public class NodeDAO implements INodeDAO
 	}
 
 	@Override
-	public Node get(Long id) {
+	public Node get(long id) {
 		return (Node) hibernateTemplate.get(Node.class, id);
 	}
 
@@ -56,14 +57,12 @@ public class NodeDAO implements INodeDAO
 	@Override
 	public void delete(Node node) {
 		Node currentNode = node;
-		while(node.getParentNode() != null)
+		while(currentNode.getParentNode() != null){
 			currentNode = currentNode.getParentNode();
-		
+		}
 		// We are now working with the highest node in our nodetree
 		List<ChainConfiguration> configs = (List<ChainConfiguration>)hibernateTemplate.find("from ChainConfiguration cc where cc.rootNode.id = " + currentNode.getId());
 		if(configs.size() == 0){
-			node.clearAllChildNodes();
-			hibernateTemplate.saveOrUpdate(node);
 			hibernateTemplate.delete(node);
 		}else{
 			String message = "Node is being used by the following chain configurations and cannot be deleted:\n";
@@ -90,7 +89,8 @@ public class NodeDAO implements INodeDAO
 
 	@SuppressWarnings("unchecked")
 	public List<Node> getEnabledSenderConfigurations() {
-		List<Node> nodes = (List<Node>)hibernateTemplate.find("select n from Node n inner join n.moduleConfiguration mc inner join mc.module m where m.type = 'sender'");
+		List<Node> nodes = (List<Node>)hibernateTemplate.find("select n from Node n inner join n.moduleConfiguration mc inner join mc.module m where m.type = 'Input'");
+		Logger.info(nodes.size()+"", null);
 		return nodes;
 	}
 	

@@ -76,7 +76,9 @@ public class ConfigurationServer {
 	public static SenderConfigurationBean getSenderConfiguration(long uid) {
 		// return new SenderConfigurationBean(senderConfigurationDAO.get((int)
 		// uid));
-		return new SenderConfigurationBean(nodeDAO.get(uid));
+		ChainConfigurationDAO c=new ChainConfigurationDAO();
+		ChainConfiguration cc=c.get(uid);
+		return new SenderConfigurationBean(nodeDAO.get(cc.getRootNode().getId()));
 	}
 
 	/**

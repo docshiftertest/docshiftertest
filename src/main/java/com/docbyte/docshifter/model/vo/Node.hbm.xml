@@ -4,18 +4,17 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-	<class name="com.docbyte.docshifter.model.vo.Node"
-		table="NODE">
+	<class name="com.docbyte.docshifter.model.vo.Node" table="NODE">
 		<id name="id" column="ID">
 			<generator class="native" />
 		</id>
 
-		<many-to-one name="parentNode" column="PARENTNODE"/>
-		<many-to-one name="moduleConfiguration" column="MODULECONFIGURATION" class="ModuleConfiguration"/>
+		<many-to-one name="parentNode" column="PARENTNODE" lazy="false" cascade="save-update"/>
+		<many-to-one name="moduleConfiguration" column="MODULECONFIGURATION" class="com.docbyte.docshifter.model.vo.ModuleConfiguration" lazy="false" cascade="all"/>
 
-      	<set name="childNodes" table="NODE">
+      	<set name="childNodes" table="NODE" inverse="true" cascade="all-delete-orphan" lazy="false">
         	<key column="PARENTNODE"/>
-        	<one-to-many class="Node"/>
+        	<one-to-many class="com.docbyte.docshifter.model.vo.Node"/>
         </set>
         
 	</class>

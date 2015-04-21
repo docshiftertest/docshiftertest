@@ -1,28 +1,37 @@
 package com.docbyte.docshifter.model.vo;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.docbyte.docshifter.config.test.NodeCallable;
 
 public class Node {
 	
-	private int id;
+	private long id;
 	private Node parentNode;
-	private Set<Node> childNodes;
+	private Set<Node> childNodes=null;
 	private ModuleConfiguration moduleConfiguration;
 	
 	public Node(){}
 	
 	public Node(Node parentNode, ModuleConfiguration moduleConfiguration){
-		this.parentNode = parentNode;
+		setParentNode(parentNode);
+		if(parentNode!=null)
+		{
+			this.parentNode.addChild(this);
+		}
+		if(childNodes==null)
+		{
+			this.childNodes=new HashSet<Node>();
+		}
 		this.moduleConfiguration = moduleConfiguration;
 	}
 	
-	public int getId(){
+	public long getId(){
 		return id;
 	}
 	
-	public void setId(int id){
+	public void setId(long id){
 		this.id = id;
 	}
 	
@@ -33,13 +42,25 @@ public class Node {
 	public void setParentNode(Node parentNode){
 		this.parentNode = parentNode;
 	}
+	public void addChild(Node n){
+		this.childNodes.add(n);
+	}
 	
 	public Set<Node> getChildNodes(){
 		return childNodes;
 	}
 	
 	public void setChildNodes(Set<Node> childNodes){
-		this.childNodes = childNodes;
+		if(this.childNodes==null)
+		{
+			this.childNodes=childNodes;
+		}
+		else{
+			this.childNodes.clear();
+			for(Node n:childNodes){
+				this.childNodes.add(n);
+			}
+		}
 	}
 	
 	public ModuleConfiguration getModuleConfiguration(){
@@ -55,6 +76,10 @@ public class Node {
 			n.clearAllChildNodes();
 		}
 		childNodes.clear();
+	}
+	
+	public void ClearChild(){
+		this.childNodes.clear();
 	}
 	
 	public boolean compareTo(Object o){
@@ -104,6 +129,6 @@ public class Node {
 	}
 	
 	public boolean isLeaf(){
-		return childNodes.size() != 0;
+		return childNodes.size() == 0;
 	}
 }

@@ -6,7 +6,7 @@ import com.docbyte.docshifter.model.vo.ChainConfiguration;
 
 public interface IChainConfigurationDAO
 {
-	public ChainConfiguration get(int id);
+	public ChainConfiguration get(long id);
 	public ChainConfiguration get(String name);
 	
 	public void save(ChainConfiguration config) throws Exception;

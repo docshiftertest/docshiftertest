@@ -16,8 +16,8 @@
 		<property name="printerName" />
 		<property name="queueName" />
 
-		<one-to-one name="rootNode"
-			class="Node" cascade="all" />
+		<many-to-one name="rootNode" column="ROOTNODE"
+			class="com.docbyte.docshifter.model.vo.Node" cascade="all" lazy="false" />
         
 	</class>
 </hibernate-mapping>

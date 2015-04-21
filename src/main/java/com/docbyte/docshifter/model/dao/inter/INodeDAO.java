@@ -6,7 +6,7 @@ import com.docbyte.docshifter.model.vo.Node;
 
 public interface INodeDAO
 {
-	public Node get(Long id);
+	public Node get(long id);
 	public List<Node> get();
 	
 	public Node insert(Node node) throws Exception;

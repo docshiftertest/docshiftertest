@@ -7,7 +7,7 @@ public class ChainConfiguration implements Serializable
 {
 	private static final long serialVersionUID = -4600324113793261377L;
 
-	private int id;
+	private long id;
 	
 	private String name;
 	private String description;
@@ -33,7 +33,7 @@ public class ChainConfiguration implements Serializable
 	{
 		return description;
 	}
-	public int getId()
+	public long getId()
 	{
 		return id;
 	}
@@ -63,7 +63,7 @@ public class ChainConfiguration implements Serializable
 		this.enabled = enabled;
 	}
 	
-	public void setId(int id)
+	public void setId(long id)
 	{
 		this.id = id;
 	}
