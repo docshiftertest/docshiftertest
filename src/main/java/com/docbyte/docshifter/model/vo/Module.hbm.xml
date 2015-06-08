@@ -13,7 +13,7 @@
 		<property name="description" />
 		<property name="type" />
 
-		<set name="parameters" table="ModuleParams" cascade="all-delete-orphan"
+		<set name="parameters" table="ModuleParams"
 			lazy="false">
 			<key column="MODULEID" />
 			<many-to-many column="PARAMID"

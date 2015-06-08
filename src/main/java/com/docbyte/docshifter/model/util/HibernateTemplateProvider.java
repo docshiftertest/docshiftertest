@@ -12,8 +12,7 @@ import com.docbyte.docshifter.model.vo.GlobalSettings;
 import com.docbyte.docshifter.model.vo.Module;
 import com.docbyte.docshifter.model.vo.ModuleConfiguration;
 import com.docbyte.docshifter.model.vo.Parameter;
-import com.docbyte.docshifter.model.vo.ReceiverConfiguration;
-import com.docbyte.docshifter.model.vo.SenderConfiguration;
+import com.docbyte.docshifter.model.vo.Node;
 
 public class HibernateTemplateProvider{
 	
@@ -36,8 +35,7 @@ public class HibernateTemplateProvider{
 		config.addClass(Module.class);
 		config.addClass(ModuleConfiguration.class);
 		config.addClass(Parameter.class);
-		config.addClass(ReceiverConfiguration.class);
-		config.addClass(SenderConfiguration.class);
+		config.addClass(Node.class);
 		config.setProperties(System.getProperties());
 		factory = config.configure().buildSessionFactory();
 	}

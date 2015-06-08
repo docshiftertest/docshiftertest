@@ -10,11 +10,11 @@ import org.hibernate.HibernateException;
 import com.docbyte.docshifter.model.dao.ChainConfigurationDAO;
 import com.docbyte.docshifter.model.dao.ModuleConfigurationsDAO;
 import com.docbyte.docshifter.model.dao.ModuleDAO;
-import com.docbyte.docshifter.model.dao.SenderConfigurationDAO;
+import com.docbyte.docshifter.model.dao.NodeDAO;
 import com.docbyte.docshifter.model.vo.ChainConfiguration;
 import com.docbyte.docshifter.model.vo.Module;
 import com.docbyte.docshifter.model.vo.ModuleConfiguration;
-import com.docbyte.docshifter.model.vo.SenderConfiguration;
+import com.docbyte.docshifter.model.vo.Node;
 import com.docbyte.docshifter.util.Logger;
 
 /**
@@ -26,7 +26,7 @@ import com.docbyte.docshifter.util.Logger;
  * 
  */
 public class ConfigurationServer {
-	private static SenderConfigurationDAO senderConfigurationDAO = new SenderConfigurationDAO();
+	private static NodeDAO nodeDAO = new NodeDAO();
 	private static ChainConfigurationDAO chainConfigurationDAO = new ChainConfigurationDAO();
 	private static ModuleConfigurationsDAO moduleConfigurationDAO = new ModuleConfigurationsDAO();
 	private static ModuleDAO moduleDAO = new ModuleDAO();
@@ -39,37 +39,27 @@ public class ConfigurationServer {
 	 */
 	public static Set<SenderConfigurationBean> getEnabledSenderConfigurations() {
 		HashSet<SenderConfigurationBean> set = new HashSet<SenderConfigurationBean>();
-		List<SenderConfiguration> list = senderConfigurationDAO.getEnabled();
-
-		for (SenderConfiguration c : list) {
-			set.add(new SenderConfigurationBean(c));
-		}
-
+		List<Node> list = nodeDAO.getEnabledSenderConfigurations();
+		for(Node n : list)
+			set.add(new SenderConfigurationBean(n));
 		return set;
 	}
 
 	public static SenderConfigurationBean getSenderConfigurationWS(
 			String className, String paramValue) {
-		SenderConfiguration sender = senderConfigurationDAO
-				.getByClassNameAndParamValue(className, paramValue);
-
-		if (sender != null) {
-			return new SenderConfigurationBean(sender);
-		} else {
-			return null;
-		}
+		SenderConfigurationBean sender = new SenderConfigurationBean(nodeDAO.getSenderByClassNameAndParamValue(className, paramValue));
+		return sender;
 	}
 
-	public static TransformationConfigurationBean getPrintserviceTransformationConfiguration(
+	public static ChainConfiguration getPrintserviceTransformationConfiguration(
 			String queueName) {
-		ChainConfiguration c = chainConfigurationDAO
-				.getPrintserviceTransformation(queueName);
+		ChainConfiguration c = chainConfigurationDAO.getPrintserviceTransformation(queueName);
 
-		return new TransformationConfigurationBean(c);
+		return c;
 	}
 
 	/**
-	 * Method that returns the GeneralConfigurationBean assosiated with this
+	 * Method that returns the GeneralConfigurationBean associated with this
 	 * ConfigurationServer.
 	 */
 	public static GeneralConfigurationBean getGeneralConfiguration() {
@@ -77,7 +67,7 @@ public class ConfigurationServer {
 	}
 
 	/**
-	 * Method that returns the SenderConfigurationBean assosiated with the given
+	 * Method that returns the SenderConfigurationBean associated with the given
 	 * Configuration UID.
 	 * 
 	 * @param long uid a long representing the UID of the requested
@@ -86,11 +76,13 @@ public class ConfigurationServer {
 	public static SenderConfigurationBean getSenderConfiguration(long uid) {
 		// return new SenderConfigurationBean(senderConfigurationDAO.get((int)
 		// uid));
-		return new SenderConfigurationBean(senderConfigurationDAO.get(uid));
+		ChainConfigurationDAO c=new ChainConfigurationDAO();
+		ChainConfiguration cc=c.get(uid);
+		return new SenderConfigurationBean(nodeDAO.get(cc.getRootNode().getId()));
 	}
 
 	/**
-	 * Method that returns the SenderConfigurationBean assosiated with the given
+	 * Method that returns the SenderConfigurationBean associated with the given
 	 * class name
 	 * 
 	 * @param String
@@ -99,21 +91,17 @@ public class ConfigurationServer {
 	 */
 	public static List<SenderConfigurationBean> getSenderConfiguration(
 			String className) {
-		List<SenderConfiguration> senders = senderConfigurationDAO
-				.getByClassName(className);
-		List<SenderConfigurationBean> beans = new ArrayList<SenderConfigurationBean>();
-
-		for (SenderConfiguration sc : senders) {
-			beans.add(new SenderConfigurationBean(sc));
-		}
-
-		return beans;
+		List<Node> nodes = nodeDAO.getSendersByClassName(className);
+		List<SenderConfigurationBean> senders = new ArrayList<SenderConfigurationBean>();
+		for(Node n : nodes)
+			senders.add(new SenderConfigurationBean(n));
+		
+		return senders;
 	}
 
-	public static TransformationConfigurationBean getTransformationConfiguration(
+	public static ChainConfiguration getTransformationConfiguration(
 			long uid) {
-		return new TransformationConfigurationBean(
-				chainConfigurationDAO.get((int) uid));
+		return chainConfigurationDAO.get((int) uid);
 	}
 
 	// TODO throw exception if the configuration is not found

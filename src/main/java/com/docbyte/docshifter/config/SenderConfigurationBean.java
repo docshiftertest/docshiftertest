@@ -3,85 +3,56 @@ package com.docbyte.docshifter.config;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import com.docbyte.docshifter.model.dao.ChainConfigurationDAO;
-import com.docbyte.docshifter.model.vo.ChainConfiguration;
-import com.docbyte.docshifter.model.vo.ReceiverConfiguration;
-import com.docbyte.docshifter.model.vo.SenderConfiguration;
 
-/**
- * Value object which represents a SenderConfiguration. Code to communicated with the configuration server should be put in here.
- * 
- * @author $Author$
- * @version $Rev$
- * Last Modification Date: $Date$
- *
- */
-public class SenderConfigurationBean {
-	private ModuleBean inputModule;
-	private ChainConfigurationDAO chainConfigurationDAO = new ChainConfigurationDAO();
-	private long id;
-	
-	public SenderConfigurationBean() { }
+import com.docbyte.docshifter.config.test.NodeCallable;
+import com.docbyte.docshifter.model.vo.Node;
 
-	public SenderConfigurationBean(SenderConfiguration config){		
-		inputModule = new ModuleBean(config.getInputConfiguration());
-		this.id = config.getId();
+public class SenderConfigurationBean extends NodeBean {
+
+	public SenderConfigurationBean(Node n) {
+		super(n);
 	}
 	
-	/**
-	 * Method that provides a List of ReceiverConfigurationBean objects representing all actions linked to the given Task.
-	 * Should come from ConfigurationServer
-	 */	
+	public SenderConfigurationBean() {
+		super();
+	}
+
 	public List<ReceiverConfigurationBean> getApplicableReceiverConfigBeans(){
-		List<ReceiverConfigurationBean> list = new ArrayList<ReceiverConfigurationBean>();
+		final List<ReceiverConfigurationBean> list = new ArrayList<ReceiverConfigurationBean>();
 		
-		List<ChainConfiguration> transformationConfigs = chainConfigurationDAO.get();
-		
-		for(ChainConfiguration c : transformationConfigs){
-			if(c.isEnabled() && c.getSenderConfiguration().getId() == id){
-				for(ReceiverConfiguration rc:c.getReceiverConfiguration())
-					list.add(new ReceiverConfigurationBean(rc));
+		getNode().iterateOverNode(new NodeCallable() {
+			
+			@Override
+			public void exitingChildNodes() {}
+			
+			@Override
+			public void enteringChildNodes() {}
+			
+			@Override
+			public void call(Node n) {
+				ReceiverConfigurationBean b = new ReceiverConfigurationBean(n);
+				list.add(b);
 			}
-		}
+		});
 		
 		return list;
 	}
-	//make belief:
-	//content = timer, 
+	
 	public String getString(String name) {
-		Map<String, String> allParams = inputModule.params;
+		Map<String, String> allParams = getModuleBean().params;
 		allParams.putAll(ConfigurationServer.getGeneralConfiguration().params);
 		return (String)allParams.get(name);
 	}
-	//make belief:
+
 	public int getInt(String name){
-		Map<String, String> allParams = inputModule.params;
+		Map<String, String> allParams = getModuleBean().params;
 		allParams.putAll(ConfigurationServer.getGeneralConfiguration().params);
 		return Integer.parseInt((String)allParams.get(name));
 	}
-	//make belief:
+
 	public String getName(){
-		return inputModule.getName();
+		return getModuleBean().getName();
 	}
-
-	/**
-	 * @return the inputModule
-	 */
-	public ModuleBean getInputModule() {
-		return inputModule;
-	}
-
-	/**
-	 * @param inputModule the inputModule to set
-	 */
-	public void setInputModule(ModuleBean inputModule) {
-		this.inputModule = inputModule;
-	}
-
-	/**
-	 * @return the iD
-	 */
-	public long getID() {
-		return id;
-	}
+	
+	
 }

@@ -5,7 +5,7 @@ import javax.jms.ObjectMessage;
 
 import com.docbyte.docshifter.config.ConfigurationServer;
 import com.docbyte.docshifter.config.Task;
-import com.docbyte.docshifter.config.TransformationConfigurationBean;
+import com.docbyte.docshifter.model.vo.ChainConfiguration;
 import com.docbyte.docshifter.util.Logger;
 
 public class JMSSender extends AbstractJMSSender implements IMessageSender{
@@ -71,7 +71,7 @@ public class JMSSender extends AbstractJMSSender implements IMessageSender{
 	
 	public void sendTask(String queueName, Task task) throws JMSException{
 		if(isStarted()){
-			TransformationConfigurationBean config = ConfigurationServer.getPrintserviceTransformationConfiguration(queueName);
+			ChainConfiguration config = ConfigurationServer.getPrintserviceTransformationConfiguration(queueName);
 			if(config != null){
 				long chainConfigurationID = config.getId();
 				

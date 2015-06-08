@@ -7,7 +7,7 @@ public class ChainConfiguration implements Serializable
 {
 	private static final long serialVersionUID = -4600324113793261377L;
 
-	private int id;
+	private long id;
 	
 	private String name;
 	private String description;
@@ -16,26 +16,24 @@ public class ChainConfiguration implements Serializable
 	
 	private boolean enabled;
 
-	private SenderConfiguration senderConfiguration;
-	private Set<ReceiverConfiguration> receiverConfiguration;
+	private Node rootNode;
 
 	public ChainConfiguration() {}
 
-	public ChainConfiguration(String name, String description, boolean enabled, SenderConfiguration senderConfiguration, Set<ReceiverConfiguration> receiverConfiguration, String printerName, String queueName)
+	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName)
 	{
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
-		this.senderConfiguration = senderConfiguration;
-		this.receiverConfiguration = receiverConfiguration;
 		this.printerName = printerName;
 		this.queueName = queueName;
+		this.rootNode = rootNode;
 	}
 	public String getDescription()
 	{
 		return description;
 	}
-	public int getId()
+	public long getId()
 	{
 		return id;
 	}
@@ -45,14 +43,9 @@ public class ChainConfiguration implements Serializable
 		return name;
 	}
 
-	public Set<ReceiverConfiguration> getReceiverConfiguration()
+	public Node getRootNode()
 	{
-		return receiverConfiguration;
-	}
-
-	public SenderConfiguration getSenderConfiguration()
-	{
-		return senderConfiguration;
+		return rootNode;
 	}
 	
 	public boolean isEnabled()
@@ -70,7 +63,7 @@ public class ChainConfiguration implements Serializable
 		this.enabled = enabled;
 	}
 	
-	public void setId(int id)
+	public void setId(long id)
 	{
 		this.id = id;
 	}
@@ -79,14 +72,9 @@ public class ChainConfiguration implements Serializable
 		this.name = name;
 	}
 	
-	public void setReceiverConfiguration(Set<ReceiverConfiguration> receiverConfiguration)
+	public void setRootNode(Node rootNode)
 	{
-		this.receiverConfiguration = receiverConfiguration;
-	}
-	
-	public void setSenderConfiguration(SenderConfiguration senderConfiguration)
-	{
-		this.senderConfiguration = senderConfiguration;
+		this.rootNode = rootNode;
 	}
 
 	public String getPrinterName() {

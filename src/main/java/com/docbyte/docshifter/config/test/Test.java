@@ -1,14 +1,12 @@
 package com.docbyte.docshifter.config.test;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import com.docbyte.docshifter.config.ConfigurationServer;
 import com.docbyte.docshifter.config.GeneralConfigurationBean;
-import com.docbyte.docshifter.config.ModuleBean;
-import com.docbyte.docshifter.config.ReceiverConfigurationBean;
 import com.docbyte.docshifter.config.SenderConfigurationBean;
+import com.docbyte.docshifter.model.vo.Node;
 
 public class Test {
 
@@ -24,23 +22,32 @@ public class Test {
 		List<SenderConfigurationBean> senders = ConfigurationServer.getSenderConfiguration("inputmoduleClass");
 		
 		for(SenderConfigurationBean config : senders){
-			System.out.println("sender: " +config.getName());
 			
-			List<ReceiverConfigurationBean> receivers = config.getApplicableReceiverConfigBeans();
-			System.out.println("# applicable receivers for sender: " +receivers.size());
+			System.out.println("# applicable receivers for sender: " + config.getNode().getTotalChildNodesCount());
 			
-			for(ReceiverConfigurationBean bean : receivers){
-				System.out.println("Release modules for receiver: " +bean.getName());
-				Iterator<ModuleBean> it = bean.getReleaseModules();
+			
+			config.getNode().iterateOverNode(new NodeCallable(){
+				int amountOfTabs = 0;
 				
-				while(it.hasNext()){
-					System.out.println(it.next().getName());
+				public void call(Node n){
+					for(int i = 0; i < amountOfTabs; i++)
+						System.out.print("\t");
+					System.out.println(" - " + n.getTotalChildNodesCount());
 				}
-			}
+				
+				public void enteringChildNodes(){
+					amountOfTabs++;
+				}
+				
+				public void exitingChildNodes(){
+					amountOfTabs--;
+				}
+			});
+			
 		}
 		
 		SenderConfigurationBean ws_sender = ConfigurationServer.getSenderConfigurationWS("com.docbyte.docshifter.sender.webservice.WebServiceSender", "pdf");
-		System.out.println(ws_sender.getName());
+		System.out.println(ws_sender.getModuleBean().getName());
 	}
 	
 	private static void testGeneralConfigurationBean(){

@@ -16,13 +16,8 @@
 		<property name="printerName" />
 		<property name="queueName" />
 
-		<many-to-one name="senderConfiguration" column="SENDERCONFIGURATION"
-			class="com.docbyte.docshifter.model.vo.SenderConfiguration" lazy="false" />
-
-      	<set name="receiverConfiguration" table="CHAINCONF_RECEIVERCONF" lazy="false" cascade="all">
-        	<key column="CHAINCONFIGURATIONID" not-null="true"/>
-        	<many-to-many column="RECEIVERCONFIGURATIONID" class="com.docbyte.docshifter.model.vo.ReceiverConfiguration"/>
-        </set>	
+		<many-to-one name="rootNode" column="ROOTNODE"
+			class="com.docbyte.docshifter.model.vo.Node" cascade="all" lazy="false" />
         
 	</class>
 </hibernate-mapping>

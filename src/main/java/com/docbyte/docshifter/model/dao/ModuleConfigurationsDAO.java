@@ -8,8 +8,7 @@ import com.docbyte.docshifter.model.dao.inter.IModuleConfigurationsDAO;
 import com.docbyte.docshifter.model.util.HibernateTemplateProvider;
 import com.docbyte.docshifter.model.vo.Module;
 import com.docbyte.docshifter.model.vo.ModuleConfiguration;
-import com.docbyte.docshifter.model.vo.ReceiverConfiguration;
-import com.docbyte.docshifter.model.vo.SenderConfiguration;
+import com.docbyte.docshifter.model.vo.Node;
 import com.docbyte.docshifter.util.Logger;
 
 public class ModuleConfigurationsDAO implements IModuleConfigurationsDAO {
@@ -25,37 +24,16 @@ public class ModuleConfigurationsDAO implements IModuleConfigurationsDAO {
 	@SuppressWarnings("unchecked")
 	public void delete(ModuleConfiguration moduleConfiguration)
 			throws IllegalArgumentException {
-		// check if a sender uses the module configuration
-		List<SenderConfiguration> senderList = (List<SenderConfiguration>) hibernateTemplate
-				.find("from SenderConfiguration c where c.inputConfiguration.id = "
-						+ moduleConfiguration.getId());
-
-		// check if a receiver uses the module configuration
-		// TODO: check if still correct DONE
-		Logger.info("TEST MODULE CONF DELETE", null);
 		
-		List<ReceiverConfiguration> receiverList = new ArrayList<ReceiverConfiguration>();
-		receiverList.addAll((List<ReceiverConfiguration>) hibernateTemplate
-						.find("select c from ReceiverConfiguration c, ModuleConfiguration mc where mc in elements(c.transformationConfiguration) and mc.id = " + moduleConfiguration.getId()));
-		
-		receiverList
-		.addAll((List<ReceiverConfiguration>) hibernateTemplate
-				.find("SELECT c FROM ReceiverConfiguration c, ModuleConfiguration mc WHERE mc IN ELEMENTS(c.releaseConfiguration) AND mc.id = "
-						+ moduleConfiguration.getId()));
-
-		Logger.info("receiverlist2 " + receiverList.toString(), null);
-
-		if (senderList.size() == 0 && receiverList.size() == 0) {
+		List<Node> nodeList = (List<Node>)hibernateTemplate.find("from Node n where n.moduleConfiguration.id = " + moduleConfiguration.getId());
+		if(nodeList.size() == 0)
 			hibernateTemplate.delete(moduleConfiguration);
-		} else {
+		else{
 			String message = "Module configuration '"
 					+ moduleConfiguration.getName()
-					+ "' is being used by the following configurations and cannot be deleted:\n";
-			for (SenderConfiguration s : senderList) {
-				message += (" - id:" + s.getId() + "\n");
-			}
-			for (ReceiverConfiguration r : receiverList) {
-				message += (" - id:" + r.getId() + "\n");
+					+ "' is being used by the following nodes and cannot be deleted:\n";
+			for (Node n : nodeList) {
+				message += (" - id:" + n.getId() + "\n");
 			}
 			throw new IllegalArgumentException(message);
 		}
