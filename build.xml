@@ -1,220 +1,225 @@
 <?xml version="1.0"?>
 <project
-    name="DocShifterBeans"
-    default="zip-releases" >
+        name="DocShifterBeans"
+        default="zip-releases">
 
     <property
-        name="releases"
-        location="_deliverables" />
-    	<property file="build.number"/>
-    
+            name="releases"
+            location="_deliverables"/>
+    <property file="build.number"/>
+
 
     <property
-        name="target"
-        location="target\classes" />
+            name="target"
+            location="target\classes"/>
 
     <property
-        name="lib"
-        location="lib" />
+            name="lib"
+            location="lib"/>
 
     <property
-        name="src"
-        location="src" />
+            name="src"
+            location="src"/>
 
     <property
-        name="mayor"
-        value="5" />
+            name="mayor"
+            value="5"/>
 
     <property
-        name="minor"
-        value="2" />
+            name="minor"
+            value="4"/>
 
     <property
-        name="patch"
-        value="0" />
+            name="patch"
+            value="0"/>
 
     <property
-        name="version"
-        value="${mayor}.${minor}.${patch}" />
+            name="type"
+            value="alpha"/>
 
     <property
-        name="project-name"
-        value="DocShifterBeans-${version}" />
+            name="version"
+            value="${mayor}.${minor}.${patch}-${type}"/>
+
+    <property
+            name="project-name"
+            value="docshifterBeans-${version}"/>
     <!--
     property name="izpack_home.dir" location="C:\Program Files\IzPack" />
 	<property name="izpack.dir" value="izpack" /
     -->
 
-    <path id="toolslib" >
+    <path id="toolslib">
 
-        <path location="lib/tools/hibernate-tools.jar" />
+        <path location="lib/tools/hibernate-tools.jar"/>
 
-        <path location="lib/hibernate3.jar" />
+        <path location="lib/hibernate3.jar"/>
 
-        <path location="lib/tools/freemarker.jar" />
+        <path location="lib/tools/freemarker.jar"/>
 
-        <path location="lib/hsqldb.jar" />
+        <path location="lib/hsqldb.jar"/>
 
-        <path location="lib/dom4j-1.6.1.jar" />
+        <path location="lib/dom4j-1.6.1.jar"/>
 
-        <path location="lib/slf4j-api-1.5.2.jar" />
+        <path location="lib/slf4j-api-1.5.2.jar"/>
 
-        <path location="lib/slf4j-log4j12.jar" />
+        <path location="lib/slf4j-log4j12.jar"/>
 
-        <path location="lib/log4j.jar" />
+        <path location="lib/log4j.jar"/>
 
-        <path location="lib/jta-1.1.jar" />
+        <path location="lib/jta-1.1.jar"/>
 
-        <path location="lib/javassist-3.4.GA.jar" />
+        <path location="lib/javassist-3.4.GA.jar"/>
 
-        <path location="lib/commons-logging-1.1.1.jar" />
+        <path location="lib/commons-logging-1.1.1.jar"/>
 
-        <path location="lib/commons-dbcp-1.2.2.jar" />
+        <path location="lib/commons-dbcp-1.2.2.jar"/>
 
-        <path location="commons-pool-1.4.jar" />
+        <path location="commons-pool-1.4.jar"/>
 
-        <path location="lib/antlr-2.7.7.jar" />
+        <path location="lib/antlr-2.7.7.jar"/>
 
-        <path location="lib/jms.jar" />
+        <path location="lib/jms.jar"/>
 
-        <path location="lib/imq.jar" />
+        <path location="lib/imq.jar"/>
 
-        <path location="lib/imqjmx.jar" />
+        <path location="lib/imqjmx.jar"/>
 
-        <path location="lib/hibernate-jpa-2.0-api-1.0.0.Final.jar" />
+        <path location="lib/hibernate-jpa-2.0-api-1.0.0.Final.jar"/>
 
-        <path location="target/classes/" />
+        <path location="target/classes/"/>
     </path>
 
     <taskdef
-        name="hibernatetool"
-        classname="org.hibernate.tool.ant.HibernateToolTask"
-        classpathref="toolslib" />
+            name="hibernatetool"
+            classname="org.hibernate.tool.ant.HibernateToolTask"
+            classpathref="toolslib"/>
 
-    <path id="class.path" >
+    <path id="class.path">
 
-        <pathelement location="." />
+        <pathelement location="."/>
 
-        <fileset dir="lib" >
+        <fileset dir="lib">
 
-            <include name="**/*.jar" />
+            <include name="**/*.jar"/>
         </fileset>
 
-        <pathelement location="bin/" />
+        <pathelement location="bin/"/>
     </path>
-    
-    <path id="classpath">	
-		<pathelement path="${target}"/>
-		<pathelement location="bin/" /> 
-		<pathelement location="./lib" />		
-		<fileset dir="${lib}">
-			<include name="**/*.jar"/>
-		</fileset>
-	</path>
 
-    <path id="libs.path" >
-
-        <fileset dir="${lib}" >
-
-            <include name="**/*.jar" />
+    <path id="classpath">
+        <pathelement path="${target}"/>
+        <pathelement location="bin/"/>
+        <pathelement location="./lib"/>
+        <fileset dir="${lib}">
+            <include name="**/*.jar"/>
         </fileset>
     </path>
 
-    <path id="classes.path" >
+    <path id="libs.path">
 
-        <fileset dir="${src}" >
+        <fileset dir="${lib}">
 
-            <include name="${src}/**/*.class" />
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="classes.path">
+
+        <fileset dir="${src}">
+
+            <include name="${src}/**/*.class"/>
         </fileset>
     </path>
 
     <property
-        name="compile.path"
-        refid="class.path" />
+            name="compile.path"
+            refid="class.path"/>
 
-    <target name="init" depends="compile" >
+    <target name="init" depends="compile">
 
-        <hibernatetool destdir="${releases}" >
+        <hibernatetool destdir="${releases}">
 
-            <configuration configurationfile="_deliverables/hibernate.cfg.xml" />
+            <configuration configurationfile="_deliverables/hibernate.cfg.xml"/>
 
             <hbm2ddl
-                export="false"
-                haltonerror="true"
-                outputfilename="sql.ddl" />
+                    export="false"
+                    haltonerror="true"
+                    outputfilename="sql.ddl"/>
         </hibernatetool>
     </target>
 
     <target
-        name="releases"
-        depends="init" >
+            name="releases"
+            depends="init">
 
         <delete>
 
-            <fileset dir="${releases}" >
+            <fileset dir="${releases}">
 
-                <include name="*.jar" />
+                <include name="*.jar"/>
             </fileset>
         </delete>
 
         <manifestclasspath
-            jarfile="${releases}/docShifter-Core-all-libs.jar"
-            property="manifest_cp" >
+                jarfile="${releases}/docshifter-Core-all-libs.jar"
+                property="manifest_cp">
 
-            <classpath refid="libs.path" />
+            <classpath refid="libs.path"/>
         </manifestclasspath>
 
-        <jar destfile="${releases}/docShifter-Core-all-libs.jar" >
+        <jar destfile="${releases}/docshifter-Core-all-libs.jar">
 
             <manifest>
 
                 <attribute
-                    name="Class-Path"
-                    value="${manifest_cp} ./DocShifterBeans-${version}.jar" />
+                        name="Class-Path"
+                        value="${manifest_cp} ./${project-name}.jar"/>
 
                 <attribute
-                    name="Version"
-                    value="${version}" />
+                        name="Version"
+                        value="${version}"/>
 
                 <attribute
-                    name="build"
-                    value="${build.number}" />
+                        name="build"
+                        value="${build.number}"/>
             </manifest>
         </jar>
-        
-        
-    	<jar destfile="${releases}/DocShifterBeans-${version}.jar">
-			<fileset dir="${target}">
-				<include name="**/*.class" />
-				<include name="**/*.xml" />				
-			</fileset>
-		</jar>
-        
-        <copy todir="${releases}" >
 
-            <fileset dir="lib" >
 
-                <include name="*.jar" />
+        <jar destfile="${releases}/${project-name}.jar">
+            <fileset dir="${target}">
+                <include name="**/*.class"/>
+                <include name="**/*.xml"/>
+            </fileset>
+        </jar>
+
+        <copy todir="${releases}">
+
+            <fileset dir="lib">
+
+                <include name="*.jar"/>
             </fileset>
 
-            <fileset dir="${target}" >
+            <fileset dir="${target}">
 
-                <include name="*.cfg.xml" />
+                <include name="*.cfg.xml"/>
 
-                <include name="*.properties" />
+                <include name="*.properties"/>
             </fileset>
         </copy>
     </target>
-    <target name="compile" >
-		<propertyfile file="build.number" comment="Build Number. DO NOT EDIT!">
-			<entry key="build.number" type="int" operation="+" default="1" />
-		</propertyfile>
+    <target name="compile">
+        <propertyfile file="build.number" comment="Build Number. DO NOT EDIT!">
+            <entry key="build.number" type="int" operation="+" default="1"/>
+        </propertyfile>
 
-		
-		<javac source="1.6" target="1.6" srcdir="src/main/java" destdir="${target}" excludes="**/tests/*" encoding="ISO-8859-1">
-			<classpath refid="classpath"/>
-		</javac>
-	</target>
+
+        <javac source="1.7" target="1.7" srcdir="src/main/java" destdir="${target}" excludes="**/tests/*"
+               encoding="ISO-8859-1">
+            <classpath refid="classpath"/>
+        </javac>
+    </target>
 
 
     <!-- Don't forget to add compiler.jar or standalone-compiler.jar to the classpath of the Ant process. -->
@@ -239,28 +244,28 @@
     <!-- Put all files needed for installer in a zip. This is used by Jenkins -->
 
     <target
-        name="zip-releases"
-        depends="releases" >
+            name="zip-releases"
+            depends="releases">
 
         <!-- Installation files should be updated somewhere -->
 
-        <zip destfile="docShifterCore.zip" >
+        <zip destfile="docShifterCore.zip">
 
             <zipfileset
-                dir="lib"
-                prefix="lib" >
+                    dir="lib"
+                    prefix="lib">
             </zipfileset>
 
             <zipfileset
-                dir="${releases}/work"
-                prefix="work" >
+                    dir="${releases}/work"
+                    prefix="work">
 
-                <include name="dummy.file" />
+                <include name="dummy.file"/>
             </zipfileset>
 
             <zipfileset
-                dir="${releases}/configurations"
-                prefix="configurations" />
+                    dir="${releases}/configurations"
+                    prefix="configurations"/>
         </zip>
     </target>
 
