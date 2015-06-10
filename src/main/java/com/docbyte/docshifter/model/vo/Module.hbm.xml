@@ -12,9 +12,10 @@
 		<property name="classname" />
 		<property name="description" />
 		<property name="type" />
+		<property name="condition" />
 
 		<set name="parameters" table="ModuleParams"
-			lazy="false">
+			lazy="false" cascade="all">
 			<key column="MODULEID" />
 			<many-to-many column="PARAMID"
 				class="com.docbyte.docshifter.model.vo.Parameter" />

@@ -58,16 +58,15 @@ public class ChainConfigurationDAO implements IChainConfigurationDAO {
 								+ "' already exists. The configuration connot be saved.");
 			}
 		}
-		hibernateTemplate.saveOrUpdate(config);
+		hibernateTemplate.merge(config);
 	}
 
 	@SuppressWarnings("unchecked")
 	public void deleteUnusedConfigs() {
 		List<Node> unusedNodes = new ArrayList<Node>();
-		unusedNodes.addAll(hibernateTemplate.find("select n from Node n where n.parentNode is null AND n not in (select rn from ChainConfiguration cc inner join cc.rootNode rn)"));
+		unusedNodes.addAll(hibernateTemplate.find("select n from Node n where n.parentNode is null AND n.id not in (select rootNode from ChainConfiguration cc)"));
 		for(Node n : unusedNodes){
 			n.clearAllChildNodes();
-			hibernateTemplate.saveOrUpdate(n);
 			hibernateTemplate.delete(n);
 		}
 	}

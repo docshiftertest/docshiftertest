@@ -17,6 +17,7 @@ public class Module implements Serializable
 	private String classname;
 	private String description;
 	private String type;
+	private String condition;
 	private String inputFiletype;
 	private String outputFileType;
 	
@@ -24,19 +25,19 @@ public class Module implements Serializable
 	
 	public Module() {}
 	
-	public Module(int id, String description, String name, String classname, String type, Set<Parameter> parameters)
+	public Module(int id, String description, String name, String classname, String type, String condition, Set<Parameter> parameters)
 	{
 		this.id = id;
 		this.description = description;
 		this.name = name;
 		this.classname = classname;
 		this.type = type;
+		this.condition = condition;
 		this.parameters = parameters;
 	}
 	
-	//copy constructor
 	public Module(Module module){
-		this(module.getId(), module.getDescription(), module.getName(), module.getClassname(), module.getType(), new HashSet<Parameter>(module.getParameters()));
+		this(module.getId(), module.getDescription(), module.getName(), module.getClassname(), module.getType(), module.getCondition(), new HashSet<Parameter>(module.getParameters()));
 	}
 
 	public void addToParameters(Parameter param)
@@ -188,6 +189,14 @@ public class Module implements Serializable
 		} else if (!type.equals(other.type))
 			return false;
 		return true;
+	}
+
+	public String getCondition() {
+		return condition;
+	}
+
+	public void setCondition(String condition) {
+		this.condition = condition;
 	}
 
 }
