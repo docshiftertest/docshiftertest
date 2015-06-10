@@ -35,6 +35,10 @@ public class Parameter implements Serializable
 		this(name, description, type, false);
 	}
 
+	public Parameter(String name, ParameterTypes type) {
+		this(name, null, type, false);
+	}
+
 	public void setId(long id)
 	{
 		this.id = id;

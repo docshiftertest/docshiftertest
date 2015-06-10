@@ -20,7 +20,7 @@ public class HibernateTemplateProvider{
 	private Configuration config;
 	private SessionFactory factory;
 	
-	public static HibernateTemplateProvider instance;
+	private static HibernateTemplateProvider instance;
 	
 	public static HibernateTemplateProvider getInstance(){
 		if(instance == null){
@@ -29,7 +29,7 @@ public class HibernateTemplateProvider{
 		return instance;
 	}
 	
-	public HibernateTemplateProvider(){
+	private HibernateTemplateProvider(){
 		config = new Configuration();
 		config.addClass(ChainConfiguration.class);
 		config.addClass(GlobalSettings.class);
