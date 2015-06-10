@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+
 import com.docbyte.docshifter.model.vo.ChainConfiguration;
 import com.docbyte.docshifter.model.vo.GlobalSettings;
 import com.docbyte.docshifter.model.vo.Module;
@@ -28,7 +29,7 @@ public class HibernateTemplateProvider{
 		return instance;
 	}
 	
-	private HibernateTemplateProvider(){
+	public HibernateTemplateProvider(){
 		config = new Configuration();
 		config.addClass(ChainConfiguration.class);
 		config.addClass(GlobalSettings.class);

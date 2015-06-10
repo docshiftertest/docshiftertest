@@ -11,7 +11,7 @@ public class ModuleDAO implements IModuleDAO
 	private HibernateTemplateProvider hibernateTemplate;
 	
 	public ModuleDAO(){
-		hibernateTemplate = HibernateTemplateProvider.getInstance();
+		hibernateTemplate = new HibernateTemplateProvider();
 	}
 	
 	public void delete(Module module)

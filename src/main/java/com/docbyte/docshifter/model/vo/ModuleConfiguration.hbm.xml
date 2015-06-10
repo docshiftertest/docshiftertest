@@ -16,7 +16,7 @@
 		<many-to-one name="module" column="MODULEID" foreign-key="MODULEID"
 			lazy="false" cascade="all" />
 
-		<map name="parameterValues" table="MODULEPARAMSVALUES" lazy="false">
+		<map name="parameterValues" table="MODULEPARAMSVALUES" cascade="delete-orphan" lazy="false">
 			<key column="CONFIGURATIONID" />
 			<index-many-to-many column="PARAMID" foreign-key="PARAMID"
 				class="com.docbyte.docshifter.model.vo.Parameter" />
