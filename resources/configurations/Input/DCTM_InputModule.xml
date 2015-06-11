@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+   <name>Documentum Input</name>
+   <description>Input Module for Documentum</description>
+   <type>Input</type>
+   <classname>com.docbyte.docshifter.sender.dctm.scheduler.DCTMScheduler</classname>
+
+   <parameters>
+	<parameter>
+	    <name>start_date</name>
+	    <description>Start date (format: 01/01/2000 00:00)</description>
+	    <type>TIME</type>
+	</parameter>
+	<parameter>
+	    <name>end_date</name>
+	    <description>End date (format: 01/01/2020 00:00)</description>
+	    <type>TIME</type>
+	</parameter>
+	<parameter>
+	    <name>frequency</name>
+	    <description>Frequency (every x seconds)</description>
+	    <type>INTEGER</type>
+	</parameter>
+	<parameter>
+	    <name>dctm_repository</name>
+	    <description>Repository</description>
+	    <type>STRING</type>
+	</parameter>
+	<parameter>
+	    <name>dctm_user</name>
+	    <description>Repository (technical) User</description>
+	    <type>STRING</type>
+	</parameter>
+	<parameter>
+	    <name>dctm_pass</name>
+	    <description>Repository Password</description>
+	    <type>STRING</type>
+	</parameter>
+	<parameter>
+	    <name>renditionType</name>
+	    <description>Type of the rendition (example: pdf, pdfa, pdfs, odf, html, ...)</description>
+	    <type>STRING</type>
+	</parameter>
+   </parameters>
+</module>

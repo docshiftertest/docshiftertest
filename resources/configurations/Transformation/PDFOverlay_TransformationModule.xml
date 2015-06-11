@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+ <name>PDF Overlay</name>
+   <description>Pdf Overlay Transformation</description>
+   <type>Transformation</type>
+   <classname>com.docbyte.docshifter.receiver.operations.pdf.PdfOverlayTransformation</classname>
+   <parameters>
+		<parameter>
+			<name>delimiter</name>
+			<description>the delimiter used to seperate multiple overlays</description>
+			<type>String</type>
+		</parameter>
+      	<parameter>
+			<name>watermarkText</name>
+			<description>Your text(s) seperated by the delimiter </description>
+			<type>String</type>
+		</parameter>
+		<parameter>
+			<name>watermarkFontsize</name>
+			<description>fontsizes of the watermark(s)</description>
+			<type>String</type>
+		</parameter>
+		<parameter>
+			<name>watermarkRotation</name>
+			<description>Rotation(s)</description>
+			<type>String</type>
+		</parameter>
+		<parameter>
+			<name>watermarkXPos</name>
+			<description>x coördinate(s) starting left </description>
+			<type>String</type>
+		</parameter>
+		<parameter>
+			<name>watermarkYPos</name>
+			<description>y coördinate(s) starting at the bottom</description>
+			<type>String</type>
+		</parameter>
+   </parameters>
+</module>

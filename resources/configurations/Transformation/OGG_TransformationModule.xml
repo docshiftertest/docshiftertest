@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+ <name>Ogg Transformation</name>
+   <description>Ogg Audio Transformation</description>
+   <type>Transformation</type>
+   <classname>com.docbyte.docshifter.receiver.operations.audio.OggTransformation</classname>
+   <parameters>
+	<parameter>
+		<name>soxPath</name>
+	    <description>Path to the sox installation folder, When installed with docShifter this is @D_HOME\Tools\sox-14-3-2</description>
+		<type>STRING</type>
+	</parameter>
+	</parameters>
+</module>

@@ -161,6 +161,14 @@
             </fileset>
         </delete>
 
+
+        <jar destfile="${releases}/${project-name}.jar">
+            <fileset dir="${target}">
+                <include name="**/*.class"/>
+                <include name="**/*.xml"/>
+            </fileset>
+        </jar>
+
         <manifestclasspath
                 jarfile="${releases}/docshifter-Core-all-libs.jar"
                 property="manifest_cp">
@@ -187,19 +195,9 @@
         </jar>
 
 
-        <jar destfile="${releases}/${project-name}.jar">
-            <fileset dir="${target}">
-                <include name="**/*.class"/>
-                <include name="**/*.xml"/>
-            </fileset>
-        </jar>
-
         <copy todir="${releases}">
 
-            <fileset dir="lib">
 
-                <include name="*.jar"/>
-            </fileset>
 
             <fileset dir="${target}">
 
@@ -256,16 +254,11 @@
                     prefix="lib">
             </zipfileset>
 
-            <zipfileset
-                    dir="${releases}/work"
-                    prefix="work">
+            <zipfileset dir="${releases}">
 
                 <include name="dummy.file"/>
             </zipfileset>
 
-            <zipfileset
-                    dir="${releases}/configurations"
-                    prefix="configurations"/>
         </zip>
     </target>
 
