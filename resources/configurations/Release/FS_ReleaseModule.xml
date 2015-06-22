@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+   <name>File system release module</name>
+   <description>Puts the transformed file on a file location</description>
+   <type>Release</type>
+   <classname>com.docbyte.docshifter.receiver.operations.filesystem.FSExport</classname>
+   <parameters>
+	<parameter>
+	    <name>destinationfolder</name>
+	    <description>Destination folder</description>
+	    <type>STRING</type>
+	</parameter>
+	<parameter>
+	    <name>createFolders</name>
+	    <description>Create folders under the destination folder (values: true/false)</description>
+	    <type>BOOLEAN</type>
+	</parameter>
+   </parameters>
+</module>

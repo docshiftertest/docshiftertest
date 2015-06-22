@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<module>
-   <name>PDF/A Transformation</name>
-   <description>PDFA Transformation</description>
-   <type>Transformation</type>
-   <classname>com.docbyte.docshifter.receiver.operations.pdf.PdfATransformation</classname>
-</module>

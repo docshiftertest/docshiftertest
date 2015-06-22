@@ -9,8 +9,8 @@
 			<generator class="native" />
 		</id>
 
-		<many-to-one name="parentNode" column="PARENTNODE" lazy="false" cascade="save-update"/>
-		<many-to-one name="moduleConfiguration" column="MODULECONFIGURATION" class="com.docbyte.docshifter.model.vo.ModuleConfiguration" lazy="false" cascade="all"/>
+		<many-to-one name="parentNode" column="PARENTNODE" lazy="false" cascade="all" class="com.docbyte.docshifter.model.vo.Node"/>
+		<many-to-one name="moduleConfiguration" column="MODULECONFIGURATION" class="com.docbyte.docshifter.model.vo.ModuleConfiguration" lazy="false" cascade="save-update"/>
 
       	<set name="childNodes" table="NODE" inverse="true" cascade="all-delete-orphan" lazy="false">
         	<key column="PARENTNODE"/>

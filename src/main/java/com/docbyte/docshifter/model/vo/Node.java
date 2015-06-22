@@ -57,9 +57,7 @@ public class Node {
 		}
 		else{
 			this.childNodes.clear();
-			for(Node n:childNodes){
-				this.childNodes.add(n);
-			}
+			childNodes.addAll(childNodes);
 		}
 	}
 	
@@ -78,7 +76,7 @@ public class Node {
 		childNodes.clear();
 	}
 	
-	public void ClearChild(){
+	public void clearChild(){
 		this.childNodes.clear();
 	}
 	

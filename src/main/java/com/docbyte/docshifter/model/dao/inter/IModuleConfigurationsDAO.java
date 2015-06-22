@@ -18,4 +18,7 @@ public interface IModuleConfigurationsDAO
 	public List<ModuleConfiguration> get(Module module);
 	public List<ModuleConfiguration> getByType(String type);
 	public List<ModuleConfiguration> get();
+	
+	public ModuleConfiguration canImport(ModuleConfiguration config);
+	public void importConfiguration(ModuleConfiguration config);
 }

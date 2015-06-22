@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+   <name>HTML Transformation</name>
+   <description>HTML Transformation</description>
+   <type>Transformation</type>
+   <classname>com.docbyte.docshifter.receiver.operations.html.HtmlTransformation</classname>
+</module>

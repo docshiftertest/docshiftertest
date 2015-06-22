@@ -72,12 +72,12 @@ public class ModuleConfigurationsDAO implements IModuleConfigurationsDAO {
 			throw new IllegalArgumentException(
 					"A configuration with the same name or parameter values already exists. The configuration cannot be saved.");
 		}
-		hibernateTemplate.saveOrUpdate(moduleConfiguration);
+		hibernateTemplate.merge(moduleConfiguration);
 	}
 
 	public void update(ModuleConfiguration moduleConfiguration)
 			throws IllegalArgumentException {
-		hibernateTemplate.saveOrUpdate(moduleConfiguration);
+		hibernateTemplate.merge(moduleConfiguration);
 	}
 
 	@SuppressWarnings("unchecked")
