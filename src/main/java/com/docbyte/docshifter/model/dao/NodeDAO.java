@@ -1,16 +1,15 @@
 package com.docbyte.docshifter.model.dao;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.docbyte.docshifter.model.dao.inter.INodeDAO;
 import com.docbyte.docshifter.model.util.HibernateTemplateProvider;
 import com.docbyte.docshifter.model.vo.ChainConfiguration;
-import com.docbyte.docshifter.model.vo.ModuleConfiguration;
 import com.docbyte.docshifter.model.vo.Node;
 import com.docbyte.docshifter.model.vo.Parameter;
 import com.docbyte.docshifter.util.Logger;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class NodeDAO implements INodeDAO
 {
@@ -89,7 +88,8 @@ public class NodeDAO implements INodeDAO
 
 	@SuppressWarnings("unchecked")
 	public List<Node> getEnabledSenderConfigurations() {
-		List<Node> nodes = (List<Node>)hibernateTemplate.find("select n from Node n inner join n.moduleConfiguration mc inner join mc.module m where m.type = 'Input'");
+		//List<Node> nodes = (List<Node>)hibernateTemplate.find("select n from Node n inner join n.moduleConfiguration mc inner join mc.module m where m.type = 'Input'");
+		List<Node> nodes = (List<Node>)hibernateTemplate.find("select n from ChainConfiguration cc inner join cc.rootNode n inner join n.moduleConfiguration mc inner join mc.module m where cc.enabled = true");
 		Logger.info(nodes.size()+"", null);
 		return nodes;
 	}

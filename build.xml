@@ -53,7 +53,8 @@
 
         <path location="lib/tools/hibernate-tools.jar"/>
 
-        <path location="lib/hibernate3.jar"/>
+        <path location="lib/hibernate-core-4.3.10.Final.jar"/>
+        <path location="lib/hibernate-commons-annotations-4.0.5.Final.jar"/>
 
         <path location="lib/tools/freemarker.jar"/>
 
@@ -61,9 +62,6 @@
 
         <path location="lib/dom4j-1.6.1.jar"/>
 
-        <path location="lib/slf4j-api-1.5.2.jar"/>
-
-        <path location="lib/slf4j-log4j12.jar"/>
 
         <path location="lib/log4j.jar"/>
 
@@ -84,8 +82,9 @@
         <path location="lib/imq.jar"/>
 
         <path location="lib/imqjmx.jar"/>
+        <path location="lib/jboss-logging-3.3.0.Final.jar"/>
 
-        <path location="lib/hibernate-jpa-2.0-api-1.0.0.Final.jar"/>
+        <path location="lib/hibernate-jpa-2.1-api-1.0.0.Draft-16.jar"/>
 
         <path location="target/classes/"/>
     </path>
@@ -138,7 +137,7 @@
 
     <target name="init" depends="compile">
 
-        <hibernatetool destdir="${releases}">
+        <!--hibernatetool destdir="${releases}">
 
             <configuration configurationfile="_deliverables/hibernate.cfg.xml"/>
 
@@ -146,7 +145,7 @@
                     export="false"
                     haltonerror="true"
                     outputfilename="sql.ddl"/>
-        </hibernatetool>
+        </hibernatetool-->
     </target>
 
     <target
@@ -214,7 +213,7 @@
 
 
         <javac source="1.7" target="1.7" srcdir="src/main/java" destdir="${target}" excludes="**/tests/*"
-               encoding="ISO-8859-1">
+               encoding="ISO-8859-1" debug="true">
             <classpath refid="classpath"/>
         </javac>
     </target>

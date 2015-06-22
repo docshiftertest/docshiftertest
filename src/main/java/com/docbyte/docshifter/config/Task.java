@@ -1,5 +1,7 @@
 package com.docbyte.docshifter.config;
 
+import com.docbyte.docshifter.work.WorkFolder;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +23,10 @@ public class Task implements Serializable {
 	protected String item_id="";	//unique file identifier: default from dctm= objectid
 	protected String request="";	//transformation request: default from dctm= "rendition_req_ps_pdf"
 	protected String sent_by="";	//user requesting the transformation: default from dctm= "dm_autorender_win31"
+	protected WorkFolder workFolder=null;
 	protected HashMap<String, String> parameters;
 	protected Map<String, Object> data;
+
 	
 	public Task(){
 		
@@ -39,9 +43,10 @@ public class Task implements Serializable {
 	public void setContent(Byte[] content) {
 		this.content = content;
 	}
-	public Task(String filePath){
+	public Task(String filePath, WorkFolder wf){
 		this.item_id=filePath;
 		this.name=filePath;
+		this.workFolder = wf;
 	}
 	
 	public String getEvent() {
@@ -86,9 +91,13 @@ public class Task implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	
-	
+	public WorkFolder getWorkFolder() {
+		return workFolder;
+	}
+	public void setWorkFolder(WorkFolder workFolder) {
+		this.workFolder = workFolder;
+	}
+
 	public HashMap<String, String> getParameters() {
 		return parameters;
 	}
