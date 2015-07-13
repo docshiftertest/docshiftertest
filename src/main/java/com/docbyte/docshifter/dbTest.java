@@ -12,10 +12,10 @@ public class dbTest {
 			
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-			Module mRoot=new Module(1, "", "", "root", "input", null, null);
-			Module m01=new Module(2, "", "", "c1", "input", null, null);
-			Module m11=new Module(3, "", "", "cc1", "input", null, null);
-			Module m02=new Module(4, "", "", "c2", "input", null, null);
+			Module mRoot=new Module("", "", "root", "input", null, null);
+			Module m01=new Module("", "", "c1", "input", null, null);
+			Module m11=new Module("", "", "cc1", "input", null, null);
+			Module m02=new Module("", "", "c2", "input", null, null);
 		
 			ModuleConfiguration mcroot=new ModuleConfiguration(1, mRoot, "root", "root", null);
 			ModuleConfiguration mcc01=new ModuleConfiguration(2, m01, "child p root", "child p root", null);

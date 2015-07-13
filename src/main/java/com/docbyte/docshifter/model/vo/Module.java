@@ -25,9 +25,9 @@ public class Module implements Serializable
 	
 	public Module() {}
 	
-	public Module(int id, String description, String name, String classname, String type, String condition, Set<Parameter> parameters)
+	public Module(String description, String name, String classname, String type, String condition, Set<Parameter> parameters)
 	{
-		this.id = id;
+//		this.id = id;
 		this.description = description;
 		this.name = name;
 		this.classname = classname;
@@ -37,7 +37,7 @@ public class Module implements Serializable
 	}
 	
 	public Module(Module module){
-		this(module.getId(), module.getDescription(), module.getName(), module.getClassname(), module.getType(), module.getCondition(), new HashSet<Parameter>(module.getParameters()));
+		this(module.getDescription(), module.getName(), module.getClassname(), module.getType(), module.getCondition(), new HashSet<Parameter>(module.getParameters()));
 	}
 
 	public void addToParameters(Parameter param)

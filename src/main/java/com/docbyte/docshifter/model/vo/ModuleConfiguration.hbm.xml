@@ -14,7 +14,7 @@
 		<property name="description" />
 
 		<many-to-one name="module" column="MODULEID" foreign-key="MODULEID"
-			lazy="false" cascade="all" />
+			lazy="false" cascade="save-update" />
 
 		<map name="parameterValues" table="MODULEPARAMSVALUES" cascade="delete-orphan" lazy="false">
 			<key column="CONFIGURATIONID" />
