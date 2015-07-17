@@ -2,13 +2,10 @@ package tests;
 
 import static org.junit.Assert.*;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.naming.ConfigurationException;
-import javax.swing.filechooser.FileSystemView;
 
 import org.junit.After;
 import org.junit.Assert;
