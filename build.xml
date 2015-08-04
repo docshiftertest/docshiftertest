@@ -35,7 +35,7 @@
 
     <property
             name="type"
-            value="alpha"/>
+            value="release"/>
 
     <property
             name="version"
@@ -253,9 +253,12 @@
                     prefix="lib">
             </zipfileset>
 
-            <zipfileset dir="${releases}">
+            <zipfileset dir="${releases}" prefix="lib">
+                <include name="*.jar"/>
+            </zipfileset>
 
-                <include name="dummy.file"/>
+            <zipfileset dir="${releases}">
+                <include name="work/dummy.file"/>
             </zipfileset>
 
         </zip>
