@@ -239,7 +239,7 @@
                             <classifier>beans-${project.version}</classifier>
                         </configuration>
                     </execution>
-                    <execution>
+                    <!--execution>
                         <id>all-libs</id>
 
                         <goals>
@@ -259,7 +259,7 @@
                                 <exclude>**</exclude>
                             </excludes>
                         </configuration>
-                    </execution>
+                    </execution-->
                 </executions>
                 <configuration>
                     <outputDirectory>${project.build.directory}/jars/</outputDirectory>
