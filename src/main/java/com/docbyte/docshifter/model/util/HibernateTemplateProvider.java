@@ -1,24 +1,21 @@
 package com.docbyte.docshifter.model.util;
 
-import java.util.List;
-
+import com.docbyte.docshifter.model.vo.*;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 
-import com.docbyte.docshifter.model.vo.ChainConfiguration;
-import com.docbyte.docshifter.model.vo.GlobalSettings;
-import com.docbyte.docshifter.model.vo.Module;
-import com.docbyte.docshifter.model.vo.ModuleConfiguration;
-import com.docbyte.docshifter.model.vo.Parameter;
-import com.docbyte.docshifter.model.vo.Node;
+import java.util.List;
 
 public class HibernateTemplateProvider{
 	
 	private Configuration config;
 	private SessionFactory factory;
+	private StandardServiceRegistry serviceRegistry;
 	
 	private static HibernateTemplateProvider instance;
 	
@@ -30,15 +27,18 @@ public class HibernateTemplateProvider{
 	}
 	
 	private HibernateTemplateProvider(){
-		config = new Configuration();
-		config.addClass(ChainConfiguration.class);
-		config.addClass(GlobalSettings.class);
-		config.addClass(Module.class);
-		config.addClass(ModuleConfiguration.class);
-		config.addClass(Parameter.class);
-		config.addClass(Node.class);
+		config = new Configuration()
+				.addPackage("com.docbyte.docshifter.model.vo")
+				.addAnnotatedClass(Parameter.class)
+				.addAnnotatedClass(ChainConfiguration.class)
+				.addAnnotatedClass(Node.class)
+				.addAnnotatedClass(Module.class)
+				.addAnnotatedClass(ModuleConfiguration.class)
+				.addAnnotatedClass(GlobalSettings.class);
 		config.setProperties(System.getProperties());
-		factory = config.configure().buildSessionFactory();
+		serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
+				config.getProperties()).build();
+		factory = config.buildSessionFactory(serviceRegistry);
 	}
 	
 	public void delete(Object object){

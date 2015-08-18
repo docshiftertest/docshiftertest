@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "CHAINCONFIGURATION")
+@Table(name = "CHAINCONFIGURATION", schema = "DOCSHIFTER")
 public class ChainConfiguration implements Serializable
 {
 	private static final long serialVersionUID = -4600324113793261377L;
@@ -50,8 +50,13 @@ public class ChainConfiguration implements Serializable
 		return name;
 	}
 
-	@ManyToOne(targetEntity=com.docbyte.docshifter.model.vo.Node.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@Column(name="ROOTNODE")
+	@ManyToOne(
+			targetEntity=com.docbyte.docshifter.model.vo.Node.class,
+			cascade = CascadeType.ALL,
+			fetch = FetchType.EAGER
+
+	)
+	@JoinColumn(name="ROOTNODE")
 	public Node getRootNode()
 	{
 		return rootNode;

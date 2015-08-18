@@ -1,17 +1,19 @@
 package com.docbyte.docshifter.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-public class Module implements Serializable
-{
+@Entity
+@Table(name = "MODULE", schema = "DOCSHIFTER")
+public class Module implements Serializable {
 	private static final long serialVersionUID = -2605744674300941605L;
-	
+
 	private int id;
 	private String name;
 	private String classname;
@@ -20,13 +22,13 @@ public class Module implements Serializable
 	private String condition;
 	private String inputFiletype;
 	private String outputFileType;
-	
+
 	private Set<Parameter> parameters = new HashSet<Parameter>();
-	
-	public Module() {}
-	
-	public Module(String description, String name, String classname, String type, String condition, Set<Parameter> parameters)
-	{
+
+	public Module() {
+	}
+
+	public Module(String description, String name, String classname, String type, String condition, Set<Parameter> parameters) {
 //		this.id = id;
 		this.description = description;
 		this.name = name;
@@ -35,90 +37,89 @@ public class Module implements Serializable
 		this.condition = condition;
 		this.parameters = parameters;
 	}
-	
-	public Module(Module module){
+
+	public Module(Module module) {
 		this(module.getDescription(), module.getName(), module.getClassname(), module.getType(), module.getCondition(), new HashSet<Parameter>(module.getParameters()));
 	}
 
-	public void addToParameters(Parameter param)
-	{
+	public void addToParameters(Parameter param) {
 		this.getParameters().add(param);
 	}
 
-	public void addToParameters(Set<Parameter> params)
-	{
-		for(Parameter param : params)
-		{
+	public void addToParameters(Set<Parameter> params) {
+		for (Parameter param : params) {
 			this.addToParameters(param);
 		}
 	}
 
-	public String getDescription()
-	{
+	public String getDescription() {
 		return description;
 	}
 
-	public int getId()
-	{
+	@Id
+	@Column(name = "ID")
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	public int getId() {
 		return id;
 	}
 
-	public String getName()
-	{
+	public String getName() {
 		return name;
 	}
 
-	public Set<Parameter> getParameters()
-	{
+
+	@ManyToMany(
+			targetEntity = com.docbyte.docshifter.model.vo.Parameter.class,
+			cascade = CascadeType.ALL,
+			fetch = FetchType.EAGER
+	)
+	@JoinTable(
+			name = "MODULEPARAMS",
+			schema = "DOCSHIFTER",
+			joinColumns = @JoinColumn(name = "MODULEID"),
+			inverseJoinColumns = @JoinColumn(name = "PARAMID")
+	)
+	public Set<Parameter> getParameters() {
 		return parameters;
 	}
 
 	@JsonIgnore
-	public List<Parameter> getParametersAsList()
-	{
+	@Transient
+	public List<Parameter> getParametersAsList() {
 		return new ArrayList<Parameter>(this.getParameters());
 	}
 
-	public String getType()
-	{
+	public String getType() {
 		return type;
 	}
 
-	public boolean removeFromParameters(Parameter param)
-	{
+	public boolean removeFromParameters(Parameter param) {
 		return this.getParameters().remove(param);
 	}
 
-	public void removeFromParameters(Set<Parameter> params)
-	{
-		for(Parameter param : params)
-		{
+	public void removeFromParameters(Set<Parameter> params) {
+		for (Parameter param : params) {
 			this.removeFromParameters(param);
 		}
 	}
-	
-	public void setDescription(String description)
-	{
+
+	public void setDescription(String description) {
 		this.description = description;
 	}
-	
-	public void setId(int id)
-	{
+
+	public void setId(int id) {
 		this.id = id;
 	}
-	
-	public void setName(String name)
-	{
+
+	public void setName(String name) {
 		this.name = name;
 	}
-	
-	public void setParameters(Set<Parameter> parameters)
-	{
+
+	public void setParameters(Set<Parameter> parameters) {
 		this.parameters = parameters;
 	}
-	
-	public void setType(String type)
-	{
+
+	public void setType(String type) {
 		this.type = type;
 	}
 
@@ -130,6 +131,7 @@ public class Module implements Serializable
 		this.classname = classname;
 	}
 
+	@Transient
 	public String getInputFiletype() {
 		return inputFiletype;
 	}
@@ -138,6 +140,7 @@ public class Module implements Serializable
 		this.inputFiletype = inputFiletype;
 	}
 
+	@Transient
 	public String getOutputFileType() {
 		return outputFileType;
 	}

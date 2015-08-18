@@ -1,15 +1,5 @@
 package com.docbyte.docshifter;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.docbyte.docshifter.model.dao.ModuleConfigurationsDAO;
 import com.docbyte.docshifter.model.dao.ModuleDAO;
 import com.docbyte.docshifter.model.dao.NodeDAO;
@@ -19,6 +9,16 @@ import com.docbyte.docshifter.model.vo.ModuleConfiguration;
 import com.docbyte.docshifter.model.vo.Node;
 import com.docbyte.docshifter.model.vo.Parameter;
 import com.docbyte.docshifter.util.ParameterTypes;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TestDB {
 	private Module m1;
@@ -158,6 +158,7 @@ public class TestDB {
 	public void testUpdateNode() {
 		parameterdao.save(p1);
 		parameterdao.save(p2);
+		moduledao.insert(m2);
 		mcdao.insert(mc2);
 		nodedao.insert(n2);
 		
@@ -198,13 +199,20 @@ public class TestDB {
 		moduledao.insert(m7);
 		parameterdao.save(p7);
 		mcdao.insert(mc7);
-		nodedao.insert(n7);
+		n7 = nodedao.insert(n7);
+		nodedao.insert(n7);nodedao.insert(n7);
+
+		System.out.print(n7.getId());
 		
 		List<Node> beforelist = nodedao.get();
 		long before = beforelist.size();
-				
-		nodedao.delete(n7);
-		
+
+		System.out.print(n7.getId());
+
+		//nodedao.delete(n7);
+
+		System.out.print(n7.getId());
+
 		List<Node> afterlist = nodedao.get();
 		long after = afterlist.size();
 		
@@ -254,9 +262,9 @@ public class TestDB {
 		
 		List<Module> beforelist = moduledao.getModules();
 		long before = beforelist.size();
-						
+
 		moduledao.delete(m11);
-		
+
 		List<Module> afterlist = moduledao.getModules();
 		long after = afterlist.size();
 		
