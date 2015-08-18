@@ -5,7 +5,7 @@
 
 <hibernate-mapping>
 	<class name="com.docbyte.docshifter.model.vo.Node" table="NODE">
-		<id name="id" column="ID">
+		<id name="id" column="ID" unsaved-value="0">
 			<generator class="native" />
 		</id>
 

@@ -34,6 +34,16 @@ public class ModuleConfiguration implements Serializable{
 		this.description = description;
 		this.parameterValues = parameterValues;
 	}
+	
+	public ModuleConfiguration(Module module, String name,
+			String description, Map<Parameter, String> parameterValues) {
+		super();
+//		this.id = id;
+		this.module = module;
+		this.name = name;
+		this.description = description;
+		this.parameterValues = parameterValues;
+	}
 
 	public void setId(int id)
 	{
@@ -129,6 +139,8 @@ public class ModuleConfiguration implements Serializable{
 		return true;
 	}
 	*/
+
+	
 	@SuppressWarnings("rawtypes")
 	@JsonProperty("parameters")
 	public List<Map> jsonParameterValues()

@@ -39,9 +39,9 @@ public class NodeDAO implements INodeDAO
 	}
 
 	@Override
-	public Node insert(Node node) throws Exception {
+	public Node insert(Node node) throws IllegalArgumentException {
 		if(exists(node))
-			throw new Exception("A node with the same children already exists. The node cannot be saved.");
+			throw new IllegalArgumentException("A node with the same children already exists. The node cannot be saved.");
 		hibernateTemplate.merge(node);
 		return node;
 	}
