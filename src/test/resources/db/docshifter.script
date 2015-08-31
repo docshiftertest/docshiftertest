@@ -61,7 +61,7 @@ GRANT DBA TO "DS_USER"
 SET SCHEMA SYSTEM_LOBS
 INSERT INTO BLOCKS VALUES(0,2147483647,0)
 SET SCHEMA DOCSHIFTER
-INSERT INTO GLOBALSETTINGS VALUES(1,'OpenMQ','localhost:7676','docShifter.queue','admin','admin','localhost','8100','C:\Docbyte\DocShifter\work')
+INSERT INTO GLOBALSETTINGS VALUES(1,'ActiveMQ','tcp://192.168.10.121:61616','docShifter.queue','admin','admin','localhost','8100','/var/tmp/')
 INSERT INTO MODULE VALUES(1,'FS In','com.docbyte.docshifter.sender.fs.scheduler.FSScheduler','Input FS','Input',NULL)
 INSERT INTO MODULE VALUES(2,'pdf trans','com.docbyte.docshifter.receiver.operations.pdf.AllToPdfTransformation','pdf trans','Transformation',NULL)
 INSERT INTO MODULE VALUES(4,'File System Output','com.docbyte.docshifter.receiver.operations.filesystem.FSExport','FS output','Release',NULL)

@@ -1,48 +1,33 @@
 package com.docbyte.docshifter;
 
-import static org.junit.Assert.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.jms.JMSException;
-import javax.jms.TopicConnection;
-import javax.naming.ConfigurationException;
-
+import com.docbyte.docshifter.config.ConfigurationServer;
+import com.docbyte.docshifter.config.Constants;
+import com.docbyte.docshifter.config.GeneralConfigurationBean;
+import com.docbyte.docshifter.config.Task;
+import com.docbyte.docshifter.messaging.factory.MessagingFactory;
+import com.docbyte.docshifter.messaging.queue.information.Information;
+import com.docbyte.docshifter.messaging.queue.sender.IMessageSender;
+import com.docbyte.docshifter.model.dao.*;
+import com.docbyte.docshifter.model.vo.*;
+import com.docbyte.docshifter.util.ParameterTypes;
+import com.docbyte.docshifter.work.WorkFolder;
+import com.docbyte.docshifter.work.WorkFolderManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.docbyte.docshifter.config.ConfigurationServer;
-import com.docbyte.docshifter.config.Constants;
-import com.docbyte.docshifter.config.GeneralConfigurationBean;
-import com.docbyte.docshifter.config.Task;
-import com.docbyte.docshifter.messaging.factory.IConnectionFactory;
-import com.docbyte.docshifter.messaging.factory.MessagingConnectionFactory;
-import com.docbyte.docshifter.messaging.queue.information.Information;
-import com.docbyte.docshifter.messaging.queue.sender.IMessageSender;
-import com.docbyte.docshifter.messaging.queue.sender.JMSSender;
-import com.docbyte.docshifter.model.dao.ChainConfigurationDAO;
-import com.docbyte.docshifter.model.dao.ModuleConfigurationsDAO;
-import com.docbyte.docshifter.model.dao.ModuleDAO;
-import com.docbyte.docshifter.model.dao.NodeDAO;
-import com.docbyte.docshifter.model.dao.ParameterDAO;
-import com.docbyte.docshifter.model.vo.ChainConfiguration;
-import com.docbyte.docshifter.model.vo.Module;
-import com.docbyte.docshifter.model.vo.ModuleConfiguration;
-import com.docbyte.docshifter.model.vo.Node;
-import com.docbyte.docshifter.model.vo.Parameter;
-import com.docbyte.docshifter.util.ParameterTypes;
-import com.docbyte.docshifter.work.WorkFolder;
-import com.docbyte.docshifter.work.WorkFolderManager;
+import javax.jms.JMSException;
+import javax.naming.ConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-public class TestJMS {
+import static org.junit.Assert.assertEquals;
+
+public class TestActiveMq {
 	private GeneralConfigurationBean config;
-	private TopicConnection connection;
-	private IConnectionFactory connectionfactory;
 	private IMessageSender sender;
 	private WorkFolderManager manager;
 	private WorkFolder workfolder;
@@ -62,7 +47,6 @@ public class TestJMS {
 		config = ConfigurationServer.getGeneralConfiguration();
 		String user = config.getString(Constants.JMS_USER);
 		String password = config.getString(Constants.JMS_PASSWORD);
-		String url = config.getString(Constants.JMS_URL);
 		ccdao = new ChainConfigurationDAO();
 		nodedao = new NodeDAO();
 		mcdao = new ModuleConfigurationsDAO();
@@ -81,21 +65,19 @@ public class TestJMS {
 			moduledao.insert(m);
 			parameterdao.save(p);
 			mcdao.insert(mc);
-			nodedao.insert(n);
+			n=nodedao.insert(n);
+			cc.setRootNode(n);
 			ccdao.save(cc);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 		
 		try {
-			connectionfactory = MessagingConnectionFactory.getConnectionFactory(user, password, url);		
-			sender = JMSSender.getInstance(config.getString(Constants.JMS_QUEUE));
+			sender = MessagingFactory.getMessageSender();
 			manager = WorkFolderManager.getInstance();
 			workfolder = manager.getNewWorkfolder("work");
-			
-			connection = connectionfactory.createTopicConnection();
-			connection.start();			
-		} catch (JMSException | ConfigurationException | IOException e) {
+
+		} catch (ConfigurationException | IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -103,6 +85,10 @@ public class TestJMS {
 	/* Test fails because there are no messages on the queue */
 	@Test
 	public void testSendMessage() {
+
+		Information info = new Information();
+		int initialNrOfMessages = info.getNumberOfMessages();
+
 		String queuename = config.getString(Constants.JMS_QUEUE);
 		File file = new File(workfolder.toString() + File.separator + "test.txt");
 		if (!file.exists()) {
@@ -122,20 +108,16 @@ public class TestJMS {
 			e.printStackTrace();
 			Assert.fail("Exception: " + e);
 		}
-		
-		Information info = new Information();
+
 		int nrOfMessages = info.getNumberOfMessages();
-		assertEquals(1, nrOfMessages);
+		System.out.print(nrOfMessages);
+
+		assertEquals(initialNrOfMessages+1, nrOfMessages);
 	}
 	
 	@After
 	public void after() {
-		try {
-			connection.stop();
-			connection.close();
-		} catch (JMSException e) {
-			e.printStackTrace();
-		}
+
 		File folder = new File(workfolder.toString());
 		if (folder.exists()) {
 			manager.deleteWorkfolder(workfolder);

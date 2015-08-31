@@ -30,11 +30,13 @@ class ActiveMQConnectionFactory implements IConnectionFactory {
 //			acf = new AdminConnectionFactory();
 			// example url: "localhost:7676"
 			connectionFactory.setBrokerURL(url);
-//			acf.setProperty(AdminConnectionConfiguration.imqAddress, url);
+
+			//acf.setProperty(AdminConnectionConfiguration.imqAddress, url);
 		}
 	}
 
 	public Connection createConnection() throws JMSException {
+
 		return connectionFactory.createConnection(user, password);
 	}
 	
