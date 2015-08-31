@@ -1,7 +1,10 @@
 package com.docbyte.docshifter.model.vo;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
+@Entity
+@Table(name = "GLOBALSETTINGS", schema = "DOCSHIFTER")
 public class GlobalSettings implements Serializable
 {
 	private static final long serialVersionUID = -4810606443366108561L;
@@ -67,6 +70,9 @@ public class GlobalSettings implements Serializable
 		return defaultTempFolder;
 	}
 
+	@Id
+	@Column(name = "ID")
+	@GeneratedValue(strategy= GenerationType.AUTO)
 	public long getId()
 	{
 		return id;

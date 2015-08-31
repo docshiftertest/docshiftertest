@@ -1,13 +1,13 @@
 package com.docbyte.docshifter.model.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.docbyte.docshifter.model.dao.inter.IChainConfigurationDAO;
 import com.docbyte.docshifter.model.util.HibernateTemplateProvider;
 import com.docbyte.docshifter.model.vo.ChainConfiguration;
 import com.docbyte.docshifter.model.vo.Node;
 import com.docbyte.docshifter.util.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChainConfigurationDAO implements IChainConfigurationDAO {
 
@@ -96,7 +96,7 @@ public class ChainConfigurationDAO implements IChainConfigurationDAO {
 						+ "WHERE lower(c.queueName) = '"
 						+ queueName.toLowerCase() + "'");
 
-		if (list.size() >= 0) {
+		if (list.size() > 0) {
 			return list.get(0);
 		} else {
 			return null;

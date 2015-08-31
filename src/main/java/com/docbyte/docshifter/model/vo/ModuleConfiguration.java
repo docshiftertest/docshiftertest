@@ -3,6 +3,7 @@ package com.docbyte.docshifter.model.vo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 
+@Entity
+@Table(name = "MODULECONFIGURATIONS", schema = "DOCSHIFTER")
 public class ModuleConfiguration implements Serializable{
 
 	private static final long serialVersionUID = 7666888692582226276L;
@@ -34,12 +37,25 @@ public class ModuleConfiguration implements Serializable{
 		this.description = description;
 		this.parameterValues = parameterValues;
 	}
+	
+	public ModuleConfiguration(Module module, String name,
+			String description, Map<Parameter, String> parameterValues) {
+		super();
+//		this.id = id;
+		this.module = module;
+		this.name = name;
+		this.description = description;
+		this.parameterValues = parameterValues;
+	}
 
 	public void setId(int id)
 	{
 		this.id = id;
 	}
 
+	@Id
+	@Column(name = "ID")
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	public int getId()
 	{
 		return id;
@@ -50,16 +66,23 @@ public class ModuleConfiguration implements Serializable{
 		this.module = module;
 	}
 
+	@ManyToOne(
+			cascade = CascadeType.PERSIST,
+			fetch = FetchType.EAGER
+	)
+	@JoinColumn(name = "MODULEID")
 	public Module getModule()
 	{
 		return module;
 	}
 
+
 	public void setParameterValues(Map<Parameter, String> parameterValues)
 	{
 		this.parameterValues = parameterValues;
 	}
-	
+
+	@Transient
 	public void setParameterValue(Parameter param, String value)
 	{
 		for(Parameter existingParam : this.getParameterValues().keySet())
@@ -69,12 +92,20 @@ public class ModuleConfiguration implements Serializable{
 		}
 	}
 
+
+
+
 	@JsonIgnore
+	@ElementCollection(targetClass = java.lang.String.class)
+	@JoinTable (name = "MODULEPARAMSVALUES", schema = "DOCSHIFTER", joinColumns={@JoinColumn(name="CONFIGURATIONID")})
+	@MapKeyJoinColumn(name="PARAMID")
+	@Column(name="PARAMVALUE")
 	public Map<Parameter, String> getParameterValues()
 	{
 		return parameterValues;
 	}
-		
+
+	@Transient
 	public void addParameterValue(Parameter param, String value)
 	{
 		this.getParameterValues().put(param, value);
@@ -129,8 +160,11 @@ public class ModuleConfiguration implements Serializable{
 		return true;
 	}
 	*/
+
+	
 	@SuppressWarnings("rawtypes")
 	@JsonProperty("parameters")
+	@Transient
 	public List<Map> jsonParameterValues()
 	{
 		List<Map> parameters = new ArrayList<Map>();

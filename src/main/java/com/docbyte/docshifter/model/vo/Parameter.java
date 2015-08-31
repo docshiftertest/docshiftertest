@@ -1,9 +1,12 @@
 package com.docbyte.docshifter.model.vo;
 
-import java.io.Serializable;
-
 import com.docbyte.docshifter.util.ParameterTypes;
 
+import javax.persistence.*;
+import java.io.Serializable;
+
+@Entity
+@Table(name = "PARAM", schema = "DOCSHIFTER")
 public class Parameter implements Serializable
 {
 	private static final long serialVersionUID = -4973841817482543428L;
@@ -44,6 +47,9 @@ public class Parameter implements Serializable
 		this.id = id;
 	}
 
+	@Id
+	@Column(name = "ID")
+	@GeneratedValue(strategy= GenerationType.AUTO)
 	public long getId()
 	{
 		return id;

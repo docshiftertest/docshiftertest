@@ -25,7 +25,7 @@ public class JMSReceiver extends AbstractJMSReceiver implements IMessageReceiver
 		if (docShifterController==null)
 			throw new IllegalArgumentException("controller can not be null");
 		setController(docShifterController);
-		setQueueNameSuffix("printServiceReceive");
+		setQueueNameSuffix("printServiceReceiver");
 	}
 	
 	public JMSReceiver(IDocShifterController docShifterController, String queueNameSuffix) {

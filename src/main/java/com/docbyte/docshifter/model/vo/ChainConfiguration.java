@@ -1,8 +1,10 @@
 package com.docbyte.docshifter.model.vo;
 
+import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Set;
 
+@Entity
+@Table(name = "CHAINCONFIGURATION", schema = "DOCSHIFTER")
 public class ChainConfiguration implements Serializable
 {
 	private static final long serialVersionUID = -4600324113793261377L;
@@ -33,16 +35,28 @@ public class ChainConfiguration implements Serializable
 	{
 		return description;
 	}
+
+	@Id
+	@Column(name = "ID")
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	public long getId()
 	{
 		return id;
 	}
-	
+
+
 	public String getName()
 	{
 		return name;
 	}
 
+	@ManyToOne(
+			targetEntity=com.docbyte.docshifter.model.vo.Node.class,
+			cascade = CascadeType.ALL,
+			fetch = FetchType.EAGER
+
+	)
+	@JoinColumn(name="ROOTNODE")
 	public Node getRootNode()
 	{
 		return rootNode;

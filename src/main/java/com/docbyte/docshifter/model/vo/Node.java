@@ -1,10 +1,13 @@
 package com.docbyte.docshifter.model.vo;
 
+import com.docbyte.docshifter.config.test.NodeCallable;
+
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.docbyte.docshifter.config.test.NodeCallable;
-
+@Entity
+@Table(name = "NODE", schema = "DOCSHIFTER")
 public class Node {
 	
 	private long id;
@@ -26,7 +29,10 @@ public class Node {
 		}
 		this.moduleConfiguration = moduleConfiguration;
 	}
-	
+
+	@Id
+	@Column(name = "ID")
+	@GeneratedValue(strategy= GenerationType.AUTO)
 	public long getId(){
 		return id;
 	}
@@ -34,7 +40,9 @@ public class Node {
 	public void setId(long id){
 		this.id = id;
 	}
-	
+
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "PARENTNODE")
 	public Node getParentNode(){
 		return parentNode;
 	}
@@ -45,7 +53,9 @@ public class Node {
 	public void addChild(Node n){
 		this.childNodes.add(n);
 	}
-	
+
+
+	@OneToMany(mappedBy = "parentNode")
 	public Set<Node> getChildNodes(){
 		return childNodes;
 	}
@@ -60,7 +70,9 @@ public class Node {
 			childNodes.addAll(childNodes);
 		}
 	}
-	
+
+	@ManyToOne(cascade = CascadeType.PERSIST)
+	@JoinColumn(name = "MODULECONFIGURATION")
 	public ModuleConfiguration getModuleConfiguration(){
 		return moduleConfiguration;
 	}
@@ -114,7 +126,8 @@ public class Node {
 			func.exitingChildNodes();
 		}
 	}
-	
+
+	@Transient
 	public int getTotalChildNodesCount(){
 		if(childNodes.size() == 0)
 			return 0;
@@ -125,7 +138,8 @@ public class Node {
 			return i;
 		}
 	}
-	
+
+	@Transient
 	public boolean isLeaf(){
 		return childNodes.size() == 0;
 	}
