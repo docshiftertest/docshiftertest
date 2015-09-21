@@ -96,7 +96,7 @@ public class ModuleConfiguration implements Serializable{
 
 
 	@JsonIgnore
-	@ElementCollection(targetClass = java.lang.String.class)
+	@ElementCollection(targetClass = java.lang.String.class, fetch = FetchType.EAGER)
 	@JoinTable (name = "MODULEPARAMSVALUES", schema = "DOCSHIFTER", joinColumns={@JoinColumn(name="CONFIGURATIONID")})
 	@MapKeyJoinColumn(name="PARAMID")
 	@Column(name="PARAMVALUE")

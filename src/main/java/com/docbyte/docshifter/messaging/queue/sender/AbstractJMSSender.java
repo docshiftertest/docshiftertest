@@ -1,12 +1,5 @@
 package com.docbyte.docshifter.messaging.queue.sender;
 
-import javax.jms.Connection;
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-
 import com.docbyte.docshifter.config.ConfigurationServer;
 import com.docbyte.docshifter.config.Constants;
 import com.docbyte.docshifter.config.GeneralConfigurationBean;
@@ -15,6 +8,8 @@ import com.docbyte.docshifter.messaging.IMessageSenderOrPublisher;
 import com.docbyte.docshifter.messaging.factory.IConnectionFactory;
 import com.docbyte.docshifter.messaging.factory.MessagingConnectionFactory;
 import com.docbyte.docshifter.util.Logger;
+
+import javax.jms.*;
 
 public abstract class AbstractJMSSender extends AbstractJMSConnection implements IMessageSenderOrPublisher  {
 	public static int retriesLeft=999;
@@ -49,7 +44,7 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 	 */
 	public void close() {
 		//Logger.debug("Being asked to close Connection"+(nrStarted--), null);
-		//if(nrStarted<=0){
+		if(nrStarted>0){
 			//nrStarted=0;
 			Logger.debug("Closing Connection"+(nrStarted), null);
 			try{
@@ -75,7 +70,7 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 			}
 			nrStarted--;
 			Logger.info("nrStarted = " + nrStarted, null);
-//		}
+		}
 //		try{
 //			if (connection != null)
 //				connection.close();

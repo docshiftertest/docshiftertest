@@ -5,7 +5,7 @@
     <groupId>com.docshifter</groupId>
     <artifactId>docshifter-beans</artifactId>
     <version>5.4.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <description></description>
     <properties>
         <maven.compile.source>1.7</maven.compile.source>

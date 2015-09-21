@@ -41,7 +41,7 @@ public class Node {
 		this.id = id;
 	}
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "PARENTNODE")
 	public Node getParentNode(){
 		return parentNode;
@@ -55,7 +55,7 @@ public class Node {
 	}
 
 
-	@OneToMany(mappedBy = "parentNode")
+	@OneToMany(mappedBy = "parentNode", fetch = FetchType.EAGER)
 	public Set<Node> getChildNodes(){
 		return childNodes;
 	}
