@@ -3,3 +3,4 @@ _deliverables/*
 docShifterCore.zip
 *.log
 *.iml
+/target/
