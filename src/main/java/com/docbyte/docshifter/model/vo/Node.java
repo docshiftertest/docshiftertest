@@ -55,7 +55,7 @@ public class Node {
 	}
 
 
-	@OneToMany(mappedBy = "parentNode", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "parentNode", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
 	public Set<Node> getChildNodes(){
 		return childNodes;
 	}
