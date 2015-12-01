@@ -5,39 +5,13 @@ xsi:schemaLocation="http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.docshifter</groupId>
     <artifactId>docshifter-beans</artifactId>
-    <version>5.4.1-SNAPSHOT</version>
+    <version>5.5-RELEASE</version>
     <packaging>jar</packaging>
     <description></description>
     <properties>
         <maven.compile.source>1.7</maven.compile.source>
         <maven.compile.target>1.7</maven.compile.target>
     </properties>
-    <repositories>
-        <repository>
-            <id>internal</id>
-            <name>Archiva Managed Internal Repository</name>
-            <url>http://jira:9095/repository/internal/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>internal</id>
-            <name>Archiva Managed Internal Repository</name>
-            <url>http://jira:9095/repository/internal/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.apache.activemq</groupId>
