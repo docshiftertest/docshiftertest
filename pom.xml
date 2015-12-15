@@ -16,7 +16,7 @@ xsi:schemaLocation="http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <repository>
             <id>internal</id>
             <name>Archiva Managed Internal Repository</name>
-            <url>http://jira:9095/repository/internal/</url>
+            <url>http://mvn.docbyte.com/repository/internal/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -29,7 +29,7 @@ xsi:schemaLocation="http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <pluginRepository>
             <id>internal</id>
             <name>Archiva Managed Internal Repository</name>
-            <url>http://jira:9095/repository/internal/</url>
+            <url>http://mvn.docbyte.com/repository/internal/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -49,6 +49,12 @@ xsi:schemaLocation="http://maven.apache.org/xsd/maven-4.0.0.xsd">
                     <artifactId>geronimo-jms_1.1_spec</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-email</artifactId>
+            <version>LATEST</version>
+            <classifier>jdk16</classifier>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -207,6 +213,11 @@ xsi:schemaLocation="http://maven.apache.org/xsd/maven-4.0.0.xsd">
   			<artifactId>aladdin</artifactId>
   			<version>3.60.48366</version>
 		</dependency>
+        <dependency>
+            <groupId>com.senn.magic</groupId>
+            <artifactId>senn-magic</artifactId>
+            <version>3.5</version>
+        </dependency>
     </dependencies>
 
 
