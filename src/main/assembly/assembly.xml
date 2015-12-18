@@ -5,6 +5,7 @@
     <formats>
         <format>zip</format>
     </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
             <directory>${project.build.directory}/jars</directory>
@@ -14,8 +15,11 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/_deliverables</directory>
+            <directory>${project.basedir}</directory>
             <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>notification.properties</include>
+            </includes>
         </fileSet>
     </fileSets>
     <dependencySets>
