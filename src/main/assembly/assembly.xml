@@ -16,6 +16,13 @@
         </fileSet>
         <fileSet>
             <directory>${project.basedir}</directory>
+            <outputDirectory>/work</outputDirectory>
+            <includes>
+                <include>dummyfile</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>notification.properties</include>
