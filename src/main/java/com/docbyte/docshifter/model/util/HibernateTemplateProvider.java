@@ -16,7 +16,11 @@ public class HibernateTemplateProvider{
 	private Configuration config;
 	private SessionFactory factory;
 	private StandardServiceRegistry serviceRegistry;
-	
+
+	public void setFactory(SessionFactory factory) {
+		this.factory = factory;
+	}
+
 	private static HibernateTemplateProvider instance;
 	
 	public static HibernateTemplateProvider getInstance(){

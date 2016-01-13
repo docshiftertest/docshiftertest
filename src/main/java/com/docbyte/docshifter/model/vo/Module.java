@@ -27,7 +27,15 @@ public class Module implements Serializable {
 
 	public Module() {
 	}
-
+	public Module(int id, String description, String name, String classname, String type, String condition, Set<Parameter> parameters) {
+		this.id = id;
+		this.description = description;
+		this.name = name;
+		this.classname = classname;
+		this.type = type;
+		this.condition = condition;
+		this.parameters = parameters;
+	}
 	public Module(String description, String name, String classname, String type, String condition, Set<Parameter> parameters) {
 //		this.id = id;
 		this.description = description;
@@ -37,6 +45,18 @@ public class Module implements Serializable {
 		this.condition = condition;
 		this.parameters = parameters;
 	}
+
+	public Module(int id, String description, String name, String classname, String type, Set<Parameter> parameters) {
+		this.id = id;
+		this.description = description;
+		this.name = name;
+		this.classname = classname;
+		this.type = type;
+		this.condition = condition;
+		this.parameters = parameters;
+	}
+
+
 
 	public Module(Module module) {
 		this(module.getDescription(), module.getName(), module.getClassname(), module.getType(), module.getCondition(), new HashSet<Parameter>(module.getParameters()));
