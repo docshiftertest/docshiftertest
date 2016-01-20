@@ -36,7 +36,8 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 		//}
 	}
 
-	private static int nrStarted=0;
+	//TODO: why static ???
+	private int nrStarted=0;
 //	private boolean started = false;
 
 	/* (non-Javadoc)
@@ -46,25 +47,25 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 		//Logger.debug("Being asked to close Connection"+(nrStarted--), null);
 		if(nrStarted>0){
 			//nrStarted=0;
-			Logger.debug("Closing Connection"+(nrStarted), null);
+			Logger.info("Closing Connection"+(nrStarted), null);
 			try{
 				if (producer != null){
 					producer.close();
-					Logger.info("Producer closed", null);}
+					Logger.info("Producer closed nr="+(nrStarted), null);}
 			} catch (Exception ex){
 				Logger.warn("Exception while closing producer from connection"+(nrStarted), ex);
 			}
 			try{
 				if (session != null){
 					session.close();
-					Logger.info("session closed", null);}
+					Logger.info("session closed nr="+(nrStarted), null);}
 			} catch (Exception ex){
 				Logger.warn("Exception while closing session from connection"+(nrStarted), ex);
 			}
 			try{
 				if (connection != null){
 					connection.close();
-					Logger.info("connection closed", null);}
+					Logger.info("connection closed nr="+(nrStarted), null);}
 			} catch (Exception ex){
 				Logger.warn("Exception while closing connection"+(nrStarted), ex);
 			}
@@ -83,7 +84,7 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 //		return started;
 	}
 	
-	public static int getNrStarted() {
+	public int getNrStarted() {
 		return nrStarted;
 	}
 
@@ -114,10 +115,10 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 			connection = connectionFactory.createConnection();
 			connection.start();
 			nrStarted++;
-			Logger.debug("Started Connection"+(nrStarted), null);
+			Logger.debug("Started Connection nr="+(nrStarted), null);
 			try{
 				session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-				Logger.info("session started", null);
+				Logger.info("session started nr="+(nrStarted), null);
 			}catch(JMSException e){
 				close();
 				retry(e);
@@ -131,7 +132,7 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 			producer.setDeliveryMode(DeliveryMode.PERSISTENT);
 
 		} catch (JMSException e){
-			Logger.info("Error, closing connection", null);
+			Logger.info("Error, closing connection nr="+(nrStarted), null);
 			close();
 			retry(e);
 			/*
