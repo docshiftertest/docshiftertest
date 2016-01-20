@@ -169,6 +169,7 @@ public class ModuleConfiguration implements Serializable{
 	{
 		List<Map> parameters = new ArrayList<Map>();
 		Map<String, String> parameter = null;
+
 		for(java.util.Map.Entry<Parameter, String> entry: parameterValues.entrySet())
 		{
 		parameter = new HashMap<String, String>();
@@ -176,6 +177,7 @@ public class ModuleConfiguration implements Serializable{
 		parameter.put("value",entry.getValue());
 		parameters.add(parameter);
 		}
+
 		return parameters;
 	}
 
