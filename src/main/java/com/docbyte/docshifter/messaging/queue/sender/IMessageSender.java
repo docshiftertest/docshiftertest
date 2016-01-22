@@ -5,7 +5,7 @@ import javax.jms.JMSException;
 import com.docbyte.docshifter.config.Task;
 import com.docbyte.docshifter.messaging.IMessageSenderOrPublisher;
 
-public interface IMessageSender extends IMessageSenderOrPublisher  {
+public interface IMessageSender extends IMessageSenderOrPublisher {
 	
 	abstract public void sendTask(long ChainConfigurationID,Task task) throws JMSException;
 	abstract public void sendDocumentumTask(long ChainConfigurationID, Task task) throws JMSException;
