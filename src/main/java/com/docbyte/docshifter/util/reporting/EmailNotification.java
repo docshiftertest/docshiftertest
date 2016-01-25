@@ -40,15 +40,21 @@ public class EmailNotification extends Notification {
 			message.getTo().addItem(new MailAddress(this.getDestination()));
 			message.setSubject(this.getSubject());
 			message.setHtmlBody(this.getMessage());
-			Attachment attachment = new Attachment(this.getAttachment().getAbsolutePath());
-			message.getAttachments().addItem(attachment);
+			Attachment attachment = null;
+			if (this.getAttachment() != null){
+				attachment = new Attachment(this.getAttachment().getAbsolutePath());
+				message.getAttachments().addItem(attachment);
+			}
 
-			
 			SmtpClient client = new SmtpClient(host);
 			client.setSecurityOptions(SecurityOptions.Auto);
 			client.send(message);
 			client.dispose();
-			attachment.dispose();
+
+			if (attachment != null){
+				attachment.dispose();
+			}
+
 			return true;
 		} catch (Exception ex) {
 			ex.printStackTrace();

@@ -213,6 +213,12 @@ xsi:schemaLocation="http://maven.apache.org/xsd/maven-4.0.0.xsd">
             <artifactId>senn-magic</artifactId>
             <version>3.5</version>
         </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-pdf</artifactId>
+            <version>LATEST</version>
+            <!--<classifier>jdk16</classifier>-->
+        </dependency>
     </dependencies>
 
 
