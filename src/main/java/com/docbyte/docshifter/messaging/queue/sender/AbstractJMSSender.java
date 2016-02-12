@@ -11,7 +11,7 @@ import com.docbyte.docshifter.util.Logger;
 
 import javax.jms.*;
 
-public abstract class AbstractJMSSender extends AbstractJMSConnection implements IMessageSenderOrPublisher  {
+public abstract class AbstractJMSSender extends AbstractJMSConnection implements IMessageSenderOrPublisher{
 	public static int retriesLeft=999;
 	public static final int RETRYDELAY=5;
 	
@@ -19,32 +19,41 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 	protected Session session = null;
 	protected Destination destination;
 	protected MessageProducer producer = null;
-	
-	public void retry(Exception ex){
-		
-		//if(0<=retriesLeft){
-			Logger.error("JMS Exception occured, make sure the JMS Provider is running correctly. Retry in "+RETRYDELAY+" minutes", ex);
-			try {
-				Thread.sleep(RETRYDELAY*60000);
-			} catch (InterruptedException e1) {
-			}
-			run();
-		//}
-		//else {
-		//	Logger.error("JMS Exception occured, make sure the JMS Provider is running correctly. No more retries left, Shutting down...", ex);
-		//System.exit(1);
-		//}
-	}
-
+	private boolean firstRun = true;
 	//TODO: why static ???
 	private int nrStarted=0;
-//	private boolean started = false;
 
-	/* (non-Javadoc)
-	 * @see com.docbyte.docshifter.messaging.queue.JMSSenderOrPublisher#close()
-	 */
+	public boolean isStarted() {
+		return nrStarted>0;
+	}
+	public int getNrStarted() {
+		return nrStarted;
+	}
+
+	@Override
+	public Connection getConnection() {
+		return connection;
+	}
+	public void setConnection(Connection connection) {
+		this.connection = connection;
+	}
+
+	@Override
+	public void retry(Exception ex){
+
+			Logger.error("JMS Exception occured, make sure the JMS Provider is running correctly. Retry in "+RETRYDELAY+" minutes", ex);
+			try {
+				Thread.sleep(RETRYDELAY * 60000);
+			} catch (InterruptedException e1) {
+				Logger.error("Thread failed to put in sleepmodus. AbstractJMSSender", e1);
+			}
+			run();
+	}
+
 	public void close() {
 		//Logger.debug("Being asked to close Connection"+(nrStarted--), null);
+		Logger.info("Start to run ... DONE exiting ="+(nrStarted), null);
+/*
 		if(nrStarted>0){
 			//nrStarted=0;
 			Logger.info("Closing Connection"+(nrStarted), null);
@@ -71,39 +80,23 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 			}
 			nrStarted--;
 			Logger.info("nrStarted = " + nrStarted, null);
-		}
-//		try{
-//			if (connection != null)
-//				connection.close();
-//			started=false;
-//		} catch (Exception ex){}
+		} */
+
 	}
 
-	public boolean isStarted() {
-		return nrStarted>0;
-//		return started;
-	}
-	
-	public int getNrStarted() {
-		return nrStarted;
-	}
-
-	@Override
-	public Connection getConnection() {
-		return connection;
-	}
-
-
-	public void setConnection(Connection connection) {
-		this.connection = connection;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see com.docbyte.docshifter.messaging.queue.JMSSenderOrPublisher#run()
-	 */
 	@Override
 	public void run() {
+
+		Logger.info("Start to run ... ="+(nrStarted), null);
+		if (firstRun) {
+			firstRun = false;
+			init();
+		}
+
+	}
+
+	public void init(){
+
 		GeneralConfigurationBean config = ConfigurationServer.getGeneralConfiguration();
 		user = config.getString(Constants.JMS_USER);
 		password = config.getString(Constants.JMS_PASSWORD);
@@ -120,51 +113,22 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 				session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 				Logger.info("session started nr="+(nrStarted), null);
 			}catch(JMSException e){
-				close();
+				//close();
+				Logger.error("session ERROR nr="+(nrStarted), null);
 				retry(e);
-				//e.printStackTrace();
-				//session=connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			}
-			
-			destination = session.createQueue(queueName);
 
+			destination = session.createQueue(queueName);
 			producer = session.createProducer(destination);
 			producer.setDeliveryMode(DeliveryMode.PERSISTENT);
+			firstRun = false;
+
 
 		} catch (JMSException e){
-			Logger.info("Error, closing connection nr="+(nrStarted), null);
-			close();
+			Logger.info("Error, creating connection nr EXCEPTION="+(nrStarted), null);
+			//close();
 			retry(e);
-			/*
-			 * 
-			Logger.error("JMSSender: JMS Exception occured, make sure the JMS provider is running correctly. Shutting down docShifter ...", e);
-			//System.exit(1);
-			*/
 		}
-//		GeneralConfigurationBean config = ConfigurationServer.getGeneralConfiguration();
-//		user = config.getString(Constants.JMS_USER);
-//		password = config.getString(Constants.JMS_PASSWORD);
-//		url = config.getString(Constants.JMS_URL);
-//		queueName = config.getString(Constants.JMS_QUEUE).concat(getQueueNameSuffix());
-//		
-//		try {
-//			IConnectionFactory connectionFactory = MessagingConnectionFactory.getConnectionFactory(user, password, url);
-//			connection = connectionFactory.createConnection();
-//			connection.start();
-//			
-//			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-//			destination = session.createQueue(queueName);
-//			
-//			producer = session.createProducer(destination);
-//			producer.setDeliveryMode(DeliveryMode.PERSISTENT);
-//			
-//			setStarted(true);
-//		} catch (JMSException e){
-//			Logger.error("JMS Exception occured, make sure the JMS provider is running correctly. Shutting down docShifter ...", e);
-//			System.exit(1);
-//		}
-	}
-	
-	
 
+	}
 }

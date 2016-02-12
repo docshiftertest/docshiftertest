@@ -22,11 +22,11 @@ public class MessagingFactory {
 	}
 
 	public static IMessageSender getMessageSender() {
-		return new JMSSender();
+		return JMSSender.getInstance(null);
 	}
 
 	public static IMessageSender getMessageSender(String queueNameSuffix) {
-		return new JMSSender(queueNameSuffix);
+		return JMSSender.getInstance(queueNameSuffix);
 	}
 
 	public static IMessageSender getMessageSenderInstance(String queueNameSuffix) {

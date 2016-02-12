@@ -95,6 +95,7 @@ public abstract class AbstractJMSConnection implements ExceptionListener{
 			try {
 				Thread.sleep(RETRYDELAY*60000);
 			} catch (InterruptedException e1) {
+				Logger.error("Could not put thread in sleep. AbsctractJMSConnection", e1);
 			}
 			run();
 		//}
