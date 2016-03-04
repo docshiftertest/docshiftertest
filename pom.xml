@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        >
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.docshifter</groupId>
     <artifactId>docshifter-beans</artifactId>
-    <version>5.5-SNAPSHOT</version>
+    <version>5.5.1</version>
     <packaging>jar</packaging>
     <description></description>
     <properties>
@@ -53,7 +53,7 @@ xsi:schemaLocation="http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <dependency>
             <groupId>com.aspose</groupId>
             <artifactId>aspose-email</artifactId>
-            <version>LATEST</version>
+            <version>6.1.0</version>
             <classifier>jdk16</classifier>
         </dependency>
         <dependency>
@@ -222,7 +222,6 @@ xsi:schemaLocation="http://maven.apache.org/xsd/maven-4.0.0.xsd">
     </dependencies>
 
 
-
     <build>
         <plugins>
 
@@ -255,6 +254,27 @@ xsi:schemaLocation="http://maven.apache.org/xsd/maven-4.0.0.xsd">
                     <outputDirectory>${project.build.directory}/jars/</outputDirectory>
                 </configuration>
             </plugin>
+
+            <!-- Obfuscating the code -->
+           <!-- <plugin>
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>docshifter-beans-pro</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>proguard</goal>
+                        </goals>
+                        <configuration>
+                            <maxMemory>1024m</maxMemory>
+                            <injar>jars/docshifter-beans-${project.version}.jar</injar>
+                            <proguardInclude>${basedir}/src/main/assembly/proguard.conf</proguardInclude>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
+
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.5.3</version>
@@ -266,8 +286,10 @@ xsi:schemaLocation="http://maven.apache.org/xsd/maven-4.0.0.xsd">
                 </configuration>
                 <executions>
                     <execution>
-                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                        <phase>package</phase> <!-- bind to the packaging phase -->
+                        <id>make-assembly</id>
+                        <!-- this is used for inheritance merges -->
+                        <phase>package</phase>
+                        <!-- bind to the packaging phase -->
                         <goals>
                             <goal>single</goal>
                         </goals>
