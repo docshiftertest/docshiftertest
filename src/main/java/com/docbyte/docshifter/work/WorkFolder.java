@@ -6,10 +6,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/11/15.
@@ -32,7 +34,7 @@ public class WorkFolder implements Serializable {
 	}
 
 	public boolean isRoot() {
-		if (parent == null){
+		if (parent == null) {
 			return true;
 		}
 		return false;
@@ -65,7 +67,25 @@ public class WorkFolder implements Serializable {
 	}
 
 	public Path getFilePath(String filename, String extention) {
-		return this.getFilePath(filename + "." + extention );
+		return this.getFilePath(filename + "." + extention);
+	}
+
+	public Path getNewFilePath(String filename, String extension) {
+
+		//create path filename+extention
+		//check if exists
+
+		filename = FileUtils.shortenFileName(filename);
+
+		Path newPath = Paths.get(folder.toString(), filename + "." + extension);
+		if (Files.exists(newPath))
+		{
+			newPath = Paths.get(folder.toString(), filename + "_" + Objects.toString(System.currentTimeMillis()) + "." + extension);
+		}
+
+		//THIS IS TEMPORARY SINCE OVERRIDING STILL HAPPENS IN RELEASE
+		newPath = Paths.get(folder.toString(), filename + "_" + Objects.toString(System.currentTimeMillis()) + "." + extension);
+		return newPath;
 	}
 
 
@@ -83,10 +103,10 @@ public class WorkFolder implements Serializable {
 	private void readObject(ObjectInputStream ois)
 			throws ClassNotFoundException, IOException {
 		// default deserialization
-	//	ois.defaultReadObject();
-		List ser = (List)ois.readObject();
-		this.parent = (WorkFolder)ser.get(1);
-		this.folder = Paths.get((String)ser.get(0));
+		//	ois.defaultReadObject();
+		List ser = (List) ois.readObject();
+		this.parent = (WorkFolder) ser.get(1);
+		this.folder = Paths.get((String) ser.get(0));
 
 	}
 }

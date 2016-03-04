@@ -13,6 +13,9 @@
             <includes>
                 <include>*.jar</include>
             </includes>
+            <excludes>
+                <exclude>*proguard_base.jar</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}</directory>
