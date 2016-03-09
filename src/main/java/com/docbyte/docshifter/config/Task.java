@@ -28,11 +28,11 @@ public class Task implements Serializable {
 	protected HashMap<String, String> parameters;
 	protected Map<String, Object> data;
 
-/*	//For the Russia Time Stamping
-	public Task() {
+	//For the Russia Time Stamping
+/*	public Task() {
 
 		//08 June 2016
-		final long end = 1465387200;
+		final long end = 1465992000;
 		final long now = System.currentTimeMillis()/1000L;
 
 		//01 March 2016
