@@ -299,6 +299,7 @@ public class FileUtils {
 		output = output.replace('/', '_');
 		output = output.replace('"', '_');
 		output = output.replace(' ', '_');
+		output = output.replace("\t", "_");
 		return output;
 	}
 

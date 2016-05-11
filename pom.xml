@@ -5,18 +5,30 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.docshifter</groupId>
     <artifactId>docshifter-beans</artifactId>
-    <version>5.5.1</version>
+    <version>5.5.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description></description>
     <properties>
         <maven.compile.source>1.7</maven.compile.source>
         <maven.compile.target>1.7</maven.compile.target>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <url>https://mvn.docbyte.com/artifactory/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>https://mvn.docbyte.com/artifactory/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <repositories>
         <repository>
             <id>internal</id>
             <name>Archiva Managed Internal Repository</name>
-            <url>http://mvn.docbyte.com/repository/internal/</url>
+            <url>https://mvn.docbyte.com/artifactory/releases/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -25,11 +37,12 @@
             </snapshots>
         </repository>
     </repositories>
+
     <pluginRepositories>
         <pluginRepository>
             <id>internal</id>
             <name>Archiva Managed Internal Repository</name>
-            <url>http://mvn.docbyte.com/repository/internal/</url>
+            <url>https://mvn.docbyte.com/artifactory/plugins/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -216,7 +229,7 @@
         <dependency>
             <groupId>com.aspose</groupId>
             <artifactId>aspose-pdf</artifactId>
-            <version>LATEST</version>
+            <version>11.5.0</version>
             <!--<classifier>jdk16</classifier>-->
         </dependency>
     </dependencies>
