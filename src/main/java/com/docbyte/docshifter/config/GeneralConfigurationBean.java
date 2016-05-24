@@ -38,7 +38,9 @@ public class GeneralConfigurationBean {
 			params.put("jms_password", config.getJmsUserPassword());
 			params.put("openoffice_host", config.getDefaultOpenOfficeHost());
 			params.put("openoffice_port", config.getDefaultOpenOfficePort());
+			params.put("errorfolder", config.getDefaultErrorFolder());
 			params.put("tempfolder", config.getDefaultTempFolder());
+
 		}
 		
 		/*

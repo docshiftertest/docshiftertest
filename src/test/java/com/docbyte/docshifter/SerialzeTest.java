@@ -33,7 +33,7 @@ public class SerialzeTest {
 	@Test
 	public void serWF() throws Exception {
 
-		WorkFolder wf = new WorkFolder(Paths.get("C:\\TEST"));
+		WorkFolder wf = new WorkFolder(Paths.get("C:\\TEST"), null);
 		Task task = new Task("test",wf);
 
 		System.out.print(Paths.get("C:\\TEST").getClass());

@@ -10,4 +10,5 @@ public class Constants {
 	public final static String OPENOFFICE_HOST = "openoffice_host";
 	public final static String OPENOFFICE_PORT = "openoffice_port";
 	public final static String TEMPFOLDER = "tempfolder";
+	public final static String ERRORFOLDER = "errorfolder";
 }
