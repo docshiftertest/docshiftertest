@@ -36,8 +36,6 @@ public class GeneralConfigurationBean {
 			params.put("jms_queue", config.getJmsQueue());
 			params.put("jms_user", config.getJmsUser());
 			params.put("jms_password", config.getJmsUserPassword());
-			params.put("openoffice_host", config.getDefaultOpenOfficeHost());
-			params.put("openoffice_port", config.getDefaultOpenOfficePort());
 			params.put("errorfolder", config.getDefaultErrorFolder());
 			params.put("tempfolder", config.getDefaultTempFolder());
 
@@ -48,8 +46,6 @@ public class GeneralConfigurationBean {
 		params.put("jms_queue","docShifter.queue");
 		params.put("jms_user","");
 		params.put("jms_password","");
-		params.put("openoffice_host","localhost");
-		params.put("openoffice_port", "8101");
 		params.put("tempfolder","c:/dstemp/");
 		*/
 	}
