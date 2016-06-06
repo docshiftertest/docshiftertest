@@ -2,12 +2,10 @@ package com.docbyte.docshifter.config;
 
 public class Constants {
 
-	public final static String JMS_SYSTEM = "jms_system";
-	public final static String JMS_URL = "jms_url";
-	public final static String JMS_QUEUE = "jms_queue";
-	public final static String JMS_USER = "jms_user";
-	public final static String JMS_PASSWORD = "jms_password";
-	public final static String OPENOFFICE_HOST = "openoffice_host";
-	public final static String OPENOFFICE_PORT = "openoffice_port";
+	public final static String MQ_SYSTEM = "mq_system";
+	public final static String MQ_URL = "mq_url";
+	public final static String MQ_QUEUE = "mq_queue";
+	public final static String MQ_USER = "mq_user";
+	public final static String MQ_PASSWORD = "mq_password";
 	public final static String TEMPFOLDER = "tempfolder";
 }

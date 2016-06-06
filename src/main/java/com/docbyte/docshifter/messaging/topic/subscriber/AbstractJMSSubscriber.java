@@ -30,9 +30,9 @@ abstract public class AbstractJMSSubscriber extends AbstractJMSConnection implem
 		GeneralConfigurationBean config = ConfigurationServer.getGeneralConfiguration();
 		
 		if(config != null){
-			user = config.getString(Constants.JMS_USER);
-			password = config.getString(Constants.JMS_PASSWORD);
-			url = config.getString(Constants.JMS_URL);
+			user = config.getString(Constants.MQ_USER);
+			password = config.getString(Constants.MQ_PASSWORD);
+			url = config.getString(Constants.MQ_URL);
 			
 			try {
 				IConnectionFactory connectionFactory = MessagingConnectionFactory.getConnectionFactory(user, password, url);

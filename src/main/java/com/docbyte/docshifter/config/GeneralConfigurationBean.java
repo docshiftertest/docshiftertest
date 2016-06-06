@@ -31,14 +31,12 @@ public class GeneralConfigurationBean {
 		GlobalSettings config = globalSettingsDAO.get();
 
 		if(config != null){
-			params.put("jms_system", config.getJmsSystem());
-			params.put("jms_url", config.getJmsURL());
-			params.put("jms_queue", config.getJmsQueue());
-			params.put("jms_user", config.getJmsUser());
-			params.put("jms_password", config.getJmsUserPassword());
-			params.put("openoffice_host", config.getDefaultOpenOfficeHost());
-			params.put("openoffice_port", config.getDefaultOpenOfficePort());
-			params.put("tempfolder", config.getDefaultTempFolder());
+			params.put(Constants.MQ_SYSTEM, config.getMqSystem());
+			params.put(Constants.MQ_URL, config.getMqURL());
+			params.put(Constants.MQ_QUEUE, config.getMqQueue());
+			params.put(Constants.MQ_USER, config.getMqUser());
+			params.put(Constants.MQ_PASSWORD, config.getMqUserPassword());
+			params.put(Constants.TEMPFOLDER, config.getDefaultTempFolder());
 		}
 		
 		/*

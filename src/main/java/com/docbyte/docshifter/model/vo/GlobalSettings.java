@@ -11,11 +11,11 @@ public class GlobalSettings implements Serializable
 
 	private long id;
 	
-	private String jmsSystem;
-	private String jmsURL;
-	private String jmsQueue;
-	private String jmsUser;
-	private String jmsUserPassword;
+	private String mqSystem;
+	private String mqURL;
+	private String mqQueue;
+	private String mqUser;
+	private String mqUserPassword;
 	
 	private String defaultOpenOfficeHost;
 	private String defaultOpenOfficePort;
@@ -31,28 +31,28 @@ public class GlobalSettings implements Serializable
 		this.defaultTempFolder = defaultTempFolder;
 	}
 	
-	public GlobalSettings(String jmsSystem, String jmsQueue, String jmsURL, String jmsUser, String jmsUserPassword)
+	public GlobalSettings(String mqSystem, String mqQueue, String mqURL, String mqUser, String mqUserPassword)
 	{
-		this.jmsSystem = jmsSystem;
-		this.jmsQueue = jmsQueue;
-		this.jmsURL = jmsURL;
-		this.jmsUser = jmsUser;
-		this.jmsUserPassword = jmsUserPassword;
+		this.mqSystem = mqSystem;
+		this.mqQueue = mqQueue;
+		this.mqURL = mqURL;
+		this.mqUser = mqUser;
+		this.mqUserPassword = mqUserPassword;
 	}
 	
-	public GlobalSettings(String defaultOpenOfficeHost, 
-			String defaultOpenOfficePort, String defaultTempFolder,
-			String jmsSystem, String jmsQueue, String jmsURL, String jmsUser,
-			String jmsUserPassword)
+	public GlobalSettings(String defaultOpenOfficeHost,
+						  String defaultOpenOfficePort, String defaultTempFolder,
+						  String mqSystem, String mqQueue, String mqURL, String mqUser,
+						  String mqUserPassword)
 	{
 		this.defaultOpenOfficeHost = defaultOpenOfficeHost;
 		this.defaultOpenOfficePort = defaultOpenOfficePort;
 		this.defaultTempFolder = defaultTempFolder;
-		this.jmsSystem = jmsSystem;
-		this.jmsQueue = jmsQueue;
-		this.jmsURL = jmsURL;
-		this.jmsUser = jmsUser;
-		this.jmsUserPassword = jmsUserPassword;
+		this.mqSystem = mqSystem;
+		this.mqQueue = mqQueue;
+		this.mqURL = mqURL;
+		this.mqUser = mqUser;
+		this.mqUserPassword = mqUserPassword;
 	}
 
 	public String getDefaultOpenOfficeHost()
@@ -78,24 +78,24 @@ public class GlobalSettings implements Serializable
 		return id;
 	}
 
-	public String getJmsQueue()
+	public String getMqQueue()
 	{
-		return jmsQueue;
+		return mqQueue;
 	}
 
-	public String getJmsURL()
+	public String getMqURL()
 	{
-		return jmsURL;
+		return mqURL;
 	}
 
-	public String getJmsUser()
+	public String getMqUser()
 	{
-		return jmsUser;
+		return mqUser;
 	}
 
-	public String getJmsUserPassword()
+	public String getMqUserPassword()
 	{
-		return jmsUserPassword;
+		return mqUserPassword;
 	}
 
 	public void setDefaultOpenOfficeHost(String defaultOpenOfficeHost)
@@ -118,32 +118,32 @@ public class GlobalSettings implements Serializable
 		this.id = id;
 	}
 
-	public void setJmsQueue(String jmsQueue)
+	public void setMqQueue(String mqQueue)
 	{
-		this.jmsQueue = jmsQueue;
+		this.mqQueue = mqQueue;
 	}
 
-	public void setJmsURL(String jmsURL)
+	public void setMqURL(String mqURL)
 	{
-		this.jmsURL = jmsURL;
+		this.mqURL = mqURL;
 	}
 
-	public void setJmsUser(String jmsUser)
+	public void setMqUser(String mqUser)
 	{
-		this.jmsUser = jmsUser;
+		this.mqUser = mqUser;
 	}
 
-	public void setJmsUserPassword(String jmsUserPassword)
+	public void setMqUserPassword(String mqUserPassword)
 	{
-		this.jmsUserPassword = jmsUserPassword;
+		this.mqUserPassword = mqUserPassword;
 	}
 	
-	public String getJmsSystem() {
-		return jmsSystem;
+	public String getMqSystem() {
+		return mqSystem;
 	}
 
-	public void setJmsSystem(String jmsSystem) {
-		this.jmsSystem = jmsSystem;
+	public void setMqSystem(String mqSystem) {
+		this.mqSystem = mqSystem;
 	}
 	
 }

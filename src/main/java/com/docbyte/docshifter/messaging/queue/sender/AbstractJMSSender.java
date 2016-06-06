@@ -98,10 +98,10 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 	public void init(){
 
 		GeneralConfigurationBean config = ConfigurationServer.getGeneralConfiguration();
-		user = config.getString(Constants.JMS_USER);
-		password = config.getString(Constants.JMS_PASSWORD);
-		url = config.getString(Constants.JMS_URL);
-		queueName = config.getString(Constants.JMS_QUEUE).concat(getQueueNameSuffix());
+		user = config.getString(Constants.MQ_USER);
+		password = config.getString(Constants.MQ_PASSWORD);
+		url = config.getString(Constants.MQ_URL);
+		queueName = config.getString(Constants.MQ_QUEUE).concat(getQueueNameSuffix());
 
 		try{
 			IConnectionFactory connectionFactory = MessagingConnectionFactory.getConnectionFactory(user, password, url);

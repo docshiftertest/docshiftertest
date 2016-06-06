@@ -1,14 +1,5 @@
 package com.docbyte.docshifter.messaging.queue.receiver;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.Session;
-import javax.management.JMException;
-import javax.management.remote.JMXConnector;
-
 import com.docbyte.docshifter.config.ConfigurationServer;
 import com.docbyte.docshifter.config.Constants;
 import com.docbyte.docshifter.config.GeneralConfigurationBean;
@@ -17,6 +8,11 @@ import com.docbyte.docshifter.messaging.IMessageReceiverOrSubscriber;
 import com.docbyte.docshifter.messaging.factory.IConnectionFactory;
 import com.docbyte.docshifter.messaging.factory.MessagingConnectionFactory;
 import com.docbyte.docshifter.util.Logger;
+
+import javax.jms.*;
+import javax.management.JMException;
+import javax.management.remote.JMXConnector;
+import java.lang.IllegalStateException;
 
 public abstract class AbstractJMSReceiver extends AbstractJMSConnection implements IMessageReceiverOrSubscriber {
 
@@ -31,7 +27,12 @@ public abstract class AbstractJMSReceiver extends AbstractJMSConnection implemen
 	 * @see com.docbyte.docshifter.messaging.queue.JMSSubscriberOrReceiver#onMessage(javax.jms.Message)
 	 */
 	public void onMessage(Message message) {
-		boolean result=controller.onMessage(message);
+		boolean result= false;
+		try {
+			result = controller.onMessage(message);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		if(!result){
 			Logger.warn("Failed to complete the requested operation",null);
 		}else if(ackMode==Session.CLIENT_ACKNOWLEDGE){
@@ -56,10 +57,10 @@ public abstract class AbstractJMSReceiver extends AbstractJMSConnection implemen
 		GeneralConfigurationBean config = ConfigurationServer.getGeneralConfiguration();
 		
 		if(config != null){
-			user = config.getString(Constants.JMS_USER);
-			password = config.getString(Constants.JMS_PASSWORD);
-			url = config.getString(Constants.JMS_URL);
-			queueName = config.getString(Constants.JMS_QUEUE).concat(getQueueNameSuffix());
+			user = config.getString(Constants.MQ_USER);
+			password = config.getString(Constants.MQ_PASSWORD);
+			url = config.getString(Constants.MQ_URL);
+			queueName = config.getString(Constants.MQ_QUEUE).concat(getQueueNameSuffix());
 			
 			try {
 				IConnectionFactory connectionFactory = MessagingConnectionFactory.getConnectionFactory(user, password, url);

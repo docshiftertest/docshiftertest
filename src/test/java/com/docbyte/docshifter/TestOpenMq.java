@@ -50,9 +50,9 @@ public class TestOpenMq {
 	@Before
 	public void before() {
 		config = ConfigurationServer.getGeneralConfiguration();
-		String user = config.getString(Constants.JMS_USER);
-		String password = config.getString(Constants.JMS_PASSWORD);
-		String url = config.getString(Constants.JMS_URL);
+		String user = config.getString(Constants.MQ_USER);
+		String password = config.getString(Constants.MQ_PASSWORD);
+		String url = config.getString(Constants.MQ_URL);
 		ccdao = new ChainConfigurationDAO();
 		nodedao = new NodeDAO();
 		mcdao = new ModuleConfigurationsDAO();
@@ -66,7 +66,7 @@ public class TestOpenMq {
 		map.put(p, "parameter" + millis);
 		ModuleConfiguration mc = new ModuleConfiguration(m, "moduleconf" + millis, "moduleconf" + millis, map);
 		Node n= new Node(null, mc);
-		cc = new ChainConfiguration("chainconftest" + millis, "chainconftest" + millis, true, n, null, config.getString(Constants.JMS_QUEUE));
+		cc = new ChainConfiguration("chainconftest" + millis, "chainconftest" + millis, true, n, null, config.getString(Constants.MQ_QUEUE));
 		try {
 			moduledao.insert(m);
 			parameterdao.save(p);
@@ -91,12 +91,12 @@ public class TestOpenMq {
 	
 	/* Test fails because there are no messages on the queue */
 	@Test
-	public void testSendMessage() {
+	public void testSendMessage() throws Exception {
 
 		Information info = new Information();
 		int initialNrOfMessages = info.getNumberOfMessages();
 
-		String queuename = config.getString(Constants.JMS_QUEUE);
+		String queuename = config.getString(Constants.MQ_QUEUE);
 		File file = new File(workfolder.toString() + File.separator + "test.txt");
 		if (!file.exists()) {
 			try {

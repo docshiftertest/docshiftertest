@@ -5,8 +5,7 @@ import javax.jms.MessageListener;
 
 public interface IMessageReceiverOrSubscriber extends MessageListener {
 
-	public abstract void onMessage(Message message);
-
-	public abstract void run();
+	void onMessage(Message message);
+	void run();
 
 }

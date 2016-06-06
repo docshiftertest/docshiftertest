@@ -22,10 +22,10 @@ public class Information
 
 	public Information() {
 		GeneralConfigurationBean config = ConfigurationServer.getGeneralConfiguration();
-		user = config.getString(Constants.JMS_USER);
-		password = config.getString(Constants.JMS_PASSWORD);
-		url = config.getString(Constants.JMS_URL);
-		queueName = config.getString(Constants.JMS_QUEUE);
+		user = config.getString(Constants.MQ_USER);
+		password = config.getString(Constants.MQ_PASSWORD);
+		url = config.getString(Constants.MQ_URL);
+		queueName = config.getString(Constants.MQ_QUEUE);
 		try {
 			connectionFactory = MessagingConnectionFactory.getConnectionFactory(user, password, url);
 		} catch (JMSException e) {

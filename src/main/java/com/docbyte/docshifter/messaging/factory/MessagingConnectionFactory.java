@@ -11,7 +11,7 @@ public abstract class MessagingConnectionFactory {
 		
 	public static IConnectionFactory getConnectionFactory(String user, String password, String url) throws JMSException{
 		GeneralConfigurationBean config = ConfigurationServer.getGeneralConfiguration();
-		return getConnectionFactory (user, password, url, config.getString(Constants.JMS_SYSTEM));
+		return getConnectionFactory (user, password, url, config.getString(Constants.MQ_SYSTEM));
 	}
 
 
