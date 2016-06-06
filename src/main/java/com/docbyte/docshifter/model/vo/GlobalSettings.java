@@ -18,6 +18,7 @@ public class GlobalSettings implements Serializable
 	private String mqUserPassword;
 
 	private String defaultTempFolder;
+	private String defaultErrorFolder;
 
 	public GlobalSettings() {}
 	
