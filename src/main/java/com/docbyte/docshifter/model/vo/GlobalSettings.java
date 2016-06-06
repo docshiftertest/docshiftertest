@@ -16,18 +16,13 @@ public class GlobalSettings implements Serializable
 	private String mqQueue;
 	private String mqUser;
 	private String mqUserPassword;
-	
-	private String defaultOpenOfficeHost;
-	private String defaultOpenOfficePort;
-	
+
 	private String defaultTempFolder;
 
 	public GlobalSettings() {}
 	
-	public GlobalSettings(String defaultOpenOfficeHost, String defaultOpenOfficePort, String defaultTempFolder)
+	public GlobalSettings(String defaultTempFolder)
 	{
-		this.defaultOpenOfficeHost = defaultOpenOfficeHost;
-		this.defaultOpenOfficePort = defaultOpenOfficePort;
 		this.defaultTempFolder = defaultTempFolder;
 	}
 	
@@ -40,13 +35,10 @@ public class GlobalSettings implements Serializable
 		this.mqUserPassword = mqUserPassword;
 	}
 	
-	public GlobalSettings(String defaultOpenOfficeHost,
-						  String defaultOpenOfficePort, String defaultTempFolder,
+	public GlobalSettings(String defaultTempFolder,
 						  String mqSystem, String mqQueue, String mqURL, String mqUser,
 						  String mqUserPassword)
 	{
-		this.defaultOpenOfficeHost = defaultOpenOfficeHost;
-		this.defaultOpenOfficePort = defaultOpenOfficePort;
 		this.defaultTempFolder = defaultTempFolder;
 		this.mqSystem = mqSystem;
 		this.mqQueue = mqQueue;
@@ -55,15 +47,6 @@ public class GlobalSettings implements Serializable
 		this.mqUserPassword = mqUserPassword;
 	}
 
-	public String getDefaultOpenOfficeHost()
-	{
-		return defaultOpenOfficeHost;
-	}
-
-	public String getDefaultOpenOfficePort()
-	{
-		return defaultOpenOfficePort;
-	}
 
 	public String getDefaultTempFolder()
 	{
@@ -96,16 +79,6 @@ public class GlobalSettings implements Serializable
 	public String getMqUserPassword()
 	{
 		return mqUserPassword;
-	}
-
-	public void setDefaultOpenOfficeHost(String defaultOpenOfficeHost)
-	{
-		this.defaultOpenOfficeHost = defaultOpenOfficeHost;
-	}
-
-	public void setDefaultOpenOfficePort(String defaultOpenOfficePort)
-	{
-		this.defaultOpenOfficePort = defaultOpenOfficePort;
 	}
 
 	public void setDefaultTempFolder(String defaultTempFolder)
@@ -145,5 +118,12 @@ public class GlobalSettings implements Serializable
 	public void setMqSystem(String mqSystem) {
 		this.mqSystem = mqSystem;
 	}
-	
+
+	public void setDefaultErrorFolder(String defaultErrorFolder) {
+		this.defaultErrorFolder = defaultErrorFolder;
+	}
+
+	public String getDefaultErrorFolder() {
+		return defaultErrorFolder;
+	}
 }

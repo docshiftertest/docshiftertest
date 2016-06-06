@@ -17,6 +17,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.jms.JMSException;
 import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +60,8 @@ public class TestActiveMq {
 		map.put(p, "parameter" + millis);
 		ModuleConfiguration mc = new ModuleConfiguration(m, "moduleconf" + millis, "moduleconf" + millis, map);
 		Node n= new Node(null, mc);
-		cc = new ChainConfiguration("chainconftest" + millis, "chainconftest" + millis, true, n, null, config.getString(Constants.MQ_QUEUE));
+		cc = new ChainConfiguration("chainconftest" + millis, "chainconftest" + millis, true, n, null, config.getString(Constants.MQ_QUEUE), "", "", "");
+
 		try {
 			moduledao.insert(m);
 			parameterdao.save(p);

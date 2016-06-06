@@ -64,6 +64,11 @@
     </pluginRepositories>
     <dependencies>
         <dependency>
+            <groupId>com.docbyte.utils</groupId>
+            <artifactId>core</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-client</artifactId>
             <version>5.11.1</version>
@@ -317,24 +322,24 @@
             </plugin>
 
             <!-- Obfuscating the code -->
-           <!-- <plugin>
-                <groupId>com.github.wvengen</groupId>
-                <artifactId>proguard-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>docshifter-beans-pro</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>proguard</goal>
-                        </goals>
-                        <configuration>
-                            <maxMemory>1024m</maxMemory>
-                            <injar>jars/docshifter-beans-${project.version}.jar</injar>
-                            <proguardInclude>${basedir}/src/main/assembly/proguard.conf</proguardInclude>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>-->
+            <!-- <plugin>
+                 <groupId>com.github.wvengen</groupId>
+                 <artifactId>proguard-maven-plugin</artifactId>
+                 <executions>
+                     <execution>
+                         <id>docshifter-beans-pro</id>
+                         <phase>package</phase>
+                         <goals>
+                             <goal>proguard</goal>
+                         </goals>
+                         <configuration>
+                             <maxMemory>1024m</maxMemory>
+                             <injar>jars/docshifter-beans-${project.version}.jar</injar>
+                             <proguardInclude>${basedir}/src/main/assembly/proguard.conf</proguardInclude>
+                         </configuration>
+                     </execution>
+                 </executions>
+             </plugin>-->
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>

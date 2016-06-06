@@ -66,7 +66,7 @@ public class TestOpenMq {
 		map.put(p, "parameter" + millis);
 		ModuleConfiguration mc = new ModuleConfiguration(m, "moduleconf" + millis, "moduleconf" + millis, map);
 		Node n= new Node(null, mc);
-		cc = new ChainConfiguration("chainconftest" + millis, "chainconftest" + millis, true, n, null, config.getString(Constants.MQ_QUEUE));
+		cc = new ChainConfiguration("chainconftest" + millis, "chainconftest" + millis, true, n, null, config.getString(Constants.MQ_QUEUE),"","","");
 		try {
 			moduledao.insert(m);
 			parameterdao.save(p);

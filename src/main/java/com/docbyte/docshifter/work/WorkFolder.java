@@ -22,15 +22,16 @@ public class WorkFolder implements Serializable {
 	private static final long serialVersionUID = 7938321829497848697L;
 	private Path folder;
 	private WorkFolder parent;
+	private Path errorFolder;
 
-
-	public WorkFolder(Path workfolder, WorkFolder parent) {
+	public WorkFolder(Path workfolder, Path errorFolder, WorkFolder parent) {
 		this.parent = parent;
+		this.errorFolder = errorFolder;
 		this.folder = workfolder;
 	}
 
-	public WorkFolder(Path workfolder) {
-		this(workfolder, null);
+	public WorkFolder(Path workfolder, Path errorFolder) {
+		this(workfolder, errorFolder, null);
 	}
 
 	public boolean isRoot() {
@@ -38,6 +39,15 @@ public class WorkFolder implements Serializable {
 			return true;
 		}
 		return false;
+	}
+
+
+	public Path getErrorFolder() {
+		return errorFolder;
+	}
+
+	public void setErrorFolder(Path errorFolder) {
+		this.errorFolder = errorFolder;
 	}
 
 	public WorkFolder getParent() {
@@ -97,6 +107,7 @@ public class WorkFolder implements Serializable {
 		List ser = new ArrayList();
 		ser.add(this.folder.toString());
 		ser.add(this.parent);
+		ser.add(this.errorFolder.toString());
 		oos.writeObject(ser);
 	}
 
@@ -107,6 +118,6 @@ public class WorkFolder implements Serializable {
 		List ser = (List) ois.readObject();
 		this.parent = (WorkFolder) ser.get(1);
 		this.folder = Paths.get((String) ser.get(0));
-
+		this.errorFolder = Paths.get((String) ser.get(2));
 	}
 }
