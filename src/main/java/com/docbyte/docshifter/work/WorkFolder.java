@@ -1,6 +1,7 @@
 package com.docbyte.docshifter.work;
 
 import com.docbyte.docshifter.util.FileUtils;
+import com.docbyte.utils.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -23,6 +24,7 @@ public class WorkFolder implements Serializable {
 	private Path folder;
 	private WorkFolder parent;
 	private Path errorFolder;
+	private List<String> errormessageList;
 
 	public WorkFolder(Path workfolder, Path errorFolder, WorkFolder parent) {
 		this.parent = parent;
@@ -70,6 +72,16 @@ public class WorkFolder implements Serializable {
 		return folder.toString();
 	}
 
+	public List<String> getErrormessageList() {
+		return errormessageList;
+	}
+
+	public void addErrorMessage(String message){
+		if (errormessageList == null){
+			this.errormessageList = new ArrayList<>();
+		}
+		this.errormessageList.add(message);
+	}
 
 	public Path getFilePath(String filename) {
 		FileUtils.removeIllegalFilesystemCharacters(filename);
