@@ -13,6 +13,10 @@ public abstract class NodeBean {
 	private String queueName;
 	private String printerName;
 	private boolean configurationEnabled;
+
+	private String errormailHost;
+	private String errormailDestination;
+	private String errormailOrigin;
 	
 	private ModuleBean moduleBean;
 	
@@ -31,7 +35,10 @@ public abstract class NodeBean {
 		this.queueName = chainConfiguration.getQueueName();
 		this.printerName = chainConfiguration.getPrinterName();
 		this.configurationEnabled = chainConfiguration.isEnabled();
-		
+		this.errormailDestination = chainConfiguration.getErrormailDestination();
+		this.errormailHost = chainConfiguration.getErrormailHost();
+		this.errormailOrigin = chainConfiguration.getErrormailOrigin();
+
 		this.moduleBean = new ModuleBean(n.getModuleConfiguration());
 	}
 	
@@ -79,5 +86,29 @@ public abstract class NodeBean {
 	
 	public ModuleBean getModuleBean(){
 		return this.moduleBean;
+	}
+
+	public String getErrormailHost() {
+		return errormailHost;
+	}
+
+	public void setErrormailHost(String errormailHost) {
+		this.errormailHost = errormailHost;
+	}
+
+	public String getErrormailDestination() {
+		return errormailDestination;
+	}
+
+	public void setErrormailDestination(String errormailDestination) {
+		this.errormailDestination = errormailDestination;
+	}
+
+	public String getErrormailOrigin() {
+		return errormailOrigin;
+	}
+
+	public void setErrormailOrigin(String errormailOrigin) {
+		this.errormailOrigin = errormailOrigin;
 	}
 }

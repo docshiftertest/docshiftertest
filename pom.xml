@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
         >
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.docshifter</groupId>
     <artifactId>docshifter-beans</artifactId>
-    <version>5.5.1-SNAPSHOT</version>
+    <version>5.5.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description></description>
     <properties>
@@ -53,6 +53,11 @@
     </pluginRepositories>
     <dependencies>
         <dependency>
+            <groupId>com.docbyte.utils</groupId>
+            <artifactId>core</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-client</artifactId>
             <version>5.11.1</version>
@@ -66,7 +71,7 @@
         <dependency>
             <groupId>com.aspose</groupId>
             <artifactId>aspose-email</artifactId>
-            <version>6.1.0</version>
+            <version>LATEST</version>
             <classifier>jdk16</classifier>
         </dependency>
         <dependency>
@@ -269,24 +274,24 @@
             </plugin>
 
             <!-- Obfuscating the code -->
-           <!-- <plugin>
-                <groupId>com.github.wvengen</groupId>
-                <artifactId>proguard-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>docshifter-beans-pro</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>proguard</goal>
-                        </goals>
-                        <configuration>
-                            <maxMemory>1024m</maxMemory>
-                            <injar>jars/docshifter-beans-${project.version}.jar</injar>
-                            <proguardInclude>${basedir}/src/main/assembly/proguard.conf</proguardInclude>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>-->
+            <!-- <plugin>
+                 <groupId>com.github.wvengen</groupId>
+                 <artifactId>proguard-maven-plugin</artifactId>
+                 <executions>
+                     <execution>
+                         <id>docshifter-beans-pro</id>
+                         <phase>package</phase>
+                         <goals>
+                             <goal>proguard</goal>
+                         </goals>
+                         <configuration>
+                             <maxMemory>1024m</maxMemory>
+                             <injar>jars/docshifter-beans-${project.version}.jar</injar>
+                             <proguardInclude>${basedir}/src/main/assembly/proguard.conf</proguardInclude>
+                         </configuration>
+                     </execution>
+                 </executions>
+             </plugin>-->
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
