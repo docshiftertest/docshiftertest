@@ -20,7 +20,8 @@ public class ModuleBean {
 		this.description = config.getDescription();
 		
 		params = new HashMap<String, String>();
-		
+
+
 		Iterator<Parameter> it = config.getParameterValues().keySet().iterator();
 		while(it.hasNext()){
 			Parameter key = it.next();

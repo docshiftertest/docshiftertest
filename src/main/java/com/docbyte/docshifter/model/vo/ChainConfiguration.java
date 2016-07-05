@@ -15,6 +15,9 @@ public class ChainConfiguration implements Serializable
 	private String description;
 	private String printerName;
 	private String queueName;
+	private String errormailHost;
+	private String errormailDestination;
+	private String errormailOrigin;
 	
 	private boolean enabled;
 
@@ -22,7 +25,8 @@ public class ChainConfiguration implements Serializable
 
 	public ChainConfiguration() {}
 
-	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName)
+	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
+							  String errormailOrigin, String errormailDestination, String errormailHost)
 	{
 		this.name = name;
 		this.description = description;
@@ -30,6 +34,9 @@ public class ChainConfiguration implements Serializable
 		this.printerName = printerName;
 		this.queueName = queueName;
 		this.rootNode = rootNode;
+		this.errormailDestination = errormailDestination;
+		this.errormailHost = errormailHost;
+		this.errormailOrigin = errormailOrigin;
 	}
 	public String getDescription()
 	{
@@ -105,5 +112,29 @@ public class ChainConfiguration implements Serializable
 
 	public void setQueueName(String queueName) {
 		this.queueName = queueName;
+	}
+
+	public String getErrormailHost() {
+		return errormailHost;
+	}
+
+	public void setErrormailHost(String errormailHost) {
+		this.errormailHost = errormailHost;
+	}
+
+	public String getErrormailDestination() {
+		return errormailDestination;
+	}
+
+	public void setErrormailDestination(String errormailDestination) {
+		this.errormailDestination = errormailDestination;
+	}
+
+	public String getErrormailOrigin() {
+		return errormailOrigin;
+	}
+
+	public void setErrormailOrigin(String errormailOrigin) {
+		this.errormailOrigin = errormailOrigin;
 	}
 }

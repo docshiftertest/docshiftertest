@@ -1,5 +1,6 @@
 package com.docbyte.docshifter.config;
 
+import com.docbyte.docshifter.util.Logger;
 import com.docbyte.docshifter.work.WorkFolder;
 
 import java.io.Serializable;
@@ -27,10 +28,29 @@ public class Task implements Serializable {
 	protected HashMap<String, String> parameters;
 	protected Map<String, Object> data;
 
-	
-	public Task(){
-		
+	//For the Russia Time Stamping
+/*	public Task() {
+
+		//08 June 2016
+		final long end = 1465992000;
+		final long now = System.currentTimeMillis()/1000L;
+
+		//01 March 2016
+		final long start = 1456833600;
+
+		Logger.info("THIS TRIALVERSION WILL END ON 01/06/2016", null);
+		if (now-start < 0) {
+			Logger.info("TRIAL EXPIRED", null);
+			System.exit(9);
+		}
+
+		if (now > end) {
+			Logger.info("TRIAL EXPIRED", null);
+			System.exit(9);
+		}
 	}
+*/
+	public Task(){}
 	/**
 	 * @return the content
 	 */
@@ -44,6 +64,7 @@ public class Task implements Serializable {
 		this.content = content;
 	}
 	public Task(String filePath, WorkFolder wf){
+		//this();
 		this.item_id=filePath;
 		this.name=filePath;
 		this.workFolder = wf;

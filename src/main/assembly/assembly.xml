@@ -13,10 +13,20 @@
             <includes>
                 <include>*.jar</include>
             </includes>
+            <excludes>
+                <exclude>*proguard_base.jar</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}</directory>
             <outputDirectory>/work</outputDirectory>
+            <includes>
+                <include>dummyfile</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}</directory>
+            <outputDirectory>/errorfolder</outputDirectory>
             <includes>
                 <include>dummyfile</include>
             </includes>

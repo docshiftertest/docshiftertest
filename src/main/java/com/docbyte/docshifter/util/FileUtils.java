@@ -109,6 +109,14 @@ public class FileUtils {
 		return bytes;
 	}
 
+	public static String shortenFileName(String filename){
+		String newfilename = filename;
+		if (filename.length() > 40) {
+			newfilename = filename.substring(0, 40);
+		}
+		return newfilename;
+	}
+
 
 	public static void dos2unix(File file) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -278,17 +286,18 @@ public class FileUtils {
 	}
 
 	public static String removeIllegalFilesystemCharacters(String input){
-		String output=input;
-		output=output.replace('/', '_');
-		output=output.replace('\\', '_');
-		output=output.replace('*', '_');
-		output=output.replace('?', '_');
-		output=output.replace(':', '_');
-		output=output.replace('"', '_');
-		output=output.replace('<', '_');
-		output=output.replace('>', '_');
-		output=output.replace('|', '_');
-		output=output.replace(' ', '_');
+		String output = input;
+		output = output.replace('/', '_');
+		output = output.replace('\\', '_');
+		output = output.replace('*', '_');
+		output = output.replace('?', '_');
+		output = output.replace(':', '_');
+		output = output.replace('"', '_');
+		output = output.replace('<', '_');
+		output = output.replace('>', '_');
+		output = output.replace('|', '_');
+		output = output.replace(' ', '_');
+		output = output.replace("\t", "_");
 		return output;
 	}
 
