@@ -3,7 +3,8 @@ package com.docbyte.docshifter.work;
 import com.docbyte.docshifter.config.ConfigurationServer;
 import com.docbyte.docshifter.config.Constants;
 import com.docbyte.docshifter.config.GeneralConfigurationBean;
-import com.docbyte.docshifter.util.FileUtils;
+import com.docbyte.utils.FileUtils;
+import com.docbyte.docshifter.util.Logger;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
@@ -20,7 +21,7 @@ public class WorkFolderManager {
 	private static WorkFolderManager instance = null;
 
 	private Path workfolder;
-
+	private Path errorfolder;
 
 
 	public static WorkFolderManager getInstance() throws ConfigurationException {
@@ -34,37 +35,38 @@ public class WorkFolderManager {
 	public WorkFolderManager() throws ConfigurationException {
 		GeneralConfigurationBean cfg = ConfigurationServer.getGeneralConfiguration();
 		workfolder = Paths.get(cfg.getString(Constants.TEMPFOLDER)).toAbsolutePath();
+		errorfolder = Paths.get(cfg.getString(Constants.ERRORFOLDER)).toAbsolutePath();
 
 		if (!Files.isDirectory(workfolder)) {
 			throw new ConfigurationException("Workfolder is badly configured");
+		}
+
+		if (!Files.isDirectory(errorfolder)) {
+			throw new ConfigurationException("Errorfolder is badly configured");
 		}
 
 	}
 
 
 	public synchronized WorkFolder getNewWorkfolder(String name) throws IOException {
-
-		return new WorkFolder(getNewPath(workfolder, name));
+		return new WorkFolder(getNewPath(workfolder, name), getNewPath(errorfolder, name));
 	}
 
 	public synchronized WorkFolder getNewWorkfolder(WorkFolder root, String name) throws IOException {
-
-
-		return new WorkFolder(getNewPath(root.getFolder(), name), root);
+		return new WorkFolder(getNewPath(root.getFolder(), name), getNewPath(root.getErrorFolder(), name), root);
 	}
-
 
 
 	private Path getNewPath(Path root, String name)  throws IOException {
 
-		Files.createDirectories(workfolder);
+		//Files.createDirectories(root);
 
 		name = FileUtils.removeIllegalFilesystemCharacters(name);
 
-		Path specificWorkFolder = workfolder.resolve(name);
+		Path specificWorkFolder = root.resolve(name);
 
 		while (Files.exists(specificWorkFolder)) {
-			specificWorkFolder = workfolder.resolve(name + System.currentTimeMillis());
+			specificWorkFolder = root.resolve(name + System.currentTimeMillis());
 		}
 
 		Files.createDirectory(specificWorkFolder);
@@ -85,6 +87,28 @@ public class WorkFolderManager {
 
 		deletePath(folder.getFolder(), force);
 
+	}
+
+	public void deleteErrorfolder(WorkFolder folder){
+		deleteErrorfolder(folder, false);
+	}
+	public void deleteErrorfolder(WorkFolder folder, boolean force) {
+		if (!folder.isRoot()) {
+			deleteErrorfolder(folder.getParent(), force);
+			folder.setParent(null);
+		}
+
+		if (folder.getErrorFolder() == null){
+			Logger.info("ERRORFOLDER IS NULL *****", null);
+		} else {
+			deletePath(folder.getErrorFolder(), force);
+		}
+
+
+	}
+
+	public void copyToErrorFolder(WorkFolder folder){
+		FileUtils.copyFolder(folder.getFolder(), folder.getErrorFolder());
 	}
 
 	private boolean deletePath(Path dir, boolean force) {

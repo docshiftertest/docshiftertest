@@ -16,18 +16,14 @@ public class GlobalSettings implements Serializable
 	private String jmsQueue;
 	private String jmsUser;
 	private String jmsUserPassword;
-	
-	private String defaultOpenOfficeHost;
-	private String defaultOpenOfficePort;
-	
+
+	private String defaultErrorFolder;
 	private String defaultTempFolder;
 
 	public GlobalSettings() {}
 	
-	public GlobalSettings(String defaultOpenOfficeHost, String defaultOpenOfficePort, String defaultTempFolder)
+	public GlobalSettings(String defaultTempFolder)
 	{
-		this.defaultOpenOfficeHost = defaultOpenOfficeHost;
-		this.defaultOpenOfficePort = defaultOpenOfficePort;
 		this.defaultTempFolder = defaultTempFolder;
 	}
 	
@@ -39,14 +35,25 @@ public class GlobalSettings implements Serializable
 		this.jmsUser = jmsUser;
 		this.jmsUserPassword = jmsUserPassword;
 	}
-	
-	public GlobalSettings(String defaultOpenOfficeHost, 
-			String defaultOpenOfficePort, String defaultTempFolder,
+
+	public GlobalSettings(String defaultTempFolder,
+						  String jmsSystem, String jmsQueue, String jmsURL, String jmsUser,
+						  String jmsUserPassword, String defaultErrorFolder)
+	{
+
+		this.defaultTempFolder = defaultTempFolder;
+		this.jmsSystem = jmsSystem;
+		this.jmsQueue = jmsQueue;
+		this.jmsURL = jmsURL;
+		this.jmsUser = jmsUser;
+		this.jmsUserPassword = jmsUserPassword;
+		this.defaultErrorFolder = defaultErrorFolder;
+	}
+
+	public GlobalSettings(String defaultTempFolder,
 			String jmsSystem, String jmsQueue, String jmsURL, String jmsUser,
 			String jmsUserPassword)
 	{
-		this.defaultOpenOfficeHost = defaultOpenOfficeHost;
-		this.defaultOpenOfficePort = defaultOpenOfficePort;
 		this.defaultTempFolder = defaultTempFolder;
 		this.jmsSystem = jmsSystem;
 		this.jmsQueue = jmsQueue;
@@ -55,20 +62,12 @@ public class GlobalSettings implements Serializable
 		this.jmsUserPassword = jmsUserPassword;
 	}
 
-	public String getDefaultOpenOfficeHost()
-	{
-		return defaultOpenOfficeHost;
-	}
-
-	public String getDefaultOpenOfficePort()
-	{
-		return defaultOpenOfficePort;
-	}
 
 	public String getDefaultTempFolder()
 	{
 		return defaultTempFolder;
 	}
+
 
 	@Id
 	@Column(name = "ID")
@@ -96,16 +95,6 @@ public class GlobalSettings implements Serializable
 	public String getJmsUserPassword()
 	{
 		return jmsUserPassword;
-	}
-
-	public void setDefaultOpenOfficeHost(String defaultOpenOfficeHost)
-	{
-		this.defaultOpenOfficeHost = defaultOpenOfficeHost;
-	}
-
-	public void setDefaultOpenOfficePort(String defaultOpenOfficePort)
-	{
-		this.defaultOpenOfficePort = defaultOpenOfficePort;
 	}
 
 	public void setDefaultTempFolder(String defaultTempFolder)
@@ -145,5 +134,12 @@ public class GlobalSettings implements Serializable
 	public void setJmsSystem(String jmsSystem) {
 		this.jmsSystem = jmsSystem;
 	}
-	
+
+	public void setDefaultErrorFolder(String defaultErrorFolder) {
+		this.defaultErrorFolder = defaultErrorFolder;
+	}
+
+	public String getDefaultErrorFolder() {
+		return defaultErrorFolder;
+	}
 }

@@ -286,17 +286,17 @@ public class FileUtils {
 	}
 
 	public static String removeIllegalFilesystemCharacters(String input){
-		String output=input;
-		output=output.replace('/', '_');
-		output=output.replace('\\', '_');
-		output=output.replace('*', '_');
-		output=output.replace('?', '_');
-		output=output.replace(':', '_');
-		output=output.replace('"', '_');
-		output=output.replace('<', '_');
-		output=output.replace('>', '_');
-		output=output.replace('|', '_');
-		output=output.replace(' ', '_');
+		String output = input;
+		output = output.replace('/', '_');
+		output = output.replace('\\', '_');
+		output = output.replace('*', '_');
+		output = output.replace('?', '_');
+		output = output.replace(':', '_');
+		output = output.replace('"', '_');
+		output = output.replace('<', '_');
+		output = output.replace('>', '_');
+		output = output.replace('|', '_');
+		output = output.replace(' ', '_');
 		output = output.replace("\t", "_");
 		return output;
 	}

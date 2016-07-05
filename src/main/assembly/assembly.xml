@@ -26,6 +26,13 @@
         </fileSet>
         <fileSet>
             <directory>${project.basedir}</directory>
+            <outputDirectory>/errorfolder</outputDirectory>
+            <includes>
+                <include>dummyfile</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>notification.properties</include>
