@@ -37,6 +37,7 @@ public class GeneralConfigurationBean {
 			params.put(Constants.MQ_USER, config.getMqUser());
 			params.put(Constants.MQ_PASSWORD, config.getMqUserPassword());
 			params.put(Constants.TEMPFOLDER, config.getDefaultTempFolder());
+			params.put(Constants.ERRORFOLDER, config.getDefaultErrorFolder());
 		}
 		
 		/*

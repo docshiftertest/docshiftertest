@@ -9,6 +9,7 @@ import com.docbyte.docshifter.messaging.queue.sender.JMSSender;
 import com.docbyte.docshifter.messaging.topic.subscriber.IMessageSubscriber;
 import com.docbyte.docshifter.messaging.topic.subscriber.JMSSubscriber;
 
+@Deprecated
 public class MessagingFactory {
 
 	public static IMessageReceiver getMessageReceiver(

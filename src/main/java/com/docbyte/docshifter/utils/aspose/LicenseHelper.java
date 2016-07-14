@@ -1,8 +1,6 @@
-package com.docbyte.docshifter.util.aspose;
+package com.docbyte.docshifter.utils.aspose;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 
 

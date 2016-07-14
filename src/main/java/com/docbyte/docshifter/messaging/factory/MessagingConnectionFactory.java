@@ -1,6 +1,7 @@
 package com.docbyte.docshifter.messaging.factory;
 
 
+import com.aspose.email.system.exceptions.NotImplementedException;
 import com.docbyte.docshifter.config.ConfigurationServer;
 import com.docbyte.docshifter.config.Constants;
 import com.docbyte.docshifter.config.GeneralConfigurationBean;
@@ -20,8 +21,9 @@ public abstract class MessagingConnectionFactory {
 			case "ACTIVEMQ":
 				return new ActiveMQConnectionFactory(user, password, url);
 			case "OPENMQ":
-			default:
 				return new OpenMQConnectionFactory(user, password, url);
+			default:
+				throw new NotImplementedException("System not yet implemented");
 		}
 
 	}

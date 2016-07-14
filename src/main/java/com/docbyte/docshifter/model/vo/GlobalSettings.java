@@ -56,7 +56,7 @@ public class GlobalSettings implements Serializable
 
 	@Id
 	@Column(name = "ID")
-	@GeneratedValue(strategy= GenerationType.AUTO)
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	public long getId()
 	{
 		return id;

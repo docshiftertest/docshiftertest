@@ -1,19 +1,14 @@
 package com.docbyte.docshifter.util.reporting;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-
 import com.aspose.email.Attachment;
 import com.aspose.email.MailAddress;
 import com.aspose.email.MailMessage;
 import com.aspose.email.SecurityOptions;
 import com.aspose.email.SmtpClient;
-import com.docbyte.docshifter.util.aspose.LicenseHelper;
+import com.docbyte.docshifter.utils.aspose.LicenseHelper;
 import com.docbyte.docshifter.util.Logger;
 
 import java.io.File;
-import java.util.Properties;
 
 public class EmailNotification extends Notification {
 

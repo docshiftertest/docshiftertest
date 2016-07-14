@@ -17,6 +17,10 @@ public class AMQPSender implements IMessageSender {
 	private RabbitTemplate rabbitTemplate;
 	private Queue docshifterQueue;
 
+	public AMQPSender(RabbitTemplate rabbitTemplate, Queue docshifterQueue) {
+		this.rabbitTemplate = rabbitTemplate;
+		this.docshifterQueue = docshifterQueue;
+	}
 
 	private void sendTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task) throws Exception {
 		DocshifterMessage message=new DocshifterMessage(

@@ -24,6 +24,10 @@ public class WorkFolder implements Serializable {
 	private WorkFolder parent;
 	private Path errorFolder;
 
+	public WorkFolder() {
+
+	}
+
 	public WorkFolder(Path workfolder, Path errorFolder, WorkFolder parent) {
 		this.parent = parent;
 		this.errorFolder = errorFolder;
