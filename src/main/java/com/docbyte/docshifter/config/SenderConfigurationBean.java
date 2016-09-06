@@ -53,6 +53,10 @@ public class SenderConfigurationBean extends NodeBean {
 	public String getName(){
 		return getModuleBean().getName();
 	}
+
+	public String getConfigName(){
+		return getModuleBean().getConfigName();
+	}
 	
 	
 }

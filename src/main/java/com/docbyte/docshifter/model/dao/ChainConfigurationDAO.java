@@ -40,7 +40,7 @@ public class ChainConfigurationDAO implements IChainConfigurationDAO {
 
 	@SuppressWarnings("unchecked")
 	public void save(ChainConfiguration config) throws Exception {
-		Logger.info("saving chain conf dao", null);
+		Logger.debug("saving chain conf dao", null);
 		if (exists(config)) {
 			throw new Exception(
 					"A workflow with the same configurations already exists! The workflow cannot be saved.");

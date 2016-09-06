@@ -12,10 +12,11 @@ public class ModuleBean {
 	private String type;
 	private String name;
 	private String description;
+	private String configName;
 	
 	public ModuleBean(ModuleConfiguration config){
 		this.type = config.getModule().getType();
-		//this.name = config.getName();
+		this.configName = config.getName();
 		this.name = config.getModule().getClassname();
 		this.description = config.getDescription();
 		
@@ -74,6 +75,10 @@ public class ModuleBean {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	public String getConfigName(){
+		return configName;
 	}
 
 	/**

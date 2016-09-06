@@ -52,7 +52,7 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 
 	public void close() {
 		//Logger.debug("Being asked to close Connection"+(nrStarted--), null);
-		Logger.info("Start to run ... DONE exiting ="+(nrStarted), null);
+		Logger.debug("Start to run ... DONE exiting ="+(nrStarted), null);
 /*
 		if(nrStarted>0){
 			//nrStarted=0;
@@ -87,7 +87,7 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 	@Override
 	public void run() {
 
-		Logger.info("Start to run ... ="+(nrStarted), null);
+		Logger.debug("Start to run ... ="+(nrStarted), null);
 		if (firstRun) {
 			firstRun = false;
 			init();
@@ -111,7 +111,7 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 			Logger.debug("Started Connection nr="+(nrStarted), null);
 			try{
 				session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-				Logger.info("session started nr="+(nrStarted), null);
+				Logger.debug("session started nr="+(nrStarted), null);
 			}catch(JMSException e){
 				//close();
 				Logger.error("session ERROR nr="+(nrStarted), null);
@@ -125,7 +125,7 @@ public abstract class AbstractJMSSender extends AbstractJMSConnection implements
 
 
 		} catch (JMSException e){
-			Logger.info("Error, creating connection nr EXCEPTION="+(nrStarted), null);
+			Logger.error("Error, creating connection nr EXCEPTION="+(nrStarted), null);
 			//close();
 			retry(e);
 		}

@@ -89,7 +89,7 @@ public class WorkFolder implements Serializable {
 	}
 
 	public Path getFilePath(String filename, String extention) {
-		return this.getFilePath(filename + "." + extention);
+		return this.getNewFilePath(filename, extention);
 	}
 
 	public Path getNewFilePath(String filename, String extension) {

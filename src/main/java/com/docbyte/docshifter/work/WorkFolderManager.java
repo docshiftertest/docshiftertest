@@ -99,7 +99,7 @@ public class WorkFolderManager {
 		}
 
 		if (folder.getErrorFolder() == null){
-			Logger.info("ERRORFOLDER IS NULL *****", null);
+			Logger.error("ERRORFOLDER IS NULL *****", null);
 		} else {
 			deletePath(folder.getErrorFolder(), force);
 		}

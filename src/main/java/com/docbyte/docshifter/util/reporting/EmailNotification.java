@@ -58,7 +58,7 @@ public class EmailNotification extends Notification {
 			return true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			Logger.info("MAILERROR:", ex);
+			Logger.error("MAILERROR:", ex);
 			return false;
 		}
 	}

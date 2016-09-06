@@ -90,7 +90,7 @@ public class NodeDAO implements INodeDAO
 	public List<Node> getEnabledSenderConfigurations() {
 		//List<Node> nodes = (List<Node>)hibernateTemplate.find("select n from Node n inner join n.moduleConfiguration mc inner join mc.module m where m.type = 'Input'");
 		List<Node> nodes = (List<Node>)hibernateTemplate.find("select n from ChainConfiguration cc inner join cc.rootNode n inner join n.moduleConfiguration mc inner join mc.module m where cc.enabled = true");
-		Logger.info(nodes.size()+"", null);
+		Logger.debug(nodes.size()+"", null);
 		return nodes;
 	}
 	

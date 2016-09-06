@@ -63,6 +63,8 @@ public class Task implements Serializable {
 	public void setContent(Byte[] content) {
 		this.content = content;
 	}
+
+
 	public Task(String filePath, WorkFolder wf){
 		//this();
 		this.item_id=filePath;

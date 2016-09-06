@@ -183,8 +183,8 @@ public class FileUtils {
 
 	public static void copyFile(File srcFile, File destFile) throws IOException {
 		if (!srcFile.isDirectory()) {
-			Logger.info("copyfile-isfile", null);
-			Logger.info("srcfile= " + srcFile + " destfile= " + destFile, null);
+			Logger.debug("copyfile-isfile", null);
+			Logger.debug("srcfile= " + srcFile + " destfile= " + destFile, null);
 			FileInputStream inStream = null;
 			FileOutputStream outStream = null;
 			FileChannel inChannel = null;
@@ -213,18 +213,18 @@ public class FileUtils {
 				}
 			}
 		}else{
-			Logger.info("copyfile-isfolder--->copyfolder", null);
+			Logger.debug("copyfile-isfolder--->copyfolder", null);
 			copyFolder(srcFile, destFile);
 		}
 	}
 	
 	public static void copyFolder(File src, File dest) throws IOException {
 		if (src.isDirectory()) {
-			Logger.info("copyfolder-isdir", null);
+			Logger.debug("copyfolder-isdir", null);
 			// if directory not exists, create it
 			if (!dest.exists()) {
 				dest.mkdir();
-				Logger.info("Directory copied from " + src + "  to " + dest,
+				Logger.debug("Directory copied from " + src + "  to " + dest,
 						null);
 			}
 

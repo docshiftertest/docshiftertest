@@ -42,7 +42,7 @@ public class JMSSender extends AbstractJMSSender implements IMessageSender{
 			if (msg.length() > 88) {
 				msg = msg.substring(0, 88) + "...";
 			}
-			Logger.info("Sending dctm-message: " + msg+" for file: "+task.getFilePath(),null);
+			Logger.debug("Sending dctm-message: " + msg+" for file: "+task.getFilePath(),null);
 			producer.send(message);
 		}else throw new JMSException("Must start the JMSSender first, got "+getNrStarted()+" Connections");
 	}
@@ -52,7 +52,7 @@ public class JMSSender extends AbstractJMSSender implements IMessageSender{
 			ObjectMessage message=session.createObjectMessage(task);
 			message.setStringProperty("type","normal");
 			message.setLongProperty("configID",senderConfigurationID);
-			Logger.info("Sending message: " + senderConfigurationID +" for file: "+task.getFilePath(),null);
+			Logger.debug("Sending message: " + senderConfigurationID +" for file: "+task.getFilePath(),null);
 			producer.send(message);
 		}else throw new JMSException("Must start the JMSSender first, got "+getNrStarted()+" Connections");
 	}
@@ -63,7 +63,7 @@ public class JMSSender extends AbstractJMSSender implements IMessageSender{
 			ObjectMessage message=session.createObjectMessage(task);
 			message.setStringProperty("type","print");
 			
-			Logger.info("Sending message for file: "+task.getFilePath(),null);
+			Logger.debug("Sending message for file: "+task.getFilePath(),null);
 			producer.send(message);
 		}else throw new JMSException("Must start the JMSSender first");
 	}
@@ -78,7 +78,7 @@ public class JMSSender extends AbstractJMSSender implements IMessageSender{
 				ObjectMessage message=session.createObjectMessage(task);
 				message.setStringProperty("type","print");
 				message.setLongProperty("configID",chainConfigurationID);
-				Logger.info("Sending message: " + chainConfigurationID +" for file: "+task.getFilePath(),null);
+				Logger.debug("Sending message: " + chainConfigurationID +" for file: "+task.getFilePath(),null);
 				
 				producer.send(message);
 			}
