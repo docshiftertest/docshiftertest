@@ -1,7 +1,7 @@
 package com.docbyte.docshifter;
 
 import com.docbyte.docshifter.config.ConfigurationServer;
-import com.docbyte.docshifter.config.Constants;
+import com.docshifter.core.config.Constants;
 import com.docbyte.docshifter.config.GeneralConfigurationBean;
 import com.docbyte.docshifter.config.Task;
 import com.docbyte.docshifter.messaging.factory.MessagingFactory;
@@ -10,14 +10,13 @@ import com.docbyte.docshifter.messaging.queue.sender.IMessageSender;
 import com.docbyte.docshifter.model.dao.*;
 import com.docbyte.docshifter.model.vo.*;
 import com.docbyte.docshifter.util.ParameterTypes;
-import com.docbyte.docshifter.work.WorkFolder;
-import com.docbyte.docshifter.work.WorkFolderManager;
+import com.docshifter.core.work.WorkFolder;
+import com.docshifter.core.work.WorkFolderManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.jms.JMSException;
 import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.IOException;

@@ -1,21 +1,13 @@
 package com.docbyte.docshifter;
 
-import com.docbyte.docshifter.config.ConfigurationServer;
-import com.docbyte.docshifter.config.Constants;
-import com.docbyte.docshifter.config.GeneralConfigurationBean;
 import com.docbyte.docshifter.config.Task;
 import com.docbyte.docshifter.messaging.factory.IConnectionFactory;
 import com.docbyte.docshifter.messaging.factory.MessagingConnectionFactory;
-import com.docbyte.docshifter.messaging.queue.sender.JMSSender;
-import com.docbyte.docshifter.util.Logger;
-import com.docbyte.docshifter.work.WorkFolder;
+import com.docshifter.core.work.WorkFolder;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.jms.*;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.nio.file.Paths;
 
 /**

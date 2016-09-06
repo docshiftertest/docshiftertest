@@ -7,7 +7,7 @@ import javax.management.JMException;
 import javax.management.remote.JMXConnector;
 
 public interface IConnectionFactory {
-	
+
 	public Connection createConnection() throws JMSException;
 
 	public TopicConnection createTopicConnection() throws JMSException;

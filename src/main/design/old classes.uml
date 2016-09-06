@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="274.20555555555575" y="2304.5">com.docbyte.docshifter.model.dao.inter.IModuleDAO</node>
+    <node x="2570.833333333332" y="3908.000000000002">com.docbyte.docshifter.messaging.queue.sender.IMessageSender</node>
+    <node x="109.00000000000045" y="4086.0000000000027">com.docbyte.docshifter.utils.aspose.LicenseHelper</node>
+    <node x="628.514814814815" y="2356.0">com.docbyte.docshifter.model.dao.GlobalSettingsDAO</node>
+    <node x="1448.833333333334" y="-448.0">com.docbyte.docshifter.util.FileUtils</node>
+    <node x="-275.11018518518495" y="346.0">com.docbyte.docshifter.util.MimeUtils.EPAMimeType</node>
+    <node x="2570.125" y="2004.5">com.docbyte.docshifter.config.ModuleBean</node>
+    <node x="-479.99999999999955" y="4086.0000000000027">com.docbyte.docshifter.util.ParameterTypes</node>
+    <node x="2385.889814814815" y="2956.0">com.docbyte.docshifter.config.ReceiverConfigurationBean</node>
+    <node x="107.97592592592616" y="3075.0">com.docbyte.docshifter.config.ConfigurationServer</node>
+    <node x="81.00000000000205" y="4456.000000000003">com.docbyte.docshifter.util.ModuleTypes</node>
+    <node x="1612.1250000000002" y="1940.0">com.docbyte.docshifter.model.dao.ChainConfigurationDAO</node>
+    <node x="2685.889814814815" y="2956.0">com.docbyte.docshifter.config.TransformationConfigurationBean</node>
+    <node x="-190.29444444444425" y="2279.0">com.docbyte.docshifter.model.dao.inter.IModuleConfigurationsDAO</node>
+    <node x="-201.67268518518495" y="-440.0">com.docbyte.docshifter.util.MimeUtils</node>
+    <node x="1614.8333333333321" y="3868.000000000002">com.docbyte.docshifter.messaging.topic.publisher.AbstractJMSPublisher</node>
+    <node x="857.8333333333335" y="-448.0">com.docbyte.docshifter.messaging.factory.IConnectionFactory</node>
+    <node x="2115.125" y="1953.0">com.docbyte.docshifter.model.vo.ChainConfiguration</node>
+    <node x="2622.833333333334" y="-448.0">com.docbyte.docshifter.config.Constants</node>
+    <node x="2166.833333333332" y="3790.000000000002">com.docbyte.docshifter.messaging.queue.sender.AbstractJMSSender</node>
+    <node x="2270.4555555555557" y="2389.0">com.docbyte.docshifter.config.NodeBean</node>
+    <node x="137.26481481481505" y="1350.0">com.docbyte.docshifter.model.util.HibernateTemplateProvider</node>
+    <node x="1980.1250000000002" y="398.0">com.docbyte.docshifter.model.vo.Module</node>
+    <node x="2214.875" y="1480.0">com.docbyte.docshifter.model.vo.Node</node>
+    <node x="682.0989583333321" y="4252.000000000002">com.docbyte.docshifter.messaging.queue.receiver.JMSReceiver</node>
+    <node x="1106.8333333333335" y="761.0000000000005">com.docbyte.docshifter.util.reporting.Notification</node>
+    <node x="2344.833333333332" y="3498.000000000002">com.docbyte.docshifter.messaging.IMessageSenderOrPublisher</node>
+    <node x="1942.8333333333321" y="3947.000000000002">com.docbyte.docshifter.messaging.IDocShifterSender</node>
+    <node x="1403.3333333333321" y="3341.000000000002">com.docbyte.docshifter.messaging.AbstractJMSConnection</node>
+    <node x="-340.29444444444425" y="2622.0">com.docbyte.docshifter.model.dao.ModuleConfigurationsDAO</node>
+    <node x="2380.083333333332" y="4213.000000000002">com.docbyte.docshifter.messaging.queue.sender.JMSSender</node>
+    <node x="1884.336507936508" y="2965.8571428571427">com.docbyte.docshifter.config.SenderConfigurationBean</node>
+    <node x="2143.833333333334" y="-448.0">com.docbyte.docshifter.model.vo.GlobalSettings</node>
+    <node x="-217.99999999999795" y="4456.000000000003">com.docbyte.docshifter.messaging.IGlobalSettings</node>
+    <node x="-665.0240740740737" y="2648.0">com.docbyte.docshifter.model.dao.NodeDAO</node>
+    <node x="1158.8333333333335" y="-274.0">com.docbyte.docshifter.messaging.queue.information.Information</node>
+    <node x="1290.8333333333321" y="3842.000000000002">com.docbyte.docshifter.messaging.topic.subscriber.AbstractJMSSubscriber</node>
+    <node x="1282.8333333333335" y="572.0000000000005">com.docbyte.docshifter.util.reporting.EmailNotification</node>
+    <node x="-177.99999999999955" y="4086.0000000000027">com.docbyte.docshifter.util.Logger</node>
+    <node x="2177.6009259259263" y="0.0">com.docbyte.docshifter.model.vo.Parameter</node>
+    <node x="856.3333333333321" y="3498.000000000002">com.docbyte.docshifter.messaging.IMessageReceiverOrSubscriber</node>
+    <node x="608.8333333333335" y="-274.0">com.docbyte.docshifter.messaging.factory.ActiveMQConnectionFactory</node>
+    <node x="567.8333333333335" y="572.0000000000005">com.docbyte.docshifter.config.Task</node>
+    <node x="-495.99999999999795" y="4456.000000000003">com.docbyte.docshifter.util.HSQLDBShutdown</node>
+    <node x="873.8333333333335" y="-287.0">com.docbyte.docshifter.messaging.factory.OpenMQConnectionFactory</node>
+    <node x="-67.92268518518495" y="847.0">com.docbyte.docshifter.util.MimeUtils.MimeTypeMap</node>
+    <node x="246.00000000000205" y="4456.000000000003">com.docbyte.docshifter.messaging.IGlobalSettingsService</node>
+    <node x="1339.3333333333335" y="1106.0000000000005">com.docbyte.docshifter.util.reporting.Notification.Type</node>
+    <node x="796.9791666666652" y="4532.000000000002">com.docbyte.docshifter.messaging.factory.MessagingFactory</node>
+    <node x="709.764814814815" y="1986.5">com.docbyte.docshifter.model.dao.inter.IGlobalSettingsDAO</node>
+    <node x="1277.9791666666652" y="4291.000000000002">com.docbyte.docshifter.messaging.topic.subscriber.JMSSubscriber</node>
+    <node x="811.8333333333321" y="3960.000000000002">com.docbyte.docshifter.messaging.topic.subscriber.IMessageSubscriber</node>
+    <node x="996.8333333333321" y="3868.000000000002">com.docbyte.docshifter.messaging.queue.receiver.AbstractJMSReceiver</node>
+    <node x="-486.5" y="1849.0">com.docbyte.docshifter.model.dao.ParameterDAO</node>
+    <node x="677.8333333333335" y="1074.0000000000005">com.docbyte.docshifter.config.PrintTask</node>
+    <node x="-677.5240740740737" y="2344.0">com.docbyte.docshifter.model.dao.inter.INodeDAO</node>
+    <node x="161.70555555555575" y="2648.0">com.docbyte.docshifter.model.dao.ModuleDAO</node>
+    <node x="1773.3750000000002" y="1546.5">com.docbyte.docshifter.model.dao.inter.IChainConfigurationDAO</node>
+    <node x="-550.0" y="1442.5">com.docbyte.docshifter.model.dao.inter.IParameterDAO</node>
+    <node x="2228.875" y="1056.0">com.docbyte.docshifter.model.vo.ModuleConfiguration</node>
+    <node x="599.9999999999986" y="3960.000000000002">com.docbyte.docshifter.messaging.queue.receiver.IMessageReceiver</node>
+    <node x="619.8333333333335" y="6.0">com.docbyte.docshifter.messaging.factory.MessagingConnectionFactory</node>
+    <node x="527.7055555555557" y="2725.5">com.docbyte.docshifter.config.GeneralConfigurationBean</node>
+    <node x="1504.8333333333321" y="3232.000000000002">com.docbyte.docshifter.messaging.IDocShifterController</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.docbyte.docshifter.model.vo.Module" target="com.docbyte.docshifter.model.vo.Parameter">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.ConfigurationServer" target="com.docbyte.docshifter.model.dao.ChainConfigurationDAO">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.topic.subscriber.JMSSubscriber" target="com.docbyte.docshifter.messaging.topic.subscriber.IMessageSubscriber">
+      <point x="-114.0" y="-56.5" />
+      <point x="1334.9791666666652" y="4183.000000000002" />
+      <point x="894.3333333333321" y="4183.000000000002" />
+      <point x="0.0" y="16.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.NodeBean" target="com.docbyte.docshifter.config.ModuleBean">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.dao.ParameterDAO" target="com.docbyte.docshifter.model.util.HibernateTemplateProvider">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.util.MimeUtils" target="com.docbyte.docshifter.util.MimeUtils.MimeTypeMap">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.queue.sender.IMessageSender" target="com.docbyte.docshifter.messaging.IMessageSenderOrPublisher">
+      <point x="0.0" y="-68.5" />
+      <point x="2711.833333333332" y="3770.000000000002" />
+      <point x="2528.1666666666656" y="3770.000000000002" />
+      <point x="73.33333333333348" y="42.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.topic.subscriber.IMessageSubscriber" target="com.docbyte.docshifter.messaging.IMessageReceiverOrSubscriber">
+      <point x="0.0" y="-16.5" />
+      <point x="894.3333333333321" y="3770.000000000002" />
+      <point x="948.9583333333321" y="3770.000000000002" />
+      <point x="-30.875" y="42.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.ConfigurationServer" target="com.docbyte.docshifter.model.dao.ModuleConfigurationsDAO">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.util.MimeUtils.MimeTypeMap" target="com.docbyte.docshifter.util.MimeUtils">
+      <point x="155.25" y="-173.5" />
+      <point x="294.32731481481505" y="827.0" />
+      <point x="217.38981481481505" y="827.0" />
+      <point x="217.38981481481505" y="326.0" />
+      <point x="441.45231481481505" y="326.0" />
+      <point x="275.625" y="368.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.vo.ModuleConfiguration" target="com.docbyte.docshifter.model.vo.Parameter">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.dao.ModuleDAO" target="com.docbyte.docshifter.model.util.HibernateTemplateProvider">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.queue.receiver.AbstractJMSReceiver" target="com.docbyte.docshifter.messaging.IMessageReceiverOrSubscriber">
+      <point x="-68.5" y="-108.5" />
+      <point x="1065.3333333333321" y="3770.000000000002" />
+      <point x="1010.7083333333321" y="3770.000000000002" />
+      <point x="30.875" y="42.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.NodeBean" target="com.docbyte.docshifter.model.vo.Node">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.TransformationConfigurationBean" target="com.docbyte.docshifter.config.NodeBean">
+      <point x="0.0" y="-29.5" />
+      <point x="2847.889814814815" y="2814.0" />
+      <point x="2741.2888888888892" y="2814.0" />
+      <point x="188.33333333333348" y="200.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.dao.NodeDAO" target="com.docbyte.docshifter.model.util.HibernateTemplateProvider">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.factory.ActiveMQConnectionFactory" target="com.docbyte.docshifter.messaging.factory.IConnectionFactory">
+      <point x="0.0" y="-108.5" />
+      <point x="731.3333333333335" y="-312.0" />
+      <point x="907.3333333333335" y="-312.0" />
+      <point x="-99.0" y="55.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.SenderConfigurationBean" target="com.docbyte.docshifter.config.ReceiverConfigurationBean">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.dao.ChainConfigurationDAO" target="com.docbyte.docshifter.model.dao.inter.IChainConfigurationDAO">
+      <point x="120.75" y="-199.5" />
+      <point x="0.0" y="133.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.PrintTask" target="com.docbyte.docshifter.config.Task">
+      <point x="0.0" y="-82.5" />
+      <point x="0.0" y="226.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.ConfigurationServer" target="com.docbyte.docshifter.config.SenderConfigurationBean">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.queue.sender.JMSSender" target="com.docbyte.docshifter.messaging.queue.sender.AbstractJMSSender">
+      <point x="-127.0" y="-134.5" />
+      <point x="2443.583333333332" y="4193.000000000002" />
+      <point x="2358.833333333332" y="4193.000000000002" />
+      <point x="0.0" y="186.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.util.reporting.Notification" target="com.docbyte.docshifter.util.reporting.EmailNotification">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.factory.OpenMQConnectionFactory" target="com.docbyte.docshifter.messaging.factory.IConnectionFactory">
+      <point x="0.0" y="-121.5" />
+      <point x="0.0" y="55.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.dao.NodeDAO" target="com.docbyte.docshifter.model.dao.inter.INodeDAO">
+      <point x="-83.0" y="-160.5" />
+      <point x="-582.0240740740737" y="2597.0" />
+      <point x="-562.0240740740737" y="2597.0" />
+      <point x="0.0" y="81.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.ConfigurationServer" target="com.docbyte.docshifter.model.dao.NodeDAO">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.factory.MessagingFactory" target="com.docbyte.docshifter.messaging.queue.receiver.JMSReceiver">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.topic.publisher.AbstractJMSPublisher" target="com.docbyte.docshifter.messaging.IMessageSenderOrPublisher">
+      <point x="77.0" y="-108.5" />
+      <point x="1845.8333333333321" y="3770.000000000002" />
+      <point x="2381.4999999999986" y="3770.000000000002" />
+      <point x="-73.33333333333348" y="42.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.dao.ModuleDAO" target="com.docbyte.docshifter.model.dao.inter.IModuleDAO">
+      <point x="86.5" y="-160.5" />
+      <point x="0.0" y="121.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.util.reporting.EmailNotification" target="com.docbyte.docshifter.util.reporting.Notification">
+      <point x="46.25" y="69.5" />
+      <point x="1421.5833333333335" y="736.0000000000005" />
+      <point x="1509.5833333333335" y="736.0000000000005" />
+      <point x="134.25" y="-147.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.AbstractJMSConnection" target="com.docbyte.docshifter.messaging.IDocShifterController">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.vo.ChainConfiguration" target="com.docbyte.docshifter.model.vo.Node">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.dao.ParameterDAO" target="com.docbyte.docshifter.model.dao.inter.IParameterDAO">
+      <point x="-92.0" y="-160.5" />
+      <point x="0.0" y="107.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.queue.receiver.IMessageReceiver" target="com.docbyte.docshifter.messaging.IMessageReceiverOrSubscriber">
+      <point x="0.0" y="-16.5" />
+      <point x="675.9999999999986" y="3770.000000000002" />
+      <point x="887.2083333333321" y="3770.000000000002" />
+      <point x="-92.625" y="42.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.dao.GlobalSettingsDAO" target="com.docbyte.docshifter.model.util.HibernateTemplateProvider">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.queue.sender.JMSSender" target="com.docbyte.docshifter.messaging.queue.sender.IMessageSender">
+      <point x="0.0" y="-134.5" />
+      <point x="2570.583333333332" y="4193.000000000002" />
+      <point x="2641.333333333332" y="4193.000000000002" />
+      <point x="-70.5" y="68.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.ReceiverConfigurationBean" target="com.docbyte.docshifter.config.NodeBean">
+      <point x="0.0" y="-29.5" />
+      <point x="2525.889814814815" y="2814.0" />
+      <point x="2552.9555555555557" y="2814.0" />
+      <point x="0.0" y="200.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.ConfigurationServer" target="com.docbyte.docshifter.config.GeneralConfigurationBean">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.topic.subscriber.AbstractJMSSubscriber" target="com.docbyte.docshifter.messaging.AbstractJMSConnection">
+      <point x="76.0" y="-134.5" />
+      <point x="1518.8333333333321" y="3770.000000000002" />
+      <point x="1554.8333333333321" y="3770.000000000002" />
+      <point x="-50.5" y="199.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.queue.receiver.JMSReceiver" target="com.docbyte.docshifter.messaging.queue.receiver.IMessageReceiver">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.topic.subscriber.AbstractJMSSubscriber" target="com.docbyte.docshifter.messaging.IMessageReceiverOrSubscriber">
+      <point x="-76.0" y="-134.5" />
+      <point x="1366.8333333333321" y="3760.000000000002" />
+      <point x="1072.4583333333321" y="3760.000000000002" />
+      <point x="92.625" y="42.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.factory.MessagingConnectionFactory" target="com.docbyte.docshifter.messaging.factory.ActiveMQConnectionFactory">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.factory.MessagingConnectionFactory" target="com.docbyte.docshifter.messaging.factory.OpenMQConnectionFactory">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.util.reporting.Notification.Type" target="com.docbyte.docshifter.util.reporting.Notification">
+      <point x="0.0" y="-29.5" />
+      <point x="0.0" y="147.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.queue.receiver.JMSReceiver" target="com.docbyte.docshifter.messaging.queue.receiver.AbstractJMSReceiver">
+      <point x="87.66666666666674" y="-95.5" />
+      <point x="901.2656249999989" y="4193.000000000002" />
+      <point x="1133.8333333333321" y="4193.000000000002" />
+      <point x="0.0" y="108.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.topic.publisher.AbstractJMSPublisher" target="com.docbyte.docshifter.messaging.AbstractJMSConnection">
+      <point x="-77.0" y="-108.5" />
+      <point x="1691.8333333333321" y="3770.000000000002" />
+      <point x="1655.8333333333321" y="3770.000000000002" />
+      <point x="50.5" y="199.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.topic.subscriber.JMSSubscriber" target="com.docbyte.docshifter.messaging.topic.subscriber.AbstractJMSSubscriber">
+      <point x="0.0" y="-56.5" />
+      <point x="1448.9791666666652" y="4193.000000000002" />
+      <point x="1442.8333333333321" y="4193.000000000002" />
+      <point x="0.0" y="134.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.dao.ModuleConfigurationsDAO" target="com.docbyte.docshifter.model.dao.inter.IModuleConfigurationsDAO">
+      <point x="120.5" y="-186.5" />
+      <point x="0.0" y="146.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.ConfigurationServer" target="com.docbyte.docshifter.model.dao.ModuleDAO">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.NodeBean" target="com.docbyte.docshifter.model.dao.ChainConfigurationDAO">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.util.MimeUtils.EPAMimeType" target="com.docbyte.docshifter.util.MimeUtils">
+      <point x="0.0" y="-225.5" />
+      <point x="-45.110185185184946" y="326.0" />
+      <point x="-109.79768518518495" y="326.0" />
+      <point x="-275.625" y="368.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.factory.MessagingFactory" target="com.docbyte.docshifter.messaging.topic.subscriber.JMSSubscriber">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.queue.information.Information" target="com.docbyte.docshifter.messaging.factory.IConnectionFactory">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.vo.Node" target="com.docbyte.docshifter.model.vo.ModuleConfiguration">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.GeneralConfigurationBean" target="com.docbyte.docshifter.model.dao.GlobalSettingsDAO">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.SenderConfigurationBean" target="com.docbyte.docshifter.config.NodeBean">
+      <point x="-92.5" y="-95.5" />
+      <point x="1985.4079365079365" y="3001.285714285714" />
+      <point x="1981.336507936508" y="2919.8571428571427" />
+      <point x="2335.6222222222223" y="2814.0" />
+      <point x="2364.6222222222223" y="2814.0" />
+      <point x="-188.33333333333326" y="200.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.dao.GlobalSettingsDAO" target="com.docbyte.docshifter.model.dao.inter.IGlobalSettingsDAO">
+      <point x="63.75" y="-69.5" />
+      <point x="819.764814814815" y="2254.0" />
+      <point x="812.764814814815" y="2254.0" />
+      <point x="0.0" y="42.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.queue.receiver.AbstractJMSReceiver" target="com.docbyte.docshifter.messaging.AbstractJMSConnection">
+      <point x="68.5" y="-108.5" />
+      <point x="1202.3333333333321" y="3770.000000000002" />
+      <point x="1453.8333333333321" y="3770.000000000002" />
+      <point x="-151.5" y="199.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.util.MimeUtils.MimeTypeMap" target="com.docbyte.docshifter.util.MimeUtils.EPAMimeType">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.topic.subscriber.JMSSubscriber" target="com.docbyte.docshifter.messaging.IDocShifterSender">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.dao.ChainConfigurationDAO" target="com.docbyte.docshifter.model.util.HibernateTemplateProvider">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.config.NodeBean" target="com.docbyte.docshifter.model.vo.ChainConfiguration">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.queue.sender.AbstractJMSSender" target="com.docbyte.docshifter.messaging.IMessageSenderOrPublisher">
+      <point x="96.0" y="-186.5" />
+      <point x="0.0" y="42.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.messaging.queue.sender.AbstractJMSSender" target="com.docbyte.docshifter.messaging.AbstractJMSConnection">
+      <point x="-96.0" y="-186.5" />
+      <point x="2262.833333333332" y="3760.000000000002" />
+      <point x="1756.8333333333321" y="3760.000000000002" />
+      <point x="151.5" y="199.5" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.dao.ModuleConfigurationsDAO" target="com.docbyte.docshifter.model.util.HibernateTemplateProvider">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.docbyte.docshifter.model.vo.ModuleConfiguration" target="com.docbyte.docshifter.model.vo.Module">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.10000000000000014" x="3203.999999999992" y="2475.3333333333376" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Constructors</Category>
+    <Category>Fields</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+    <Category>Inner Classes</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

@@ -6,6 +6,7 @@ import javax.jms.MessageListener;
 public interface IMessageReceiverOrSubscriber extends MessageListener {
 
 	void onMessage(Message message);
+
 	void run();
 
 }

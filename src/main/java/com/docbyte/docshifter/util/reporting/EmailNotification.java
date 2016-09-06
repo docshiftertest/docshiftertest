@@ -1,12 +1,8 @@
 package com.docbyte.docshifter.util.reporting;
 
-import com.aspose.email.Attachment;
-import com.aspose.email.MailAddress;
-import com.aspose.email.MailMessage;
-import com.aspose.email.SecurityOptions;
-import com.aspose.email.SmtpClient;
-import com.docbyte.docshifter.utils.aspose.LicenseHelper;
+import com.aspose.email.*;
 import com.docbyte.docshifter.util.Logger;
+import com.docbyte.docshifter.utils.aspose.LicenseHelper;
 
 import java.io.File;
 
@@ -36,7 +32,7 @@ public class EmailNotification extends Notification {
 			message.setSubject(this.getSubject());
 			message.setHtmlBody(this.getMessage());
 			Attachment attachment = null;
-			if (this.getAttachment() != null){
+			if (this.getAttachment() != null) {
 				attachment = new Attachment(this.getAttachment().getAbsolutePath());
 				message.getAttachments().addItem(attachment);
 			}
@@ -46,7 +42,7 @@ public class EmailNotification extends Notification {
 			client.send(message);
 			client.dispose();
 
-			if (attachment != null){
+			if (attachment != null) {
 				attachment.dispose();
 			}
 

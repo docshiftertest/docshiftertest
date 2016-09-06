@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * Last Modification Date: $Date$
- * 
+ *
  * @author $Author$
  * @version $Rev$
  */
@@ -47,15 +47,14 @@ public class FileUtils {
 
 	/**
 	 * Tests if file extension is the same as given extension
-	 * 
+	 *
 	 * @param filePath
-	 * @param extension
-	 *            file-extension without .!
+	 * @param extension file-extension without .!
 	 * @return true if file-extension is the same
 	 */
 	public static boolean testFileExtension(String filePath, String extension) {
 		if (filePath == null || extension == null || filePath.length() == 0
-				|| extension.length() == 0)
+					|| extension.length() == 0)
 			return false;
 		int dot = filePath.lastIndexOf(".");
 
@@ -93,7 +92,7 @@ public class FileUtils {
 		int offset = 0;
 		int numRead = 0;
 		while (offset < bytes.length
-				&& (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+					   && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
 			offset += numRead;
 		}
 
@@ -101,7 +100,7 @@ public class FileUtils {
 		if (offset < bytes.length) {
 			is.close();
 			throw new IOException("Could not completely read file "
-					+ file.getName());
+										  + file.getName());
 		}
 
 		// Close the input stream and return bytes
@@ -109,7 +108,7 @@ public class FileUtils {
 		return bytes;
 	}
 
-	public static String shortenFileName(String filename){
+	public static String shortenFileName(String filename) {
 		String newfilename = filename;
 		if (filename.length() > 40) {
 			newfilename = filename.substring(0, 40);
@@ -148,9 +147,8 @@ public class FileUtils {
 
 	/**
 	 * Returns a list of all the files located in a given folder
-	 * 
-	 * @param folderpath
-	 *            aboslute path of the folder
+	 *
+	 * @param folderpath aboslute path of the folder
 	 * @return a list of files
 	 */
 	//@SuppressWarnings("unchecked")
@@ -177,7 +175,7 @@ public class FileUtils {
 		copyFile(srcFile, destFile);
 		if (!srcFile.delete()) {
 			throw new IOException("Unable to delete file "
-					+ srcFile.getAbsolutePath());
+										  + srcFile.getAbsolutePath());
 		}
 	}
 
@@ -212,12 +210,12 @@ public class FileUtils {
 				} catch (Exception ex) {
 				}
 			}
-		}else{
+		} else {
 			Logger.info("copyfile-isfolder--->copyfolder", null);
 			copyFolder(srcFile, destFile);
 		}
 	}
-	
+
 	public static void copyFolder(File src, File dest) throws IOException {
 		if (src.isDirectory()) {
 			Logger.info("copyfolder-isdir", null);
@@ -246,7 +244,7 @@ public class FileUtils {
 	}
 
 	public static String createFolderStucture(String rootFolderPath,
-			String folderStructurePath) {
+											  String folderStructurePath) {
 		if (folderStructurePath == null)
 			folderStructurePath = "";
 		File targetFolder = new File(rootFolderPath + folderStructurePath);
@@ -285,7 +283,7 @@ public class FileUtils {
 		}
 	}
 
-	public static String removeIllegalFilesystemCharacters(String input){
+	public static String removeIllegalFilesystemCharacters(String input) {
 		String output = input;
 		output = output.replace('/', '_');
 		output = output.replace('\\', '_');

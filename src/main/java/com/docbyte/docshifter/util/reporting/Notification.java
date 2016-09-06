@@ -8,17 +8,15 @@ import java.util.Properties;
 
 public abstract class Notification {
 
-	
+
 	private String destination;
 	private String origin;
 	private String subject;
 	private String message;
 	private File attachment;
-	
-	
-	
-	
-	public Notification(String destination, String origin, String subject,	String message, File attachment) {
+
+
+	public Notification(String destination, String origin, String subject, String message, File attachment) {
 		this.destination = destination;
 		this.origin = origin;
 		this.subject = subject;
@@ -26,13 +24,9 @@ public abstract class Notification {
 		this.attachment = attachment;
 	}
 
-	public Notification(String destination, String origin, String subject,	String message) {
+	public Notification(String destination, String origin, String subject, String message) {
 		this(destination, origin, subject, message, null);
 	}
-
-
-	public abstract boolean send();
-
 
 	public static Notification getFromProps(String properties) {
 		Properties prop = new Properties();
@@ -43,17 +37,16 @@ public abstract class Notification {
 		} catch (IOException e) {
 			return null;
 		}
-		 
+
 		return getFromProps(prop);
-		
+
 	}
-	
+
 	public static Notification getFromProps(Properties prop) {
-		
-		
-		
+
+
 		Type type = Type.valueOf(prop.getProperty("docshifter.notification.type"));
-		
+
 		switch (type) {
 			case MAIL:
 				String destination = prop.getProperty("docshifter.notification.destination");
@@ -63,8 +56,10 @@ public abstract class Notification {
 			default:
 				return null;
 		}
-		
+
 	}
+
+	public abstract boolean send();
 
 	public String getDestination() {
 		return destination;

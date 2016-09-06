@@ -12,8 +12,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.docbyte.docshifter.work.WorkFolder;
-import com.docbyte.docshifter.work.WorkFolderManager;
+import com.docshifter.core.work.WorkFolder;
+import com.docshifter.core.work.WorkFolderManager;
 
 public class TestWorkfolder {	
 	WorkFolderManager manager;
