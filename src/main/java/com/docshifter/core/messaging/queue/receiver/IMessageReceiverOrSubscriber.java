@@ -1,4 +1,4 @@
-package com.docshifter.core.messaging;
+package com.docshifter.core.messaging.queue.receiver;
 
 import javax.jms.Message;
 import javax.jms.MessageListener;

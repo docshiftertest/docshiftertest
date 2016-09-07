@@ -1,4 +1,4 @@
-package com.docshifter.core.messaging;
+package com.docshifter.core.messaging.queue.sender;
 
 public interface IMessageSenderOrPublisher {
 

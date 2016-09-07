@@ -1,7 +1,6 @@
 package com.docshifter.core.messaging.queue.sender;
 
 import com.docbyte.docshifter.config.Task;
-import com.docshifter.core.messaging.IMessageSenderOrPublisher;
 
 public interface IMessageSender extends IMessageSenderOrPublisher {
 
