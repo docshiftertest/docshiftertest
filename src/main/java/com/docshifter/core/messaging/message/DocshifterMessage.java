@@ -1,6 +1,7 @@
 package com.docshifter.core.messaging.message;
 
-import com.docbyte.docshifter.config.Task;
+
+import com.docshifter.core.task.Task;
 
 import java.io.Serializable;
 

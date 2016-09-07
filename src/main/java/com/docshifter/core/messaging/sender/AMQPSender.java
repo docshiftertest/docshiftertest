@@ -1,10 +1,10 @@
 package com.docshifter.core.messaging.sender;
 
-import com.docbyte.docshifter.config.Task;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
 import com.docbyte.docshifter.util.Logger;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
+import com.docshifter.core.task.Task;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
