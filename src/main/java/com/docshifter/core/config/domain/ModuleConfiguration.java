@@ -17,8 +17,6 @@ public class ModuleConfiguration implements Serializable{
 
 	private static final long serialVersionUID = 7666888692582226276L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	private Module module;
 	private String name;
@@ -99,7 +97,7 @@ public class ModuleConfiguration implements Serializable{
 
 	@JsonIgnore
 	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
-	@JoinTable (name = "MODULEPARAMSVALUES", schema = "DOCSHIFTER", joinColumns={@JoinColumn(name="CONFIGURATIONID")})
+	@JoinTable (name = "MODULEPARAMSVALUES", joinColumns={@JoinColumn(name="CONFIGURATIONID")})
 	@MapKeyJoinColumn(name="PARAMID")
 	@Column(name="PARAMVALUE")
 	public Map<Parameter, String> getParameterValues()

@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
  * Created by michiel.vandriessche@docbyte.com on 9/6/16.
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = com.docshifter.main.DocShifterConfiguration.class)
+@SpringBootTest(classes = com.docshifter.main.TestController.class)
 public class ChainConfigurationRepositoryTest extends DBTests {
 
 	@Test

@@ -8,9 +8,9 @@ import javax.management.remote.JMXConnector;
 
 public interface IConnectionFactory {
 
-	public Connection createConnection() throws JMSException;
+	Connection createConnection() throws JMSException;
 
-	public TopicConnection createTopicConnection() throws JMSException;
+	TopicConnection createTopicConnection() throws JMSException;
 
-	public JMXConnector createAdminConnection() throws JMException;
+	JMXConnector createAdminConnection() throws JMException;
 }

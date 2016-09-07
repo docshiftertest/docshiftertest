@@ -11,4 +11,6 @@ public class Constants {
 	public final static String ERRORFOLDER = "errorfolder";
 	public final static String OPENOFFICE_HOST = " ";
 	public final static String OPENOFFICE_PORT = " ";
+
+
 }

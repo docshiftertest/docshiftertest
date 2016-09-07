@@ -54,14 +54,14 @@ public class GeneralConfigService {
 	 * @return the String value linked to the requested parameter
 	 */
 	public String getString(String name){
-		return (String) params.get(name);
+		return params.get(name);
 	}
 /**
 	 * @param name the name of the requested parameter
 	 * @return the int value linked to the requested parameter
 	 */
 	public int getInt(String name){
-		return Integer.parseInt((String)params.get(name));
+		return Integer.parseInt(params.get(name));
 	}
 	
 	public Map<String, String> getParams() {

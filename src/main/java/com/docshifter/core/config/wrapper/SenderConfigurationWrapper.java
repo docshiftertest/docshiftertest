@@ -31,13 +31,13 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 	public String getString(String name) {
 		Map<String, String> allParams = getModuleWrapper().params;
 		//TODO: add general config params id necessary
-		return (String)allParams.get(name);
+		return allParams.get(name);
 	}
 
 	public int getInt(String name){
 		Map<String, String> allParams = getModuleWrapper().params;
 		//TODO: add general config params id necessary
-		return Integer.parseInt((String)allParams.get(name));
+		return Integer.parseInt(allParams.get(name));
 	}
 
 	public String getName(){

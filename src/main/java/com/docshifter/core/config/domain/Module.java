@@ -14,8 +14,6 @@ import java.util.Set;
 public class Module implements Serializable {
 	private static final long serialVersionUID = -2605744674300941605L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	private String name;
 	private String classname;
@@ -25,7 +23,6 @@ public class Module implements Serializable {
 	private String inputFiletype;
 	private String outputFileType;
 
-	@ManyToOne
 	private Set<Parameter> parameters = new HashSet<Parameter>();
 
 	public Module() {
@@ -98,7 +95,6 @@ public class Module implements Serializable {
 	)
 	@JoinTable(
 			name = "MODULEPARAMS",
-			schema = "DOCSHIFTER",
 			joinColumns = @JoinColumn(name = "MODULEID"),
 			inverseJoinColumns = @JoinColumn(name = "PARAMID")
 	)

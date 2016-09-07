@@ -39,11 +39,8 @@ public class WorkFolder implements Serializable {
 	}
 
 	public boolean isRoot() {
-		if (parent == null) {
-			return true;
-		}
-		return false;
-	}
+        return parent == null;
+    }
 
 
 	public Path getErrorFolder() {

@@ -5,7 +5,10 @@ import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -76,25 +79,6 @@ public class DBTests {
 
 		millis = "" + System.currentTimeMillis();
 
-		m1 = new Module("testmodule1" + millis, "testmodule1" + millis, "testsmodule1" + millis, "input", null, null);
-		m2 = new Module("testmodule2" + millis, "testmodule2" + millis, "testsmodule2" + millis, "input", null, null);
-		m4 = new Module("testmodule4" + millis, "testmodule4" + millis, "testsmodule4" + millis, "input", null, null);
-		m7 = new Module("testmodule7" + millis, "testmodule7" + millis, "testsmodule7" + millis, "input", null, null);
-		m8 = new Module("testmodule8" + millis, "testmodule8" + millis, "testsmodule8" + millis, "input", null, null);
-		m9 = new Module("testmodule9" + millis, "testmodule9" + millis, "testsmodule9" + millis, "input", null, null);
-		m10 = new Module("testmodule10" + millis, "testmodule10" + millis, "testsmodule10" + millis, "input", null, null);
-		m11 = new Module("testmodule11" + millis, "testmodule11" + millis, "testsmodule11" + millis, "input", null, null);
-		m12 = new Module("testmodule12" + millis, "testmodule12" + millis, "testsmodule12" + millis, "input", null, null);
-
-		m1 = moduleRepository.save(m1);
-		m2 = moduleRepository.save(m2);
-		m4 = moduleRepository.save(m4);
-		m7 = moduleRepository.save(m7);
-		m8 = moduleRepository.save(m8);
-		m9 = moduleRepository.save(m9);
-		m10 = moduleRepository.save(m10);
-		m11 = moduleRepository.save(m11);
-		m12 = moduleRepository.save(m12);
 
 		p1 = new Parameter("parameter1" + millis, "parameter1" + millis, ParameterTypes.STRING);
 		p2 = new Parameter("parameter2" + millis, "parameter2" + millis, ParameterTypes.STRING);
@@ -110,19 +94,17 @@ public class DBTests {
 		p15 = new Parameter("parameter15" + millis, "parameter15" + millis, ParameterTypes.STRING);
 		p16 = new Parameter("parameter16" + millis, "parameter16" + millis, ParameterTypes.STRING);
 
-		parameterRepository.save(p1);
-		parameterRepository.save(p2);
-		parameterRepository.save(p3);
-		parameterRepository.save(p4);
-		parameterRepository.save(p7);
-		parameterRepository.save(p8);
-		parameterRepository.save(p9);
-		parameterRepository.save(p10);
-		parameterRepository.save(p11);
-		parameterRepository.save(p13);
-		parameterRepository.save(p14);
-		parameterRepository.save(p15);
-		parameterRepository.save(p16);
+		m1 = new Module("testmodule1" + millis, "testmodule1" + millis, "testsmodule1" + millis, "input", null,  new HashSet(Arrays.asList(p1)));
+		m2 = new Module("testmodule2" + millis, "testmodule2" + millis, "testsmodule2" + millis, "input", null, null);
+		m4 = new Module("testmodule4" + millis, "testmodule4" + millis, "testsmodule4" + millis, "input", null, null);
+		m7 = new Module("testmodule7" + millis, "testmodule7" + millis, "testsmodule7" + millis, "input", null, null);
+		m8 = new Module("testmodule8" + millis, "testmodule8" + millis, "testsmodule8" + millis, "input", null, null);
+		m9 = new Module("testmodule9" + millis, "testmodule9" + millis, "testsmodule9" + millis, "input", null, null);
+		m10 = new Module("testmodule10" + millis, "testmodule10" + millis, "testsmodule10" + millis, "input", null, null);
+		m11 = new Module("testmodule11" + millis, "testmodule11" + millis, "testsmodule11" + millis, "input", null, null);
+		m12 = new Module("testmodule12" + millis, "testmodule12" + millis, "testsmodule12" + millis, "input", null, null);
+
+
 
 		Map<Parameter, String> map0 = new HashMap<Parameter, String>();
 		map0.put(p1, "parameter0");
@@ -155,6 +137,31 @@ public class DBTests {
 		mc10 = new ModuleConfiguration(m14, "testsconf10" + millis, "testconfiguration10" + millis, map14);
 		mc11 = new ModuleConfiguration(m15, "testsconf11" + millis, "testconfiguration11" + millis, map15);
 		mc12 = new ModuleConfiguration(m2, "testsconf12" + millis, "testconfiguration12" + millis, map2);
+
+
+	/*//	m1 = moduleRepository.save(m1);
+		m2 = moduleRepository.save(m2);
+		m4 = moduleRepository.save(m4);
+		m7 = moduleRepository.save(m7);
+		m8 = moduleRepository.save(m8);
+		m9 = moduleRepository.save(m9);
+		m10 = moduleRepository.save(m10);
+		m11 = moduleRepository.save(m11);
+		m12 = moduleRepository.save(m12);*/
+
+	//	p1 = parameterRepository.save(p1);
+		p2 = parameterRepository.save(p2);
+		p3 = parameterRepository.save(p3);
+		p4 = parameterRepository.save(p4);
+		p7 = parameterRepository.save(p7);
+		p8 = parameterRepository.save(p8);
+		p9 = parameterRepository.save(p9);
+		p10 = parameterRepository.save(p10);
+		p11 = parameterRepository.save(p11);
+		p13 = parameterRepository.save(p13);
+		p14 = parameterRepository.save(p14);
+		p15 = parameterRepository.save(p15);
+		p16 = parameterRepository.save(p16);
 
 		moduleConfigurationRepository.save(mc1);
 		moduleConfigurationRepository.save(mc2);

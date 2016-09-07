@@ -1,6 +1,7 @@
 package com.docbyte.docshifter.messaging;
 
 import com.docbyte.docshifter.util.Logger;
+import com.docshifter.core.messaging.IDocShifterController;
 
 import javax.jms.Connection;
 import javax.jms.ExceptionListener;
