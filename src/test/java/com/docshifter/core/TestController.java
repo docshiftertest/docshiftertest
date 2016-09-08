@@ -1,6 +1,5 @@
-package com.docshifter.core.main;
+package com.docshifter.core;
 
-import com.docshifter.core.config.service.GeneralConfigService;
 import com.docshifter.core.messaging.IDocShifterSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;

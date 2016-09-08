@@ -28,7 +28,7 @@ public class AMQPSender implements IMessageSender {
 				task,
 				chainConfigurationID);
 
-		Logger.info("Sending message: " + message.toString()+" for file: "+task.getFilePath(),null);
+		Logger.info("Sending message: " + message.toString()+" for file: "+task.getSourceFilePath(),null);
 
 		rabbitTemplate.convertAndSend(queue, message);
 	}

@@ -1,4 +1,4 @@
-package com.docshifter.core.main;
+package com.docshifter.core;
 
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.domain.GlobalSettingsRepository;
@@ -25,6 +25,7 @@ import java.util.List;
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
  */
+@Configuration
 @EnableJpaRepositories(basePackages = {"com.docshifter.core.config.domain"})
 public class DocShifterConfiguration {
 

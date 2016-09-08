@@ -28,6 +28,20 @@ public class WorkFolderManager {
 
 	@Autowired
 	public WorkFolderManager(GeneralConfigService generalConfiguration) throws ConfigurationException {
+
+		System.out.println(generalConfiguration);
+		System.out.println(Constants.TEMPFOLDER);
+		System.out.println(generalConfiguration.getString(Constants.TEMPFOLDER));
+		System.out.println(Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)));
+		System.out.println(Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)).toAbsolutePath());
+		System.out.println(generalConfiguration);
+		System.out.println(Constants.ERRORFOLDER);
+		System.out.println(generalConfiguration.getString(Constants.ERRORFOLDER));
+		System.out.println(Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)));
+		System.out.println(Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)).toAbsolutePath());
+
+
+
 		workfolder = Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)).toAbsolutePath();
 		errorfolder = Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)).toAbsolutePath();
 

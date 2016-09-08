@@ -13,7 +13,7 @@ import java.util.List;
 @RepositoryRestResource
 public interface ChainConfigurationRepository extends CrudRepository<ChainConfiguration, Long> {
 
-	List<Node> findRootNodesByEnabled(boolean enabled);
+	List<ChainConfiguration> findByEnabled(boolean enabled);
 
 	ChainConfiguration findByRootNode(Node rootNode);
 

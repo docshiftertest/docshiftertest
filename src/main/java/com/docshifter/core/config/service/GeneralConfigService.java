@@ -39,6 +39,8 @@ public class GeneralConfigService {
 	public GeneralConfigService(GlobalSettingsRepository globalSettingsRepository){
 		this.globalSettingsRepository = globalSettingsRepository;
 		params = new HashMap<String, String>();
+
+		System.out.print(this.globalSettingsRepository.count());
 		
 		GlobalSettings config = this.globalSettingsRepository.findOne(1l);
 

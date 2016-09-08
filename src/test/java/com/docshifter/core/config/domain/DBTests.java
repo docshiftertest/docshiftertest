@@ -136,17 +136,7 @@ public class DBTests {
 		mc12 = new ModuleConfiguration(m2, "testsconf12" + millis, "testconfiguration12" + millis, map2);
 
 
-	/*//	m1 = moduleRepository.save(m1);
-		m2 = moduleRepository.save(m2);
-		m4 = moduleRepository.save(m4);
-		m7 = moduleRepository.save(m7);
-		m8 = moduleRepository.save(m8);
-		m9 = moduleRepository.save(m9);
-		m10 = moduleRepository.save(m10);
-		m11 = moduleRepository.save(m11);
-		m12 = moduleRepository.save(m12);*/
-
-	//	p1 = parameterRepository.save(p1);
+		p1 = parameterRepository.save(p1);
 		p2 = parameterRepository.save(p2);
 		p3 = parameterRepository.save(p3);
 		p4 = parameterRepository.save(p4);
@@ -159,6 +149,17 @@ public class DBTests {
 		p14 = parameterRepository.save(p14);
 		p15 = parameterRepository.save(p15);
 		p16 = parameterRepository.save(p16);
+
+		m1 = moduleRepository.save(m1);
+		m2 = moduleRepository.save(m2);
+		m4 = moduleRepository.save(m4);
+		m7 = moduleRepository.save(m7);
+		m8 = moduleRepository.save(m8);
+		m9 = moduleRepository.save(m9);
+		m10 = moduleRepository.save(m10);
+		m11 = moduleRepository.save(m11);
+		m12 = moduleRepository.save(m12);
+
 
 		moduleConfigurationRepository.save(mc1);
 		moduleConfigurationRepository.save(mc2);

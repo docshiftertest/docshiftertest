@@ -126,7 +126,7 @@
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>LATEST</version>
+            <version>2.3.3</version>
         </dependency>
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>

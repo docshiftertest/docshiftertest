@@ -16,7 +16,7 @@ public class PrintTask extends Task {
 	
 	public PrintTask(String filePath){
 		this.item_id=filePath;
-		this.name="filesystem task";
+		//this.name="filesystem task";
 		//this.item_id=filePath;
 		//this.name=filePath;
 	}
