@@ -3,17 +3,16 @@ package com.docshifter.core.config.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "MODULE")
-public class Module implements Serializable {
-	private static final long serialVersionUID = -2605744674300941605L;
+public class Module {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	private String name;
 	private String classname;
@@ -23,6 +22,10 @@ public class Module implements Serializable {
 	private String inputFiletype;
 	private String outputFileType;
 
+	@ManyToMany
+	@JoinTable(name = "moduleparams",
+			joinColumns = {	@JoinColumn(name = "module") },
+			inverseJoinColumns = { @JoinColumn(name = "param") })
 	private Set<Parameter> parameters = new HashSet<Parameter>();
 
 	public Module() {
@@ -76,9 +79,6 @@ public class Module implements Serializable {
 		return description;
 	}
 
-	@Id
-	@Column(name = "ID")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public long getId() {
 		return id;
 	}
@@ -88,16 +88,7 @@ public class Module implements Serializable {
 	}
 
 
-	@ManyToMany(
-			targetEntity = Parameter.class,
-			cascade = CascadeType.ALL,
-			fetch = FetchType.EAGER
-	)
-	@JoinTable(
-			name = "MODULEPARAMS",
-			joinColumns = @JoinColumn(name = "MODULEID"),
-			inverseJoinColumns = @JoinColumn(name = "PARAMID")
-	)
+
 	public Set<Parameter> getParameters() {
 		return parameters;
 	}

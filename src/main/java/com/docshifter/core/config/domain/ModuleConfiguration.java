@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,15 +11,21 @@ import java.util.Map;
 
 
 @Entity
-@Table(name = "MODULECONFIGURATIONS")
-public class ModuleConfiguration implements Serializable{
+public class ModuleConfiguration {
 
-	private static final long serialVersionUID = 7666888692582226276L;
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
+
+	@ManyToOne
 	private Module module;
 	private String name;
 	private String description;
+
+	@JsonIgnore
+	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
+	@MapKeyClass(Parameter.class)
 	private Map<Parameter, String> parameterValues = new HashMap<Parameter, String>();
 
 
@@ -29,7 +34,7 @@ public class ModuleConfiguration implements Serializable{
 	public ModuleConfiguration() {}
 
 	public ModuleConfiguration(int id, Module module, String name,
-			String description, Map<Parameter, String> parameterValues) {
+							   String description, Map<Parameter, String> parameterValues) {
 		super();
 		this.id = id;
 		this.module = module;
@@ -39,7 +44,7 @@ public class ModuleConfiguration implements Serializable{
 	}
 
 	public ModuleConfiguration(Module module, String name,
-			String description, Map<Parameter, String> parameterValues) {
+							   String description, Map<Parameter, String> parameterValues) {
 		super();
 //		this.id = id;
 		this.module = module;
@@ -53,9 +58,7 @@ public class ModuleConfiguration implements Serializable{
 		this.id = id;
 	}
 
-	@Id
-	@Column(name = "ID")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+
 	public long getId()
 	{
 		return id;
@@ -94,12 +97,6 @@ public class ModuleConfiguration implements Serializable{
 
 
 
-
-	@JsonIgnore
-	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
-	@JoinTable (name = "MODULEPARAMSVALUES", joinColumns={@JoinColumn(name="CONFIGURATIONID")})
-	@MapKeyJoinColumn(name="PARAMID")
-	@Column(name="PARAMVALUE")
 	public Map<Parameter, String> getParameterValues()
 	{
 		return parameterValues;

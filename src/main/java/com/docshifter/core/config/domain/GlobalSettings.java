@@ -1,13 +1,15 @@
 package com.docshifter.core.config.domain;
 
-import javax.persistence.*;
-import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
-@Table(name = "GLOBALSETTINGS")
 public class GlobalSettings
 {
-
+	@Id
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private long id;
 	
 	private String mqSystem;
@@ -53,9 +55,7 @@ public class GlobalSettings
 		return defaultTempFolder;
 	}
 
-	@Id
-	@Column(name = "ID")
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+
 	public long getId()
 	{
 		return id;

@@ -5,13 +5,11 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by michiel.vandriessche@docbyte.com on 9/6/16.
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = com.docshifter.main.TestController.class)
+@SpringBootTest(classes = com.docshifter.core.main.TestController.class)
 public class ChainConfigurationRepositoryTest extends DBTests {
 
 	@Test

@@ -1,16 +1,12 @@
 package com.docshifter.core.config.domain;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Entity
-@Table(name = "CHAINCONFIGURATION")
-public class ChainConfiguration implements Serializable
-{
-	private static final long serialVersionUID = -4600324113793261377L;
+public class ChainConfiguration {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 	
 	private String name;
@@ -23,6 +19,7 @@ public class ChainConfiguration implements Serializable
 	
 	private boolean enabled;
 
+	@ManyToOne
 	private Node rootNode;
 
 	public ChainConfiguration() {}
@@ -45,9 +42,7 @@ public class ChainConfiguration implements Serializable
 		return description;
 	}
 
-	@Id
-	@Column(name = "ID")
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+
 	public long getId()
 	{
 		return id;
@@ -59,13 +54,7 @@ public class ChainConfiguration implements Serializable
 		return name;
 	}
 
-	@ManyToOne(
-			targetEntity=Node.class,
-			cascade = CascadeType.ALL,
-			fetch = FetchType.EAGER
 
-	)
-	@JoinColumn(name="ROOTNODE")
 	public Node getRootNode()
 	{
 		return rootNode;

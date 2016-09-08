@@ -1,15 +1,13 @@
 package com.docshifter.core.config.domain;
 
-import com.docbyte.docshifter.util.ParameterTypes;
-
-import javax.persistence.*;
-import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
-@Table(name = "PARAM")
-public class Parameter implements Serializable
+public class Parameter
 {
-	private static final long serialVersionUID = -4973841817482543428L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +26,7 @@ public class Parameter implements Serializable
 	}
 	public Parameter() {}
 	
-	public Parameter(String name, String description, ParameterTypes type, Boolean required) 
+	public Parameter(String name, String description, ParameterTypes type, Boolean required)
 	{
 		this.name = name;
 		this.description = description;
@@ -49,9 +47,6 @@ public class Parameter implements Serializable
 		this.id = id;
 	}
 
-	@Id
-	@Column(name = "ID")
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	public long getId()
 	{
 		return id;

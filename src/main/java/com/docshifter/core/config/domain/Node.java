@@ -1,20 +1,25 @@
 package com.docshifter.core.config.domain;
 
 
-import javax.annotation.processing.Processor;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 @Entity
-@Table(name = "NODE")
 public class Node {
-	
+	@Id
+	@Column(name = "ID")
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private long id;
+
+	@ManyToOne
 	private Node parentNode;
+
+	@OneToMany(mappedBy = "parentNode")
 	private Set<Node> childNodes=null;
+
+	@ManyToOne
 	private ModuleConfiguration moduleConfiguration;
 	
 	public Node(){}
@@ -32,9 +37,7 @@ public class Node {
 		this.moduleConfiguration = moduleConfiguration;
 	}
 
-	@Id
-	@Column(name = "ID")
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+
 	public long getId(){
 		return id;
 	}
@@ -43,8 +46,7 @@ public class Node {
 		this.id = id;
 	}
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "PARENTNODE")
+
 	public Node getParentNode(){
 		return parentNode;
 	}
@@ -57,7 +59,7 @@ public class Node {
 	}
 
 
-	@OneToMany(mappedBy = "parentNode", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
+
 	public Set<Node> getChildNodes(){
 		return childNodes;
 	}
@@ -73,8 +75,7 @@ public class Node {
 		}
 	}
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
-	@JoinColumn(name = "MODULECONFIGURATION")
+
 	public ModuleConfiguration getModuleConfiguration(){
 		return moduleConfiguration;
 	}
