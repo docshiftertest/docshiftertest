@@ -4,3 +4,4 @@ docShifterCore.zip
 *.log
 *.iml
 /target/
+.idea/ 

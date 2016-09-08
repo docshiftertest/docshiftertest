@@ -3,6 +3,9 @@ package com.docshifter.core.task;
 import com.docshifter.core.work.WorkFolder;
 
 import java.io.Serializable;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,11 +20,12 @@ import java.util.Map;
 public class Task implements Serializable {
 
 	private static final long serialVersionUID = 4087826709318179760L;
-	protected String name="";		// filepath for dctm and filesystem tasks  (or filename if content is used)
-	protected String item_id="";	//unique file identifier: default from dctm= objectid
-	protected WorkFolder workFolder=null;
-	protected HashMap<String, String> parameters;
-	protected Map<String, Object> data;
+	protected String item_id;    //unique file identifier: default from dctm= objectid
+	protected WorkFolder workFolder;
+	protected Path sourceFilePath;
+	protected Path folderStructure;
+	protected ArrayList<String> messages;
+
 
 	//For the Russia Time Stamping
 /*	public Task() {
@@ -45,57 +49,57 @@ public class Task implements Serializable {
 		}
 	}
 */
-	public Task(){}
+	public Task() {
+	}
 
 
-	public Task(String filePath, WorkFolder wf){
-		//this();
-		this.item_id=filePath;
-		this.name=filePath;
+	public Task(String filePath, WorkFolder wf) {
+		this.item_id = filePath;
 		this.workFolder = wf;
 	}
 
-	public String getFilePath(){
-		return this.name;
-	}
-	public void setFilePath(String filePath){
-		this.name=filePath;
-	}
+
 	public String getItem_id() {
 		return item_id;
 	}
+
 	public void setItem_id(String item_id) {
 		this.item_id = item_id;
 	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
+
 	public WorkFolder getWorkFolder() {
 		return workFolder;
 	}
+
 	public void setWorkFolder(WorkFolder workFolder) {
 		this.workFolder = workFolder;
 	}
 
-	public HashMap<String, String> getParameters() {
-		return parameters;
-	}
-	public void setParameters(HashMap<String, String> parameters) {
-		this.parameters = parameters;
-	}
+
 	//temp to show sending a task through jms works (ObjectMessage)
-	public String toString(){
-		return getFilePath();
+	public String toString() {
+		return sourceFilePath.toAbsolutePath().toString();
 	}
 
+	public Path getSourceFilePath() {
+		return sourceFilePath;
+	}
+	public void setSourceFilePath(Path sourceFilePath) {
+		this.sourceFilePath = sourceFilePath;
+	}
 
-	public Map<String, Object> getData() {
-		return data;
+	public Path getFolderStructure() {
+		return folderStructure;
 	}
-	public void setData(Map<String, Object> map) {
-		this.data = map;
+	public void setFolderStructure(Path folderStructure) {
+		this.folderStructure = folderStructure;
 	}
+
+	public ArrayList<String> getMessages() {
+		return messages;
+	}
+	public void addMessage(String message) {
+		messages.add(message);
+	}
+
 }

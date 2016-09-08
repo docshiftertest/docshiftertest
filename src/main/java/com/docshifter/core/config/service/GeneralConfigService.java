@@ -6,6 +6,9 @@ import com.docshifter.core.config.domain.GlobalSettings;
 import com.docshifter.core.config.domain.GlobalSettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -22,6 +25,7 @@ import java.util.Map;
 @Service
 public class GeneralConfigService {
 	protected Map<String, String> params;
+
 	private GlobalSettingsRepository globalSettingsRepository;
 
 	

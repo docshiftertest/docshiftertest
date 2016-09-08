@@ -1,7 +1,10 @@
 package com.docshifter.core.main;
 
 import com.docshifter.core.config.Constants;
+import com.docshifter.core.config.domain.GlobalSettingsRepository;
+import com.docshifter.core.config.service.ConfigurationService;
 import com.docshifter.core.config.service.GeneralConfigService;
+import com.docshifter.core.work.WorkFolderManager;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -13,7 +16,9 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.stereotype.Repository;
 
+import javax.naming.ConfigurationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,11 +33,21 @@ public class DocShifterConfiguration {
 	public GeneralConfigService generalConfigService;
 
 	@Autowired
-	private RepositoryRestConfiguration repositoryRestConfiguration;
+	public ConfigurationService configurationService;
 
 
 
+	@Bean
+	public WorkFolderManager getWorkFolderManager() {
 
+		try {
+			return new WorkFolderManager(generalConfigService);
+		} catch (ConfigurationException e) {
+			e.printStackTrace();
+			//TODO catch this properly
+			return null;
+		}
+	}
 	@Bean
 	public ConnectionFactory connectionFactory() {
 
