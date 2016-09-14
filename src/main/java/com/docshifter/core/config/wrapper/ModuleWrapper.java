@@ -51,7 +51,10 @@ public class ModuleWrapper {
 	 * @param name the name of the requested parameter
 	 * @return the boolean value linked to the requested parameter
 	 */
-	public boolean getBoolean(String name){
+	public Boolean getBoolean(String name){
+		if (params.get(name) == null) {
+			return null;
+		}
 		return Boolean.parseBoolean(params.get(name));
 	}
 

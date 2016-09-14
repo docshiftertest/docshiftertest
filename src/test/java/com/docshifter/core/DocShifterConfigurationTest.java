@@ -17,6 +17,7 @@ public class DocShifterConfigurationTest {
 
 	@Test
 	public void contextLoads() {
+
 	}
 
 }

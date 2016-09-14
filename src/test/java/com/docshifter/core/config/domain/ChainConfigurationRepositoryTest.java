@@ -15,21 +15,8 @@ public class ChainConfigurationRepositoryTest extends DBTests {
 
 	@Test
 	public void findRootNodesByEnabled() throws Exception {
-		System.out.println("HERE");
-		System.out.println("HERE");
-		System.out.println("HERE");
-		System.out.println("HERE");
-		System.out.println("HERE");
-		System.out.println("HERE");
-		System.out.println("HERE");
-		System.out.println("HERE");
 
 		System.out.println(chainConfigurationRepository.findByEnabled(true));
-		System.out.println("HERE");
-		System.out.println("HERE");
-		System.out.println("HERE");
-		System.out.println("HERE");
-		System.out.println("HERE");
 	}
 
 	@Test

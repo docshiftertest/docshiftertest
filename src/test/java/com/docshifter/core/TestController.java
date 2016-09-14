@@ -12,9 +12,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class TestController implements IDocShifterSender {
 
 
-    @Autowired
-    DocShifterConfiguration docShifterConfiguration;
-
     @Override
     public void restartNotStatic() {
 

@@ -4,10 +4,7 @@ import com.docshifter.core.work.WorkFolder;
 
 import java.io.Serializable;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Value object which represents a dmi_queue_item object.
@@ -23,8 +20,9 @@ public class Task implements Serializable {
 	protected String item_id;    //unique file identifier: default from dctm= objectid
 	protected WorkFolder workFolder;
 	protected Path sourceFilePath;
-	protected Path folderStructure;
-	protected ArrayList<String> messages;
+	protected String name;
+	protected String folderStructure;
+	protected ArrayList<String> messages = new ArrayList<>();
 
 
 	//For the Russia Time Stamping
@@ -88,10 +86,10 @@ public class Task implements Serializable {
 		this.sourceFilePath = sourceFilePath;
 	}
 
-	public Path getFolderStructure() {
+	public String getFolderStructure() {
 		return folderStructure;
 	}
-	public void setFolderStructure(Path folderStructure) {
+	public void setFolderStructure(String folderStructure) {
 		this.folderStructure = folderStructure;
 	}
 
@@ -101,5 +99,7 @@ public class Task implements Serializable {
 	public void addMessage(String message) {
 		messages.add(message);
 	}
+
+
 
 }
