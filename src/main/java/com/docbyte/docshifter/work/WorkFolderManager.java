@@ -107,7 +107,7 @@ public class WorkFolderManager {
 
 	}
 
-	public void copyToErrorFolder(WorkFolder folder){
+	public void copyToErrorFolder(WorkFolder folder) throws Exception {
 		FileUtils.copyFolder(folder.getFolder(), folder.getErrorFolder());
 	}
 
