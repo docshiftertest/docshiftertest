@@ -1,4 +1,4 @@
-package com.docbyte.docshifter;
+package com.docshifter.core.work;
 
 import static org.junit.Assert.*;
 
@@ -14,26 +14,21 @@ import org.junit.Test;
 
 import com.docshifter.core.work.WorkFolder;
 import com.docshifter.core.work.WorkFolderManager;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class TestWorkfolder {	
+public class TestWorkfolder {
+	@Autowired
 	WorkFolderManager manager;
 	WorkFolder workfolder;
-	
-	@Before
-	public void before() {
-		try {
-			manager = WorkFolderManager.getInstance();
-		} catch (ConfigurationException e) {
-			e.printStackTrace();
-		}
-	}
+
+
 
 	@Test
 	public void testCreateWorkfolder() {
 		try {
 			workfolder = manager.getNewWorkfolder("testcreate");
 		} catch (IOException e) {
-			Assert.fail("Exception: " + e);
+			fail("Exception: " + e);
 		}
 		File folder = new File(workfolder.toString());
 		assertTrue(folder.exists());
@@ -44,7 +39,7 @@ public class TestWorkfolder {
 		try {
 			workfolder = manager.getNewWorkfolder("testdelete");
 		} catch (IOException e) {
-			Assert.fail("Exception: " + e);
+			fail("Exception: " + e);
 		}
 		File folder = new File(workfolder.toString());
 		manager.deleteWorkfolder(workfolder);

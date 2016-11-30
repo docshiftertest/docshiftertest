@@ -55,13 +55,13 @@ public class ConfigurationService {
 		//TODO is this working?
 		List<Node> list = nodeRepository.getEnabledSenderConfigurations();
 		for(Node n : list)
-			set.add(new SenderConfigurationWrapper(n));
+			set.add(new SenderConfigurationWrapper(n, chainConfigurationRepository));
 		return set;
 	}
 
 	public SenderConfigurationWrapper getSenderConfigurationWS(
 			String className, String paramValue) {
-		SenderConfigurationWrapper sender = new SenderConfigurationWrapper(nodeRepository.getSenderByClassNameAndParamValue(className, paramValue));
+		SenderConfigurationWrapper sender = new SenderConfigurationWrapper(nodeRepository.getSenderByClassNameAndParamValue(className, paramValue), chainConfigurationRepository);
 		return sender;
 	}
 
@@ -84,7 +84,7 @@ public class ConfigurationService {
 		// return new SenderConfigurationWrapper(senderConfigurationDAO.get((int)
 		// uid));
 		ChainConfiguration cc=chainConfigurationRepository.findOne(uid);
-		return new SenderConfigurationWrapper(nodeRepository.findOne(cc.getRootNode().getId()));
+		return new SenderConfigurationWrapper(nodeRepository.findOne(cc.getRootNode().getId()), chainConfigurationRepository);
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class ConfigurationService {
 		List<Node> nodes = nodeRepository.getSendersByClassName(className);
 		List<SenderConfigurationWrapper> senders = new ArrayList<SenderConfigurationWrapper>();
 		for(Node n : nodes)
-			senders.add(new SenderConfigurationWrapper(n));
+			senders.add(new SenderConfigurationWrapper(n, chainConfigurationRepository));
 		
 		return senders;
 	}

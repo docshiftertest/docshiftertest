@@ -9,8 +9,8 @@ import java.util.Map;
 
 public class SenderConfigurationWrapper extends NodeWrapper {
 
-	public SenderConfigurationWrapper(Node n) {
-		super(n);
+	public SenderConfigurationWrapper(Node n, ChainConfigurationRepository chainConfigurationRepository) {
+		super(n, chainConfigurationRepository);
 	}
 	
 	public SenderConfigurationWrapper() {
@@ -21,7 +21,7 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 		final List<ReceiverConfigurationWrapper> list = new ArrayList<ReceiverConfigurationWrapper>();
 
 		getNode().iterateOverNode( n-> {
-				ReceiverConfigurationWrapper b = new ReceiverConfigurationWrapper(n);
+				ReceiverConfigurationWrapper b = new ReceiverConfigurationWrapper(n, chainConfigurationRepository);
 				list.add(b);
 		});
 		
