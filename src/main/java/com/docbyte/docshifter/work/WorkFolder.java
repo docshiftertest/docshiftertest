@@ -98,6 +98,7 @@ public class WorkFolder implements Serializable {
 		//check if exists
 
 		filename = FileUtils.shortenFileName(filename);
+		filename = FileUtils.removeIllegalFilesystemCharacters(filename);
 
 		Path newPath = Paths.get(folder.toString(), filename + "." + extension);
 		if (Files.exists(newPath))
@@ -105,8 +106,6 @@ public class WorkFolder implements Serializable {
 			newPath = Paths.get(folder.toString(), filename + "_" + Objects.toString(System.currentTimeMillis()) + "." + extension);
 		}
 
-		//THIS IS TEMPORARY SINCE OVERRIDING STILL HAPPENS IN RELEASE
-		newPath = Paths.get(folder.toString(), filename + "_" + Objects.toString(System.currentTimeMillis()) + "." + extension);
 		return newPath;
 	}
 
