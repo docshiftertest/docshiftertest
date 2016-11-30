@@ -1,6 +1,8 @@
 package com.docshifter.core.config.wrapper;
 
-import com.docshifter.core.config.domain.*;
+import com.docshifter.core.config.domain.ChainConfiguration;
+import com.docshifter.core.config.domain.ChainConfigurationRepository;
+import com.docshifter.core.config.domain.Node;
 
 public abstract class NodeWrapper {
 
@@ -18,12 +20,11 @@ public abstract class NodeWrapper {
 	
 	private ModuleWrapper moduleWrapper;
 
-	private ChainConfigurationRepository chainConfigurationRepository;
-
+	protected ChainConfigurationRepository chainConfigurationRepository;
 	
-	public NodeWrapper(Node n){
+	public NodeWrapper(Node n, ChainConfigurationRepository chainConfigurationRepository){
 		this.node = n;
-
+		this.chainConfigurationRepository = chainConfigurationRepository;
 
 		Node rootNode = n;
 		if(n!=null)

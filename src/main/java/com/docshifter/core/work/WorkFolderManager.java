@@ -46,11 +46,11 @@ public class WorkFolderManager {
 		errorfolder = Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)).toAbsolutePath();
 
 		if (!Files.isDirectory(workfolder)) {
-			throw new ConfigurationException("Workfolder is badly configured");
+			throw new ConfigurationException("Workfolder is badly configured: " +workfolder);
 		}
 
 		if (!Files.isDirectory(errorfolder)) {
-			throw new ConfigurationException("Errorfolder is badly configured");
+			throw new ConfigurationException("Errorfolder is badly configured " + errorfolder);
 		}
 
 	}

@@ -5,6 +5,7 @@ import com.docshifter.core.work.WorkFolder;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Value object which represents a dmi_queue_item object.
@@ -22,6 +23,7 @@ public class Task implements Serializable {
 	protected String name;
 	protected String folderStructure;
 	protected ArrayList<String> messages = new ArrayList<>();
+	protected HashMap<String, Object> data = new HashMap<>();
 
 
 	//For the Russia Time Stamping
@@ -93,6 +95,19 @@ public class Task implements Serializable {
 		messages.add(message);
 	}
 
+	public String getName() {
+		return name;
+	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
 
+	public HashMap<String, Object> getData() {
+		return data;
+	}
+
+	public void setData(HashMap<String, Object> data) {
+		this.data = data;
+	}
 }
