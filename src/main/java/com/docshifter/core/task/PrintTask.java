@@ -1,5 +1,7 @@
 package com.docshifter.core.task;
 
+import java.nio.file.Path;
+
 public class PrintTask extends Task {
 
 	/**
@@ -14,8 +16,8 @@ public class PrintTask extends Task {
 		super();
 	}
 	
-	public PrintTask(String filePath){
-		this.item_id=filePath;
+	public PrintTask(Path filePath){
+		this.sourceFilePath=filePath;
 		//this.name="filesystem task";
 		//this.item_id=filePath;
 		//this.name=filePath;
@@ -24,14 +26,14 @@ public class PrintTask extends Task {
 	public String getFilename() {
 		return filename;
 	}
-	public String getFilePath(){
-		return this.item_id;
+	public Path getFilePath(){
+		return this.sourceFilePath;
 	}
 	public void setFilename(String filename) {
 		this.filename = filename;
 	}
-	public void setFilePath(String filename) {
-		this.item_id = filename;
+	public void setFilePath(Path filename) {
+		this.sourceFilePath = filename;
 	}
 
 

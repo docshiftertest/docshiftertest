@@ -1,5 +1,7 @@
 package com.docshifter.core.task;
 
+import com.docshifter.core.work.WorkFolder;
+
 /**
  * Created by michiel.vandriessche@docbyte.com on 9/6/16.
  */
@@ -9,6 +11,12 @@ public class DctmTask extends Task {
 	protected String request="";	//transformation request: default from dctm= "rendition_req_ps_pdf"
 	protected String sent_by="";	//user requesting the transformation: default from dctm= "dm_autorender_win31"
 	protected String task_id="";
+	protected String item_id;    //unique file identifier: default from dctm= objectid
+
+	public DctmTask(String item_id, WorkFolder wf) {
+		this.item_id = item_id;
+		this.workFolder = wf;
+	}
 
 	public String getEvent() {
 		return event;
@@ -42,6 +50,14 @@ public class DctmTask extends Task {
 		this.request = message;
 	}
 
+	public String getItem_id() {
+		return item_id;
+	}
+
+	public void setItem_id(String item_id) {
+		this.item_id = item_id;
+	}
+
 	/**
 	 * @return the task_id
 	 */
@@ -56,3 +72,4 @@ public class DctmTask extends Task {
 		this.task_id = task_id;
 	}
 }
+

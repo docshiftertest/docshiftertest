@@ -17,7 +17,6 @@ import java.util.ArrayList;
 public class Task implements Serializable {
 
 	private static final long serialVersionUID = 4087826709318179760L;
-	protected String item_id;    //unique file identifier: default from dctm= objectid
 	protected WorkFolder workFolder;
 	protected Path sourceFilePath;
 	protected String name;
@@ -51,19 +50,13 @@ public class Task implements Serializable {
 	}
 
 
-	public Task(String filePath, WorkFolder wf) {
-		this.item_id = filePath;
+	public Task(Path filePath, WorkFolder wf) {
+		this.sourceFilePath = filePath;
 		this.workFolder = wf;
 	}
 
 
-	public String getItem_id() {
-		return item_id;
-	}
 
-	public void setItem_id(String item_id) {
-		this.item_id = item_id;
-	}
 
 	public WorkFolder getWorkFolder() {
 		return workFolder;
