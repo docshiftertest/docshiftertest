@@ -109,6 +109,26 @@ public class WorkFolder implements Serializable {
 		return newPath;
 	}
 
+	public Path getNewFolderPath(String foldername) {
+
+		foldername = FileUtils.removeIllegalFilesystemCharacters(foldername);
+
+		Path newPath = Paths.get(folder.toString(), foldername);
+		if (Files.exists(newPath))
+		{
+			newPath = Paths.get(folder.toString(), foldername + "_" + Objects.toString(System.currentTimeMillis()));
+		}
+
+		try {
+			Files.createDirectories(newPath);
+			return newPath;
+		} catch (IOException e) {
+			Logger.error("Could not create directory: " + newPath, null);
+			return null;
+		}
+
+	}
+
 
 	private void writeObject(ObjectOutputStream oos)
 			throws IOException {
