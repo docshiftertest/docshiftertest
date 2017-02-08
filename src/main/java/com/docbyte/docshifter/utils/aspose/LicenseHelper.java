@@ -10,7 +10,7 @@ public final class LicenseHelper {
 	private final com.aspose.email.License emailLicense;
 	private final com.aspose.pdf.License pdfLicense;
 
-	private final String lic = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+	private static final String lic = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
 									   "<License>\n" +
 									   "  <Data>\n" +
 									   "    <LicensedTo>Docbyte</LicensedTo>\n" +
@@ -51,6 +51,10 @@ public final class LicenseHelper {
 
 	public static LicenseHelper getLicenceHelper() {
 		return licenceHelper;
+	}
+
+	public static String getAsposeLicense(){
+		return lic;
 	}
 
 }

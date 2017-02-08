@@ -39,17 +39,6 @@ public class DocShifterConfiguration {
 
 
 	@Bean
-	public WorkFolderManager getWorkFolderManager() {
-
-		try {
-			return new WorkFolderManager(generalConfigService);
-		} catch (ConfigurationException e) {
-			e.printStackTrace();
-			//TODO catch this properly
-			return null;
-		}
-	}
-	@Bean
 	public ConnectionFactory connectionFactory() {
 
 		CachingConnectionFactory connectionFactory = new CachingConnectionFactory(generalConfigService.getString(Constants.MQ_URL));

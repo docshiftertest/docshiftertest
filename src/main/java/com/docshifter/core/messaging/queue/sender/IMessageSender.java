@@ -12,4 +12,6 @@ public interface IMessageSender extends IMessageSenderOrPublisher {
 
 	void sendTask(String queueName, Task task) throws Exception;
 
+	int getMessageCount();
+
 }

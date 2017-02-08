@@ -1,6 +1,7 @@
 package com.docshifter.core.work;
 
 import com.docbyte.docshifter.util.FileUtils;
+import com.docbyte.docshifter.util.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -72,30 +73,49 @@ public class WorkFolder implements Serializable {
 	}
 
 
+	@Deprecated
 	public Path getFilePath(String filename) {
 		FileUtils.removeIllegalFilesystemCharacters(filename);
 		return folder.resolve(filename);
 	}
 
+	@Deprecated
 	public Path getFilePath(String filename, String extention) {
 		return this.getFilePath(filename + "." + extention);
 	}
 
 	public Path getNewFilePath(String filename, String extension) {
 
-		//create path filename+extention
-		//check if exists
-
 		filename = FileUtils.shortenFileName(filename);
+		filename = FileUtils.removeIllegalFilesystemCharacters(filename);
 
 		Path newPath = Paths.get(folder.toString(), filename + "." + extension);
-		if (Files.exists(newPath))
+		while (Files.exists(newPath))
 		{
 			newPath = Paths.get(folder.toString(), filename + "_" + Objects.toString(System.currentTimeMillis()) + "." + extension);
 		}
 
-		//THIS IS TEMPORARY SINCE OVERRIDING STILL HAPPENS IN RELEASE
-		newPath = Paths.get(folder.toString(), filename + "_" + Objects.toString(System.currentTimeMillis()) + "." + extension);
+		return newPath;
+	}
+
+	public Path getNewFolderPath(String folderName) {
+
+		folderName = FileUtils.shortenFileName(folderName);
+		folderName = FileUtils.removeIllegalFilesystemCharacters(folderName);
+
+		Path newPath = Paths.get(folder.toString(), folderName);
+		while (Files.exists(newPath))
+		{
+			newPath = Paths.get(folder.toString(), folderName + "_" + Objects.toString(System.currentTimeMillis()));
+		}
+
+		try {
+			Files.createDirectories(newPath);
+		} catch (IOException e) {
+			Logger.error("Could not create directory:" + newPath, null);
+			return null;
+		}
+
 		return newPath;
 	}
 

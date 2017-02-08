@@ -6,7 +6,10 @@ import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.task.Task;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+
+import java.util.Properties;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 5/20/16.
@@ -39,6 +42,14 @@ public class AMQPSender implements IMessageSender {
 
 	private void sendTask(DocshifterMessageType type, Task task) throws Exception {
 		sendTask(type, docshifterQueue.getName(), 0, task);
+	}
+
+	public int getMessageCount(){
+		RabbitAdmin rabbitAdmin=new RabbitAdmin(rabbitTemplate.getConnectionFactory());
+		Properties props = rabbitAdmin.getQueueProperties(docshifterQueue.getName());
+		int messageCount = Integer.parseInt(props.get("QUEUE_MESSAGE_COUNT").toString());
+		Logger.debug(docshifterQueue.getName() + " has " + messageCount + " messages", null);
+		return messageCount;
 	}
 
 	@Override

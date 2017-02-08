@@ -13,6 +13,8 @@ public class DctmTask extends Task {
 	protected String task_id="";
 	protected String item_id;    //unique file identifier: default from dctm= objectid
 
+	public DctmTask() {}
+
 	public DctmTask(String item_id, WorkFolder wf) {
 		this.item_id = item_id;
 		this.workFolder = wf;

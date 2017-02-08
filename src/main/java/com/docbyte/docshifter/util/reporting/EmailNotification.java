@@ -79,7 +79,7 @@ public class EmailNotification extends Notification {
 //				+ "Please undertake the nessecary steps.\r\n"
 //				+ "\r\n");
 //
-//		System.out.println(not.send());
+//		System.OUT.println(not.send());
 //
 //	}
 
