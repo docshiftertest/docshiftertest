@@ -1,7 +1,7 @@
 package com.docshifter.core.work;
 
-import com.docbyte.docshifter.util.FileUtils;
-import com.docbyte.docshifter.util.Logger;
+import com.docbyte.utils.FileUtils;
+import com.docbyte.utils.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

@@ -1,7 +1,7 @@
 package com.docshifter.core.messaging.sender;
 
+import com.docbyte.utils.Logger;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
-import com.docbyte.docshifter.util.Logger;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.task.Task;

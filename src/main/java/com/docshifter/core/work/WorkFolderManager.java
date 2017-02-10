@@ -1,7 +1,7 @@
 package com.docshifter.core.work;
 
-import com.docbyte.docshifter.util.Logger;
 import com.docbyte.utils.FileUtils;
+import com.docbyte.utils.Logger;
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.service.GeneralConfigService;
 import org.springframework.beans.factory.annotation.Autowired;

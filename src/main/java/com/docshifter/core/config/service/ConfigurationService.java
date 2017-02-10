@@ -1,7 +1,7 @@
 package com.docshifter.core.config.service;
 
 
-import com.docbyte.docshifter.util.Logger;
+import com.docbyte.utils.Logger;
 import com.docshifter.core.config.wrapper.SenderConfigurationWrapper;
 import com.docshifter.core.config.domain.*;
 import org.hibernate.HibernateException;
