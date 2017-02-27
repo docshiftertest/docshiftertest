@@ -4,6 +4,8 @@ import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.domain.GlobalSettingsRepository;
 import com.docshifter.core.config.service.ConfigurationService;
 import com.docshifter.core.config.service.GeneralConfigService;
+import com.docshifter.core.config.service.NalperionService;
+import com.docshifter.core.work.WorkFolder;
 import com.docshifter.core.work.WorkFolderManager;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -36,6 +38,12 @@ public class DocShifterConfiguration {
 
 	@Autowired
 	public ConfigurationService configurationService;
+
+	@Autowired
+	public NalperionService nalperionService;
+
+	@Autowired
+	public WorkFolderManager workFolderManager;
 
 
 	@Bean
@@ -72,6 +80,7 @@ public class DocShifterConfiguration {
 	return new Queue(generalConfigService.getString(Constants.MQ_QUEUE));
 
 	}
+
 
 
 }

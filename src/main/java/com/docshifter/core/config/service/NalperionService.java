@@ -5,10 +5,9 @@ import com.docshifter.core.exceptions.DocShifterLicenceException;
 import com.nalpeiron.nalplibrary.NALP;
 import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
-import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class NalperionService implements ApplicationContextAware {
+public class NalperionService {
 
     //These private ints are unique to your product and must
     // be set here to the values corresponding to your product.
@@ -43,15 +42,13 @@ public class NalperionService implements ApplicationContextAware {
     private ApplicationContext applicationContext;
 
     //TODO: LOGGING
-    public NalperionService() {
+    @Autowired
+    public NalperionService(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
         openValidateNalperionLibrary();
         licenceValidationScheduler.scheduleAtFixedRate(new NalperionLicenseValidator(), 0, 1, TimeUnit.HOURS);
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
 
     //TODO LOGGING
     private final void openValidateNalperionLibrary() {
