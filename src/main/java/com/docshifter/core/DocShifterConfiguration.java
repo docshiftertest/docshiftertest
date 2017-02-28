@@ -1,11 +1,9 @@
 package com.docshifter.core;
 
 import com.docshifter.core.config.Constants;
-import com.docshifter.core.config.domain.GlobalSettingsRepository;
 import com.docshifter.core.config.service.ConfigurationService;
 import com.docshifter.core.config.service.GeneralConfigService;
-import com.docshifter.core.config.service.NalperionService;
-import com.docshifter.core.work.WorkFolder;
+import com.docshifter.core.config.service.NalpeironService;
 import com.docshifter.core.work.WorkFolderManager;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -14,14 +12,11 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.stereotype.Repository;
 
-import javax.naming.ConfigurationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +35,7 @@ public class DocShifterConfiguration {
 	public ConfigurationService configurationService;
 
 	@Autowired
-	public NalperionService nalperionService;
+	public NalpeironService nalpeironService;
 
 	@Autowired
 	public WorkFolderManager workFolderManager;

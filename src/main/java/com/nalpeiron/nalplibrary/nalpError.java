@@ -4,13 +4,10 @@
 // Created Jan 18 2013
 // R. D. Ramey
 //
-// based on NLS version by Jeremy Porath
-// Created April 26, 2010
-//
 
 package com.nalpeiron.nalplibrary;
 
-public class 
+public class
 nalpError extends Error
 {
 	static final long serialVersionUID = 999L;
@@ -22,7 +19,7 @@ nalpError extends Error
 /**
  * Default constructor
  */
-	public 
+	public
 	nalpError(
 	)
 	{
@@ -32,24 +29,22 @@ nalpError extends Error
 
 /**
  * Regular constructor
- * @param i:	The error code that was returned by the Nalpeiron function
+ * @param i:	The error code that was returned by the Nalp function
  */
-	public 
+	public
 	nalpError(
-	int i, 
+	int i,
 	String msg
 	)
 	{
 		nalpErrorCode = i;
 		nalpErrorMsg = msg;
+
+		System.out.println("Error " + i + " " + msg);
 	}
 
-/**
- * Constructs an error message based on the error code passed in
- * @param i:	The error code that was returned by the Nalpeiron function
- * @return:		A string that can be used as a possible error message to show the user
- */
-	public String 
+
+	public String
 	getErrorMessage(
 	)
 	{
@@ -57,10 +52,10 @@ nalpError extends Error
 	}
 
 /**
- * Returns the error code of the Nalpeiron function
- * @return	The error code of the Nalpeiron function.  Should always be negative
+ * Returns the error code of the Nalp function
+ * @return	The error code of the Nalp function.  Should always be negative
  */
-	public int 
+	public int
 	getErrorCode(
 	)
 	{

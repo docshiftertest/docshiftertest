@@ -2,7 +2,7 @@ package com.docshifter.core.utils.aspose;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-
+@Deprecated
 public final class LicenseHelper {
 
     private static final LicenseHelper licenceHelper = new LicenseHelper();

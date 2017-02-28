@@ -1,11 +1,8 @@
 //
-// nsa.java
+//nalp.java
 //
 // Created Jan 19 2012
 // R. D. Ramey
-//
-// based on NLS version by Jeremy Porath
-// Created April 26, 2010
 
 package com.nalpeiron.nalplibrary;
 
@@ -23,7 +20,7 @@ public class NALP
 	//Library close function
 	private native int NalpLibClose(long LibHandle);
 
-	//Turn NSA/NSL error returns into informative strings
+	//Turn NSA/NSL error returns into nalpative strings
 	private native String NalpGetErrorMsg(long LibHandle, int nalpErrNo);
 
 	//Open the JNI wrapper library.  Use static initialization block
@@ -37,7 +34,7 @@ public class NALP
  * Call NalpLibOpen(), which initializes the NSA C library for use
  * @return:	0 on success, negative value on error.  A (void *) cast
  * 			of the library handle in libHandle
- * @throws nalpError:	If there was a problem calling the NSA function,
+ * @throws nalpError :	If there was a problem calling the NSA function,
  * 						this error will be thrown
  */
 	public int
@@ -45,7 +42,8 @@ public class NALP
 		boolean NSLEnable, int LogLevel, String WorkDir, int LogQLen,
 		int CacheQLen, int NetThMin, int NetThMax, int OfflineMode,
 		String ProxyIP, String ProxyPort, String ProxyUsername,
-		String ProxyPass, int security)
+		String ProxyPass, String DaemonIP, String DaemonPort,
+		String DaemonUser, String DaemonPass, int security)
 	throws nalpError
 	{
 		int			i;
@@ -76,7 +74,7 @@ public class NALP
 
 		xmlParams = xmlParams +
 			"<SecurityValue>" + security + "</SecurityValue>";
-		
+
 		if (!WorkDir.equals(""))
 		{
 			xmlParams = xmlParams + "<WorkDir>" + WorkDir + "</WorkDir>";
@@ -123,27 +121,51 @@ public class NALP
 		}
 
 		xmlParams = xmlParams + "<OfflineMode>" + OfflineMode + "</OfflineMode>";
-		
+
 		if (!ProxyIP.equals(""))
 		{
 			xmlParams = xmlParams + "<ProxyIP>" + ProxyIP + "</ProxyIP>";
 		}
-		
+
 		if (!ProxyPort.equals(""))
 		{
 			xmlParams = xmlParams + "<ProxyPort>" + ProxyPort + "</ProxyPort>";
 		}
-		
+
 		if (!ProxyUsername.equals(""))
 		{
 			xmlParams = xmlParams +
 				"<ProxyUsername>" + ProxyUsername+ "</ProxyUsername>";
 		}
-		
+
 		if (!ProxyPass.equals(""))
 		{
 			xmlParams = xmlParams +
 				"<ProxyPassword>" + ProxyPass + "</ProxyPassword>";
+		}
+
+		if (!DaemonIP.equals(""))
+		{
+			xmlParams = xmlParams +
+				"<DaemonIP>" + DaemonIP + "</DaemonIP>";
+		}
+
+		if (!DaemonPort.equals(""))
+		{
+			xmlParams = xmlParams +
+				"<DaemonPort>" + DaemonPort + "</DaemonPort>";
+		}
+
+		if (!DaemonUser.equals(""))
+		{
+			xmlParams = xmlParams +
+				"<DaemonUser>" + DaemonUser + "</DaemonUser>";
+		}
+
+		if (!DaemonPass.equals(""))
+		{
+			xmlParams = xmlParams +
+				"<DaemonPassword>" + DaemonPass + "</DaemonPassword>";
 		}
 
 		xmlParams = xmlParams + "</SHAFERXMLParams>";
@@ -160,7 +182,8 @@ public class NALP
 
 		if (i < 0)
 		{
-			throw new nalpError(i, NalpGetErrorMsg(LibHandle, i));
+			//throw new nalpError(i, NalpGetErrorMsg(LibHandle, i));
+			System.out.println("Error " + i + ": " + callNalpGetErrorMsg(i));
 		}
 		else
 		{
@@ -174,7 +197,7 @@ public class NALP
 /**
  * Call NalpLibClose() which shuts down the C library
  * @return:	0 on success, negative value on error
- * @throws nalpError:	If there was a problem calling the NSA function,
+ * @throws nalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
@@ -196,14 +219,14 @@ public class NALP
 
 /**
  * Call NalpGetErrorMsg(), Get error message associated with error no.
- * @return: utf8 xml string containing error information
+ * @return: utf8 xml string containing error nalpation
  */
 	public String
 	callNalpGetErrorMsg(int nalpErrorNo)
 	throws nalpError
 	{
 		String 	nalpErrorMsg;
-	
+
 
 		nalpErrorMsg = NalpGetErrorMsg(LibHandle, nalpErrorNo);
 
