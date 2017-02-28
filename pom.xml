@@ -7,11 +7,12 @@
     <version>6.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description></description>
+<name>docshifter-beans</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.4.0.RELEASE</version>
+        <version>LATEST</version>
     </parent>
 
 
@@ -162,10 +163,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
+            <version>LATEST</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>LATEST</version>
         </dependency>
 
 
@@ -173,11 +176,13 @@
         <dependency>
             <groupId>org.springframework.amqp</groupId>
             <artifactId>spring-rabbit</artifactId>
+            <version>LATEST</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
+            <version>LATEST</version>
         </dependency>
 
         <!-- Testing dependencies -->
@@ -189,7 +194,7 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-rest-core</artifactId>
-			<version>2.5.1.RELEASE</version>
+			<version>LATEST</version>
 		</dependency>
 	</dependencies>
 
@@ -209,19 +214,7 @@
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.6</version>
-                <executions>
-                    <execution>
-                        <id>beans</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <phase>package</phase>
-                        <configuration>
-                            <jarName>docshifter</jarName>
-                            <classifier>beans-${project.version}</classifier>
-                        </configuration>
-                    </execution>
-                </executions>
+
                 <configuration>
                     <outputDirectory>${project.build.directory}/jars/</outputDirectory>
                 </configuration>

@@ -18,4 +18,6 @@ public interface ChainConfigurationRepository extends CrudRepository<ChainConfig
 	ChainConfiguration findByRootNode(Node rootNode);
 
 	ChainConfiguration findByQueueName(String queueName);
+
+    ChainConfiguration findOneByName(String name);
 }

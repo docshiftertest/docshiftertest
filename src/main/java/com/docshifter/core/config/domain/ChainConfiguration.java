@@ -19,7 +19,7 @@ public class ChainConfiguration {
 	
 	private boolean enabled;
 
-	@ManyToOne
+	@ManyToOne(cascade=CascadeType.ALL)
 	private Node rootNode;
 
 	public ChainConfiguration() {}
