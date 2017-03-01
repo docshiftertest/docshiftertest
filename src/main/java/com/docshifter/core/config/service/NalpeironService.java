@@ -6,12 +6,14 @@ import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import com.nalpeiron.nalplibrary.NALP;
 import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
-import com.nalpeiron.nalplibrary.nalpError;
+import com.nalpeiron.nalplibrary.NalpError;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,6 +29,7 @@ public class NalpeironService {
     private static final int AUTH_Z = 263; // N{233...499}
     private static final String CLIENT_DATA = "";
 
+    //TODO: fill in some sensible values
     public static final String NALPEIRON_USERNAME = "";
     private static final String APP_LANGUAGE = "en-US";
     private static final String VERSION = "6.0-alpha";
@@ -40,13 +43,51 @@ public class NalpeironService {
 
     private ApplicationContext applicationContext;
 
+    // Advanced settings, for normal operation leave as defaults
+    @Value("${nalpeiron.loglevel:6}")
+    private int LogLevel; // set log level, please see documentation
+    @Value("${nalpeiron.oflinemode:0}")
+    private int OfflineMode; // Select Offline mode, please see documentation
+    @Value("${nalpeiron.maxlogqueue:300}")
+    private int LogQLen; // please see documentation
+    @Value("${nalpeiron.maxchachequeue:35}")
+    private int CacheQLen; // please see documentation
+    @Value("${nalpeiron.networkminthreads:25}")
+    private int NetThMin; // please see documentation
+    @Value("${nalpeiron.networkmaxthreads:25}")
+    private int NetThMax; // please see documentation
+    @Value("${nalpeiron.proxyip:}")
+    private String ProxyIP; // InternetConnection Proxy IP Address if required
+    @Value("${nalpeiron.proxyport:}")
+    private String ProxyPort; // InternetConnection Proxy Port if required
+    @Value("${nalpeiron.proxyusername:}")
+    private String ProxyUsername; // InternetConnection Proxy Username if required
+    @Value("${nalpeiron.proxypassword:}")
+    private String ProxyPass; // InternetConnection Proxy Password if required
+    @Value("${nalpeiron.daemonip:}")
+    private String DaemonIP; //Daemon IP
+    @Value("${nalpeiron.daemonport:}")
+    private String DaemonPort; //Daemon Port
+    @Value("${nalpeiron.daemonuser:}")
+    private String DaemonUser; //Daemon User
+    @Value("${nalpeiron.daemonpassword:}")
+    private String DaemonPass; //Daemon Password
+    @Value("${nalpeiron.workdir:./license/}")
+    private String WorkDir;// Workfolder for
+    private final boolean NSAEnable = true; // Enable Analytics
+    private final boolean NSLEnable = true; // Enable Licensing
+
     public static final List<NalpeironHelper.FeatureStatus> VALID_FEATURE_STATUS = Arrays.asList(NalpeironHelper.FeatureStatus.AUTHORIZED);
     public static final List<NalpeironHelper.LicenseStatus> VALID_LICENCE_STATUS = Arrays.asList(NalpeironHelper.LicenseStatus.PROD_AUTHORIZED, NalpeironHelper.LicenseStatus.PROD_INTRIAL, NalpeironHelper.LicenseStatus.PROD_NETWORK, NalpeironHelper.LicenseStatus.PROD_NETWORK_LTCO);
 
-    //TODO: LOGGING
     @Autowired
     public NalpeironService(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
+    }
+
+    //TODO: LOGGING
+    @PostConstruct
+    private void init() {
         try {
             NalpeironHelper.dllTest();
         } catch (DocShifterLicenceException e) {
@@ -73,29 +114,7 @@ public class NalpeironService {
 
             helper = new NalpeironHelper(applicationContext, nalp, nsa, nsl);
 
-            { //TODO get config
-                // Advanced settings, for normal operation leave as defaults
-                int LogLevel = 6; // set log level, please see documentation
-                int OfflineMode = 0;// Select Offline mode, please see documentation
-                int LogQLen = 300; // please see documentation
-                int CacheQLen = 35; // please see documentation
-                int NetThMin = 25; // please see documentation
-                int NetThMax = 25; // please see documentation
-                String ProxyIP = ""; // InternetConnection Proxy IP Address if required
-                String ProxyPort = ""; // InternetConnection Proxy Port if required
-                String ProxyUsername = ""; // InternetConnection Proxy Username if required
-                String ProxyPass = ""; // InternetConnection Proxy Password if required
-                String DaemonIP = ""; //Daemon IP
-                String DaemonPort = ""; //Daemon Port
-                String DaemonUser = ""; //Daemon User
-                String DaemonPass = ""; //Daemon Password
-                Boolean NSAEnable = true; // Enable Analytics
-                Boolean NSLEnable = true; // Enable Licensing
-                String WorkDir = System.getenv("APPDATA") + "\\Nalpeiron"; // Work
-                String LogDir = System.getenv("APPDATA") + "\\Nalpeiron";
-
-                helper.openNalpLibriray("./bin/docShifterFileCheck.dll", NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
-            }
+            helper.openNalpLibriray("./bin/docShifterFileCheck.dll", NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
 
             //Turn end user privacy off
             helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
@@ -109,7 +128,7 @@ public class NalpeironService {
             helper.sendAnalyticsSystemInfo(NALPEIRON_USERNAME, APP_LANGUAGE, VERSION,
                     EDITION, BUILD, LICENCE_STAT, CLIENT_DATA);
 
-        } catch (DocShifterLicenceException | nalpError e) {
+        } catch (DocShifterLicenceException | NalpError e) {
             Logger.fatal("error inn docshifter licence processing", e);
             SpringApplication.exit(applicationContext); //TODO; define error code
         }
@@ -150,7 +169,7 @@ public class NalpeironService {
         helper.sendAnalyticsCache(NALPEIRON_USERNAME);
 
         //Cleanup and shutdown library
-        helper.cloasNalpLibriry();
+        helper.closeNalpLibriry();
 
         //remove helper from assigned memory
         helper = null;

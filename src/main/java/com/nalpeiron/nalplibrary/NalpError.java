@@ -1,5 +1,5 @@
 //
-// nalpError.java
+// NalpError.java
 //
 // Created Jan 18 2013
 // R. D. Ramey
@@ -8,7 +8,7 @@
 package com.nalpeiron.nalplibrary;
 
 public class
-nalpError extends Error
+NalpError extends Error
 {
 	static final long serialVersionUID = 999L;
 
@@ -19,8 +19,7 @@ nalpError extends Error
 /**
  * Default constructor
  */
-	public
-	nalpError(
+	public NalpError(
 	)
 	{
 		super("Undefined Error");
@@ -31,8 +30,7 @@ nalpError extends Error
  * Regular constructor
  * @param i:	The error code that was returned by the Nalp function
  */
-	public
-	nalpError(
+	public NalpError(
 	int i,
 	String msg
 	)

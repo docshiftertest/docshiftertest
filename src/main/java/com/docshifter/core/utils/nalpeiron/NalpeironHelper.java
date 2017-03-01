@@ -5,7 +5,7 @@ import com.docshifter.core.exceptions.DocShifterLicenceException;
 import com.nalpeiron.nalplibrary.NALP;
 import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
-import com.nalpeiron.nalplibrary.nalpError;
+import com.nalpeiron.nalplibrary.NalpError;
 import org.springframework.context.ApplicationContext;
 
 import java.util.StringTokenizer;
@@ -215,7 +215,7 @@ public class NalpeironHelper {
                     return l;
                 }
             }
-            throw new IllegalArgumentException("License status not found"); //TODO: wrap in DocShifterLicenceException
+            throw new IllegalArgumentException("License status not found");
         }
     }
 
@@ -248,7 +248,7 @@ public class NalpeironHelper {
                 }
             }
 
-            throw new IllegalArgumentException("privacy value not found"); //TODO: wrap in DocShifterLicenceException
+            throw new IllegalArgumentException("privacy value not found");
         }
     }
 
@@ -285,7 +285,7 @@ public class NalpeironHelper {
                 }
             }
 
-            throw new IllegalArgumentException("privacy value not found"); //TODO: wrap in DocShifterLicenceException
+            throw new IllegalArgumentException("privacy value not found");
         }
     }
 
@@ -319,318 +319,533 @@ public class NalpeironHelper {
                 }
             }
 
-            throw new IllegalArgumentException("Activation type not found"); //TODO: wrap in DocShifterLicenceException
+            throw new IllegalArgumentException("Activation type not found");
         }
     }
 
     public void openNalpLibriray(String Filename, boolean NSAEnable, boolean NSLEnable, int LogLevel, String WorkDir, int LogQLen, int CacheQLen, int NetThMin, int NetThMax,
                                  int OfflineMode, String ProxyIP, String ProxyPort, String ProxyUsername, String ProxyPass, String DaemonIP, String DaemonPort, String DaemonUser, String DaemonPass, int security) throws DocShifterLicenceException {
-        int i = nalp.callNalpLibOpen(Filename, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername,
-                ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
+        try {
+            int i = nalp.callNalpLibOpen(Filename, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername,
+                    ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("could not open nalp library", new nalpError(i, nalp.callNalpGetErrorMsg(i)));
+            if (i < 0) {
+                throw new DocShifterLicenceException("could not open nalp library", new NalpError(i, nalp.callNalpGetErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }
 
-    public void cloasNalpLibriry() throws DocShifterLicenceException {
-        int i = nalp.callNalpLibClose();
+    public void closeNalpLibriry() throws DocShifterLicenceException {
+        try {
+            int i = nalp.callNalpLibClose();
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("could not open nalp library", new nalpError(i, resolveNalpErrorMsg(i)));
+
+            if (i < 0) {
+                throw new DocShifterLicenceException("could not open nalp library", new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+
+    }
+
+    public String resolveNalpErrorMsg(int nalpErrorNo) throws DocShifterLicenceException {
+        try {
+            String i = nalp.callNalpGetErrorMsg(nalpErrorNo);
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }
 
-    public String resolveNalpErrorMsg(int nalpErrorNo) {
-        String i = nalp.callNalpGetErrorMsg(nalpErrorNo);
-        return i;
+    public String getLicencingVersion() throws DocShifterLicenceException {
+        try {
+            String i = nsl.callNSLGetVersion();
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
     }
 
-    /*public String getLicencingVersion() {
-        String i = nsl.callNSLGetVersion();
-        return i;
-    }*/
-
-    /*public String getComputerID() {
-        String i = nsl.callNSLGetComputerID();
-        return i;
-    }*/
-
-    /*public String getLicenceHostName() {
-        String i = nsl.callNSLGetHostName();
-        return i;
-    }*/
-
-    /*public int getRemainingLeaseSeconds() {
-        int i = nsl.callNSLGetLeaseExpSec();
-        return i;
-    }*/
-
-    /*public String getLeaseExpirationDate() {
-        String i = nsl.callNSLGetLeaseExpDate();
-        return i;
-    }*/
-
-    /*public int getRemainingMaintenanceSeconds() {
-        int i = nsl.callNSLGetMaintExpSec();
-        return i;
-    }*/
-
-    /*public int getRemainingSubscriptionSeconds() {
-        int i = nsl.callNSLGetSubExpSec();
-        return i;
-    }*/
-
-    /*public String getSubscriptionExpirationDate() {
-        String i = nsl.callNSLGetSubExpDate();
-        return i;
-    }*/
-
-    /*public String getMaintenanceExpirationDate() {
-        String i = nsl.callNSLGetMaintExpDate();
-        return i;
-    }*/
-
-    /*public int getRemainingTrialSeconds() {
-        int i = nsl.callNSLGetTrialExpSec();
-        return i;
-    }*/
-
-    /*public String getTrialExpirationDate() {
-        String i = nsl.callNSLGetTrialExpDate();
-        return i;
-    }*/
-
-    public LicenseStatus getLicense(String licenseNo, String xmlRegInfo) {
-        int i = nsl.callNSLGetLicense(licenseNo, xmlRegInfo);
-        return LicenseStatus.getLicenseStatus(i);
+    public String getComputerID() throws DocShifterLicenceException {
+        try {
+            String i = nsl.callNSLGetComputerID();
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
     }
 
-    /*public void returnLicense(String licenseNo) throws DocShifterLicenceException {
-        int i = nsl.callNSLReturnLicense(licenseNo);
+    public String getLicenceHostName() throws DocShifterLicenceException {
+        try {
+            String i = nsl.callNSLGetHostName();
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+    public int getRemainingLeaseSeconds() throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLGetLeaseExpSec();
+
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLGetLeaseExpSec"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public String getLeaseExpirationDate() throws DocShifterLicenceException {
+        try {
+            String i = nsl.callNSLGetLeaseExpDate();
+
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    /*public int getRemainingMaintenanceSeconds() throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLGetMaintExpSec();
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLGetMaintExpSec"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }*/
 
-    /*public void importCertificate(String licenseNo, String cert) throws DocShifterLicenceException {
-        int i = nsl.callNSLImportCertificate(licenseNo, cert);
-
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+    public int getRemainingSubscriptionSeconds() throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLGetSubExpSec();
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLGetSubExpSec"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
-    }*/
+    }
 
-    /*public String getActivationCertificateRequest(String licenseNo, String xmlRegInfo) {
-        String i = nsl.callNSLGetActivationCertReq(licenseNo, xmlRegInfo);
-        return i;
-    }*/
+    public String getSubscriptionExpirationDate() throws DocShifterLicenceException {
+        try {
+            String i = nsl.callNSLGetSubExpDate();
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
 
-    /*public String getDeactivationCertificateRequest(String licenseNo) {
-        String i = nsl.callNSLGetDeactivationCertReq(licenseNo);
-        return i;
-    }*/
+    public int getRemainingTrialSeconds() throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLGetTrialExpSec();
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLGetTrialExpSec"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public String getTrialExpirationDate() throws DocShifterLicenceException {
+        try {
+            String i = nsl.callNSLGetTrialExpDate();
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public LicenseStatus getLicense(String licenseNo, String xmlRegInfo) throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLGetLicense(licenseNo, xmlRegInfo);
+            return LicenseStatus.getLicenseStatus(i);
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public void returnLicense(String licenseNo) throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLReturnLicense(licenseNo);
+
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLReturnLicense"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public void importCertificate(String licenseNo, String cert) throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLImportCertificate(licenseNo, cert);
+
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLImportCertificate"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public String getActivationCertificateRequest(String licenseNo, String xmlRegInfo) throws DocShifterLicenceException {
+        try {
+            String i = nsl.callNSLGetActivationCertReq(licenseNo, xmlRegInfo);
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public String getDeactivationCertificateRequest(String licenseNo) throws DocShifterLicenceException {
+        try {
+            String i = nsl.callNSLGetDeactivationCertReq(licenseNo);
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
 
     public void validateLibrary(int custID, int prodID) throws DocShifterLicenceException {
-        int i = nsl.callNSLValidateLibrary(custID, prodID);
+        try {
+            int i = nsl.callNSLValidateLibrary(custID, prodID);
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLValidateLibrary"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }
 
-    public LicenseStatus getLicenseStatus() {
-        int i = nsl.callNSLGetLicenseStatus();
-        return LicenseStatus.getLicenseStatus(i);
+    public LicenseStatus getLicenseStatus() throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLGetLicenseStatus();
+            return LicenseStatus.getLicenseStatus(i);
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
     }
 
-    public String getLicenseCode() {
-        String i = nsl.callNSLGetLicenseCode();
-        return i;
+    public String getLicenseCode() throws DocShifterLicenceException {
+        try {
+            String i = nsl.callNSLGetLicenseCode();
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
     }
 
-    public LicenceType getLicenseType() {
-        int i = nsl.callNSLGetLicenseType();
-        return LicenceType.getLicenceType(i);
+    public LicenceType getLicenseType() throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLGetLicenseType();
+            return LicenceType.getLicenceType(i);
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
     }
 
 
-    public ActivationType getActivationType() {
-        int i = nsl.callNSLGetActivationType();
-        return ActivationType.getActivationType(i);
+    public ActivationType getActivationType() throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLGetActivationType();
+            return ActivationType.getActivationType(i);
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
     }
 
 
     public int getLicenceTimeStamp() throws DocShifterLicenceException {
-        int i = nsl.callNSLGetTimeStamp();
+        try {
+            int i = nsl.callNSLGetTimeStamp();
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLGetTimeStamp"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
-
-        return i;
     }
 
-    public FeatureStatus getFeatureStatus(String featureName) {
-        int i = nsl.callNSLGetFeatureStatus(featureName);
-        return FeatureStatus.getFeatureStatus(i);
+    public FeatureStatus getFeatureStatus(String featureName) throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLGetFeatureStatus(featureName);
+            return FeatureStatus.getFeatureStatus(i);
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
     }
 
-    /*public int checkoutFeature(String featureName, String licCode) {
-        int i = nsl.callNSLCheckoutFeature(featureName, licCode);
-        return i;
-    }*/
-
-    /*public int returnFeature(String featureName, String licenseNo) {
-        int i = nsl.callNSLReturnFeature(featureName, licenseNo);
-        return i;
-    }*/
-
-    /*public int getPoolStatus(String poolName) {
-        int i = nsl.callNSLGetPoolStatus(poolName);
-        return i;
-    }*/
-
-    /*public int checkoutPool(String poolName, String licenseNo, int amt) {
-        int i = nsl.callNSLCheckoutPool(poolName, licenseNo, amt);
-        return i;
-    }*/
-
-    /*public int returnPool(String poolName, String licenseNo, int amt) {
-        int i = nsl.callNSLReturnPool(poolName, licenseNo, amt);
-        return i;
-    }*/
-
-    /*public String getUDFValue(String UDFName) {
-        String i = nsl.callNSLGetUDFValue(UDFName);
-        return i;
-    }*/
-
-    /*public int getNumberAvailableProc(int[] maxProc, int[] availProc) {
-        int i = nsl.callNSLGetNumbAvailProc(maxProc, availProc);
-        return i;
-    }*/
-
-    /*public void registerLicence(String licenseNo, String xmlRegInfo) throws DocShifterLicenceException {
-        int i = nsl.callNSLRegister(licenseNo, xmlRegInfo);
-
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+    public FeatureStatus checkoutFeature(String featureName, String licCode) throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLCheckoutFeature(featureName, licCode);
+            return FeatureStatus.getFeatureStatus(i);
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
-    }*/
+    }
 
-    /*public int testNalpeironLicencingConnection() {
-        int i = nsl.callNSLTestConnection();
-        return i;
-    }*/
-
-
-    /*public String getAnalyticsVersion() {
-        String i = nsa.callNSAGetVersion();
-        return i;
-    }*/
-
-    /*public void analyticsLogin(String Username, String clientData, long[] lid) throws DocShifterLicenceException {
-        int i = nsa.callNSALogin(Username, clientData, lid);
-
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+    public void returnFeature(String featureName, String licenseNo) throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLReturnFeature(featureName, licenseNo);
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLReturnFeature"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
-    }*/
+    }
+
+    public PoolStatus getPoolStatus(String poolName) throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLGetPoolStatus(poolName);
+            return PoolStatus.getPoolStatus(i);
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public void checkoutPool(String poolName, String licenseNo, int amt) throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLCheckoutPool(poolName, licenseNo, amt);
+
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLCheckoutPool"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public void returnPool(String poolName, String licenseNo, int amt) throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLReturnPool(poolName, licenseNo, amt);
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLReturnPool"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public String getUDFValue(String UDFName) throws DocShifterLicenceException {
+        try {
+            String i = nsl.callNSLGetUDFValue(UDFName);
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public int getNumberAvailableSimultaneousLicences(int[] maxProc, int[] availProc) throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLGetNumbAvailProc(maxProc, availProc);
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLGetNumbAvailProc"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public void registerLicence(String licenseNo, String xmlRegInfo) throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLRegister(licenseNo, xmlRegInfo);
+
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLRegister"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public void testNalpeironLicencingConnection() throws DocShifterLicenceException {
+        try {
+            int i = nsl.callNSLTestConnection();
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLTestConnection"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public String getAnalyticsVersion() throws DocShifterLicenceException {
+        try {
+            String i = nsa.callNSAGetVersion();
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public void analyticsLogin(String Username, String clientData, long[] lid) throws DocShifterLicenceException {
+        try {
+            int i = nsa.callNSALogin(Username, clientData, lid);
+
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSALogin"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
 
     public void analyticsLogout(String Username, String clientData, long[] lid) throws DocShifterLicenceException {
-        int i = nsa.callNSALogout(Username, clientData, lid);
+        try {
+            int i = nsa.callNSALogout(Username, clientData, lid);
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSALogout"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }
 
-    /*public String getAnalyticsHostName() {
-        String i = nsa.callNSAGetHostName();
-        return i;
-    }*/
+    public String getAnalyticsHostName() throws DocShifterLicenceException {
+        try {
+            String i = nsa.callNSAGetHostName();
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
 
     public void startFeature(String Username, String FeatureCode, String clientData, long[] fid) throws DocShifterLicenceException {
-        int i = nsa.callNSAFeatureStart(Username, FeatureCode, clientData, fid);
+        try {
+            int i = nsa.callNSAFeatureStart(Username, FeatureCode, clientData, fid);
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAFeatureStart"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }
 
     public void stopFeature(String Username, String FeatureCode, String clientData, long[] fid) throws DocShifterLicenceException {
-        int i = nsa.callNSAFeatureStop(Username, FeatureCode, clientData, fid);
+        try {
+            int i = nsa.callNSAFeatureStop(Username, FeatureCode, clientData, fid);
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAFeatureStop"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }
 
-    /*public int ShaferNSAException(String Username, String ExceptionCode, String clientData, String Description) {
-        int i = nsa.callNSAException(Username, ExceptionCode, clientData, Description);
-        return i;
-    }*/
+    public int getAnalyticsExceptionCode(String Username, String ExceptionCode, String clientData, String Description) throws DocShifterLicenceException {
+        try {
+            int i = nsa.callNSAException(Username, ExceptionCode, clientData, Description);
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
 
     public void sendAnalyticsSystemInfo(String Username, String Applang, String Version, String Edition, String Build, String LicenseStat, String clientData) throws DocShifterLicenceException {
-        int i = nsa.callNSASysInfo(Username, Applang, Version, Edition, Build, LicenseStat, clientData);
+        try {
+            int i = nsa.callNSASysInfo(Username, Applang, Version, Edition, Build, LicenseStat, clientData);
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSASysInfo"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }
 
     public void sendAnalyticsCache(String Username) throws DocShifterLicenceException {
-        int i = nsa.callNSASendCache(Username);
+        try {
+            int i = nsa.callNSASendCache(Username);
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSASendCache"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }
 
     public void startAnalyticsApp(String username, String clientData, long[] aid) throws DocShifterLicenceException {
-        int i = nsa.callNSAApStart(username, clientData, aid);
+        try {
+            int i = nsa.callNSAApStart(username, clientData, aid);
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAApStart"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }
 
     public void stopAnalyticsApp(String username, String clientData, long[] aid) throws DocShifterLicenceException {
-        int i = nsa.callNSAApStop(username, clientData, aid);
+        try {
+            int i = nsa.callNSAApStop(username, clientData, aid);
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAApStop"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }
 
     public void getAnalyticsLocation() throws DocShifterLicenceException {
-        int i = nsa.callNSAGetLocation();
+        try {
+            int i = nsa.callNSAGetLocation();
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAGetLocation"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }
 
-    public void getAnalyticsPrivacy() throws DocShifterLicenceException {
-        int i = nsa.callNSAGetPrivacy();
-
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+    public PrivacyValue getPrivacy() throws DocShifterLicenceException {
+        try {
+            int i = nsa.callNSAGetPrivacy();
+            return PrivacyValue.getPrivacyValue(i);
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }
 
     public void setAnalyticsPrivacy(int privacy) throws DocShifterLicenceException {
-        int i = nsa.callNSASetPrivacy(privacy);
+        try {
+            int i = nsa.callNSASetPrivacy(privacy);
 
-        if (i < 0) {
-            throw new DocShifterLicenceException("Error during licence processing", new nalpError(i, resolveNalpErrorMsg(i)));
+            if (i < 0) {
+                throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSASetPrivacy"), new NalpError(i, resolveNalpErrorMsg(i)));
+            }
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
         }
     }
 
-   /* public String getAnalyticsStats() {
-        String i = nsa.callNSAGetStats();
-        return i;
-    }*/
+    public String getAnalyticsStats() throws DocShifterLicenceException {
+        try {
+            String i = nsa.callNSAGetStats();
+            return i;
+        } catch (NalpError error) {
+            throw new DocShifterLicenceException(error);
+        }
+    }
 }

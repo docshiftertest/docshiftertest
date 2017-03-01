@@ -34,7 +34,7 @@ public class NALP
  * Call NalpLibOpen(), which initializes the NSA C library for use
  * @return:	0 on success, negative value on error.  A (void *) cast
  * 			of the library handle in libHandle
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 						this error will be thrown
  */
 	public int
@@ -44,7 +44,7 @@ public class NALP
 		String ProxyIP, String ProxyPort, String ProxyUsername,
 		String ProxyPass, String DaemonIP, String DaemonPort,
 		String DaemonUser, String DaemonPass, int security)
-	throws nalpError
+	throws NalpError
 	{
 		int			i;
 		long		lhandle_t[];
@@ -177,12 +177,12 @@ public class NALP
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			//throw new nalpError(i, NalpGetErrorMsg(LibHandle, i));
+			//throw new NalpError(i, NalpGetErrorMsg(LibHandle, i));
 			System.out.println("Error " + i + ": " + callNalpGetErrorMsg(i));
 		}
 		else
@@ -197,12 +197,12 @@ public class NALP
 /**
  * Call NalpLibClose() which shuts down the C library
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
 	callNalpLibClose()
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -210,7 +210,7 @@ public class NALP
 
 		if (i < 0)
 		{
-			throw new nalpError(i, NalpGetErrorMsg(LibHandle, i));
+			throw new NalpError(i, NalpGetErrorMsg(LibHandle, i));
 		}
 
 		return i;
@@ -223,7 +223,7 @@ public class NALP
  */
 	public String
 	callNalpGetErrorMsg(int nalpErrorNo)
-	throws nalpError
+	throws NalpError
 	{
 		String 	nalpErrorMsg;
 

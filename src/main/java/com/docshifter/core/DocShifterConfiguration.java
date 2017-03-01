@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.util.ArrayList;
@@ -28,54 +29,52 @@ import java.util.List;
 @EnableJpaRepositories(basePackages = {"com.docshifter.core.config.domain"})
 public class DocShifterConfiguration {
 
-	@Autowired
-	public GeneralConfigService generalConfigService;
+    @Autowired
+    public GeneralConfigService generalConfigService;
 
-	@Autowired
-	public ConfigurationService configurationService;
+    @Autowired
+    public ConfigurationService configurationService;
 
-	@Autowired
-	public NalpeironService nalpeironService;
+    @Autowired
+    public NalpeironService nalpeironService;
 
-	@Autowired
-	public WorkFolderManager workFolderManager;
+    @Autowired
+    public WorkFolderManager workFolderManager;
 
+    @Bean
+    public ConnectionFactory connectionFactory() {
 
-	@Bean
-	public ConnectionFactory connectionFactory() {
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory(generalConfigService.getString(Constants.MQ_URL));
+        connectionFactory.setUsername(generalConfigService.getString(Constants.MQ_USER));
+        connectionFactory.setPassword(generalConfigService.getString(Constants.MQ_PASSWORD));
+        return connectionFactory;
+    }
 
-		CachingConnectionFactory connectionFactory = new CachingConnectionFactory(generalConfigService.getString(Constants.MQ_URL));
-		connectionFactory.setUsername(generalConfigService.getString(Constants.MQ_USER));
-		connectionFactory.setPassword(generalConfigService.getString(Constants.MQ_PASSWORD));
-		return connectionFactory;
-	}
+    @Bean
+    public MessageConverter jsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
 
-	@Bean
-	public MessageConverter jsonMessageConverter(){
-		return new Jackson2JsonMessageConverter();
-	}
+    @Bean
+    public RabbitTemplate rabbitTemplate() {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory());
+        template.setMessageConverter(jsonMessageConverter());
+        return template;
+    }
 
-	@Bean
-	public RabbitTemplate rabbitTemplate() {
-		RabbitTemplate template = new RabbitTemplate(connectionFactory());
-		template.setMessageConverter(jsonMessageConverter());
-		return template;
-	}
+    @Bean
+    public List<Queue> docShifterQueues() {
+        List<Queue> queueList = new ArrayList<>();
+        queueList.add(defaultQueue());
 
-	@Bean
-	public List<Queue> docShifterQueues() {
-		List<Queue> queueList = new ArrayList<>();
-		queueList.add(defaultQueue());
+        return queueList;
+    }
 
-		return  queueList;
-	}
+    @Bean
+    public Queue defaultQueue() {
+        return new Queue(generalConfigService.getString(Constants.MQ_QUEUE));
 
-	@Bean
-	public Queue defaultQueue() {
-	return new Queue(generalConfigService.getString(Constants.MQ_QUEUE));
-
-	}
-
+    }
 
 
 }

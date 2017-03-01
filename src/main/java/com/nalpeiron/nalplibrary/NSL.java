@@ -164,12 +164,12 @@ public class NSL
 	/**
  * Call NSLGetVersion()
  * @return:	0 on success, negative value on error, nslVersion
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String
 	callNSLGetVersion()
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nslVersion = new byte[256];
 		int		i;
@@ -179,7 +179,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -189,19 +189,19 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
 /**
  * Call NSLGetComputerID()
  * @return:	0 on success, negative value on error, computerID
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String
 	callNSLGetComputerID()
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nslCompID = new byte[50];
 		int		i;
@@ -211,7 +211,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -221,19 +221,19 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
 /**
  * Call NSLGetHostName()
  * @return:	0 on success, negative value on error, hostname
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String
 	callNSLGetHostName()
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nslHostName = new byte[128];
 		int		i;
@@ -243,7 +243,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -253,19 +253,19 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
 /**
  * Call NSLGetLeaseExpSec() -- Send any cache file to Nalp server
  * @return:	0 on success, negative value on error, exp epoch seconds
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int
 	callNSLGetLeaseExpSec()
-	throws nalpError
+	throws NalpError
 	{
 		int[] expSec = new int[1];
 		int[] expEpoch = new int[1];
@@ -276,7 +276,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return expSec[0];
@@ -285,12 +285,12 @@ public class NSL
 /**
  * Call NSLGetLeaseExpDate()
  * @return:	0 on success, negative value on error, Expiration date
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String
 	callNSLGetLeaseExpDate()
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nslExpDate = new byte[128];
 		int		i;
@@ -300,7 +300,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -310,19 +310,19 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
 /**
  * Call NSLGetRefreshExpSec() -- Send any cache file to Nalp server
  * @return:	0 on success, negative value on error, exp epoch seconds
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int
 	callNSLGetRefreshExpSec()
-	throws nalpError
+	throws NalpError
 	{
 		int[] expSec = new int[1];
 		int[] expEpoch = new int[1];
@@ -333,7 +333,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return expSec[0];
@@ -342,12 +342,12 @@ public class NSL
 /**
  * Call NSLGetRefreshExpDate()
  * @return:	0 on success, negative value on error, Expiration date
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String
 	callNSLGetRefreshExpDate()
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nslExpDate = new byte[128];
 		int		i;
@@ -357,7 +357,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -367,7 +367,7 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
@@ -375,12 +375,12 @@ public class NSL
 /**
  * Call NSLGetSubExpSec() -- Send any cache file to Nalp server
  * @return:	0 on success, negative value on error, exp epoch seconds
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int
 	callNSLGetSubExpSec()
-	throws nalpError
+	throws NalpError
 	{
 		int[] expSec = new int[1];
 		int[] expEpoch = new int[1];
@@ -391,7 +391,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return expSec[0];
@@ -400,12 +400,12 @@ public class NSL
 /**
  * Call NSLGetSubExpDate()
  * @return:	0 on success, negative value on error, Expiration date
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String
 	callNSLGetSubExpDate()
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nslExpDate = new byte[128];
 		int		i;
@@ -415,7 +415,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -425,7 +425,7 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
@@ -433,12 +433,12 @@ public class NSL
 /**
  * Call NSLGetMaintExpSec() -- Send any cache file to Nalp server
  * @return:	0 on success, negative value on error, exp epoch seconds
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int
 	callNSLGetMaintExpSec()
-	throws nalpError
+	throws NalpError
 	{
 		int[] expSec = new int[1];
 		int[] expEpoch = new int[1];
@@ -449,7 +449,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return expSec[0];
@@ -458,12 +458,12 @@ public class NSL
 /**
  * Call NSLGetMaintExpDate()
  * @return:	0 on success, negative value on error, Expiration date
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String
 	callNSLGetMaintExpDate()
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nslExpDate = new byte[128];
 		int		i;
@@ -473,7 +473,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -483,7 +483,7 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
@@ -492,12 +492,12 @@ public class NSL
 /**
  * Call NSLGetTrialExpSec() -- Send any cache file to Nalp server
  * @return:	0 on success, negative value on error, exp epoch seconds
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int
 	callNSLGetTrialExpSec()
-	throws nalpError
+	throws NalpError
 	{
 		int[] expSec = new int[1];
 		int[] expEpoch = new int[1];
@@ -508,7 +508,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return expSec[0];
@@ -517,12 +517,12 @@ public class NSL
 /**
  * Call NSLGetTrialExpDate()
  * @return:	0 on success, negative value on error, Expiration date
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String
 	callNSLGetTrialExpDate()
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nslExpDate = new byte[128];
 		int		i;
@@ -532,7 +532,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -542,19 +542,19 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
 /**
  * Call NSLGetLicense
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int
 	callNSLGetLicense(String licenseNo, String xmlRegInfo)
-	throws nalpError
+	throws NalpError
 	{
 		int[] licStat = new int[1];
 		int	i;
@@ -569,12 +569,12 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return licStat[0];
@@ -583,12 +583,12 @@ public class NSL
 /**
  * Call NSLReturnLicense
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int
 	callNSLReturnLicense(String licenseNo)
-	throws nalpError
+	throws NalpError
 	{
 		int[] licStat = new int[1];
 		int	i;
@@ -601,12 +601,12 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return licStat[0];
@@ -615,12 +615,12 @@ public class NSL
 /**
  * Call NSLImportCertificate
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int
 	callNSLImportCertificate(String licenseNo, String cert)
-	throws nalpError
+	throws NalpError
 	{
 		int[] licStat = new int[1];
 		int	i;
@@ -633,12 +633,12 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return licStat[0];
@@ -647,12 +647,12 @@ public class NSL
 /**
  * Call NSLGetActivationCertReq()
  * @return:	0 on success, negative value on error, nslVersion
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String
 	callNSLGetActivationCertReq(String licenseNo, String xmlRegInfo)
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nslCert = new byte[4096];
 		int		i;
@@ -666,12 +666,12 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -681,7 +681,7 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
@@ -689,12 +689,12 @@ public class NSL
 /**
  * Call NSLGetDeactivationCertReq()
  * @return:	0 on success, negative value on error, nslVersion
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String
 	callNSLGetDeactivationCertReq(String licenseNo)
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nslCert = new byte[4096];
 		int		i;
@@ -707,12 +707,12 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -722,7 +722,7 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
@@ -730,12 +730,12 @@ public class NSL
 /**
  * Call NSLValidateLibrary() - Collect and send system nalpation to Napeiron
  * @return:	0 on success, anything else in an invalid library
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int
 	callNSLValidateLibrary(int custID, int prodID)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -745,7 +745,7 @@ public class NSL
 		if (i < 0)
 		{
 			System.out.println("Error loading library: %d" + i);
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
@@ -754,11 +754,11 @@ public class NSL
 /**
  * Call NSLGetLicenseStatus()
  * @return:	0 on success, negative value on error, license status
- * @throws nalpError :	If there was a problem calling the NSLfunction,
+ * @throws NalpError :	If there was a problem calling the NSLfunction,
  * 	this error will be thrown
  */
 	public int callNSLGetLicenseStatus()
-	throws nalpError
+	throws NalpError
 	{
 		int[] licStat = new int[1];
 		int	i;
@@ -768,7 +768,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return licStat[0];
@@ -777,11 +777,11 @@ public class NSL
 /**
  * Call NSLGetLicenseInfo() to get license type
  * @return:	0 on success, negative value on error, license type
- * @throws nalpError :	If there was a problem calling the NSLfunction,
+ * @throws NalpError :	If there was a problem calling the NSLfunction,
  * 	this error will be thrown
  */
 	public int callNSLGetLicenseType()
-	throws nalpError
+	throws NalpError
 	{
 		int[] licType = new int[1];
 		int[] actType = new int[1];
@@ -792,7 +792,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return licType[0];
@@ -801,11 +801,11 @@ public class NSL
 /**
  * Call NSLGetLicenseInfo() to get activation type
  * @return:	0 on success, negative value on error, license type
- * @throws nalpError :	If there was a problem calling the NSLfunction,
+ * @throws NalpError :	If there was a problem calling the NSLfunction,
  * 	this error will be thrown
  */
 	public int callNSLGetActivationType()
-	throws nalpError
+	throws NalpError
 	{
 		int[] licType = new int[1];
 		int[] actType = new int[1];
@@ -816,7 +816,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return actType[0];
@@ -825,11 +825,11 @@ public class NSL
 /**
  * Call NSLGetNumbAvailProc() to get maximum allowed processes
  * @return:	0 on success, negative value on error, license type
- * @throws nalpError :	If there was a problem calling the NSLfunction,
+ * @throws NalpError :	If there was a problem calling the NSLfunction,
  * 	this error will be thrown
  */
 	public int callNSLGetMaxProcs()
-	throws nalpError
+	throws NalpError
 	{
 		int[] maxProc = new int[1];
 		int[] availProc = new int[1];
@@ -840,7 +840,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return maxProc[0];
@@ -849,11 +849,11 @@ public class NSL
 /**
  * Call NSLGetNumbAvailProc() to get maximum allowed processes
  * @return:	0 on success, negative value on error, license type
- * @throws nalpError :	If there was a problem calling the NSLfunction,
+ * @throws NalpError :	If there was a problem calling the NSLfunction,
  * 	this error will be thrown
  */
 	public int callNSLGetAvailProcs()
-	throws nalpError
+	throws NalpError
 	{
 		int[] maxProc = new int[1];
 		int[] availProc = new int[1];
@@ -864,7 +864,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return availProc[0];
@@ -873,11 +873,11 @@ public class NSL
 /**
  * Call NSLGetLicenseCode()
  * @return:	0 on success, negative value on error, license code
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String callNSLGetLicenseCode()
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nslLicCode = new byte[256];
 		int	i;
@@ -887,7 +887,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -897,19 +897,19 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
 /**
  * Call NSLGetTimeStamp()
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int
 	callNSLGetTimeStamp()
-	throws nalpError
+	throws NalpError
 	{
 		int[] timeStamp = new int[1];
 		int	i;
@@ -919,7 +919,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return timeStamp[0];
@@ -928,11 +928,11 @@ public class NSL
 /**
  * Call NSLGetFeatureStatus() -- Get status of floating feature
  * @return:	0 on success, negative value on error, feature status
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int callNSLGetFeatureStatus(String featureName)
-	throws nalpError
+	throws NalpError
 	{
 		int[] featureStatus = new int[1];
 		int	i;
@@ -946,12 +946,12 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return featureStatus[0];
@@ -960,11 +960,11 @@ public class NSL
 /**
  * Call NSLCheckoutFeature() -- Checkout a floating feature
  * @return:	0 on success, negative value on error, feature status
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int callNSLCheckoutFeature(String featureName, String licenseNo)
-	throws nalpError
+	throws NalpError
 	{
 		int[] featureStatus = new int[1];
 		int	i;
@@ -979,12 +979,12 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return featureStatus[0];
@@ -993,11 +993,11 @@ public class NSL
 /**
  * Call NSLReturnFeature() -- Return a floating feature to server
  * @return:	0 on success, negative value on error, feature status
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int callNSLReturnFeature(String featureName, String licenseNo)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -1010,12 +1010,12 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return 0;
@@ -1025,11 +1025,11 @@ public class NSL
  * Call NSLGetPoolStatus() -- Get status and number of elements in pool
  * @return:	0 on success, negative value on error. Returns
  * pool status if invalid else returns number of element checked out
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int callNSLGetPoolStatus(String poolName)
-	throws nalpError
+	throws NalpError
 	{
 		int[] poolStatus = new int[1];
 		int[] poolAmt = new int[1];
@@ -1044,12 +1044,12 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		if (poolStatus[0] < 0)
@@ -1063,11 +1063,11 @@ public class NSL
 /**
  * Call NSLCheckoutPool() -- Checkout elements from a pool
  * @return:	0 on success, negative value on error else number of elements
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int callNSLCheckoutPool(String poolName, String licenseNo, int amt)
-	throws nalpError
+	throws NalpError
 	{
 		int[] poolStatus = new int[1];
 		int	i;
@@ -1083,12 +1083,12 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		if (poolStatus[0] < 0)
@@ -1102,11 +1102,11 @@ public class NSL
 /**
  * Call NSLReturnPool() -- Return elements to pool
  * @return:	0 on success, negative value on error, feature status
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int callNSLReturnPool(String poolName, String licenseNo, int amt)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -1121,12 +1121,12 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return 0;
@@ -1135,12 +1135,12 @@ public class NSL
 /**
  * Call NSLGetUDFValue()
  * @return:	0 on success, negative value on error, Expiration date
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String
 	callNSLGetUDFValue(String UDFName)
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	UDFValue = new byte[4096];
 		int		i;
@@ -1154,12 +1154,12 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -1169,19 +1169,19 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
 /**
  * Call NSLGetNumbAvailProc()
  * @return:	0 on success, negative value on error, license status
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int
 	callNSLGetNumbAvailProc(int[] maxProc, int[] availProc)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -1190,7 +1190,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
@@ -1199,11 +1199,11 @@ public class NSL
 /**
  * Call NSLRegister
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public int callNSLRegister(String licenseNo, String xmlRegInfo)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -1216,19 +1216,19 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
 	}
 
 	public int callNSLTestConnection()
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -1237,7 +1237,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
@@ -1246,11 +1246,11 @@ public class NSL
 /**
  * Call NSLGetNewLicenseCode()
  * @return:	0 on success, negative value on error, license code
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String callNSLGetNewLicenseCode(String profile)
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nslLicCode = new byte[256];
 		int	i;
@@ -1262,12 +1262,12 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -1277,18 +1277,18 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
 /**
  * Call NSLGetPreset()
  * @return:	0 on success, negative value on error, preset message
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public String callNSLGetPreset(int messageNo)
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	message = new byte[512];
 		int	i;
@@ -1298,7 +1298,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally
@@ -1308,18 +1308,18 @@ public class NSL
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
 /**
  * Call NSLGetMsgByDate()
  * @return:	0 on success, negative value on error, preset message
- * @throws nalpError :	If there was a problem calling the NSL function,
+ * @throws NalpError :	If there was a problem calling the NSL function,
  * 	this error will be thrown
  */
 	public ArrayList<String> callNSLGetMsgByDate()
-	throws nalpError
+	throws NalpError
 	{
 		byte[]				message = new byte[512];
 		int[]				retVal = new int[1];
@@ -1335,7 +1335,7 @@ public class NSL
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp library uses UTF-8 internally

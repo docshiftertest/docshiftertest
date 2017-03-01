@@ -22,26 +22,31 @@ public class NalpeironLicenseValidator implements Runnable {
     }
 
     public final void validateLicenceStatus() {
-        NalpeironHelper.LicenseStatus licenceStatus = nalpeironHelper.getLicenseStatus();
+        try {
+            NalpeironHelper.LicenseStatus licenceStatus = nalpeironHelper.getLicenseStatus();
 
-        //if we do not have a valid licence, try to get a trail
-        if (!NalpeironService.VALID_LICENCE_STATUS.contains(licenceStatus)) {
-            //Send an empty license number for a trial and reg info
+            //if we do not have a valid licence, try to get a trail
+            if (!NalpeironService.VALID_LICENCE_STATUS.contains(licenceStatus)) {
+                //Send an empty license number for a trial and reg info
                 licenceStatus = nalpeironHelper.getLicense("", "");
 
-        }
+            }
 
-        //if still do not have a valid licence, exit the app
-        if (!NalpeironService.VALID_LICENCE_STATUS.contains(licenceStatus)) {
-            Logger.fatal("license could not be validate. The licence status is: " + licenceStatus, null);
-            SpringApplication.exit(nalpeironHelper.getApplicationContext()); //TODO; define error code
-        }
+            //if still do not have a valid licence, exit the app
+            if (!NalpeironService.VALID_LICENCE_STATUS.contains(licenceStatus)) {
+                Logger.fatal("license could not be validate. The licence status is: " + licenceStatus, null);
+                SpringApplication.exit(nalpeironHelper.getApplicationContext()); //TODO; define error code
+            }
 
-        //TODO: if we still do not have a valid licence, try to get an activation certificate request (ofline activation supported?)
+            //TODO: if we still do not have a valid licence, try to get an activation certificate request (ofline activation supported?)
             /*if (!NalpeironService.NalpeironStatusCodes.VALID_LICENSE_CODES.contains(NalpeironStatusCodes)) {
                 //Send an empty license number for a trial and reg info
                 NalpeironStatusCodes = nsl.callNSLGetLicense("", "");
             SpringApplication.exit(applicationContext); //TODO; define error code
             }*/
+        } catch (DocShifterLicenceException ex) {
+            Logger.fatal("Exception in nalpeiron execution", ex);
+            SpringApplication.exit(nalpeironHelper.getApplicationContext()); //TODO; define error code
+        }
     }
 }

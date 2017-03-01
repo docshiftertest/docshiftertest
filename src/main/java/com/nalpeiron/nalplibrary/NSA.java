@@ -66,12 +66,12 @@ public class NSA
 /**
  * Call NSAGetVersion()
  * @return:	0 on success, negative value on error, nsaVersion
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public String
 	callNSAGetVersion()
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nsaVersion = new byte[256];
 		int		i;
@@ -81,7 +81,7 @@ public class NSA
 
 		if (i < 0)
 		{
-			throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp's library uses UTF-8 internally
@@ -91,7 +91,7 @@ public class NSA
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
@@ -99,12 +99,12 @@ public class NSA
 /**
  * Call NSAGetHostName()
  * @return:	0 on success, negative value on error, hostname
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public String
 	callNSAGetHostName()
-	throws nalpError
+	throws NalpError
 	{
 		byte[]	nsaHostName = new byte[128];
 		int		i;
@@ -114,7 +114,7 @@ public class NSA
 
 		if (i < 0)
 		{
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
 		}
 
@@ -125,7 +125,7 @@ public class NSA
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 
@@ -133,12 +133,12 @@ public class NSA
 /**
  * Call NSALogin()
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
 	callNSALogin(String Username, String clientData, long[] lid)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -151,12 +151,12 @@ public class NSA
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
 		}
 
@@ -166,12 +166,12 @@ public class NSA
 /**
  * Call NSALogout()
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
 	callNSALogout(String Username, String clientData, long[] lid)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -184,12 +184,12 @@ public class NSA
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
 		}
 
@@ -199,13 +199,13 @@ public class NSA
 /**
  * Call NSAFeatureStart()
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
 	callNSAFeatureStart(String Username,
 			String FeatureCode, String clientData, long[] fid)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -219,12 +219,12 @@ public class NSA
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
 		}
 
@@ -234,13 +234,13 @@ public class NSA
 /**
  * Call NSAFeatureStop()
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
 	callNSAFeatureStop(String Username,
 			String FeatureCode, String clientData, long[] fid)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -254,12 +254,12 @@ public class NSA
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
 		}
 
@@ -269,13 +269,13 @@ public class NSA
 /**
  * Call NSAException
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
 	callNSAException(String Username,
 			String ExceptionCode, String clientData, String Description)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 		long[] transID = new long[1];
@@ -294,13 +294,13 @@ public class NSA
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
 			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
@@ -309,13 +309,13 @@ public class NSA
 /**
  * Call NSASysInfo() - Collect and send system nalpation to Napeiron
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
 	callNSASysInfo(String Username, String Applang, String Version,
 			String Edition, String Build, String LicenseStat, String clientData)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 		long[] transID = new long[1];
@@ -337,11 +337,11 @@ public class NSA
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 		if (i < 0)
 		{
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
 		}
 
@@ -351,12 +351,12 @@ public class NSA
 /**
  * Call NSASendCache() -- Send any cache file to Nalp server
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
 	callNSASendCache(String Username)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 		long[] transID = new long[1];
@@ -372,12 +372,12 @@ public class NSA
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
 		}
 
@@ -387,12 +387,12 @@ public class NSA
 /**
  * Call NSAApStart()
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
 	callNSAApStart(String Username, String clientData, long[] aid)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -405,12 +405,12 @@ public class NSA
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
 		}
 
@@ -420,12 +420,12 @@ public class NSA
 /**
  * Call NSAApStop()
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
 	callNSAApStop(String Username, String clientData, long[] aid)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -438,12 +438,12 @@ public class NSA
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 
 		if (i < 0)
 		{
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
 		}
 
@@ -453,12 +453,12 @@ public class NSA
 /**
  * Call NSAGetLocation() -- Get location data from Nalp server
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
 	callNSAGetLocation()
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -467,7 +467,7 @@ public class NSA
 
 		if (i < 0)
 		{
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
 		}
 
@@ -477,12 +477,12 @@ public class NSA
 /**
  * Call NSAGetPrivacy() Get the privacy setting
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
 	callNSAGetPrivacy()
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -499,12 +499,12 @@ public class NSA
 /**
  * Call NSASetPrivacy() set privacy value (0 off or 1 on)
  * @return:	0 on success, negative value on error
- * @throws nalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError :	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
 	callNSASetPrivacy(int Privacy)
-	throws nalpError
+	throws NalpError
 	{
 		int	i;
 
@@ -513,7 +513,7 @@ public class NSA
 
 		if (i < 0)
 		{
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
 		}
 
@@ -526,7 +526,7 @@ public class NSA
  */
 	public String
 	callNSAGetStats()
-	throws nalpError
+	throws NalpError
 	{
 		byte[] 	nsaStats = new byte[1024];
 		int		i;
@@ -536,7 +536,7 @@ public class NSA
 
 		if (i < 0)
 		{
-			//throw new nalpError(i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
 			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
 		}
 
@@ -547,7 +547,7 @@ public class NSA
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new nalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding");
 		}
 	}
 }
