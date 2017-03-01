@@ -20,11 +20,11 @@ import java.nio.file.Paths;
 @Service
 public class WorkFolderManager {
 
-	private static WorkFolderManager instance = null;
+	//private static WorkFolderManager instance = null;
+
 
 	private Path workfolder;
 	private Path errorfolder;
-
 
 	@Autowired
 	public WorkFolderManager(GeneralConfigService generalConfiguration) throws ConfigurationException {
