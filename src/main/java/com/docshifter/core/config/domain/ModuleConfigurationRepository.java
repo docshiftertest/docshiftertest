@@ -10,7 +10,6 @@ import java.util.List;
  */
 @Repository
 public interface ModuleConfigurationRepository extends CrudRepository<ModuleConfiguration, Long> {
-    
 
 
     List<ModuleConfiguration> findByModuleId(long id);
@@ -20,4 +19,6 @@ public interface ModuleConfigurationRepository extends CrudRepository<ModuleConf
     List<ModuleConfiguration> findByModule(Module module);
 
     List<ModuleConfiguration> findByModuleType(String type);
+
+
 }
