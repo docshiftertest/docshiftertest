@@ -5,13 +5,19 @@
     <groupId>com.docshifter</groupId>
     <artifactId>beans</artifactId>
     <version>6.0-SNAPSHOT</version>
-    <description></description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.5.1.RELEASE</version>
     </parent>
+    <properties>
+        <hsqldb.version>2.3.4</hsqldb.version>
+        <maven.compile.source>1.8</maven.compile.source>
+        <maven.compile.target>1.8</maven.compile.target>
+        <maven.test.failure.ignore>true</maven.test.failure.ignore>
+    </properties>
+
 
     <distributionManagement>
         <repository>
@@ -56,17 +62,15 @@
         <dependency>
             <groupId>com.docbyte</groupId>
             <artifactId>utils</artifactId>
-            <version>0.3</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.10</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>3.2.2</version>
         </dependency>
         <dependency>
             <groupId>commons-configuration</groupId>
@@ -76,7 +80,6 @@
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
-            <version>1.4</version>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -101,18 +104,12 @@
         <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
-            <version>1.6</version>
         </dependency>
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>2.3.4</version>
         </dependency>
-        <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>1.4.5</version>
-        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -164,7 +161,8 @@
                     <excludes>
                         <exclude>**/application.properties</exclude>
                     </excludes>
-                    <finalName>docshifter-beans-${project.version}</finalName>
+                    <jarName>docshifter-beans</jarName>
+                    <classifier>${project.version}</classifier>
                     <outputDirectory>${project.build.directory}/jars/</outputDirectory>
                 </configuration>
             </plugin>
