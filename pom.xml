@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+<project xmlns="http://maven.apache.org/POM/4.0.0">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.docshifter</groupId>
     <artifactId>beans</artifactId>
     <version>6.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
     <description></description>
-<name>docshifter-beans</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>LATEST</version>
+        <version>1.5.1.RELEASE</version>
     </parent>
-
 
     <distributionManagement>
         <repository>
@@ -99,12 +96,7 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging-api</artifactId>
-            <version>1.1</version>
+            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>commons-pool</groupId>
@@ -116,89 +108,46 @@
             <artifactId>hsqldb</artifactId>
             <version>2.3.4</version>
         </dependency>
-		<dependency>
-			<groupId>org.mariadb.jdbc</groupId>
-			<artifactId>mariadb-java-client</artifactId>
-			<version>1.4.5</version>
-		</dependency>
-
-        <!-- TODO: check updates -->
         <dependency>
-            <groupId>org.glassfish.mq</groupId>
-            <artifactId>imq</artifactId>
-            <version>5.1</version>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>1.4.5</version>
         </dependency>
-        <dependency>
-            <groupId>org.glassfish.mq</groupId>
-            <artifactId>imqjmx</artifactId>
-            <version>5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.jms</groupId>
-            <artifactId>javax.jms-api</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.senn.magic</groupId>
-            <artifactId>senn-magic</artifactId>
-            <version>3.5</version>
-        </dependency>
-
-        <!-- SPRING -->
-
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
-            <version>LATEST</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>LATEST</version>
         </dependency>
-
-
-
         <dependency>
             <groupId>org.springframework.amqp</groupId>
             <artifactId>spring-rabbit</artifactId>
-            <version>LATEST</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>LATEST</version>
         </dependency>
-
-        <!-- Testing dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-rest-core</artifactId>
-			<version>LATEST</version>
-		</dependency>
-
-        <!-- errorfix entitymanager bean -->
-
         <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-        <version>1.5.1.RELEASE</version>
-    </dependency>
-        <!-- end errorfix -->
-
-	</dependencies>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-rest-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+    </dependencies>
 
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -211,52 +160,33 @@
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.6</version>
-
                 <configuration>
+                    <excludes>
+                        <exclude>**/application.properties</exclude>
+                    </excludes>
+                    <finalName>docshifter-beans-${project.version}</finalName>
                     <outputDirectory>${project.build.directory}/jars/</outputDirectory>
                 </configuration>
             </plugin>
-
-            <!-- Obfuscating the code -->
-            <!-- <plugin>
-                 <groupId>com.github.wvengen</groupId>
-                 <artifactId>proguard-maven-plugin</artifactId>
-                 <executions>
-                     <execution>
-                         <id>docshifter-beans-pro</id>
-                         <phase>package</phase>
-                         <goals>
-                             <goal>proguard</goal>
-                         </goals>
-                         <configuration>
-                             <maxMemory>1024m</maxMemory>
-                             <injar>jars/docshifter-beans-${project.version}.jar</injar>
-                             <proguardInclude>${basedir}/src/main/assembly/proguard.conf</proguardInclude>
-                         </configuration>
-                     </execution>
-                 </executions>
-             </plugin>-->
-
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.5.3</version>
-                <configuration>
-                    <finalName>Docshifter</finalName>
-                    <descriptors>
-                        <descriptor>src/main/assembly/assembly.xml</descriptor>
-                    </descriptors>
-                </configuration>
                 <executions>
                     <execution>
                         <id>make-assembly</id>
-                        <!-- this is used for inheritance merges -->
                         <phase>package</phase>
-                        <!-- bind to the packaging phase -->
                         <goals>
                             <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <finalName>Docshifter-Beans</finalName>
+                    <descriptors>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+
             </plugin>
         </plugins>
     </build>
