@@ -15,14 +15,14 @@ public class Node {
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private long id;
 
-	@ManyToOne
+	@ManyToOne(cascade=CascadeType.ALL)
 	@JsonIgnore
 	private Node parentNode;
 
 	@OneToMany(mappedBy = "parentNode")
 	private Set<Node> childNodes=null;
 
-	@ManyToOne
+	@ManyToOne(cascade=CascadeType.ALL)
 	private ModuleConfiguration moduleConfiguration;
 	
 	public Node(){}

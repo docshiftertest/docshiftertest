@@ -15,6 +15,8 @@ public class Module {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	private String name;
+
+	@Column(unique = true)
 	private String classname;
 	private String description;
 	private String type;
@@ -22,7 +24,7 @@ public class Module {
 	private String inputFiletype;
 	private String outputFileType;
 
-	@ManyToMany
+	@ManyToMany(cascade=CascadeType.ALL)
 	@JoinTable(name = "moduleparams",
 			joinColumns = {	@JoinColumn(name = "module") },
 			inverseJoinColumns = { @JoinColumn(name = "param") })
