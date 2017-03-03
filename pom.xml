@@ -161,8 +161,7 @@
                     <excludes>
                         <exclude>**/application.properties</exclude>
                     </excludes>
-                    <jarName>docshifter-beans</jarName>
-                    <classifier>${project.version}</classifier>
+                    <finalName>docshifter-beans-${project.version}</finalName>
                     <outputDirectory>${project.build.directory}/jars/</outputDirectory>
                 </configuration>
             </plugin>
