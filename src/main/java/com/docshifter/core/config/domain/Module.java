@@ -24,7 +24,7 @@ public class Module {
 	private String inputFiletype;
 	private String outputFileType;
 
-	@ManyToMany(cascade=CascadeType.ALL)
+	@ManyToMany
 	@JoinTable(name = "moduleparams",
 			joinColumns = {	@JoinColumn(name = "module") },
 			inverseJoinColumns = { @JoinColumn(name = "param") })

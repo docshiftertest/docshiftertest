@@ -15,14 +15,15 @@ public class Node {
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private long id;
 
-	@ManyToOne(cascade=CascadeType.ALL)
-	@JsonIgnore
+	@ManyToOne
+	@JsonIgnore()
 	private Node parentNode;
 
-	@OneToMany(mappedBy = "parentNode")
+	//@OneToMany(mappedBy = "parentNode")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "parentNode", cascade = CascadeType.ALL)
 	private Set<Node> childNodes=null;
 
-	@ManyToOne(cascade=CascadeType.ALL)
+	@ManyToOne
 	private ModuleConfiguration moduleConfiguration;
 	
 	public Node(){}

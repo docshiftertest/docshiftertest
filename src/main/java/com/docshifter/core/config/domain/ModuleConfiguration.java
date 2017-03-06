@@ -18,7 +18,7 @@ public class ModuleConfiguration {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@ManyToOne(cascade=CascadeType.ALL)
+	@ManyToOne
 	private Module module;
 	private String name;
 	private String description;
