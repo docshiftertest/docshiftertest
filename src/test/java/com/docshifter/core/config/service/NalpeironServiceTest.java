@@ -11,6 +11,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -32,13 +35,20 @@ public class NalpeironServiceTest {
     @Test
     public void initialTest() {
 
+        String moduleId = "FSIN";
+
         long[] fid = {0L};
 
+        Map<String, Object> testClientData = new HashMap<>();
+
+        testClientData.put("moduleId", moduleId);
+        testClientData.put("mapTest", new boolean[]{true, false, true, true});
+
         try {
-            nalpeironService.validateAndStartModule("DCTMI", fid);
-            nalpeironService.endModule("DCTMI", fid);
+            nalpeironService.validateAndStartModule(moduleId, fid);
+            nalpeironService.endModule(moduleId, testClientData, fid);
         }catch (DocShifterLicenceException ex) {
-            fail("Module could not be accessed: " + ex);
+            fail("Module could not be accessed: " + ex.getMessage());
         }
     }
 

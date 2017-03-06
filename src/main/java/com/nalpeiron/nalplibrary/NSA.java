@@ -87,7 +87,7 @@ public class NSA
 		//Nalp's library uses UTF-8 internally
 		try
 		{
-			return new String(nsaVersion, 0, i, "UTF-8");
+			return new String(nsaVersion, 0, nsaVersion.length, "UTF-8");
 		}
 		catch (UnsupportedEncodingException e)
 		{
@@ -121,7 +121,7 @@ public class NSA
 		//Nalp's library uses UTF-8 internally
 		try
 		{
-			return new String(nsaHostName, 0, i, "UTF-8");
+			return new String(nsaHostName, 0, nsaHostName.length, "UTF-8");
 		}
 		catch (UnsupportedEncodingException e)
 		{
@@ -543,7 +543,7 @@ public class NSA
 		//Nalp's library uses UTF-8 internally
 		try
 		{
-			return new String(nsaStats, 0, i, "UTF-8");
+			return new String(nsaStats, 0, nsaStats.length, "UTF-8");
 		}
 		catch (UnsupportedEncodingException e)
 		{

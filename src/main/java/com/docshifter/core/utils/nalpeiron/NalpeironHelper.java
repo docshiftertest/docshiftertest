@@ -2,12 +2,21 @@ package com.docshifter.core.utils.nalpeiron;
 
 import com.docbyte.utils.Logger;
 import com.docshifter.core.exceptions.DocShifterLicenceException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nalpeiron.nalplibrary.NALP;
 import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
 import com.nalpeiron.nalplibrary.NalpError;
 import org.springframework.context.ApplicationContext;
 
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,15 +28,20 @@ public class NalpeironHelper {
     private final NSA nsa;
     private final NSL nsl;
 
+    private final String workDir;
+
     private ApplicationContext applicationContext;
 
     private final ScheduledExecutorService licenceValidationScheduler = Executors.newSingleThreadScheduledExecutor();
 
-    public NalpeironHelper(ApplicationContext applicationContext, NALP nalp, NSA nsa, NSL nsl) {
+    public NalpeironHelper(ApplicationContext applicationContext, NALP nalp, NSA nsa, NSL nsl, String workDir) {
 
         this.nalp = nalp;
         this.nsa = nsa;
         this.nsl = nsl;
+
+        this.workDir = workDir;
+
         this.applicationContext = applicationContext;
     }
 
@@ -55,7 +69,7 @@ public class NalpeironHelper {
 
     public void validateLicenceAndInitiatePeriodicChecking() {
         //validate the licence and start the periodic checking
-        NalpeironLicenseValidator validator = new NalpeironLicenseValidator(this);
+        NalpeironLicenseValidator validator = new NalpeironLicenseValidator(this, resolveLicenseNo());
         validator.validateLicenceStatus();
         licenceValidationScheduler.scheduleAtFixedRate(validator, 1, 1, TimeUnit.HOURS);
     }
@@ -77,7 +91,7 @@ public class NalpeironHelper {
 
 
     public enum FeatureStatus {
-        SHOWERRORS(0x01, ""),
+        //SHOWERRORS(0x01, ""),
         EXPIRED(-5, "Feature request but license expired"),
         UNAUTHORIZED(-4, "Feature not authorized for use"),
         DENIED(-3, "Feature request denied"),
@@ -114,7 +128,7 @@ public class NalpeironHelper {
 
 
     public enum PoolStatus {
-        SHOWERRORS(0x01, ""),
+        //SHOWERRORS(0x01, ""),
         EXPIRED(-5, "Element request but license expired"),
         UNAUTHORIZED(-4, "Element not authorized for use"),
         DENIED(-3, "Element request denied"),
@@ -151,7 +165,7 @@ public class NalpeironHelper {
 
 
     public enum LicenseStatus {
-        SHOWERRORS(0x01, ""),
+        //SHOWERRORS(0x01, ""),
         // [Description("Undetermined")]
         PRODUNDETERMINED(0, ""),
         // [Description("Authorized")]
@@ -485,13 +499,15 @@ public class NalpeironHelper {
         }
     }
 
-    public void importCertificate(String licenseNo, String cert) throws DocShifterLicenceException {
+    public LicenseStatus importCertificate(String licenseNo, String cert) throws DocShifterLicenceException {
         try {
             int i = nsl.callNSLImportCertificate(licenseNo, cert);
 
             if (i < 0) {
                 throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLImportCertificate"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
+
+            return LicenseStatus.getLicenseStatus(i);
         } catch (NalpError error) {
             throw new DocShifterLicenceException(error);
         }
@@ -738,14 +754,14 @@ public class NalpeironHelper {
         }
     }
 
-    public void stopFeature(String Username, String FeatureCode, String clientData, long[] fid) throws DocShifterLicenceException {
+    public void stopFeature(String Username, String FeatureCode, Map<String, Object> clientData, long[] fid) throws DocShifterLicenceException {
         try {
-            int i = nsa.callNSAFeatureStop(Username, FeatureCode, clientData, fid);
+            int i = nsa.callNSAFeatureStop(Username, FeatureCode, new ObjectMapper().writeValueAsString(clientData), fid);
 
             if (i < 0) {
                 throw new DocShifterLicenceException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAFeatureStop"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
-        } catch (NalpError error) {
+        } catch (NalpError | JsonProcessingException error) {
             throw new DocShifterLicenceException(error);
         }
     }
@@ -846,6 +862,57 @@ public class NalpeironHelper {
             return i;
         } catch (NalpError error) {
             throw new DocShifterLicenceException(error);
+        }
+    }
+
+    public String getLicenseNumber() {
+        return nsl.NSLGetLicNo();
+    }
+
+    public String resolveLicenseNo() {
+        String licenseCode = null;
+        try {
+            byte[] bytes = Files.readAllBytes(Paths.get( workDir +"DSLicenseCode.txt"));
+            licenseCode = new String(bytes, Charset.defaultCharset());
+        } catch (Exception e) {
+            licenseCode = getLicenseCode();
+        } finally {
+            return licenseCode == null ? "" : licenseCode;
+        }
+    }
+
+    public String resolveLicenseActivationRequest() {
+        String activationRequest = null;
+        try {
+            byte[] bytes = Files.readAllBytes(Paths.get( workDir +"DSLicenseActivationRequest.txt"));
+            activationRequest = new String(bytes, Charset.defaultCharset());
+        } catch (Exception e) {
+            activationRequest = "";
+        } finally {
+            return activationRequest;
+        }
+    }
+
+    public String resolveLicenseActivationAnswer() {
+        String ActivationAnswer = null;
+        try {
+            byte[] bytes = Files.readAllBytes(Paths.get( workDir + "DSLicenseActivationAnswer.txt"));
+            ActivationAnswer = new String(bytes, Charset.defaultCharset());
+        } catch (Exception e) {
+            ActivationAnswer = "";
+        } finally {
+            return ActivationAnswer;
+        }
+    }
+
+    public void writeLicenseActivationRequest(String licenseActivationRequest) throws DocShifterLicenceException {
+
+        try {
+            Path outputFilePath = new File(workDir + "DSLicenseActivationRequest.txt").toPath();
+            byte[] bytes = licenseActivationRequest.getBytes(Charset.defaultCharset());
+            Files.write(outputFilePath, bytes, StandardOpenOption.CREATE);
+        } catch (Exception e) {
+            throw new DocShifterLicenceException("Could not write the licenseActivationRequest code to file");
         }
     }
 }

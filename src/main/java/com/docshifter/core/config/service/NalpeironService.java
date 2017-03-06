@@ -16,14 +16,15 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class NalpeironService {
 
     //These private ints are unique to your product and must
     // be set here to the values corresponding to your product.
-    private static final int customerID = 4854;
-    private static final int productID = 102;
+    private static final int customerID = 4863;
+    private static final int productID = 100; // last 5 digits of 6561300100
     private static final int AUTH_X = 375; // N{5...499}
     private static final int AUTH_Y = 648; // N{501...999}
     private static final int AUTH_Z = 263; // N{233...499}
@@ -31,10 +32,17 @@ public class NalpeironService {
 
     //TODO: fill in some sensible values
     public static final String NALPEIRON_USERNAME = "";
-    private static final String APP_LANGUAGE = "en-US";
-    private static final String VERSION = "6.0-alpha";
-    private static final String EDITION = "DEV";
-    private static final String BUILD = "local";
+
+    @Value("${docshifter.applang:}")
+    private String APP_LANGUAGE;
+    @Value("${build.version:DEV")
+    private String VERSION;
+    @Value("${docshifter.edition:DEV}")
+    private String EDITION;
+    @Value("${build.version:DEV}")
+    private String BUILD;
+
+    //TODO: asses what this does and add sensible data
     private static final String LICENCE_STAT = "???";
 
     private static NalpeironHelper helper;
@@ -47,7 +55,7 @@ public class NalpeironService {
     @Value("${nalpeiron.loglevel:6}")
     private int LogLevel; // set log level, please see documentation
     @Value("${nalpeiron.oflinemode:0}")
-    private int OfflineMode; // Select Offline mode, please see documentation
+    private int OfflineMode; // Select Offline mode, please see documentation, only for analytics, licensing will always access internet when available
     @Value("${nalpeiron.maxlogqueue:300}")
     private int LogQLen; // please see documentation
     @Value("${nalpeiron.maxchachequeue:35}")
@@ -73,7 +81,7 @@ public class NalpeironService {
     @Value("${nalpeiron.daemonpassword:}")
     private String DaemonPass; //Daemon Password
     @Value("${nalpeiron.workdir:./license/}")
-    private String WorkDir;// Workfolder for
+    private String WorkDir;// Workfolder for nalpeiron license and cache files
     private final boolean NSAEnable = true; // Enable Analytics
     private final boolean NSLEnable = true; // Enable Licensing
 
@@ -89,9 +97,10 @@ public class NalpeironService {
     @PostConstruct
     private void init() {
         try {
+            //Test if the DLL is present
             NalpeironHelper.dllTest();
         } catch (DocShifterLicenceException e) {
-            Logger.fatal("nalpjava library could not be found", e);
+            Logger.fatal("nalpjava library could not be found, or the manifest could not be read", e);
             SpringApplication.exit(applicationContext); //TODO; define error code
         }
         openValidateNalpeironLibrary();
@@ -112,9 +121,9 @@ public class NalpeironService {
             //Licensing functions
             NSL nsl = new NSL(nalp, offset);
 
-            helper = new NalpeironHelper(applicationContext, nalp, nsa, nsl);
+            helper = new NalpeironHelper(applicationContext, nalp, nsa, nsl, WorkDir);
 
-            helper.openNalpLibriray("./bin/docShifterFileCheck.dll", NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
+            helper.openNalpLibriray(WorkDir + "docShifterFileCheck.dll", NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
 
             //Turn end user privacy off
             helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
@@ -145,14 +154,14 @@ public class NalpeironService {
         }
 
         //At this point we have access to the feature.  do some analytics
-        helper.startFeature(NALPEIRON_USERNAME, moduleId, CLIENT_DATA, fid);
+        helper.startFeature(NALPEIRON_USERNAME, moduleId, "<firstname>Joe</firstname><lastname>Bloggs</lastname><field1>field1data</field1>", fid);
 
         return fid;
     }
 
-    public void endModule(String moduleId, long[] fid) throws DocShifterLicenceException {
+    public void endModule(String moduleId, Map<String, Object> clientData, long[] fid) throws DocShifterLicenceException {
         //call end feature
-        helper.stopFeature(NALPEIRON_USERNAME, moduleId, CLIENT_DATA, fid);
+        helper.stopFeature(NALPEIRON_USERNAME, moduleId, clientData, fid);
     }
 
     @Override
