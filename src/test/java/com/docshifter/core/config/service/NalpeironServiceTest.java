@@ -35,7 +35,7 @@ public class NalpeironServiceTest {
     @Test
     public void initialTest() {
 
-        String moduleId = "FSIN";
+        String moduleId = "PVEE";
 
         long[] fid = {0L};
 

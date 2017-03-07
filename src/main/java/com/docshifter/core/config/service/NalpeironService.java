@@ -35,11 +35,11 @@ public class NalpeironService {
 
     @Value("${docshifter.applang:}")
     private String APP_LANGUAGE;
-    @Value("${build.version:DEV")
+    @Value("${docshifter.version:DEV")
     private String VERSION;
     @Value("${docshifter.edition:DEV}")
     private String EDITION;
-    @Value("${build.version:DEV}")
+    @Value("${docshifter.build:DEV}")
     private String BUILD;
 
     //TODO: asses what this does and add sensible data
@@ -154,7 +154,7 @@ public class NalpeironService {
         }
 
         //At this point we have access to the feature.  do some analytics
-        helper.startFeature(NALPEIRON_USERNAME, moduleId, "<firstname>Joe</firstname><lastname>Bloggs</lastname><field1>field1data</field1>", fid);
+        helper.startFeature(NALPEIRON_USERNAME, moduleId, CLIENT_DATA, fid);
 
         return fid;
     }

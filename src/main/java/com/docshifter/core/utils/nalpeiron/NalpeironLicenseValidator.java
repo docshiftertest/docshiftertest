@@ -17,7 +17,7 @@ public class NalpeironLicenseValidator implements Runnable {
     }
 
     @Override
-    public void run() {
+    public final void run() {
         validateLicenceStatus();
     }
 
