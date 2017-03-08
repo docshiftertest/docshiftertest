@@ -15,7 +15,8 @@ public class Node {
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private long id;
 
-	@ManyToOne
+	@ManyToOne()
+	//@ManyToOne(cascade = CascadeType.REMOVE)
 	@JsonIgnore()
 	private Node parentNode;
 
@@ -24,6 +25,7 @@ public class Node {
 	private Set<Node> childNodes=null;
 
 	@ManyToOne
+	//@ManyToOne(cascade = CascadeType.REMOVE)
 	private ModuleConfiguration moduleConfiguration;
 	
 	public Node(){}
