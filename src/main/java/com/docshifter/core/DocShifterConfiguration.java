@@ -79,4 +79,10 @@ public class DocShifterConfiguration {
 	public FanoutExchange reloadExchange() {
 		return new FanoutExchange(Constants.RELOAD_QUEUE);
 	}
+
+	@Bean
+	public Queue syncQueue() {
+		return new Queue(Constants.SYNC_QUEUE);
+
+	}
 }
