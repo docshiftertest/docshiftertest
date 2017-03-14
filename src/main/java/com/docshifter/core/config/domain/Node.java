@@ -15,8 +15,8 @@ public class Node {
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private long id;
 
-	@ManyToOne()
-	//@ManyToOne(cascade = CascadeType.REMOVE)
+	//@ManyToOne()
+	@ManyToOne(cascade = CascadeType.REMOVE)
 	@JsonIgnore()
 	private Node parentNode;
 
@@ -24,8 +24,8 @@ public class Node {
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "parentNode", cascade = CascadeType.ALL)
 	private Set<Node> childNodes=null;
 
-	@ManyToOne
-	//@ManyToOne(cascade = CascadeType.REMOVE)
+	//@ManyToOne
+	@ManyToOne(cascade = CascadeType.REMOVE)
 	private ModuleConfiguration moduleConfiguration;
 	
 	public Node(){}
