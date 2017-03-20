@@ -23,7 +23,9 @@ import org.springframework.stereotype.Repository;
 
 import javax.naming.ConfigurationException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
@@ -71,7 +73,10 @@ public class DocShifterConfiguration {
 
 	@Bean
 	public Queue defaultQueue() {
-	return new Queue(generalConfigService.getString(Constants.MQ_QUEUE));
+		Map<String, Object> args = new HashMap<>();
+		args.put("x-max-priority", 4);
+
+		return new Queue(generalConfigService.getString(Constants.MQ_QUEUE), true, false, false, args);
 
 	}
 
