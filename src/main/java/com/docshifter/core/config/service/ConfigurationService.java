@@ -56,6 +56,9 @@ public class ConfigurationService {
 //		List<Node> list = nodeDAO.getEnabledSenderConfigurations();
 		//TODO is this working?
 		List<Node> list = nodeRepository.getEnabledSenderConfigurations();
+
+
+
 		for(Node n : list)
 			set.add(new SenderConfigurationWrapper(n, chainConfigurationRepository));
 		return set;
