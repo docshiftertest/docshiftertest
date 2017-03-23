@@ -14,4 +14,5 @@ public class Constants {
 
 
     public final static String RELOAD_QUEUE = "docshifterReload";
+	public final static String SYNC_QUEUE = "docshifterSync";
 }

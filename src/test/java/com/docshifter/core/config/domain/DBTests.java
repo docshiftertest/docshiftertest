@@ -102,7 +102,6 @@ public class DBTests {
 		m12 = new Module("testmodule12" + millis, "testmodule12" + millis, "testsmodule12" + millis, "input", null, null);
 
 
-
 		Map<Parameter, String> map0 = new HashMap<Parameter, String>();
 		map0.put(p1, "parameter0");
 		Map<Parameter, String> map1 = new HashMap<Parameter, String>();
@@ -136,6 +135,18 @@ public class DBTests {
 		mc12 = new ModuleConfiguration(m2, "testsconf12" + millis, "testconfiguration12" + millis, map2);
 
 
+
+		m1 = moduleRepository.save(m1);
+		m2 = moduleRepository.save(m2);
+		m4 = moduleRepository.save(m4);
+		m7 = moduleRepository.save(m7);
+		m8 = moduleRepository.save(m8);
+		m9 = moduleRepository.save(m9);
+		m10 = moduleRepository.save(m10);
+		m11 = moduleRepository.save(m11);
+		m12 = moduleRepository.save(m12);
+
+
 		p1 = parameterRepository.save(p1);
 		p2 = parameterRepository.save(p2);
 		p3 = parameterRepository.save(p3);
@@ -149,16 +160,6 @@ public class DBTests {
 		p14 = parameterRepository.save(p14);
 		p15 = parameterRepository.save(p15);
 		p16 = parameterRepository.save(p16);
-
-		m1 = moduleRepository.save(m1);
-		m2 = moduleRepository.save(m2);
-		m4 = moduleRepository.save(m4);
-		m7 = moduleRepository.save(m7);
-		m8 = moduleRepository.save(m8);
-		m9 = moduleRepository.save(m9);
-		m10 = moduleRepository.save(m10);
-		m11 = moduleRepository.save(m11);
-		m12 = moduleRepository.save(m12);
 
 
 		moduleConfigurationRepository.save(mc1);
@@ -178,16 +179,16 @@ public class DBTests {
 		n4 = new Node(null, mc4);
 		n7 = new Node(null, mc7);
 
-		nodeRepository.save(n1);
-		nodeRepository.save(n2);
-		nodeRepository.save(n3);
-		nodeRepository.save(n4);
-		nodeRepository.save(n7);
 
 		chc1 = new ChainConfiguration("testchain", "desc", true, n1, null, null, null,null,null);
 
 		chainConfigurationRepository.save(chc1);
 
+		nodeRepository.save(n1);
+		nodeRepository.save(n2);
+		nodeRepository.save(n3);
+		nodeRepository.save(n4);
+		nodeRepository.save(n7);
 
 	}
 }

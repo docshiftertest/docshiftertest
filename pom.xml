@@ -42,7 +42,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-
     </repositories>
 
     <pluginRepositories>
@@ -58,6 +57,7 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
+
     <dependencies>
         <dependency>
             <groupId>com.docbyte</groupId>

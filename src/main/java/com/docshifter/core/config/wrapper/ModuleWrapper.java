@@ -100,5 +100,8 @@ public class ModuleWrapper {
 		this.description = description;
 	}
 
-	
+
+	public Map<String,String> getParamMap() {
+		return this.params;
+	}
 }
