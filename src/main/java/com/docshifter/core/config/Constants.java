@@ -13,4 +13,5 @@ public class Constants {
 	public final static String OPENOFFICE_PORT = " ";
 
 
+    public final static String RELOAD_QUEUE = "docshifterReload";
 }

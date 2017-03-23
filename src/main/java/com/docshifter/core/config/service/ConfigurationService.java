@@ -8,6 +8,7 @@ import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +30,7 @@ public class ConfigurationService {
 	private ModuleRepository moduleRepository;
 	private ModuleConfigurationRepository moduleConfigurationRepository;
 	private GeneralConfigService generalConfigService;
+
 
 	@Autowired
 	public ConfigurationService(NodeRepository nodeRepository, ChainConfigurationRepository chainConfigurationRepository, ModuleRepository moduleRepository, ModuleConfigurationRepository moduleConfigurationRepository, GeneralConfigService generalConfigService) {

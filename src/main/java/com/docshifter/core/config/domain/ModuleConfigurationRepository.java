@@ -12,5 +12,13 @@ import java.util.List;
 public interface ModuleConfigurationRepository extends CrudRepository<ModuleConfiguration, Long> {
 
 
-	List<ModuleConfiguration> findByModule(Module module);
+    List<ModuleConfiguration> findByModuleId(long id);
+
+    ModuleConfiguration findByName(String name);
+
+    List<ModuleConfiguration> findByModule(Module module);
+
+    List<ModuleConfiguration> findByModuleType(String type);
+
+
 }

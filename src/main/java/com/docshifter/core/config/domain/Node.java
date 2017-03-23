@@ -1,6 +1,8 @@
 package com.docshifter.core.config.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,13 +15,17 @@ public class Node {
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private long id;
 
-	@ManyToOne
+	//@ManyToOne()
+	@ManyToOne(cascade = CascadeType.REMOVE)
+	@JsonIgnore()
 	private Node parentNode;
 
-	@OneToMany(mappedBy = "parentNode")
+	//@OneToMany(mappedBy = "parentNode")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "parentNode", cascade = CascadeType.ALL)
 	private Set<Node> childNodes=null;
 
-	@ManyToOne
+	//@ManyToOne
+	@ManyToOne(cascade = CascadeType.REMOVE)
 	private ModuleConfiguration moduleConfiguration;
 	
 	public Node(){}

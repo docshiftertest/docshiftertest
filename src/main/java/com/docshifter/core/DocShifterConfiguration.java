@@ -5,6 +5,8 @@ import com.docshifter.core.config.service.ConfigurationService;
 import com.docshifter.core.config.service.GeneralConfigService;
 import com.docshifter.core.config.service.NalpeironService;
 import com.docshifter.core.work.WorkFolderManager;
+import org.springframework.amqp.core.Exchange;
+import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -76,5 +78,8 @@ public class DocShifterConfiguration {
 
     }
 
-
+	@Bean
+	public FanoutExchange reloadExchange() {
+		return new FanoutExchange(Constants.RELOAD_QUEUE);
+	}
 }

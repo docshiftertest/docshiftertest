@@ -13,9 +13,6 @@
             <includes>
                 <include>*.jar</include>
             </includes>
-            <excludes>
-                <exclude>*proguard_base.jar</exclude>
-            </excludes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}</directory>
@@ -31,19 +28,15 @@
                 <include>dummyfile</include>
             </includes>
         </fileSet>
-        <fileSet>
-            <directory>${project.basedir}</directory>
-            <outputDirectory>/</outputDirectory>
-            <includes>
-                <include>notification.properties</include>
-            </includes>
-        </fileSet>
     </fileSets>
     <dependencySets>
         <dependencySet>
-            <outputDirectory>/lib</outputDirectory>
+            <outputDirectory>lib</outputDirectory>
             <useProjectArtifact>true</useProjectArtifact>
             <scope>runtime</scope>
+            <excludes>
+                <exclude>com.docshifter</exclude>
+            </excludes>
         </dependencySet>
     </dependencySets>
 </assembly>

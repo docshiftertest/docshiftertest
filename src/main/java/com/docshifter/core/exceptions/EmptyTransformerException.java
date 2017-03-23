@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.docbyte.docshifter.receiver.utils;
+package com.docshifter.core.exceptions;
 
 /**
  * @author dieter.verlinde

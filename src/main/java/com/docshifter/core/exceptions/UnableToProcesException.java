@@ -1,4 +1,4 @@
-package com.docbyte.docshifter.utils.exceptions;
+package com.docshifter.core.exceptions;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 4/13/15.
