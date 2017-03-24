@@ -7,6 +7,7 @@ import com.nalpeiron.nalplibrary.NALP;
 import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
 import com.nalpeiron.nalplibrary.NalpError;
+import org.apache.commons.lang.SystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -123,7 +124,17 @@ public class NalpeironService {
 
             helper = new NalpeironHelper(applicationContext, nalp, nsa, nsl, WorkDir);
 
-            helper.openNalpLibriray(WorkDir + "docShifterFileCheck.dll", NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
+            String dllName = "docShifterFileCheck.";
+            if (SystemUtils.IS_OS_UNIX) {
+                dllName += "so";
+            } else if (SystemUtils.IS_OS_WINDOWS) {
+                dllName += "dll";
+            } else {
+                Logger.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application", null);
+                SpringApplication.exit(applicationContext); //TODO; define error code
+            }
+
+            helper.openNalpLibriray(WorkDir + dllName, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
 
             //Turn end user privacy off
             helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
