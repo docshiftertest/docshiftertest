@@ -124,17 +124,19 @@ public class NalpeironService {
 
             helper = new NalpeironHelper(applicationContext, nalp, nsa, nsl, WorkDir);
 
-            String dllName = "docShifterFileCheck.";
+            String dllPath = WorkDir + "docShifterFileCheck.";
             if (SystemUtils.IS_OS_UNIX) {
-                dllName += "so";
+                dllPath += "so";
             } else if (SystemUtils.IS_OS_WINDOWS) {
-                dllName += "dll";
+                dllPath += "dll";
             } else {
                 Logger.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application", null);
                 SpringApplication.exit(applicationContext); //TODO; define error code
             }
 
-            helper.openNalpLibriray(WorkDir + dllName, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
+            Logger.debug("using " + dllPath + "as the nalpeiron connection dll", null);
+
+            helper.openNalpLibriray(dllPath, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
 
             //Turn end user privacy off
             helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
@@ -149,7 +151,7 @@ public class NalpeironService {
                     EDITION, BUILD, LICENCE_STAT, CLIENT_DATA);
 
         } catch (DocShifterLicenceException | NalpError e) {
-            Logger.fatal("error inn docshifter licence processing", e);
+            Logger.fatal("error in docshifter licence processing", e);
             SpringApplication.exit(applicationContext); //TODO; define error code
         }
     }
