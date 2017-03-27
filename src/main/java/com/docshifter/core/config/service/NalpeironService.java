@@ -122,11 +122,16 @@ public class NalpeironService {
                 Logger.debug("nalpeiron core dll found", null);
 
             } catch (DocShifterLicenceException e) {
+                int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
                 Logger.fatal("nalpjava library could not be found, or the manifest could not be read", e);
-                SpringApplication.exit(applicationContext); //TODO; define error code
+                SpringApplication.exit(applicationContext, () -> errorCode);
+
+                Logger.debug("exited Spring app, doing system.exit()", null);
+
+                System.exit(errorCode);
             }
 
-            Logger.debug("Openimg nalpeiron library", null);
+            Logger.debug("Opening nalpeiron library", null);
 
             openValidateNalpeironLibrary();
         }
@@ -168,11 +173,16 @@ public class NalpeironService {
             } else if (SystemUtils.IS_OS_WINDOWS) {
                 dllPath += "dll";
             } else {
+                int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
                 Logger.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application", null);
-                SpringApplication.exit(applicationContext); //TODO; define error code
+                SpringApplication.exit(applicationContext, () -> errorCode);
+
+                Logger.debug("exited Spring app, doing system.exit()", null);
+
+                System.exit(errorCode);
             }
 
-            Logger.debug("using " + dllPath + "as the nalpeiron connection dll", null);
+            Logger.debug("using '" + dllPath + "' as the nalpeiron connection dll", null);
 
             helper.openNalpLibriray(dllPath, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
 
@@ -189,8 +199,11 @@ public class NalpeironService {
                     EDITION, BUILD, LICENCE_STAT, CLIENT_DATA);
 
         } catch (DocShifterLicenceException | NalpError e) {
+            int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
             Logger.fatal("error in docshifter licence processing. Could not complete openening and validating Nalpeiron Library.", e);
-            SpringApplication.exit(applicationContext); //TODO; define error code
+            SpringApplication.exit(applicationContext, () -> errorCode);
+
+            System.exit(errorCode);
         }
     }
 

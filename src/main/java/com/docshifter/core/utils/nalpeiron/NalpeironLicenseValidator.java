@@ -94,13 +94,23 @@ public class NalpeironLicenseValidator implements Runnable {
                 String testfield = nalpeironHelper.getUDFValue("testfield");
             } else {
                 // license could not be validate, close application
+                int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
                 Logger.info("license could not be validated, closing application", null);
-                SpringApplication.exit(nalpeironHelper.getApplicationContext());
+                SpringApplication.exit(nalpeironHelper.getApplicationContext(), () -> errorCode);
+
+                Logger.debug("exited Spring app, doing system.exit()", null);
+
+                System.exit(errorCode);
             }
 
         } catch (DocShifterLicenceException ex) {
+            int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
             Logger.fatal("Exception while trying to validate the nalpeiron license, closing the application", ex);
-            SpringApplication.exit(nalpeironHelper.getApplicationContext());
+            SpringApplication.exit(nalpeironHelper.getApplicationContext(), () -> errorCode);
+
+            Logger.debug("exited Spring app, doing system.exit()", null);
+
+            System.exit(errorCode);
         }
     }
 }
