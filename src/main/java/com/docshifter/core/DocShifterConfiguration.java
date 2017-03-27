@@ -21,7 +21,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
@@ -72,10 +74,12 @@ public class DocShifterConfiguration {
         return queueList;
     }
 
-    @Bean
-    public Queue defaultQueue() {
-        return new Queue(generalConfigService.getString(Constants.MQ_QUEUE));
+	@Bean
+	public Queue defaultQueue() {
+		Map<String, Object> args = new HashMap<>();
+		args.put("x-max-priority", 4);
 
+		return new Queue(generalConfigService.getString(Constants.MQ_QUEUE), true, false, false, args);
     }
 
 	@Bean

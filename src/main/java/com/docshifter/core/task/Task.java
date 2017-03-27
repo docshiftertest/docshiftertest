@@ -19,6 +19,7 @@ import java.util.Map;
 public class Task implements Serializable {
 
 	private static final long serialVersionUID = 4087826709318179760L;
+	protected String id;
 	protected WorkFolder workFolder;
 	protected Path sourceFilePath;
 	protected String name;
@@ -114,5 +115,13 @@ public class Task implements Serializable {
 
 	public void addData(String identifier, Object dataObject){
 		data.put(identifier, dataObject);
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 }
