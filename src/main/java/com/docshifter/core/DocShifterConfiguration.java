@@ -71,22 +71,15 @@ public class DocShifterConfiguration {
         List<Queue> queueList = new ArrayList<>();
         queueList.add(defaultQueue());
 
-<<<<<<< HEAD
+        return queueList;
+    }
+
 	@Bean
 	public Queue defaultQueue() {
 		Map<String, Object> args = new HashMap<>();
 		args.put("x-max-priority", 4);
 
 		return new Queue(generalConfigService.getString(Constants.MQ_QUEUE), true, false, false, args);
-=======
-        return queueList;
-    }
->>>>>>> major/6.0
-
-    @Bean
-    public Queue defaultQueue() {
-        return new Queue(generalConfigService.getString(Constants.MQ_QUEUE));
-
     }
 
 	@Bean
