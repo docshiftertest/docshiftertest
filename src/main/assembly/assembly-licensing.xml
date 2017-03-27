@@ -1,0 +1,29 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+    <id>Core</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>${project.basedir}/license</directory>
+            <outputDirectory>/lib</outputDirectory>
+            <includes>
+                <include>nalpjava.dll</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/license</directory>
+            <outputDirectory>/licensing</outputDirectory>
+            <includes>
+                <include>docShifterFileCheck.DLL</include>
+                <include>docShifterFileCheck.so</include>
+                <include>DSLicenseActivationAnswer.txt</include>
+                <include>DSLicenseActivationRequest.txt</include>
+                <include>DSLicenseCode.txt</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

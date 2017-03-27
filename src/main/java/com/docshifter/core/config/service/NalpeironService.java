@@ -104,7 +104,7 @@ public class NalpeironService {
 
         Logger.debug("using active profile: " + activeProfile, null);
 
-        if (!activeProfile.equalsIgnoreCase("receiver")) {
+        if (activeProfile == null || !activeProfile.equalsIgnoreCase("receiver")) {
             Logger.debug("active profile is not receiver, will not initialize and validate the nalpeiron licensing service", null);
         } else {
 
