@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -97,14 +98,41 @@ public class NalpeironService {
     //TODO: LOGGING
     @PostConstruct
     private void init() {
-        try {
-            //Test if the DLL is present
-            NalpeironHelper.dllTest();
-        } catch (DocShifterLicenceException e) {
-            Logger.fatal("nalpjava library could not be found, or the manifest could not be read", e);
-            SpringApplication.exit(applicationContext); //TODO; define error code
+        Logger.debug("|===========================| NALPEIRON SERVICE INIT START |===========================|", null);
+
+        String activeProfile = System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME);
+
+        Logger.debug("using active profile: " + activeProfile, null);
+
+        if (!activeProfile.equalsIgnoreCase("receiver")) {
+            Logger.debug("active profile is not receiver, will not initialize and validate the nalpeiron licensing service", null);
+        } else {
+
+
+            if (!(WorkDir.endsWith("/") || WorkDir.endsWith("\\"))) {
+                WorkDir += "/";
+            }
+
+            Logger.debug("using nalpeiron workdir: " + WorkDir, null);
+
+            try {
+                //Test if the DLL is present
+                NalpeironHelper.dllTest();
+
+                Logger.debug("nalpeiron core dll found", null);
+
+            } catch (DocShifterLicenceException e) {
+                Logger.fatal("nalpjava library could not be found, or the manifest could not be read", e);
+                SpringApplication.exit(applicationContext); //TODO; define error code
+            }
+
+            Logger.debug("Openimg nalpeiron library", null);
+
+            openValidateNalpeironLibrary();
         }
-        openValidateNalpeironLibrary();
+
+        Logger.debug("|===========================| NALPEIRON SERVICE INIT FINISHED |===========================|", null);
+
     }
 
     private final void openValidateNalpeironLibrary() {
@@ -113,16 +141,26 @@ public class NalpeironService {
             int security = 1 + (int) (Math.random() * (501));
             int offset = AUTH_X + ((security * AUTH_Y) % AUTH_Z);
 
+            Logger.debug("generated security params for nalpeiron", null);
+
             //Library open, close and error handling
             NALP nalp = new NALP();
+
+            Logger.debug("opened NALP()", null);
 
             //Analytics functions
             NSA nsa = new NSA(nalp);
 
+            Logger.debug("opened NSA()", null);
+
             //Licensing functions
             NSL nsl = new NSL(nalp, offset);
 
+            Logger.debug("opened NSL()", null);
+
             helper = new NalpeironHelper(applicationContext, nalp, nsa, nsl, WorkDir);
+
+            Logger.debug("initialized NalpeironHelper", null);
 
             String dllPath = WorkDir + "docShifterFileCheck.";
             if (SystemUtils.IS_OS_UNIX) {
@@ -151,7 +189,7 @@ public class NalpeironService {
                     EDITION, BUILD, LICENCE_STAT, CLIENT_DATA);
 
         } catch (DocShifterLicenceException | NalpError e) {
-            Logger.fatal("error in docshifter licence processing", e);
+            Logger.fatal("error in docshifter licence processing. Could not complete openening and validating Nalpeiron Library.", e);
             SpringApplication.exit(applicationContext); //TODO; define error code
         }
     }
