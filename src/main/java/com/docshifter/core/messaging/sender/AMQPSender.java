@@ -31,7 +31,7 @@ public class AMQPSender implements IMessageSender {
 	}
 
 
-	private void sendTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task, int priority) throws Exception {
+	private void sendTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task, int priority)  {
 		DocshifterMessage message=new DocshifterMessage(
 				type,
 				task,
@@ -45,11 +45,11 @@ public class AMQPSender implements IMessageSender {
 		});
 	}
 
-	private void sendTask(DocshifterMessageType type, long chainConfigurationID, Task task, int priority) throws Exception {
+	private void sendTask(DocshifterMessageType type, long chainConfigurationID, Task task, int priority)  {
 		sendTask(type, docshifterQueue.getName(), chainConfigurationID, task, priority);
 	}
 
-	private void sendTask(DocshifterMessageType type, Task task, int priority) throws Exception {
+	private void sendTask(DocshifterMessageType type, Task task, int priority)  {
 		sendTask(type, docshifterQueue.getName(), 0, task, priority);
 	}
 
@@ -63,42 +63,42 @@ public class AMQPSender implements IMessageSender {
 	}
 
 	@Override
-	public void sendTask(long chainConfigurationID, Task task) throws Exception {
+	public void sendTask(long chainConfigurationID, Task task)  {
 		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfigurationID, task, DEFAULT_PRIORITY);
 	}
 
 	@Override
-	public void sendDocumentumTask(long chainConfigurationID, Task task) throws Exception {
+	public void sendDocumentumTask(long chainConfigurationID, Task task)  {
 		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfigurationID, task, DEFAULT_PRIORITY);
 	}
 
 	@Override
-	public void sendPrintTask(Task task) throws Exception {
+	public void sendPrintTask(Task task)  {
 		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), 0, task, DEFAULT_PRIORITY);
 	}
 
 	@Override
-	public void sendTask(String queueName, Task task) throws Exception {
+	public void sendTask(String queueName, Task task)  {
 		sendTask(DocshifterMessageType.DEFAULT, queueName, 0, task, DEFAULT_PRIORITY);
 	}
 
 	@Override
-	public void sendTask(long chainConfigurationID, Task task, int priority) throws Exception {
+	public void sendTask(long chainConfigurationID, Task task, int priority)  {
 		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfigurationID, task, priority);
 	}
 
 	@Override
-	public void sendDocumentumTask(long chainConfigurationID, Task task, int priority) throws Exception {
+	public void sendDocumentumTask(long chainConfigurationID, Task task, int priority)  {
 		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfigurationID, task, priority);
 	}
 
 	@Override
-	public void sendPrintTask(Task task, int priority) throws Exception {
+	public void sendPrintTask(Task task, int priority)  {
 		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), 0, task, priority);
 	}
 
 	@Override
-	public void sendTask(String queueName, Task task, int priority) throws Exception {
+	public void sendTask(String queueName, Task task, int priority)  {
 		sendTask(DocshifterMessageType.DEFAULT, queueName, 0, task, priority);
 	}
 

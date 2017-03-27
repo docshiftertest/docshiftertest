@@ -41,6 +41,9 @@ public class DocShifterConfiguration {
 	@Autowired
 	public ConfigurationService configurationService;
 
+	@Autowired
+	public WorkFolderManager workFolderManager;
+
 
 	@Bean
 	public ConnectionFactory connectionFactory() {
