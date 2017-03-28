@@ -1,7 +1,7 @@
 package com.docshifter.core.utils.nalpeiron;
 
 import com.docbyte.utils.Logger;
-import com.docshifter.core.exceptions.DocShifterLicenceException;
+import com.docshifter.core.exceptions.DocShifterLicenseException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.boot.SpringApplication;
 
@@ -18,25 +18,25 @@ public class NalpeironLicenseValidator implements Runnable {
 
     @Override
     public final void run() {
-        validateLicenceStatus();
+        validateLicenseStatus();
     }
 
-    public final void validateLicenceStatus() {
+    public final void validateLicenseStatus() {
         try {
 
             boolean validLicense = false;
 
-            NalpeironHelper.LicenseStatus licenceStatus = nalpeironHelper.getLicenseStatus();
+            NalpeironHelper.LicenseStatus licenseStatus = nalpeironHelper.getLicenseStatus();
             //log status
-            Logger.info("NALPlicence validation returned status: " + licenceStatus.toString(), null);
+            Logger.info("NALPlicense validation returned status: " + licenseStatus.toString(), null);
 
             //if the license status ha s value below 0, then the current license could not validate, try getting a new one
-            if (licenceStatus.getValue() < 0) {
+            if (licenseStatus.getValue() < 0) {
                 //test for online connection
                 boolean hasConnection = true;
                 try {
                     nalpeironHelper.testNalpeironLicencingConnection();
-                } catch (DocShifterLicenceException e) {
+                } catch (DocShifterLicenseException e) {
                     hasConnection = false;
                 }
 
@@ -44,10 +44,10 @@ public class NalpeironLicenseValidator implements Runnable {
                     // DO ONLINE CHECKING
 
                     // get a license with the supplied license code
-                    licenceStatus = nalpeironHelper.getLicense(licenseNo, ""); //TODO define what has to happen with the XML REG INFO
+                    licenseStatus = nalpeironHelper.getLicense(licenseNo, ""); //TODO define what has to happen with the XML REG INFO
 
                     //if the license status ha s value below 0, then the current license could not validate, try getting a new one
-                    if (licenceStatus.getValue() < 0) {
+                    if (licenseStatus.getValue() < 0) {
                         // license activation failed.
                         Logger.info("The license could not be activated online, or your trial has expired", null);
                         validLicense = false;
@@ -60,10 +60,10 @@ public class NalpeironLicenseValidator implements Runnable {
                     String activationAnswer = nalpeironHelper.resolveLicenseActivationAnswer();
 
                     if (!StringUtils.isBlank(activationAnswer)) {
-                       licenceStatus = nalpeironHelper.importCertificate(licenseNo, activationAnswer);
+                       licenseStatus = nalpeironHelper.importCertificate(licenseNo, activationAnswer);
 
                         //if the license status ha s value below 0, then the current license could not validate, try getting a new one
-                        if (licenceStatus.getValue() < 0) {
+                        if (licenseStatus.getValue() < 0) {
                             // license import failed.
                             Logger.info("The license could not be imported", null);
                             validLicense = false;
@@ -103,7 +103,7 @@ public class NalpeironLicenseValidator implements Runnable {
                 System.exit(errorCode);
             }
 
-        } catch (DocShifterLicenceException ex) {
+        } catch (DocShifterLicenseException ex) {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
             Logger.fatal("Exception while trying to validate the nalpeiron license, closing the application", ex);
             SpringApplication.exit(nalpeironHelper.getApplicationContext(), () -> errorCode);

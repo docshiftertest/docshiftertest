@@ -1,7 +1,7 @@
 package com.docshifter.core.config.service;
 
 import com.docbyte.utils.Logger;
-import com.docshifter.core.exceptions.DocShifterLicenceException;
+import com.docshifter.core.exceptions.DocShifterLicenseException;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import com.nalpeiron.nalplibrary.NALP;
 import com.nalpeiron.nalplibrary.NSA;
@@ -45,7 +45,7 @@ public class NalpeironService {
     private String BUILD;
 
     //TODO: asses what this does and add sensible data
-    private static final String LICENCE_STAT = "???";
+    private static final String LICENSE_STAT = "???";
 
     private static NalpeironHelper helper;
 
@@ -88,7 +88,7 @@ public class NalpeironService {
     private final boolean NSLEnable = true; // Enable Licensing
 
     public static final List<NalpeironHelper.FeatureStatus> VALID_FEATURE_STATUS = Arrays.asList(NalpeironHelper.FeatureStatus.AUTHORIZED);
-    public static final List<NalpeironHelper.LicenseStatus> VALID_LICENCE_STATUS = Arrays.asList(NalpeironHelper.LicenseStatus.PROD_AUTHORIZED, NalpeironHelper.LicenseStatus.PROD_INTRIAL, NalpeironHelper.LicenseStatus.PROD_NETWORK, NalpeironHelper.LicenseStatus.PROD_NETWORK_LTCO);
+    public static final List<NalpeironHelper.LicenseStatus> VALID_LICENSE_STATUS = Arrays.asList(NalpeironHelper.LicenseStatus.PROD_AUTHORIZED, NalpeironHelper.LicenseStatus.PROD_INTRIAL, NalpeironHelper.LicenseStatus.PROD_NETWORK, NalpeironHelper.LicenseStatus.PROD_NETWORK_LTCO);
 
     @Autowired
     public NalpeironService(ApplicationContext applicationContext) {
@@ -121,7 +121,7 @@ public class NalpeironService {
 
                 Logger.debug("nalpeiron core dll found", null);
 
-            } catch (DocShifterLicenceException e) {
+            } catch (DocShifterLicenseException e) {
                 int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
                 Logger.fatal("nalpjava library could not be found, or the manifest could not be read", e);
                 SpringApplication.exit(applicationContext, () -> errorCode);
@@ -191,28 +191,28 @@ public class NalpeironService {
 
             helper.validateLibrary(customerID, productID);
 
-            helper.validateLicenceAndInitiatePeriodicChecking();
+            helper.validateLicenseAndInitiatePeriodicChecking();
 
             //At this point we have a license, so start analytics
             helper.startAnalyticsApp(NALPEIRON_USERNAME, CLIENT_DATA, aid);
             helper.sendAnalyticsSystemInfo(NALPEIRON_USERNAME, APP_LANGUAGE, VERSION,
-                    EDITION, BUILD, LICENCE_STAT, CLIENT_DATA);
+                    EDITION, BUILD, LICENSE_STAT, CLIENT_DATA);
 
-        } catch (DocShifterLicenceException | NalpError e) {
+        } catch (DocShifterLicenseException | NalpError e) {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            Logger.fatal("error in docshifter licence processing. Could not complete openening and validating Nalpeiron Library.", e);
+            Logger.fatal("error in docshifter license processing. Could not complete openening and validating Nalpeiron Library.", e);
             SpringApplication.exit(applicationContext, () -> errorCode);
 
             System.exit(errorCode);
         }
     }
 
-    public long[] validateAndStartModule(String moduleId, long[] fid) throws DocShifterLicenceException {
+    public long[] validateAndStartModule(String moduleId, long[] fid) throws DocShifterLicenseException {
         NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(moduleId);
 
         if (!VALID_FEATURE_STATUS.contains(featureStatus)) {
             String errorMessage = "feature could not be activated. The feature status is: " + featureStatus.name() + ". Blocking acces to module: " + moduleId;
-            DocShifterLicenceException ex = new DocShifterLicenceException(errorMessage);
+            DocShifterLicenseException ex = new DocShifterLicenseException(errorMessage);
             Logger.info(errorMessage, ex);
             throw ex;
         }
@@ -223,7 +223,7 @@ public class NalpeironService {
         return fid;
     }
 
-    public void endModule(String moduleId, Map<String, Object> clientData, long[] fid) throws DocShifterLicenceException {
+    public void endModule(String moduleId, Map<String, Object> clientData, long[] fid) throws DocShifterLicenseException {
         //call end feature
         helper.stopFeature(NALPEIRON_USERNAME, moduleId, clientData, fid);
     }
@@ -232,8 +232,8 @@ public class NalpeironService {
     protected void finalize() throws Throwable {
         super.finalize();
 
-        //Stop the licenceValidationScheduler
-        helper.stopLicenceValidationScheduler();
+        //Stop the licenseValidationScheduler
+        helper.stopLicenseValidationScheduler();
 
         //End analytics
         helper.stopAnalyticsApp(NALPEIRON_USERNAME, CLIENT_DATA, aid);

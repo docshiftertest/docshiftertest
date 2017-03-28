@@ -1,7 +1,7 @@
 package com.docshifter.core.config.service;
 
 import com.docshifter.core.TestController;
-import com.docshifter.core.exceptions.DocShifterLicenceException;
+import com.docshifter.core.exceptions.DocShifterLicenseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ public class NalpeironServiceTest {
         try {
             nalpeironService.validateAndStartModule(moduleId, fid);
             nalpeironService.endModule(moduleId, testClientData, fid);
-        }catch (DocShifterLicenceException ex) {
+        }catch (DocShifterLicenseException ex) {
             fail("Module could not be accessed: " + ex.getMessage());
         }
     }
