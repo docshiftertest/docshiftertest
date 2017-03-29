@@ -1,7 +1,6 @@
 package com.docshifter.core.utils.nalpeiron;
 
 import com.docbyte.utils.Logger;
-import com.docshifter.core.config.service.NalpeironService;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.boot.SpringApplication;
@@ -26,43 +25,45 @@ public class NalpeironLicenseValidator implements Runnable {
         try {
             boolean validLicense = false;
 
-            NalpeironHelper.LicenseStatus licenseStatus = nalpeironHelper.getLicenseStatus();
-            //log status
-            Logger.info("Current license status is: " + licenseStatus.toString(), null);
+            //test for online connection
+            boolean hasConnection = true;
+            try {
+                nalpeironHelper.testNalpeironLicencingConnection();
+            } catch (DocShifterLicenseException e) {
+                hasConnection = false;
+            }
 
-            //if the license status ha s value below 0, then the current license could not validate, try getting a new one
-            if (licenseStatus.getValue() < 0) {
-                Logger.info("Invalid license. Trying to activate the license", null);
+            NalpeironHelper.LicenseStatus licenseStatus;
 
-                //test for online connection
-                boolean hasConnection = true;
-                try {
-                    nalpeironHelper.testNalpeironLicencingConnection();
-                } catch (DocShifterLicenseException e) {
-                    hasConnection = false;
-                }
+            if (hasConnection) {
+                // ALWAYS DO ONLINE CHECKING WHEN HAVING CONNECTION
 
-                if (hasConnection) {
-                    // DO ONLINE CHECKING
+                // get a license with the supplied license code
+                licenseStatus = nalpeironHelper.getLicense(licenseNo, ""); //TODO define what has to happen with the XML REG INFO
 
-                    // get a license with the supplied license code
-                    licenseStatus = nalpeironHelper.getLicense(licenseNo, ""); //TODO define what has to happen with the XML REG INFO
-
-                    //if the license status ha s value below 0, then the current license could not validate, try getting a new one
-                    if (licenseStatus.getValue() < 0) {
-                        // license activation failed.
-                        Logger.info("The license could not be activated online, or your trial has expired", null);
-                        validLicense = false;
-                    } else {
-                        Logger.info("The license has been activated online, or your trial is active", null);
-                        validLicense = true;
-                    }
+                //if the license status ha s value below 0, then the current license could not validate, try getting a new one
+                if (licenseStatus.getValue() < 0) {
+                    // license activation failed.
+                    Logger.info("The license could not be activated online, or your trial has expired", null);
+                    validLicense = false;
                 } else {
-                    //DO OFFLINE CHECKING
+                    Logger.info("The license has been activated online, or your trial is active", null);
+                    validLicense = true;
+                }
+            } else {
+                //DO OFFLINE CHECKING
+
+                licenseStatus = nalpeironHelper.getLicenseStatus();
+                //log status
+                Logger.info("Current license status is: " + licenseStatus.toString(), null);
+
+                //if the license status ha s value below 0, then the current license could not validate, try activating or generating an offline activation request
+                if (licenseStatus.getValue() < 0) {
+                    Logger.info("Invalid license. Trying to activate the license", null);
                     String activationAnswer = nalpeironHelper.resolveLicenseActivationAnswer();
 
                     if (!StringUtils.isBlank(activationAnswer)) {
-                       licenseStatus = nalpeironHelper.importCertificate(licenseNo, activationAnswer);
+                        licenseStatus = nalpeironHelper.importCertificate(licenseNo, activationAnswer);
 
                         //if the license status ha s value below 0, then the current license could not validate, try getting a new one
                         if (licenseStatus.getValue() < 0) {
@@ -74,9 +75,9 @@ public class NalpeironLicenseValidator implements Runnable {
                             validLicense = true;
                         }
                     } else {
-                       String activationRequest = nalpeironHelper.resolveLicenseActivationRequest();
+                        String activationRequest = nalpeironHelper.resolveLicenseActivationRequest();
 
-                       //if the current activation request is empty, or the file does not exist create it
+                        //if the current activation request is empty, or the file does not exist create it
                         if (StringUtils.isBlank(activationRequest)) {
                             activationRequest = nalpeironHelper.getActivationCertificateRequest(licenseNo, ""); //TODO define what has to happen with the XML REG INFO
 
@@ -86,9 +87,9 @@ public class NalpeironLicenseValidator implements Runnable {
                         Logger.info("The license needs be activated offline, or you need to have an active internet connection. Activation request code written to DSLicenseActivationRequest.txt", null);
                         validLicense = false;
                     }
+                } else {
+                    validLicense = true;
                 }
-            } else {
-                validLicense = true;
             }
 
             if (validLicense) {
