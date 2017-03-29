@@ -56,7 +56,7 @@ public class NalpeironService {
     // Advanced settings, for normal operation leave as defaults
     @Value("${nalpeiron.loglevel:6}")
     private int LogLevel; // set log level, please see documentation
-    @Value("${nalpeiron.oflinemode:0}")
+    @Value("${nalpeiron.oflinemode:1}")
     private int OfflineMode; // Select Offline mode, please see documentation, only for analytics, licensing will always access internet when available
     @Value("${nalpeiron.maxlogqueue:300}")
     private int LogQLen; // please see documentation
@@ -198,6 +198,8 @@ public class NalpeironService {
             helper.sendAnalyticsSystemInfo(NALPEIRON_USERNAME, APP_LANGUAGE, VERSION,
                     EDITION, BUILD, LICENSE_STAT, CLIENT_DATA);
 
+            helper.sendAnalyticsAndInitiatePeriodicReporting();
+
         } catch (DocShifterLicenseException | NalpError e) {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
             Logger.fatal("error in docshifter license processing. Could not complete openening and validating Nalpeiron Library.", e);
@@ -234,6 +236,9 @@ public class NalpeironService {
 
         //Stop the licenseValidationScheduler
         helper.stopLicenseValidationScheduler();
+
+        //Stop the analyticsSenderScheduler
+        helper.stopAnalyticsSenderScheduler();
 
         //End analytics
         helper.stopAnalyticsApp(NALPEIRON_USERNAME, CLIENT_DATA, aid);

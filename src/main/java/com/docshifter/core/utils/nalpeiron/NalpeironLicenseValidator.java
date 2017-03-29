@@ -1,6 +1,7 @@
 package com.docshifter.core.utils.nalpeiron;
 
 import com.docbyte.utils.Logger;
+import com.docshifter.core.config.service.NalpeironService;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.boot.SpringApplication;
@@ -23,15 +24,16 @@ public class NalpeironLicenseValidator implements Runnable {
 
     public final void validateLicenseStatus() {
         try {
-
             boolean validLicense = false;
 
             NalpeironHelper.LicenseStatus licenseStatus = nalpeironHelper.getLicenseStatus();
             //log status
-            Logger.info("NALPlicense validation returned status: " + licenseStatus.toString(), null);
+            Logger.info("Current license status is: " + licenseStatus.toString(), null);
 
             //if the license status ha s value below 0, then the current license could not validate, try getting a new one
             if (licenseStatus.getValue() < 0) {
+                Logger.info("Invalid license. Trying to activate the license", null);
+
                 //test for online connection
                 boolean hasConnection = true;
                 try {
@@ -65,10 +67,10 @@ public class NalpeironLicenseValidator implements Runnable {
                         //if the license status ha s value below 0, then the current license could not validate, try getting a new one
                         if (licenseStatus.getValue() < 0) {
                             // license import failed.
-                            Logger.info("The license could not be imported", null);
+                            Logger.info("The license could not be activated offline, import of DSLicenseActivationAnswer.txt failed", null);
                             validLicense = false;
                         } else {
-                            Logger.info("The license has been imported", null);
+                            Logger.info("The license has been activated offline, import of DSLicenseActivationAnswer.txt successful", null);
                             validLicense = true;
                         }
                     } else {
@@ -81,7 +83,8 @@ public class NalpeironLicenseValidator implements Runnable {
                             nalpeironHelper.writeLicenseActivationRequest(activationRequest);
                         }
 
-                       validLicense = false;
+                        Logger.info("The license needs be activated offline, or you need to have an active internet connection. Activation request code written to DSLicenseActivationRequest.txt", null);
+                        validLicense = false;
                     }
                 }
             } else {
