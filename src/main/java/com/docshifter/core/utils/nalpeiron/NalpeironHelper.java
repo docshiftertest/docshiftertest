@@ -26,8 +26,8 @@ import java.util.concurrent.TimeUnit;
 
 public class NalpeironHelper {
 
-    private final int cachingDurationMinutes = 58;
-    private final int licenseDurationMinutes = 30;
+    private final int cachingDurationMinutes = 30;
+    private final int licenseDurationMinutes = 58;
 
     private final NALP nalp;
     private final NSA nsa;
