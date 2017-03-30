@@ -9,6 +9,7 @@ import com.nalpeiron.nalplibrary.NALP;
 import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
 import com.nalpeiron.nalplibrary.NalpError;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;
@@ -24,6 +25,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class NalpeironHelper {
+
+    private final int cachingDurationMinutes = 58;
+    private final int licenseDurationMinutes = 30;
 
     private final NALP nalp;
     private final NSA nsa;
@@ -74,7 +78,7 @@ public class NalpeironHelper {
         //validate the license and start the periodic checking
         NalpeironLicenseValidator validator = new NalpeironLicenseValidator(this, resolveLicenseNo());
         validator.validateLicenseStatus();
-        licenseValidationScheduler.scheduleAtFixedRate(validator, 1, 1, TimeUnit.MINUTES);
+        licenseValidationScheduler.scheduleAtFixedRate(validator, 1, licenseDurationMinutes, TimeUnit.MINUTES);
     }
 
     public void stopAnalyticsSenderScheduler() {
@@ -86,7 +90,7 @@ public class NalpeironHelper {
     public void sendAnalyticsAndInitiatePeriodicReporting() {
         NalpeironAnalyticsSender sender = new NalpeironAnalyticsSender(this, NalpeironService.NALPEIRON_USERNAME);
         sender.run();
-        analyticsSenderScheduler.scheduleAtFixedRate(sender, 1, 1, TimeUnit.MINUTES);
+        analyticsSenderScheduler.scheduleAtFixedRate(sender, 1, cachingDurationMinutes, TimeUnit.MINUTES);
     }
 
     public static void dllTest() throws DocShifterLicenseException {
