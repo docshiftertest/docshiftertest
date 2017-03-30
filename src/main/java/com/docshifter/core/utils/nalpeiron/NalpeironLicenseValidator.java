@@ -94,8 +94,6 @@ public class NalpeironLicenseValidator implements Runnable {
 
             if (validLicense) {
                 //process extra fields after validationg license
-                String cpus = nalpeironHelper.getUDFValue("cpus");
-                String testfield = nalpeironHelper.getUDFValue("testfield");
             } else {
                 // license could not be validate, close application
                 int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
