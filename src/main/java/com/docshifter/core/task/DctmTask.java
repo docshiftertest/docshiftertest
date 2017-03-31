@@ -73,5 +73,10 @@ public class DctmTask extends Task {
 	public void setTask_id(String task_id) {
 		this.task_id = task_id;
 	}
+
+	@Override
+	public String toString() {
+		return "DCTM Item_ID = " + item_id;
+	}
 }
 

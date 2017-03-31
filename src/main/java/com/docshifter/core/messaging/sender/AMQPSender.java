@@ -1,13 +1,11 @@
 package com.docshifter.core.messaging.sender;
 
 import com.docbyte.utils.Logger;
-import com.docshifter.core.messaging.queue.sender.IMessageSender;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
+import com.docshifter.core.messaging.queue.sender.IMessageSender;
+import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.Task;
-import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -36,6 +34,36 @@ public class AMQPSender implements IMessageSender {
 				type,
 				task,
 				chainConfigurationID);
+
+		Logger.debug("type=" + type.name(), null);
+		Logger.debug("task=" + task.getId(), null);
+
+		if (task == null){
+			Logger.debug("task=NULL ERROR", null);
+		}
+		Logger.debug("chainConfigID=" + chainConfigurationID, null);
+
+		Logger.info("Sending message: " + message.toString()+" for file: "+task.getSourceFilePath(),null);
+
+		rabbitTemplate.convertAndSend(queue, message, message1 -> {
+			message1.getMessageProperties().setPriority(priority);
+			return message1;
+		});
+	}
+
+	private void sendTask(DocshifterMessageType type, String queue, long chainConfigurationID, DctmTask task, int priority)  {
+		DocshifterMessage message=new DocshifterMessage(
+				type,
+				task,
+				chainConfigurationID);
+
+		Logger.debug("type=" + type.name(), null);
+		Logger.debug("task=" + task.getId(), null);
+
+		if (task == null){
+			Logger.debug("task=NULL ERROR", null);
+		}
+		Logger.debug("chainConfigID=" + chainConfigurationID, null);
 
 		Logger.info("Sending message: " + message.toString()+" for file: "+task.getSourceFilePath(),null);
 
@@ -68,8 +96,8 @@ public class AMQPSender implements IMessageSender {
 	}
 
 	@Override
-	public void sendDocumentumTask(long chainConfigurationID, Task task)  {
-		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfigurationID, task, DEFAULT_PRIORITY);
+	public void sendDocumentumTask(long chainConfigurationID, DctmTask task)  {
+		sendTask(DocshifterMessageType.DCTM, docshifterQueue.getName(), chainConfigurationID, task, DEFAULT_PRIORITY);
 	}
 
 	@Override
@@ -88,8 +116,8 @@ public class AMQPSender implements IMessageSender {
 	}
 
 	@Override
-	public void sendDocumentumTask(long chainConfigurationID, Task task, int priority)  {
-		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfigurationID, task, priority);
+	public void sendDocumentumTask(long chainConfigurationID, DctmTask task, int priority)  {
+		sendTask(DocshifterMessageType.DCTM, docshifterQueue.getName(), chainConfigurationID, task, priority);
 	}
 
 	@Override

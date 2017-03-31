@@ -73,6 +73,7 @@ public class Task implements Serializable {
 
 	//temp to show sending a task through jms works (ObjectMessage)
 	public String toString() {
+
 		return sourceFilePath.toAbsolutePath().toString();
 	}
 
