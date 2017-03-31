@@ -98,7 +98,7 @@ public class NalpeironService {
     //TODO: LOGGING
     @PostConstruct
     private void init() {
-        Logger.debug("|===========================| NALPEIRON SERVICE INIT START |===========================|", null);
+        Logger.info("|===========================| LICENSING SERVICE INIT START |===========================|", null);
 
         String activeProfile = System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME);
 
@@ -136,7 +136,7 @@ public class NalpeironService {
             openValidateNalpeironLibrary();
         }
 
-        Logger.debug("|===========================| NALPEIRON SERVICE INIT FINISHED |===========================|", null);
+        Logger.info("|===========================| LICENSING SERVICE INIT FINISHED |===========================|", null);
 
     }
 
@@ -202,7 +202,7 @@ public class NalpeironService {
 
         } catch (DocShifterLicenseException | NalpError e) {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            Logger.fatal("error in docshifter license processing. Could not complete openening and validating Nalpeiron Library.", e);
+            Logger.fatal("error in docshifter license processing. Could not complete opening and validating Nalpeiron Library.", e);
             SpringApplication.exit(applicationContext, () -> errorCode);
 
             System.exit(errorCode);

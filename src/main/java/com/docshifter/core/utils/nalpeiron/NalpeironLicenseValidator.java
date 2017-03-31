@@ -59,7 +59,7 @@ public class NalpeironLicenseValidator implements Runnable {
 
                 //if the license status ha s value below 0, then the current license could not validate, try activating or generating an offline activation request
                 if (licenseStatus.getValue() < 0) {
-                    Logger.info("Invalid license. Trying to activate the license", null);
+                    Logger.info("License not activated. Trying to activate the license", null);
                     String activationAnswer = nalpeironHelper.resolveLicenseActivationAnswer();
 
                     if (!StringUtils.isBlank(activationAnswer)) {
