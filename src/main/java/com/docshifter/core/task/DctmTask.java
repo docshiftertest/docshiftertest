@@ -1,11 +1,17 @@
 package com.docshifter.core.task;
 
 import com.docshifter.core.work.WorkFolder;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import java.io.Serializable;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 9/6/16.
  */
-public class DctmTask extends Task {
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "className")
+public class DctmTask extends Task implements Serializable {
+
+
 
 	protected String event="";	//type of transformation request: default from dctm = "rendition"
 	protected String request="";	//transformation request: default from dctm= "rendition_req_ps_pdf"

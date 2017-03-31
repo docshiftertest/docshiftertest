@@ -51,28 +51,6 @@ public class AMQPSender implements IMessageSender {
 		});
 	}
 
-	private void sendTask(DocshifterMessageType type, String queue, long chainConfigurationID, DctmTask task, int priority)  {
-		DocshifterMessage message=new DocshifterMessage(
-				type,
-				task,
-				chainConfigurationID);
-
-		Logger.debug("type=" + type.name(), null);
-		Logger.debug("task=" + task.getId(), null);
-
-		if (task == null){
-			Logger.debug("task=NULL ERROR", null);
-		}
-		Logger.debug("chainConfigID=" + chainConfigurationID, null);
-
-		Logger.info("Sending message: " + message.toString()+" for file: "+task.getSourceFilePath(),null);
-
-		rabbitTemplate.convertAndSend(queue, message, message1 -> {
-			message1.getMessageProperties().setPriority(priority);
-			return message1;
-		});
-	}
-
 	private void sendTask(DocshifterMessageType type, long chainConfigurationID, Task task, int priority)  {
 		sendTask(type, docshifterQueue.getName(), chainConfigurationID, task, priority);
 	}

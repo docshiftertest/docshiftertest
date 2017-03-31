@@ -56,7 +56,10 @@ public class DocShifterConfiguration {
 
     @Bean
     public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
+		Jackson2JsonMessageConverter conv = new Jackson2JsonMessageConverter();
+
+
+		return conv;
     }
 
     @Bean

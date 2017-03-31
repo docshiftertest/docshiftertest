@@ -1,6 +1,7 @@
 package com.docshifter.core.task;
 
 import com.docshifter.core.work.WorkFolder;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.io.Serializable;
 import java.nio.file.Path;
@@ -16,6 +17,7 @@ import java.util.Map;
  * Last Modification Date: $Date$
  *
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "className")
 public class Task implements Serializable {
 
 	private static final long serialVersionUID = 4087826709318179760L;
