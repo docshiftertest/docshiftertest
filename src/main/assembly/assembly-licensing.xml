@@ -12,6 +12,7 @@
             <outputDirectory>/lib</outputDirectory>
             <includes>
                 <include>nalpjava.dll</include>
+                <include>libnalpjava.so</include>
             </includes>
         </fileSet>
         <fileSet>
