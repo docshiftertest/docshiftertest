@@ -7,6 +7,8 @@ import org.springframework.boot.SpringApplication;
 
 public class NalpeironLicenseValidator implements Runnable {
 
+    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NalpeironLicenseValidator.class.getName());
+
     private String licenseNo;
 
     private final NalpeironHelper nalpeironHelper;
@@ -44,10 +46,10 @@ public class NalpeironLicenseValidator implements Runnable {
                 //if the license status ha s value below 0, then the current license could not validate, try getting a new one
                 if (licenseStatus.getValue() < 0) {
                     // license activation failed.
-                    Logger.info("The license could not be activated online, or your trial has expired", null);
+                    logger.info("The license could not be activated online, or your trial has expired", null);
                     validLicense = false;
                 } else {
-                    Logger.info("The license has been activated online, or your trial is active", null);
+                    logger.info("The license has been activated online, or your trial is active", null);
                     validLicense = true;
                 }
             } else {
@@ -55,11 +57,11 @@ public class NalpeironLicenseValidator implements Runnable {
 
                 licenseStatus = nalpeironHelper.getLicenseStatus();
                 //log status
-                Logger.info("Current license status is: " + licenseStatus.toString(), null);
+                logger.info("Current license status is: " + licenseStatus.toString(), null);
 
                 //if the license status ha s value below 0, then the current license could not validate, try activating or generating an offline activation request
                 if (licenseStatus.getValue() < 0) {
-                    Logger.info("License not activated. Trying to activate the license", null);
+                    logger.info("License not activated. Trying to activate the license", null);
                     String activationAnswer = nalpeironHelper.resolveLicenseActivationAnswer();
 
                     if (!StringUtils.isBlank(activationAnswer)) {
@@ -68,10 +70,10 @@ public class NalpeironLicenseValidator implements Runnable {
                         //if the license status ha s value below 0, then the current license could not validate, try getting a new one
                         if (licenseStatus.getValue() < 0) {
                             // license import failed.
-                            Logger.info("The license could not be activated offline, import of DSLicenseActivationAnswer.txt failed", null);
+                            logger.info("The license could not be activated offline, import of DSLicenseActivationAnswer.txt failed", null);
                             validLicense = false;
                         } else {
-                            Logger.info("The license has been activated offline, import of DSLicenseActivationAnswer.txt successful", null);
+                            logger.info("The license has been activated offline, import of DSLicenseActivationAnswer.txt successful", null);
                             validLicense = true;
                         }
                     } else {
@@ -84,7 +86,7 @@ public class NalpeironLicenseValidator implements Runnable {
                             nalpeironHelper.writeLicenseActivationRequest(activationRequest);
                         }
 
-                        Logger.info("The license needs be activated offline, or you need to have an active internet connection. Activation request code written to DSLicenseActivationRequest.txt", null);
+                        logger.info("The license needs be activated offline, or you need to have an active internet connection. Activation request code written to DSLicenseActivationRequest.txt", null);
                         validLicense = false;
                     }
                 } else {
@@ -97,20 +99,20 @@ public class NalpeironLicenseValidator implements Runnable {
             } else {
                 // license could not be validate, close application
                 int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-                Logger.info("license could not be validated, closing application", null);
+                logger.info("license could not be validated, closing application", null);
                 SpringApplication.exit(nalpeironHelper.getApplicationContext(), () -> errorCode);
 
-                Logger.debug("exited Spring app, doing system.exit()", null);
+                logger.debug("exited Spring app, doing system.exit()", null);
 
                 System.exit(errorCode);
             }
 
         } catch (DocShifterLicenseException ex) {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            Logger.fatal("Exception while trying to validate the nalpeiron license, closing the application", ex);
+            logger.fatal("Exception while trying to validate the nalpeiron license, closing the application", ex);
             SpringApplication.exit(nalpeironHelper.getApplicationContext(), () -> errorCode);
 
-            Logger.debug("exited Spring app, doing system.exit()", null);
+            logger.debug("exited Spring app, doing system.exit()", null);
 
             System.exit(errorCode);
         }

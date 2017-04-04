@@ -1,6 +1,5 @@
 package com.docshifter.core.config.service;
 
-import com.docbyte.utils.Logger;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import com.nalpeiron.nalplibrary.NALP;
@@ -22,6 +21,8 @@ import java.util.Map;
 
 @Service
 public class NalpeironService {
+
+    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NalpeironService.class.getName());
 
     //These private ints are unique to your product and must
     // be set here to the values corresponding to your product.
@@ -98,14 +99,14 @@ public class NalpeironService {
     //TODO: LOGGING
     @PostConstruct
     private void init() {
-        Logger.info("|===========================| LICENSING SERVICE INIT START |===========================|", null);
+        logger.info("|===========================| LICENSING SERVICE INIT START |===========================|", null);
 
         String activeProfile = System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME);
 
-        Logger.debug("using active profile: " + activeProfile, null);
+        logger.debug("using active profile: " + activeProfile, null);
 
         if (activeProfile == null || !activeProfile.equalsIgnoreCase("receiver")) {
-            Logger.debug("active profile is not receiver, will not initialize and validate the nalpeiron licensing service", null);
+            logger.debug("active profile is not receiver, will not initialize and validate the nalpeiron licensing service", null);
         } else {
 
 
@@ -113,30 +114,30 @@ public class NalpeironService {
                 WorkDir += "/";
             }
 
-            Logger.debug("using nalpeiron workdir: " + WorkDir, null);
+            logger.debug("using nalpeiron workdir: " + WorkDir, null);
 
             try {
                 //Test if the DLL is present
                 NalpeironHelper.dllTest();
 
-                Logger.debug("nalpeiron core dll found", null);
+                logger.debug("nalpeiron core dll found", null);
 
             } catch (DocShifterLicenseException e) {
                 int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-                Logger.fatal("nalpjava library could not be found, or the manifest could not be read", e);
+                logger.fatal("nalpjava library could not be found, or the manifest could not be read", e);
                 SpringApplication.exit(applicationContext, () -> errorCode);
 
-                Logger.debug("exited Spring app, doing system.exit()", null);
+                logger.debug("exited Spring app, doing system.exit()", null);
 
                 System.exit(errorCode);
             }
 
-            Logger.debug("Opening nalpeiron library", null);
+            logger.debug("Opening nalpeiron library", null);
 
             openValidateNalpeironLibrary();
         }
 
-        Logger.info("|===========================| LICENSING SERVICE INIT FINISHED |===========================|", null);
+        logger.info("|===========================| LICENSING SERVICE INIT FINISHED |===========================|", null);
 
     }
 
@@ -146,26 +147,26 @@ public class NalpeironService {
             int security = 1 + (int) (Math.random() * (501));
             int offset = AUTH_X + ((security * AUTH_Y) % AUTH_Z);
 
-            Logger.debug("generated security params for nalpeiron", null);
+            logger.debug("generated security params for nalpeiron", null);
 
             //Library open, close and error handling
             NALP nalp = new NALP();
 
-            Logger.debug("opened NALP()", null);
+            logger.debug("opened NALP()", null);
 
             //Analytics functions
             NSA nsa = new NSA(nalp);
 
-            Logger.debug("opened NSA()", null);
+            logger.debug("opened NSA()", null);
 
             //Licensing functions
             NSL nsl = new NSL(nalp, offset);
 
-            Logger.debug("opened NSL()", null);
+            logger.debug("opened NSL()", null);
 
             helper = new NalpeironHelper(applicationContext, nalp, nsa, nsl, WorkDir);
 
-            Logger.debug("initialized NalpeironHelper", null);
+            logger.debug("initialized NalpeironHelper", null);
 
             String dllPath = WorkDir + "docShifterFileCheck.";
             if (SystemUtils.IS_OS_UNIX) {
@@ -174,15 +175,15 @@ public class NalpeironService {
                 dllPath += "dll";
             } else {
                 int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-                Logger.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application", null);
+                logger.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application", null);
                 SpringApplication.exit(applicationContext, () -> errorCode);
 
-                Logger.debug("exited Spring app, doing system.exit()", null);
+                logger.debug("exited Spring app, doing system.exit()", null);
 
                 System.exit(errorCode);
             }
 
-            Logger.debug("using '" + dllPath + "' as the nalpeiron connection dll", null);
+            logger.debug("using '" + dllPath + "' as the nalpeiron connection dll", null);
 
             helper.openNalpLibriray(dllPath, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
 
@@ -202,7 +203,7 @@ public class NalpeironService {
 
         } catch (DocShifterLicenseException | NalpError e) {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            Logger.fatal("error in docshifter license processing. Could not complete opening and validating Nalpeiron Library.", e);
+            logger.fatal("error in docshifter license processing. Could not complete opening and validating Nalpeiron Library.", e);
             SpringApplication.exit(applicationContext, () -> errorCode);
 
             System.exit(errorCode);
@@ -215,7 +216,7 @@ public class NalpeironService {
         if (!VALID_FEATURE_STATUS.contains(featureStatus)) {
             String errorMessage = "feature could not be activated. The feature status is: " + featureStatus.name() + ". Blocking acces to module: " + moduleId;
             DocShifterLicenseException ex = new DocShifterLicenseException(errorMessage);
-            Logger.info(errorMessage, ex);
+            logger.info(errorMessage, ex);
             throw ex;
         }
 
