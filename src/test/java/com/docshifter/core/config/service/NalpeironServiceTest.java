@@ -2,6 +2,8 @@ package com.docshifter.core.config.service;
 
 import com.docshifter.core.TestController;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.HashMap;
@@ -18,6 +21,7 @@ import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = TestController.class)
+@ActiveProfiles("licensing")
 public class NalpeironServiceTest {
 
     @Autowired
@@ -32,10 +36,11 @@ public class NalpeironServiceTest {
     }
 
 
+
     @Test
     public void initialTest() {
 
-        String moduleId = "PVEE";
+        String moduleId = "CSTM";
 
         long[] fid = {0L};
 

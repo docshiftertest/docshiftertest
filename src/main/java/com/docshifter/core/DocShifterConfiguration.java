@@ -40,9 +40,6 @@ public class DocShifterConfiguration {
     public ConfigurationService configurationService;
 
     @Autowired
-    public NalpeironService nalpeironService;
-
-    @Autowired
     public WorkFolderManager workFolderManager;
 
     @Bean
