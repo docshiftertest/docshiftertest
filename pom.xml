@@ -231,12 +231,9 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19.1</version>
                 <configuration>
-                    <systemPropertyVariables>
-                        <propertyName>java.library.path</propertyName>
-                        <buildDirectory>target/classes/license</buildDirectory>
-                    </systemPropertyVariables>
+                    <forkMode>once</forkMode>
+                    <argLine>-Djava.library.path=${project.build.directory}/classes/license/</argLine>
                 </configuration>
             </plugin>
         </plugins>
