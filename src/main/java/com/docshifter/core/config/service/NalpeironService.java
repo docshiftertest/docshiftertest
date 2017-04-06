@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.stereotype.Service;
 
@@ -20,237 +21,232 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Profile("licensing")
 public class NalpeironService {
 
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NalpeironService.class.getName());
+	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NalpeironService.class.getName());
 
-    //These private ints are unique to your product and must
-    // be set here to the values corresponding to your product.
-    private static final int customerID = 4863;
-    private static final int productID = 100; // last 5 digits of 6561300100
-    private static final int AUTH_X = 375; // N{5...499}
-    private static final int AUTH_Y = 648; // N{501...999}
-    private static final int AUTH_Z = 263; // N{233...499}
-    private static final String CLIENT_DATA = "";
+	//These private ints are unique to your product and must
+	// be set here to the values corresponding to your product.
+	private static final int customerID = 4863;
+	private static final int productID = 100; // last 5 digits of 6561300100
+	private static final int AUTH_X = 375; // N{5...499}
+	private static final int AUTH_Y = 648; // N{501...999}
+	private static final int AUTH_Z = 263; // N{233...499}
+	private static final String CLIENT_DATA = "";
 
-    //TODO: fill in some sensible values
-    public static final String NALPEIRON_USERNAME = "";
+	//TODO: fill in some sensible values
+	public static final String NALPEIRON_USERNAME = "";
 
-    @Value("${docshifter.applang:}")
-    private String APP_LANGUAGE;
-    @Value("${docshifter.version:DEV")
-    private String VERSION;
-    @Value("${docshifter.edition:DEV}")
-    private String EDITION;
-    @Value("${docshifter.build:DEV}")
-    private String BUILD;
+	@Value("${docshifter.applang:}")
+	private String APP_LANGUAGE;
+	@Value("${docshifter.version:DEV")
+	private String VERSION;
+	@Value("${docshifter.edition:DEV}")
+	private String EDITION;
+	@Value("${docshifter.build:DEV}")
+	private String BUILD;
 
-    //TODO: asses what this does and add sensible data
-    private static final String LICENSE_STAT = "???";
+	//TODO: asses what this does and add sensible data
+	private static final String LICENSE_STAT = "???";
 
-    private static NalpeironHelper helper;
+	private static NalpeironHelper helper;
 
-    private static final long[] aid = {0L};
+	private static final long[] aid = {0L};
 
-    private ApplicationContext applicationContext;
+	private ApplicationContext applicationContext;
 
-    // Advanced settings, for normal operation leave as defaults
-    @Value("${nalpeiron.loglevel:6}")
-    private int LogLevel; // set log level, please see documentation
-    @Value("${nalpeiron.offlinemode:1}")
-    private int OfflineMode; // Select Offline mode, please see documentation, only for analytics, licensing will always access internet when available
-    @Value("${nalpeiron.maxlogqueue:300}")
-    private int LogQLen; // please see documentation
-    @Value("${nalpeiron.maxchachequeue:35}")
-    private int CacheQLen; // please see documentation
-    @Value("${nalpeiron.networkminthreads:25}")
-    private int NetThMin; // please see documentation
-    @Value("${nalpeiron.networkmaxthreads:25}")
-    private int NetThMax; // please see documentation
-    @Value("${nalpeiron.proxyip:}")
-    private String ProxyIP; // InternetConnection Proxy IP Address if required
-    @Value("${nalpeiron.proxyport:}")
-    private String ProxyPort; // InternetConnection Proxy Port if required
-    @Value("${nalpeiron.proxyusername:}")
-    private String ProxyUsername; // InternetConnection Proxy Username if required
-    @Value("${nalpeiron.proxypassword:}")
-    private String ProxyPass; // InternetConnection Proxy Password if required
-    @Value("${nalpeiron.daemonip:}")
-    private String DaemonIP; //Daemon IP
-    @Value("${nalpeiron.daemonport:}")
-    private String DaemonPort; //Daemon Port
-    @Value("${nalpeiron.daemonuser:}")
-    private String DaemonUser; //Daemon User
-    @Value("${nalpeiron.daemonpassword:}")
-    private String DaemonPass; //Daemon Password
-    @Value("${nalpeiron.workdir:./license/}")
-    private String WorkDir;// Workfolder for nalpeiron license and cache files
-    private final boolean NSAEnable = true; // Enable Analytics
-    private final boolean NSLEnable = true; // Enable Licensing
+	// Advanced settings, for normal operation leave as defaults
+	@Value("${nalpeiron.loglevel:6}")
+	private int LogLevel; // set log level, please see documentation
+	@Value("${nalpeiron.offlinemode:1}")
+	private int OfflineMode; // Select Offline mode, please see documentation, only for analytics, licensing will always access internet when available
+	@Value("${nalpeiron.maxlogqueue:300}")
+	private int LogQLen; // please see documentation
+	@Value("${nalpeiron.maxchachequeue:35}")
+	private int CacheQLen; // please see documentation
+	@Value("${nalpeiron.networkminthreads:25}")
+	private int NetThMin; // please see documentation
+	@Value("${nalpeiron.networkmaxthreads:25}")
+	private int NetThMax; // please see documentation
+	@Value("${nalpeiron.proxyip:}")
+	private String ProxyIP; // InternetConnection Proxy IP Address if required
+	@Value("${nalpeiron.proxyport:}")
+	private String ProxyPort; // InternetConnection Proxy Port if required
+	@Value("${nalpeiron.proxyusername:}")
+	private String ProxyUsername; // InternetConnection Proxy Username if required
+	@Value("${nalpeiron.proxypassword:}")
+	private String ProxyPass; // InternetConnection Proxy Password if required
+	@Value("${nalpeiron.daemonip:}")
+	private String DaemonIP; //Daemon IP
+	@Value("${nalpeiron.daemonport:}")
+	private String DaemonPort; //Daemon Port
+	@Value("${nalpeiron.daemonuser:}")
+	private String DaemonUser; //Daemon User
+	@Value("${nalpeiron.daemonpassword:}")
+	private String DaemonPass; //Daemon Password
+	@Value("${nalpeiron.libdir:./license/}")
+	private String libDir;// Workfolder for nalpeiron license and cache files
+	@Value("${nalpeiron.workdir:./license/}")
+	private String WorkDir;// Workfolder for nalpeiron license and cache files
+	private final boolean NSAEnable = true; // Enable Analytics
+	private final boolean NSLEnable = true; // Enable Licensing
 
-    public static final List<NalpeironHelper.FeatureStatus> VALID_FEATURE_STATUS = Arrays.asList(NalpeironHelper.FeatureStatus.AUTHORIZED);
-    public static final List<NalpeironHelper.LicenseStatus> VALID_LICENSE_STATUS = Arrays.asList(NalpeironHelper.LicenseStatus.PROD_AUTHORIZED, NalpeironHelper.LicenseStatus.PROD_INTRIAL, NalpeironHelper.LicenseStatus.PROD_NETWORK, NalpeironHelper.LicenseStatus.PROD_NETWORK_LTCO);
+	public static final List<NalpeironHelper.FeatureStatus> VALID_FEATURE_STATUS = Arrays.asList(NalpeironHelper.FeatureStatus.AUTHORIZED);
+	public static final List<NalpeironHelper.LicenseStatus> VALID_LICENSE_STATUS = Arrays.asList(NalpeironHelper.LicenseStatus.PROD_AUTHORIZED, NalpeironHelper.LicenseStatus.PROD_INTRIAL, NalpeironHelper.LicenseStatus.PROD_NETWORK, NalpeironHelper.LicenseStatus.PROD_NETWORK_LTCO);
 
-    @Autowired
-    public NalpeironService(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
+	@Autowired
+	public NalpeironService(ApplicationContext applicationContext) {
+		this.applicationContext = applicationContext;
+	}
 
-    //TODO: LOGGING
-    @PostConstruct
-    private void init() {
-        logger.info("|===========================| LICENSING SERVICE INIT START |===========================|", null);
-
-        String activeProfile = System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME);
-
-        logger.debug("using active profile: " + activeProfile, null);
-
-        if (activeProfile == null || !activeProfile.equalsIgnoreCase("receiver")) {
-            logger.debug("active profile is not receiver, will not initialize and validate the nalpeiron licensing service", null);
-        } else {
+	//TODO: LOGGING
+	@PostConstruct
+	private void init() {
+		logger.info("|===========================| LICENSING SERVICE INIT START |===========================|", null);
 
 
-            if (!(WorkDir.endsWith("/") || WorkDir.endsWith("\\"))) {
-                WorkDir += "/";
-            }
+		if (!(WorkDir.endsWith("/") || WorkDir.endsWith("\\"))) {
+			WorkDir += "/";
+		}
 
-            logger.debug("using nalpeiron workdir: " + WorkDir, null);
+		logger.debug("using nalpeiron workdir: " + WorkDir, null);
 
-            try {
-                //Test if the DLL is present
-                NalpeironHelper.dllTest();
+		try {
+			//Test if the DLL is present
+			NalpeironHelper.dllTest();
 
-                logger.debug("nalpeiron core dll found", null);
+			logger.debug("nalpeiron core dll found", null);
 
-            } catch (DocShifterLicenseException e) {
-                int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-                logger.fatal("nalpjava library could not be found, or the manifest could not be read", e);
-                SpringApplication.exit(applicationContext, () -> errorCode);
+		} catch (DocShifterLicenseException e) {
+			int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
+			logger.fatal("nalpjava library could not be found, or the manifest could not be read", e);
+			SpringApplication.exit(applicationContext, () -> errorCode);
 
-                logger.debug("exited Spring app, doing system.exit()", null);
+			logger.debug("exited Spring app, doing system.exit()", null);
 
-                System.exit(errorCode);
-            }
+			System.exit(errorCode);
+		}
 
-            logger.debug("Opening nalpeiron library", null);
+		logger.debug("Opening nalpeiron library", null);
 
-            openValidateNalpeironLibrary();
-        }
+		openValidateNalpeironLibrary();
 
-        logger.info("|===========================| LICENSING SERVICE INIT FINISHED |===========================|", null);
 
-    }
+		logger.info("|===========================| LICENSING SERVICE INIT FINISHED |===========================|", null);
 
-    private final void openValidateNalpeironLibrary() {
-        try {
-            //generate a random number between 1 and 500 and use it to calculate the security offset
-            int security = 1 + (int) (Math.random() * (501));
-            int offset = AUTH_X + ((security * AUTH_Y) % AUTH_Z);
+	}
 
-            logger.debug("generated security params for nalpeiron", null);
+	private final void openValidateNalpeironLibrary() {
+		try {
+			//generate a random number between 1 and 500 and use it to calculate the security offset
+			int security = 1 + (int) (Math.random() * (501));
+			int offset = AUTH_X + ((security * AUTH_Y) % AUTH_Z);
 
-            //Library open, close and error handling
-            NALP nalp = new NALP();
+			logger.debug("generated security params for nalpeiron", null);
 
-            logger.debug("opened NALP()", null);
+			//Library open, close and error handling
+			NALP nalp = new NALP();
 
-            //Analytics functions
-            NSA nsa = new NSA(nalp);
+			logger.debug("opened NALP()", null);
 
-            logger.debug("opened NSA()", null);
+			//Analytics functions
+			NSA nsa = new NSA(nalp);
 
-            //Licensing functions
-            NSL nsl = new NSL(nalp, offset);
+			logger.debug("opened NSA()", null);
 
-            logger.debug("opened NSL()", null);
+			//Licensing functions
+			NSL nsl = new NSL(nalp, offset);
 
-            helper = new NalpeironHelper(applicationContext, nalp, nsa, nsl, WorkDir);
+			logger.debug("opened NSL()", null);
 
-            logger.debug("initialized NalpeironHelper", null);
+			helper = new NalpeironHelper(applicationContext, nalp, nsa, nsl, WorkDir);
 
-            String dllPath = WorkDir + "docShifterFileCheck.";
-            if (SystemUtils.IS_OS_UNIX) {
-                dllPath += "so";
-            } else if (SystemUtils.IS_OS_WINDOWS) {
-                dllPath += "dll";
-            } else {
-                int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-                logger.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application", null);
-                SpringApplication.exit(applicationContext, () -> errorCode);
+			logger.debug("initialized NalpeironHelper", null);
 
-                logger.debug("exited Spring app, doing system.exit()", null);
+			String dllPath = libDir + "/docShifterFileCheck.";
+			if (SystemUtils.IS_OS_UNIX) {
+				dllPath += "so";
+			} else if (SystemUtils.IS_OS_WINDOWS) {
+				dllPath += "dll";
+			} else {
+				int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
+				logger.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application", null);
+				SpringApplication.exit(applicationContext, () -> errorCode);
 
-                System.exit(errorCode);
-            }
+				logger.debug("exited Spring app, doing system.exit()", null);
 
-            logger.debug("using '" + dllPath + "' as the nalpeiron connection dll", null);
+				System.exit(errorCode);
+			}
 
-            helper.openNalpLibriray(dllPath, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
+			logger.debug("using '" + dllPath + "' as the nalpeiron connection dll", null);
 
-            //Turn end user privacy off
-            helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
+			helper.openNalpLibriray(dllPath, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
 
-            helper.validateLibrary(customerID, productID);
+			//Turn end user privacy off
+			helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
 
-            helper.validateLicenseAndInitiatePeriodicChecking();
+			helper.validateLibrary(customerID, productID);
 
-            //At this point we have a license, so start analytics
-            helper.startAnalyticsApp(NALPEIRON_USERNAME, CLIENT_DATA, aid);
-            helper.sendAnalyticsSystemInfo(NALPEIRON_USERNAME, APP_LANGUAGE, VERSION,
-                    EDITION, BUILD, LICENSE_STAT, CLIENT_DATA);
+			helper.validateLicenseAndInitiatePeriodicChecking();
 
-            helper.sendAnalyticsAndInitiatePeriodicReporting();
+			//At this point we have a license, so start analytics
+			helper.startAnalyticsApp(NALPEIRON_USERNAME, CLIENT_DATA, aid);
+			helper.sendAnalyticsSystemInfo(NALPEIRON_USERNAME, APP_LANGUAGE, VERSION,
+					EDITION, BUILD, LICENSE_STAT, CLIENT_DATA);
 
-        } catch (DocShifterLicenseException | NalpError e) {
-            int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            logger.fatal("error in docshifter license processing. Could not complete opening and validating Nalpeiron Library.", e);
-            SpringApplication.exit(applicationContext, () -> errorCode);
+			helper.sendAnalyticsAndInitiatePeriodicReporting();
 
-            System.exit(errorCode);
-        }
-    }
+		} catch (DocShifterLicenseException | NalpError e) {
+			int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
+			logger.fatal("error in docshifter license processing. Could not complete opening and validating Nalpeiron Library.", e);
+			SpringApplication.exit(applicationContext, () -> errorCode);
 
-    public long[] validateAndStartModule(String moduleId, long[] fid) throws DocShifterLicenseException {
-        NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(moduleId);
+			System.exit(errorCode);
+		}
+	}
 
-        if (!VALID_FEATURE_STATUS.contains(featureStatus)) {
-            String errorMessage = "feature could not be activated. The feature status is: " + featureStatus.name() + ". Blocking acces to module: " + moduleId;
-            DocShifterLicenseException ex = new DocShifterLicenseException(errorMessage);
-            logger.info(errorMessage, ex);
-            throw ex;
-        }
+	public long[] validateAndStartModule(String moduleId, long[] fid) throws DocShifterLicenseException {
+		NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(moduleId);
 
-        //At this point we have access to the feature.  do some analytics
-        helper.startFeature(NALPEIRON_USERNAME, moduleId, CLIENT_DATA, fid);
+		if (!VALID_FEATURE_STATUS.contains(featureStatus)) {
+			String errorMessage = "feature could not be activated. The feature status is: " + featureStatus.name() + ". Blocking acces to module: " + moduleId;
+			DocShifterLicenseException ex = new DocShifterLicenseException(errorMessage);
+			logger.info(errorMessage, ex);
+			throw ex;
+		}
 
-        return fid;
-    }
+		//At this point we have access to the feature.  do some analytics
+		helper.startFeature(NALPEIRON_USERNAME, moduleId, CLIENT_DATA, fid);
 
-    public void endModule(String moduleId, Map<String, Object> clientData, long[] fid) throws DocShifterLicenseException {
-        //call end feature
-        helper.stopFeature(NALPEIRON_USERNAME, moduleId, clientData, fid);
-    }
+		return fid;
+	}
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
+	public void endModule(String moduleId, Map<String, Object> clientData, long[] fid) throws DocShifterLicenseException {
+		//call end feature
+		helper.stopFeature(NALPEIRON_USERNAME, moduleId, clientData, fid);
+	}
 
-        //Stop the licenseValidationScheduler
-        helper.stopLicenseValidationScheduler();
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
 
-        //Stop the analyticsSenderScheduler
-        helper.stopAnalyticsSenderScheduler();
+		//Stop the licenseValidationScheduler
+		helper.stopLicenseValidationScheduler();
 
-        //End analytics
-        helper.stopAnalyticsApp(NALPEIRON_USERNAME, CLIENT_DATA, aid);
+		//Stop the analyticsSenderScheduler
+		helper.stopAnalyticsSenderScheduler();
 
-        //Flush the cache in case anything is queued up
-        helper.sendAnalyticsCache(NALPEIRON_USERNAME);
+		//End analytics
+		helper.stopAnalyticsApp(NALPEIRON_USERNAME, CLIENT_DATA, aid);
 
-        //Cleanup and shutdown library
-        helper.closeNalpLibriry();
+		//Flush the cache in case anything is queued up
+		helper.sendAnalyticsCache(NALPEIRON_USERNAME);
 
-        //remove helper from assigned memory
-        helper = null;
-    }
+		//Cleanup and shutdown library
+		helper.closeNalpLibriry();
+
+		//remove helper from assigned memory
+		helper = null;
+	}
 }
