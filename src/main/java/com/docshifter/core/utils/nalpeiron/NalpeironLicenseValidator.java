@@ -109,6 +109,7 @@ public class NalpeironLicenseValidator implements Runnable {
 
         } catch (DocShifterLicenseException ex) {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
+            logger.debug(" NALP ERRROCODE: " + ex.getNalpErrorCode() + "NALP ERROR MESSGAG: " + ex.getNalpErrorMsg());
             logger.fatal("Exception while trying to validate the nalpeiron license, closing the application", ex);
             SpringApplication.exit(nalpeironHelper.getApplicationContext(), () -> errorCode);
 
