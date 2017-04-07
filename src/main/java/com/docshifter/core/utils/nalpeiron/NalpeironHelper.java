@@ -30,19 +30,20 @@ public class NalpeironHelper {
     private final int licenseDurationMinutes = 58;
 
     private final NALP nalp;
-    private final NSA nsa;
+    //private final NSA nsa;
     private final NSL nsl;
 
     private final String workDir;
 
     private final ScheduledExecutorService licenseValidationScheduler = Executors.newSingleThreadScheduledExecutor();
-    private final ScheduledExecutorService analyticsSenderScheduler = Executors.newSingleThreadScheduledExecutor();
+    //private final ScheduledExecutorService analyticsSenderScheduler = Executors.newSingleThreadScheduledExecutor();
 
 
-    public NalpeironHelper(NALP nalp, NSA nsa, NSL nsl, String workDir) {
+    public NalpeironHelper(NALP nalp, NSL nsl, String workDir) {
+    //public NalpeironHelper(NALP nalp, NSA nsa, NSL nsl, String workDir) {
 
         this.nalp = nalp;
-        this.nsa = nsa;
+        //this.nsa = nsa;
         this.nsl = nsl;
 
         this.workDir = workDir;
@@ -52,9 +53,9 @@ public class NalpeironHelper {
         return nalp;
     }
 
-    public NSA getNsa() {
+    /*public NSA getNsa() {
         return nsa;
-    }
+    }*/
 
     public NSL getNsl() {
         return nsl;
@@ -73,19 +74,19 @@ public class NalpeironHelper {
         licenseValidationScheduler.scheduleAtFixedRate(validator, 1, licenseDurationMinutes, TimeUnit.MINUTES);
     }
 
-    public void stopAnalyticsSenderScheduler() {
+    /*public void stopAnalyticsSenderScheduler() {
         if (analyticsSenderScheduler != null) {
             analyticsSenderScheduler.shutdown();
         }
-    }
+    }*/
 
-    public void sendAnalyticsAndInitiatePeriodicReporting() {
+    /*public void sendAnalyticsAndInitiatePeriodicReporting() {
         NalpeironAnalyticsSender sender = new NalpeironAnalyticsSender(this, NalpeironService.NALPEIRON_USERNAME);
         sender.run();
         analyticsSenderScheduler.scheduleAtFixedRate(sender, 1, cachingDurationMinutes, TimeUnit.MINUTES);
-    }
+    }*/
 
-    public static void dllTest() throws DocShifterLicenseException {
+    public static void dllTest() {
         boolean foundNalpLib = false;
         String nalpLibName = "";
 
@@ -124,12 +125,13 @@ public class NalpeironHelper {
             }
 
             if (foundNalpLib) {
+                logger.debug("nalpeiron core library found", null);
                 return;
             }
         }
 
         if (!foundNalpLib) {
-            logger.fatal("The " + nalpLibName + " file used for yout operating system cammot be found in the included java library paths. Stopping Application", null);
+            logger.fatal("The " + nalpLibName + " file used for your operating system cammot be found in the included java library paths. Stopping Application", null);
             System.exit(0);
         }
     }
@@ -778,7 +780,7 @@ public class NalpeironHelper {
         }
     }
 
-    public String getAnalyticsVersion() throws DocShifterLicenseException {
+    /*public String getAnalyticsVersion() throws DocShifterLicenseException {
         try {
             String i = nsa.callNSAGetVersion();
             return i;
@@ -786,9 +788,9 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
-    public void analyticsLogin(String Username, String clientData, long[] lid) throws DocShifterLicenseException {
+    /*public void analyticsLogin(String Username, String clientData, long[] lid) throws DocShifterLicenseException {
         try {
             int i = nsa.callNSALogin(Username, clientData, lid);
 
@@ -799,9 +801,9 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
-    public void analyticsLogout(String Username, String clientData, long[] lid) throws DocShifterLicenseException {
+    /*public void analyticsLogout(String Username, String clientData, long[] lid) throws DocShifterLicenseException {
         try {
             int i = nsa.callNSALogout(Username, clientData, lid);
 
@@ -812,9 +814,9 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
-    public String getAnalyticsHostName() throws DocShifterLicenseException {
+    /*public String getAnalyticsHostName() throws DocShifterLicenseException {
         try {
             String i = nsa.callNSAGetHostName();
             return i;
@@ -822,9 +824,9 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
-    public void startFeature(String Username, String FeatureCode, String clientData, long[] fid) throws DocShifterLicenseException {
+    /*public void startFeature(String Username, String FeatureCode, String clientData, long[] fid) throws DocShifterLicenseException {
         try {
             int i = nsa.callNSAFeatureStart(Username, FeatureCode, clientData, fid);
 
@@ -835,9 +837,9 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
-    public void stopFeature(String Username, String FeatureCode, Map<String, Object> clientData, long[] fid) throws DocShifterLicenseException {
+    /*public void stopFeature(String Username, String FeatureCode, Map<String, Object> clientData, long[] fid) throws DocShifterLicenseException {
         try {
             int i = nsa.callNSAFeatureStop(Username, FeatureCode, new ObjectMapper().writeValueAsString(clientData), fid);
 
@@ -850,9 +852,9 @@ public class NalpeironHelper {
         } catch (JsonProcessingException ex) {
             throw new DocShifterLicenseException(ex);
         }
-    }
+    }*/
 
-    public int getAnalyticsExceptionCode(String Username, String ExceptionCode, String clientData, String Description) throws DocShifterLicenseException {
+    /*public int getAnalyticsExceptionCode(String Username, String ExceptionCode, String clientData, String Description) throws DocShifterLicenseException {
         try {
             int i = nsa.callNSAException(Username, ExceptionCode, clientData, Description);
             return i;
@@ -860,9 +862,9 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
-    public void sendAnalyticsSystemInfo(String Username, String Applang, String Version, String Edition, String Build, String LicenseStat, String clientData) throws DocShifterLicenseException {
+    /*public void sendAnalyticsSystemInfo(String Username, String Applang, String Version, String Edition, String Build, String LicenseStat, String clientData) throws DocShifterLicenseException {
         try {
             int i = nsa.callNSASysInfo(Username, Applang, Version, Edition, Build, LicenseStat, clientData);
 
@@ -873,9 +875,9 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
-    public void sendAnalyticsCache(String Username) throws DocShifterLicenseException {
+    /*public void sendAnalyticsCache(String Username) throws DocShifterLicenseException {
         try {
             int i = nsa.callNSASendCache(Username);
 
@@ -886,9 +888,9 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
-    public void startAnalyticsApp(String username, String clientData, long[] aid) throws DocShifterLicenseException {
+    /*public void startAnalyticsApp(String username, String clientData, long[] aid) throws DocShifterLicenseException {
         try {
             int i = nsa.callNSAApStart(username, clientData, aid);
 
@@ -899,9 +901,9 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
-    public void stopAnalyticsApp(String username, String clientData, long[] aid) throws DocShifterLicenseException {
+    /*public void stopAnalyticsApp(String username, String clientData, long[] aid) throws DocShifterLicenseException {
         try {
             int i = nsa.callNSAApStop(username, clientData, aid);
 
@@ -912,9 +914,9 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
-    public void getAnalyticsLocation() throws DocShifterLicenseException {
+    /*public void getAnalyticsLocation() throws DocShifterLicenseException {
         try {
             int i = nsa.callNSAGetLocation();
 
@@ -925,9 +927,9 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
-    public PrivacyValue getPrivacy() throws DocShifterLicenseException {
+    /*public PrivacyValue getPrivacy() throws DocShifterLicenseException {
         try {
             int i = nsa.callNSAGetPrivacy();
             return PrivacyValue.getPrivacyValue(i);
@@ -935,9 +937,9 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
-    public void setAnalyticsPrivacy(int privacy) throws DocShifterLicenseException {
+    /*public void setAnalyticsPrivacy(int privacy) throws DocShifterLicenseException {
         try {
             int i = nsa.callNSASetPrivacy(privacy);
 
@@ -948,9 +950,9 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
-    public String getAnalyticsStats() throws DocShifterLicenseException {
+    /*public String getAnalyticsStats() throws DocShifterLicenseException {
         try {
             String i = nsa.callNSAGetStats();
             return i;
@@ -958,7 +960,7 @@ public class NalpeironHelper {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
-    }
+    }*/
 
     public String getLicenseNumber() {
         return nsl.NSLGetLicNo();
