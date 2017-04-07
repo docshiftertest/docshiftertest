@@ -102,6 +102,8 @@ public class NalpeironHelper {
         }
 
         String property = System.getProperty("java.library.path");
+        logger.debug("java.library.path: " + property, null);
+
         StringTokenizer parser = new StringTokenizer(property, File.pathSeparator);
         logger.debug("looking for nalpjava library in the following location", null);
 
@@ -382,8 +384,8 @@ public class NalpeironHelper {
         }
     }
 
-    public void openNalpLibriray(String Filename, boolean NSAEnable, boolean NSLEnable, int LogLevel, String WorkDir, int LogQLen, int CacheQLen, int NetThMin, int NetThMax,
-                                 int OfflineMode, String ProxyIP, String ProxyPort, String ProxyUsername, String ProxyPass, String DaemonIP, String DaemonPort, String DaemonUser, String DaemonPass, int security) throws DocShifterLicenseException {
+    public void openNalpLibrary(String Filename, boolean NSAEnable, boolean NSLEnable, int LogLevel, String WorkDir, int LogQLen, int CacheQLen, int NetThMin, int NetThMax,
+                                int OfflineMode, String ProxyIP, String ProxyPort, String ProxyUsername, String ProxyPass, String DaemonIP, String DaemonPort, String DaemonUser, String DaemonPass, int security) throws DocShifterLicenseException {
         try {
             int i = nalp.callNalpLibOpen(Filename, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername,
                     ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
@@ -397,7 +399,7 @@ public class NalpeironHelper {
         }
     }
 
-    public void closeNalpLibriry() throws DocShifterLicenseException {
+    public void closeNalpLibrary() throws DocShifterLicenseException {
         try {
             int i = nalp.callNalpLibClose();
 
