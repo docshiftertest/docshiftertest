@@ -99,10 +99,7 @@ public class NalpeironLicenseValidator implements Runnable {
             } else {
                 // license could not be validate, close application
                 int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-                logger.info("license could not be validated, closing application", null);
-                SpringApplication.exit(nalpeironHelper.getApplicationContext(), () -> errorCode);
-
-                logger.debug("exited Spring app, doing system.exit()", null);
+                logger.fatal("license could not be validated, closing application", null);
 
                 System.exit(errorCode);
             }
@@ -111,9 +108,6 @@ public class NalpeironLicenseValidator implements Runnable {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
             logger.debug(" NALP ERRROCODE: " + ex.getNalpErrorCode() + "NALP ERROR MESSGAG: " + ex.getNalpErrorMsg());
             logger.fatal("Exception while trying to validate the nalpeiron license, closing the application", ex);
-            SpringApplication.exit(nalpeironHelper.getApplicationContext(), () -> errorCode);
-
-            logger.debug("exited Spring app, doing system.exit()", null);
 
             System.exit(errorCode);
         }

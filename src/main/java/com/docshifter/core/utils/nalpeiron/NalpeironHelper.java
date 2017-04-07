@@ -8,7 +8,7 @@ import com.nalpeiron.nalplibrary.NALP;
 import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
 import com.nalpeiron.nalplibrary.NalpError;
-import org.springframework.context.ApplicationContext;
+import org.apache.commons.lang.SystemUtils;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -35,21 +35,17 @@ public class NalpeironHelper {
 
     private final String workDir;
 
-    private ApplicationContext applicationContext;
-
     private final ScheduledExecutorService licenseValidationScheduler = Executors.newSingleThreadScheduledExecutor();
     private final ScheduledExecutorService analyticsSenderScheduler = Executors.newSingleThreadScheduledExecutor();
 
 
-    public NalpeironHelper(ApplicationContext applicationContext, NALP nalp, NSA nsa, NSL nsl, String workDir) {
+    public NalpeironHelper(NALP nalp, NSA nsa, NSL nsl, String workDir) {
 
         this.nalp = nalp;
         this.nsa = nsa;
         this.nsl = nsl;
 
         this.workDir = workDir;
-
-        this.applicationContext = applicationContext;
     }
 
     public NALP getNalp() {
@@ -62,10 +58,6 @@ public class NalpeironHelper {
 
     public NSL getNsl() {
         return nsl;
-    }
-
-    public ApplicationContext getApplicationContext() {
-        return applicationContext;
     }
 
     public void stopLicenseValidationScheduler() {
@@ -94,17 +86,51 @@ public class NalpeironHelper {
     }
 
     public static void dllTest() throws DocShifterLicenseException {
-        try {
-            String property = System.getProperty("java.library.path");
-            StringTokenizer parser = new StringTokenizer(property, ";");
-            logger.debug("looking for nalpjava library in the following locations", null);
-            while (parser.hasMoreTokens()) {
-                logger.debug(parser.nextToken(), null);
+        boolean foundNalpLib = false;
+        String nalpLibName = "";
+
+        if (SystemUtils.IS_OS_UNIX) {
+            nalpLibName = "libnalpjava.so";
+        } else if (SystemUtils.IS_OS_WINDOWS) {
+            nalpLibName += "nalpjava.dll";
+        } else {
+            int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
+            logger.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application", null);
+            logger.debug("exited Spring app, doing system.exit()", null);
+
+            System.exit(errorCode);
+        }
+
+        String property = System.getProperty("java.library.path");
+        StringTokenizer parser = new StringTokenizer(property, ";");
+        logger.debug("looking for nalpjava library in the following location", null);
+
+        while (parser.hasMoreTokens()) {
+            String libPath = parser.nextToken();
+            logger.debug(libPath, null);
+
+            if (libPath.endsWith(nalpLibName)) {
+                logger.debug("found " + nalpLibName + " here: " + libPath);
+                foundNalpLib = true;
             }
-            System.loadLibrary("nalpjava");
-        } catch (java.lang.UnsatisfiedLinkError e) {
-            logger.debug("Could not load the nalpjava library", e);
-            throw new DocShifterLicenseException(e);
+
+            File pathFile = new File(libPath);
+            if (pathFile.isDirectory()) {
+                File childPath = new File(libPath + "/" + nalpLibName);
+                if (childPath.exists()) {
+                    logger.debug("found " + nalpLibName + " here: " + childPath);
+                    foundNalpLib = true;
+                }
+            }
+
+            if (foundNalpLib) {
+                return;
+            }
+        }
+
+        if (!foundNalpLib) {
+            logger.fatal("The " + nalpLibName + " file used for yout operating system cammot be found in the included java library paths. Stopping Application", null);
+            System.exit(0);
         }
     }
 

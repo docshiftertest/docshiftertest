@@ -95,11 +95,6 @@ public class NalpeironService {
 	public static final List<NalpeironHelper.FeatureStatus> VALID_FEATURE_STATUS = Arrays.asList(NalpeironHelper.FeatureStatus.AUTHORIZED);
 	public static final List<NalpeironHelper.LicenseStatus> VALID_LICENSE_STATUS = Arrays.asList(NalpeironHelper.LicenseStatus.PROD_AUTHORIZED, NalpeironHelper.LicenseStatus.PROD_INTRIAL, NalpeironHelper.LicenseStatus.PROD_NETWORK, NalpeironHelper.LicenseStatus.PROD_NETWORK_LTCO);
 
-	@Autowired
-	public NalpeironService(ApplicationContext applicationContext) {
-		this.applicationContext = applicationContext;
-	}
-
 	//TODO: LOGGING
 	@PostConstruct
 	private void init() {
@@ -160,7 +155,7 @@ public class NalpeironService {
 
 			logger.debug("opened NSL()", null);
 
-			helper = new NalpeironHelper(applicationContext, nalp, nsa, nsl, WorkDir);
+			helper = new NalpeironHelper(nalp, nsa, nsl, WorkDir);
 
 			logger.debug("initialized NalpeironHelper", null);
 
