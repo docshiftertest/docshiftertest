@@ -103,7 +103,7 @@ public class NalpeironHelper {
         }
 
         String property = System.getProperty("java.library.path");
-        StringTokenizer parser = new StringTokenizer(property, ";");
+        StringTokenizer parser = new StringTokenizer(property, File.pathSeparator);
         logger.debug("looking for nalpjava library in the following location", null);
 
         while (parser.hasMoreTokens()) {
