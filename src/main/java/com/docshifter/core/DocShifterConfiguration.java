@@ -42,9 +42,6 @@ public class DocShifterConfiguration {
     @Autowired
     public WorkFolderManager workFolderManager;
 
-    @Autowired
-    public NalpeironService nalpeironService;
-
     @Bean
     public ConnectionFactory connectionFactory() {
 
@@ -96,8 +93,4 @@ public class DocShifterConfiguration {
 
 	}
 
-    @Bean
-    public NalpeironService nalpeironService() {
-        return new NalpeironService();
-    }
 }
