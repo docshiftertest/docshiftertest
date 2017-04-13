@@ -203,14 +203,14 @@ public class NalpeironService {
         }
 
         //At this point we have access to the feature.  do some analytics
-        //helper.startFeature(NALPEIRON_USERNAME, moduleId, CLIENT_DATA, fid);
+        helper.startFeature(NALPEIRON_USERNAME, moduleId, CLIENT_DATA, fid);
 
         return fid;
     }
 
     public void endModule(String moduleId, Map<String, Object> clientData, long[] fid) throws DocShifterLicenseException {
         //call end feature
-        //helper.stopFeature(NALPEIRON_USERNAME, moduleId, clientData, fid);
+        helper.stopFeature(NALPEIRON_USERNAME, moduleId, clientData, fid);
     }
 
     @Override
