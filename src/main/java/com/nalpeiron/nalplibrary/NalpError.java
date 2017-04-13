@@ -7,58 +7,54 @@
 
 package com.nalpeiron.nalplibrary;
 
-public class
-NalpError extends Error
-{
-	static final long serialVersionUID = 999L;
+public class NalpError extends Error {
+    static final long serialVersionUID = 999L;
 
-	//	This will store the error code returned by the NALP function
-	private	int			nalpErrorCode;
-	private String		nalpErrorMsg;
+    //	This will store the error code returned by the NALP function
+    private int nalpErrorCode;
+    private String nalpErrorMsg;
 
-/**
- * Default constructor
- */
-	public NalpError(
-	)
-	{
-		super("Undefined Error");
-		nalpErrorCode = 0;
-	}
+    /**
+     * Default constructor
+     */
+    public NalpError(
+    ) {
+        super("Undefined Error");
+        nalpErrorCode = 0;
+    }
 
-/**
- * Regular constructor
- * @param i:	The error code that was returned by the Nalp function
- */
-	public NalpError(
-	int i,
-	String msg
-	)
-	{
-		nalpErrorCode = i;
-		nalpErrorMsg = msg;
+    /**
+     * Regular constructor
+     *
+     * @param i: The error code that was returned by the Nalp function
+     */
+    public NalpError(
+            int i,
+            String msg
+    ) {
+        nalpErrorCode = i;
+        nalpErrorMsg = msg;
 
-		System.out.println("Error " + i + " " + msg);
-	}
+        System.out.println("Error " + i + " " + msg);
+    }
 
 
-	public String
-	getErrorMessage(
-	)
-	{
-		return nalpErrorMsg;
-	}
+    public String
+    getErrorMessage(
+    ) {
+        return nalpErrorMsg;
+    }
 
-/**
- * Returns the error code of the Nalp function
- * @return	The error code of the Nalp function.  Should always be negative
- */
-	public int
-	getErrorCode(
-	)
-	{
-		return nalpErrorCode;
-	}
+    /**
+     * Returns the error code of the Nalp function
+     *
+     * @return The error code of the Nalp function.  Should always be negative
+     */
+    public int
+    getErrorCode(
+    ) {
+        return nalpErrorCode;
+    }
 }
 
 

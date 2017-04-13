@@ -17,11 +17,11 @@ public class NalpeironAnalyticsSender implements Runnable {
 
     @Override
     public void run() {
-        /*try {
+        try {
             logger.info("Sending licensing analytics to remote server if connection available", null);
             nalpeironHelper.sendAnalyticsCache(username);
         } catch (DocShifterLicenseException ex) {
             logger.debug("Error during sending of analytics.", ex);
-        }*/
+        }
     }
 }

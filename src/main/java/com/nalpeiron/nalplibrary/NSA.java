@@ -57,7 +57,7 @@ public class NSA
 
 	public
 	NSA(
-	NALP nalp
+	NALP	nalp
 	)
 	{
 		this.nalp = nalp;
@@ -66,7 +66,7 @@ public class NSA
 /**
  * Call NSAGetVersion()
  * @return:	0 on success, negative value on error, nsaVersion
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public String
@@ -87,7 +87,7 @@ public class NSA
 		//Nalp's library uses UTF-8 internally
 		try
 		{
-			return new String(nsaVersion, 0, nsaVersion.length, "UTF-8");
+			return new String(nsaVersion, 0, i, "UTF-8");
 		}
 		catch (UnsupportedEncodingException e)
 		{
@@ -99,7 +99,7 @@ public class NSA
 /**
  * Call NSAGetHostName()
  * @return:	0 on success, negative value on error, hostname
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public String
@@ -121,7 +121,7 @@ public class NSA
 		//Nalp's library uses UTF-8 internally
 		try
 		{
-			return new String(nsaHostName, 0, nsaHostName.length, "UTF-8");
+			return new String(nsaHostName, 0, i, "UTF-8");
 		}
 		catch (UnsupportedEncodingException e)
 		{
@@ -133,7 +133,7 @@ public class NSA
 /**
  * Call NSALogin()
  * @return:	0 on success, negative value on error
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
@@ -166,7 +166,7 @@ public class NSA
 /**
  * Call NSALogout()
  * @return:	0 on success, negative value on error
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
@@ -199,7 +199,7 @@ public class NSA
 /**
  * Call NSAFeatureStart()
  * @return:	0 on success, negative value on error
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
@@ -234,7 +234,7 @@ public class NSA
 /**
  * Call NSAFeatureStop()
  * @return:	0 on success, negative value on error
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
@@ -269,7 +269,7 @@ public class NSA
 /**
  * Call NSAException
  * @return:	0 on success, negative value on error
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
@@ -309,7 +309,7 @@ public class NSA
 /**
  * Call NSASysInfo() - Collect and send system nalpation to Napeiron
  * @return:	0 on success, negative value on error
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
@@ -351,7 +351,7 @@ public class NSA
 /**
  * Call NSASendCache() -- Send any cache file to Nalp server
  * @return:	0 on success, negative value on error
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
@@ -387,7 +387,7 @@ public class NSA
 /**
  * Call NSAApStart()
  * @return:	0 on success, negative value on error
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
@@ -420,7 +420,7 @@ public class NSA
 /**
  * Call NSAApStop()
  * @return:	0 on success, negative value on error
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
@@ -453,7 +453,7 @@ public class NSA
 /**
  * Call NSAGetLocation() -- Get location data from Nalp server
  * @return:	0 on success, negative value on error
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
@@ -477,7 +477,7 @@ public class NSA
 /**
  * Call NSAGetPrivacy() Get the privacy setting
  * @return:	0 on success, negative value on error
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
@@ -499,7 +499,7 @@ public class NSA
 /**
  * Call NSASetPrivacy() set privacy value (0 off or 1 on)
  * @return:	0 on success, negative value on error
- * @throws NalpError :	If there was a problem calling the NSA function,
+ * @throws NalpError:	If there was a problem calling the NSA function,
  * 	this error will be thrown
  */
 	public int
@@ -543,7 +543,7 @@ public class NSA
 		//Nalp's library uses UTF-8 internally
 		try
 		{
-			return new String(nsaStats, 0, nsaStats.length, "UTF-8");
+			return new String(nsaStats, 0, i, "UTF-8");
 		}
 		catch (UnsupportedEncodingException e)
 		{
