@@ -1,0 +1,38 @@
+//
+// nalpJavaErrors.h
+// NSA
+//
+// Created Jan 18 2013
+// R. D. Ramey
+#ifndef _NALPJAVAERROR_H_
+#define _NALPJAVAERROR_H_
+
+#define	NALPJAVA_OK						0
+#define	NALPJAVA_FAIL					-9000
+#define	NALPJAVA_LIBLOAD_ERROR			-9001
+#define	NALPJAVA_SYMLOAD_ERROR			-9002
+#define	NALPJAVA_LIBHANDLE_ERROR		-9003
+#define	NALPJAVA_CHARARRAY_ERROR		-9004
+#define	NALPJAVA_INTARRAY_ERROR			-9005
+#define	NALPJAVA_JAVA_MEMORY			-9006
+#define	NALPJAVA_JNI_MEMORY				-9007
+#define	NALPJAVA_JAVAID_FAIL			-9008
+#define	NALPJAVA_JNIJAVA_FAIL			-9009
+#define	NALPJAVA_JNI_CLASS				-9010
+#define	NALPJAVA_JNI_CONTRESOLV			-9011
+#define	NALPJAVA_JNI_CONTOBJ			-9012
+#define	NALPJAVA_JNI_METH				-9013
+#define	NALPJAVA_JNI_OBJCACHE			-9014
+#define	NALPJAVA_LIB_MEMORY				-9015
+#define	NALPJAVA_ACCOUNT_NOTFOUND		-9016
+
+
+
+
+#endif // _NALPJAVAERROR_H_
+
+/*
+ * * vim:tabstop=4
+ * * vim:softtabstop=4
+ * * vim:shiftwidth=4
+ * */
