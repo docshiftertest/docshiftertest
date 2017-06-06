@@ -29,15 +29,47 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 	}
 	
 	public String getString(String name) {
-		Map<String, String> allParams = getModuleWrapper().params;
+		return getString(name, null);
+	}
+	
+	public String getString(String name, String defaultValue) {
 		//TODO: add general config params id necessary
-		return allParams.get(name);
+		Map<String, String> allParams = getModuleWrapper().params;
+		
+		if (allParams.containsKey(name)) {
+			return allParams.get(name);
+		} else {
+			return defaultValue;
+		}
+		
+	}
+	
+	public int getInt(String name) {
+		return getInt(name, 0);
 	}
 
-	public int getInt(String name){
+	public int getInt(String name, int defaultValue){
 		Map<String, String> allParams = getModuleWrapper().params;
-		//TODO: add general config params id necessary
-		return Integer.parseInt(allParams.get(name));
+		
+		if (allParams.containsKey(name)) {
+			return Integer.parseInt(allParams.get(name));
+		} else {
+			return defaultValue;
+		}
+	}
+	
+	public boolean getBoolean(String name) {
+		return getBoolean(name, false);
+	}
+	
+	public boolean getBoolean(String name, boolean defaultValue){
+		Map<String, String> allParams = getModuleWrapper().params;
+		
+		if (allParams.containsKey(name)) {
+			return Boolean.parseBoolean(allParams.get(name));
+		} else {
+			return defaultValue;
+		}
 	}
 
 	public String getName(){
