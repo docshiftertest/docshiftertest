@@ -24,6 +24,7 @@ public class WorkFolder implements Serializable {
 	private Path folder;
 	private WorkFolder parent;
 	private Path errorFolder;
+	private List<String> errormessageList;
 
 	public WorkFolder() {
 
