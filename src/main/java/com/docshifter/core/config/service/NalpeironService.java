@@ -53,7 +53,7 @@ public class NalpeironService {
     // Advanced settings, for normal operation leave as defaults
     @Value("${nalpeiron.loglevel:6}")
     private int LogLevel; // set log level, please see documentation
-    @Value("${nalpeiron.offlinemode:1}")
+    @Value("${nalpeiron.offlinemode:0}")
     private int OfflineMode; // Select Offline mode, please see documentation, only for analytics, licensing will always access internet when available
     @Value("${nalpeiron.maxlogqueue:300}")
     private int LogQLen; // please see documentation
