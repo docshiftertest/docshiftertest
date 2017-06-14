@@ -269,7 +269,7 @@
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
-				<build.type></build.type>
+				<build.type>-SNAPSHOT</build.type>
 			</properties>
 		</profile>
 		<profile>
