@@ -1,6 +1,5 @@
 package com.docshifter.core.utils.nalpeiron;
 
-import com.docbyte.utils.Logger;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 
 public class NalpeironAnalyticsSender implements Runnable {
