@@ -40,14 +40,14 @@ public class Task implements Serializable {
 		//01 March 2016
 		final long start = 1456833600;
 
-		Logger.info("THIS TRIALVERSION WILL END ON 01/06/2016", null);
+		logger.info("THIS TRIALVERSION WILL END ON 01/06/2016", null);
 		if (now-start < 0) {
-			Logger.info("TRIAL EXPIRED", null);
+			logger.info("TRIAL EXPIRED", null);
 			System.exit(9);
 		}
 
 		if (now > end) {
-			Logger.info("TRIAL EXPIRED", null);
+			logger.info("TRIAL EXPIRED", null);
 			System.exit(9);
 		}
 	}

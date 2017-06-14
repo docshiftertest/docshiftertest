@@ -1,11 +1,11 @@
 package com.docshifter.core.messaging.sender;
 
-import com.docbyte.utils.Logger;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
 import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.Task;
+import org.apache.log4j.Logger;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -17,6 +17,8 @@ import java.util.Properties;
  */
 
 public class AMQPSender implements IMessageSender {
+
+	private static final Logger logger = Logger.getLogger(new Object() { }.getClass().getEnclosingClass());
 
 	private RabbitTemplate rabbitTemplate;
 	private Queue docshifterQueue;
@@ -35,15 +37,15 @@ public class AMQPSender implements IMessageSender {
 				task,
 				chainConfigurationID);
 
-		Logger.debug("type=" + type.name(), null);
-		Logger.debug("task=" + task.getId(), null);
+		logger.debug("type=" + type.name(), null);
+		logger.debug("task=" + task.getId(), null);
 
 		if (task == null){
-			Logger.debug("task=NULL ERROR", null);
+			logger.debug("task=NULL ERROR", null);
 		}
-		Logger.debug("chainConfigID=" + chainConfigurationID, null);
+		logger.debug("chainConfigID=" + chainConfigurationID, null);
 
-		Logger.info("Sending message: " + message.toString()+" for file: "+task.getSourceFilePath(),null);
+		logger.info("Sending message: " + message.toString()+" for file: "+task.getSourceFilePath(),null);
 
 		rabbitTemplate.convertAndSend(queue, message, message1 -> {
 			message1.getMessageProperties().setPriority(priority);
@@ -64,7 +66,7 @@ public class AMQPSender implements IMessageSender {
 		RabbitAdmin rabbitAdmin=new RabbitAdmin(rabbitTemplate.getConnectionFactory());
 		Properties props = rabbitAdmin.getQueueProperties(docshifterQueue.getName());
 		int messageCount = Integer.parseInt(props.get("QUEUE_MESSAGE_COUNT").toString());
-		Logger.debug(docshifterQueue.getName() + " has " + messageCount + " messages", null);
+		logger.debug(docshifterQueue.getName() + " has " + messageCount + " messages", null);
 		return messageCount;
 	}
 

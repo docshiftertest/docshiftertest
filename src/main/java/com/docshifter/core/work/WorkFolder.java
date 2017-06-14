@@ -1,7 +1,7 @@
 package com.docshifter.core.work;
 
 import com.docbyte.utils.FileUtils;
-import com.docbyte.utils.Logger;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,6 +19,7 @@ import java.util.Objects;
  */
 public class WorkFolder implements Serializable {
 
+	private static final Logger logger = Logger.getLogger(new Object() { }.getClass().getEnclosingClass());
 
 	private static final long serialVersionUID = 7938321829497848697L;
 	private Path folder;
@@ -113,7 +114,7 @@ public class WorkFolder implements Serializable {
 		try {
 			Files.createDirectories(newPath);
 		} catch (IOException e) {
-			Logger.error("Could not create directory:" + newPath, null);
+			logger.error("Could not create directory:" + newPath, null);
 			return null;
 		}
 

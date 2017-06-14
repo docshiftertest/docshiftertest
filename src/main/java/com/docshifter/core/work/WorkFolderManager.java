@@ -1,9 +1,9 @@
 package com.docshifter.core.work;
 
 import com.docbyte.utils.FileUtils;
-import com.docbyte.utils.Logger;
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.service.GeneralConfigService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 @Service
 public class WorkFolderManager {
 
-	//private static WorkFolderManager instance = null;
+	private static final Logger logger = Logger.getLogger(new Object() { }.getClass().getEnclosingClass());
 
 
 	private Path workfolder;
@@ -107,7 +107,7 @@ public class WorkFolderManager {
 		}
 
 		if (folder.getErrorFolder() == null){
-			Logger.info("ERRORFOLDER IS NULL *****", null);
+			logger.info("ERRORFOLDER IS NULL *****", null);
 		} else {
 			deletePath(folder.getErrorFolder(), force);
 		}

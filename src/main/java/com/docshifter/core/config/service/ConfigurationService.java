@@ -1,14 +1,13 @@
 package com.docshifter.core.config.service;
 
 
-import com.docbyte.utils.Logger;
 import com.docshifter.core.config.wrapper.SenderConfigurationWrapper;
 import com.docshifter.core.config.domain.*;
+import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +23,8 @@ import java.util.Set;
  */
 @Service
 public class ConfigurationService {
+
+	private static final Logger logger = Logger.getLogger(new Object() { }.getClass().getEnclosingClass());
 
 	private NodeRepository nodeRepository;
 	private ChainConfigurationRepository chainConfigurationRepository;
@@ -121,7 +122,7 @@ public class ConfigurationService {
 			List<ModuleConfiguration> list = moduleConfigurationRepository.findByModule(module);
 			return list;
 		} catch (HibernateException e) {
-			Logger.error("moduleconfiguration not found", e);
+			logger.error("moduleconfiguration not found", e);
 			e.printStackTrace();
 			return null;
 		}
@@ -133,7 +134,7 @@ public class ConfigurationService {
 			Module module = moduleRepository.findOneByName(name);
 			return module;
 		} catch (HibernateException e) {
-			Logger.error("module not found", e);
+			logger.error("module not found", e);
 			e.printStackTrace();
 			return null;
 		}
