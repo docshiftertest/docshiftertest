@@ -225,6 +225,9 @@
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
+			<properties>
+				<build.type></build.type>
+			</properties>
 			<build>
 				<plugins>
 					<plugin>
@@ -269,7 +272,7 @@
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
-				<build.type></build.type>
+				<build.type>-SNAPSHOT</build.type>
 			</properties>
 		</profile>
 		<profile>
