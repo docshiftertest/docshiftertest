@@ -19,19 +19,19 @@ public final class LicenseHelper {
 			"    <EmailTo>admin@docbyte.com</EmailTo>\n" +
 			"    <LicenseType>Developer OEM</LicenseType>\n" +
 			"    <LicenseNote>Limited to 1 developer, unlimited physical locations</LicenseNote>\n" +
-			"    <OrderID>151022111459</OrderID>\n" +
+			"    <OrderID>160831043939</OrderID>\n" +
 			"    <UserID>66843</UserID>\n" +
 			"    <OEM>This is a redistributable license</OEM>\n" +
 			"    <Products>\n" +
 			"      <Product>Aspose.Total for Java</Product>\n" +
 			"    </Products>\n" +
 			"    <EditionType>Enterprise</EditionType>\n" +
-			"    <SerialNumber>d0924a68-1356-4e8e-b5bb-e4808f2a5b69</SerialNumber>\n" +
-			"    <SubscriptionExpiry>20161104</SubscriptionExpiry>\n" +
+			"    <SerialNumber>1cd0a4c6-85ae-43d5-8e64-61d6391f04f6</SerialNumber>\n" +
+			"    <SubscriptionExpiry>20171104</SubscriptionExpiry>\n" +
 			"    <LicenseVersion>3.0</LicenseVersion>\n" +
 			"    <LicenseInstructions>http://www.aspose.com/corporate/purchase/license-instructions.aspx</LicenseInstructions>\n" +
 			"  </Data>\n" +
-			"  <Signature>bd/lvMGHK2sWD1LIDqeRwVey9FipX0SP9E/enHSDOHqmND6Ehhm2xDY/JQ3iduSguyhTYVD2Wjn7DxzA1BNxWPOgkwtmc+XgmBqOGBZ+ZVqCuFNVFMNdfcTIiQKRbysFusQ/0NKcTO3KbzTfSTLoXM5NLyuPmBLncH6RDbWxUdc=</Signature>\n" +
+			"  <Signature>jH5BspRua7Ip0klxmDnUdVLXw0PmfnO/t11DyJNG5OIqIZXaKJl0XgPccYyUlwnVoAiOUvfagKXArApPnVjJ9ng+VUAOCXjOjPVZuk492yhtUwBvCEOz65pDJ84dnzofcsbllTi6KJ5499aXAivb/5tw6FL0yVZHKE0qlB7M07A=</Signature>\n" +
 			"</License>";
 
 	private LicenseHelper() {
