@@ -3,9 +3,7 @@ package com.docshifter.core;
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.service.ConfigurationService;
 import com.docshifter.core.config.service.GeneralConfigService;
-import com.docshifter.core.config.service.NalpeironService;
 import com.docshifter.core.work.WorkFolderManager;
-import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -14,10 +12,10 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.util.ArrayList;
@@ -29,8 +27,11 @@ import java.util.Map;
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
  */
 @Configuration
-@ComponentScan
-@EnableJpaRepositories(basePackages = {"com.docshifter.core.config.domain"})
+@ComponentScan(basePackages = {"com.docshifter.core", "com.docshifter.monitoring"})
+@EnableJpaRepositories(basePackages = {
+        "com.docshifter.core.config.domain",
+        "com.docshifter.monitoring.repo"})
+@EntityScan("com.docshifter.monitoring.entities")
 public class DocShifterConfiguration {
 
     @Autowired
