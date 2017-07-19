@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.docshifter</groupId>
     <artifactId>docshifter-beans</artifactId>
-    <version>5.6.0.1</version>
+    <version>5.6.1</version>
     <packaging>jar</packaging>
     <description></description>
     <properties>
@@ -70,7 +70,7 @@
         <dependency>
             <groupId>com.aspose</groupId>
             <artifactId>aspose-email</artifactId>
-            <version>16.10.0</version>
+            <version>17.7</version>
             <classifier>jdk16</classifier>
         </dependency>
         <dependency>
