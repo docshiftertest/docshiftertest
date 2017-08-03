@@ -17,6 +17,8 @@
 		<maven.compile.target>1.8</maven.compile.target>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 
+        <beans.version>6.0.1${build.type}</beans.version>
+        <monitoring.version>6.0.1${build.type}</monitoring.version>
 		<docbyteutils.version>1.0</docbyteutils.version>
 	</properties>
 
@@ -66,6 +68,12 @@
 			<artifactId>utils</artifactId>
 			<version>${docbyteutils.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>com.docshifter.monitoring</groupId>
+            <artifactId>docshifter-monitoring-lib</artifactId>
+            <version>${monitoring.version}</version>
+            <scope>provided</scope>
+        </dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
@@ -174,6 +182,28 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+
+        <!-- monitoring dependencies -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.snmp4j</groupId>
+            <artifactId>snmp4j</artifactId>
+            <version>2.5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.dozer</groupId>
+            <artifactId>dozer</artifactId>
+            <version>5.5.1</version>
+        </dependency>
+
 	</dependencies>
 
 
