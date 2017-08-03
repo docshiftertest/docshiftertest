@@ -31,7 +31,7 @@ import java.util.Map;
 @EnableJpaRepositories(basePackages = {
         "com.docshifter.core.config.domain",
         "com.docshifter.monitoring.repo"})
-@EntityScan("com.docshifter.monitoring.entities")
+@EntityScan({"com.docshifter.core.config", "com.docshifter.monitoring.entities"})
 public class DocShifterConfiguration {
 
     @Autowired
