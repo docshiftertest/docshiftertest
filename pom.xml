@@ -255,19 +255,6 @@
 									</descriptors>
 								</configuration>
 							</execution>
-							<execution>
-								<id>make-assembly-licensing</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<finalName>Docshifter-Licensing</finalName>
-									<descriptors>
-										<descriptor>src/main/assembly/assembly-licensing.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
 						</executions>
 					</plugin>
 				</plugins>

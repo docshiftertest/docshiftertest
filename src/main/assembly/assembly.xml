@@ -39,4 +39,30 @@
             </excludes>
         </dependencySet>
     </dependencySets>
+    <fileSet>
+        <directory>${project.basedir}/src/main/resources/</directory>
+        <outputDirectory>/</outputDirectory>
+        <includes>
+            <include>application.properties</include>
+        </includes>
+    </fileSet>
+    <fileSet>
+        <directory>${project.basedir}/src/main/resources/license</directory>
+        <outputDirectory>/lib</outputDirectory>
+        <includes>
+            <include>nalpjava.dll</include>
+            <include>libnalpjava.so</include>
+        </includes>
+    </fileSet>
+    <fileSet>
+        <directory>${project.basedir}/src/main/resources/license</directory>
+        <outputDirectory>/licensing</outputDirectory>
+        <includes>
+            <include>docShifterFileCheck.dll</include>
+            <include>docShifterFileCheck.so</include>
+            <include>DSLicenseActivationAnswer.txt</include>
+            <include>DSLicenseActivationRequest.txt</include>
+            <include>DSLicenseCode.txt</include>
+        </includes>
+    </fileSet>
 </assembly>
