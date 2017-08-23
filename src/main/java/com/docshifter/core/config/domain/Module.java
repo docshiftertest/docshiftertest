@@ -205,7 +205,21 @@ public class Module {
 			return false;
 		return true;
 	}
-
+	
+	@Override
+	public String toString() {
+		return "Module{" +
+				"id=" + id +
+				", name='" + name + '\'' +
+				", classname='" + classname + '\'' +
+				", description='" + description + '\'' +
+				", type='" + type + '\'' +
+				", condition='" + condition + '\'' +
+				", inputFiletype='" + inputFiletype + '\'' +
+				", outputFileType='" + outputFileType + '\'' +
+				'}';
+	}
+	
 	public String getCondition() {
 		return condition;
 	}
