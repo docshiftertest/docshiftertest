@@ -22,5 +22,7 @@ public interface IMessageSender extends IMessageSenderOrPublisher {
 	void sendTask(String queueName, Task task, int priority) ;
 
 	int getMessageCount();
+	
+	Task sendSyncTask(long ChainConfigurationID, Task task) ;
 
 }

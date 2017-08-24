@@ -1,7 +1,9 @@
 package com.docshifter.core.messaging;
 
+import com.docshifter.core.task.Task;
+
 public interface IDocShifterController<T> {
 
-	boolean onMessage(T message) throws Exception;
+	Task onMessage(T message) throws Exception;
 
 }

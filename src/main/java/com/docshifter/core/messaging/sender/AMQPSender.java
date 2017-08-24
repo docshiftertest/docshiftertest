@@ -36,7 +36,7 @@ public class AMQPSender implements IMessageSender {
 	private void sendTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task, int priority) {
 		sendTask(type, queue, chainConfigurationID, task, priority, false);
 	}
-	public Task sendTaskSync(DocshifterMessageType type, String queue, long chainConfigurationID, Task task) {
+	private Task sendSyncTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task) {
 		Object response = sendTask(type, queue, chainConfigurationID, task, SYNC_PRIORITY, true);
 		
 		if (response instanceof DocshifterMessage == false) {
@@ -72,7 +72,7 @@ public class AMQPSender implements IMessageSender {
 		
 		logger.info("Sending message: " + message.toString() + " for file: " + task.getSourceFilePath(), null);
 		
-		if (sync) {
+		if (!sync) {
 			rabbitTemplate.convertAndSend(queue, message, message1 -> {
 				message1.getMessageProperties().setPriority(priority);
 				return message1;
@@ -145,7 +145,12 @@ public class AMQPSender implements IMessageSender {
 	public void sendTask(String queueName, Task task, int priority)  {
 		sendTask(DocshifterMessageType.DEFAULT, queueName, 0, task, priority);
 	}
-
+	
+	@Override
+	public Task sendSyncTask(long chainConfigurationID, Task task) {
+		return sendSyncTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfigurationID, task);
+	}
+	
 	@Override
 	@Deprecated
 	public void close() {
