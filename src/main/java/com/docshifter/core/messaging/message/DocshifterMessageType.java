@@ -5,6 +5,7 @@ package com.docshifter.core.messaging.message;
  */
 public enum DocshifterMessageType {
 	DEFAULT,
+	SYNC,
 	DCTM,
 	RETURN
 }
