@@ -8,7 +8,8 @@ public class SyncTask extends Task {
 	
 	
 	protected Path outputFilePath;
-	
+	protected String fileName;
+
 	public SyncTask(Path filePath, WorkFolder wf) {
 		super(filePath, wf);
 	}
@@ -19,5 +20,13 @@ public class SyncTask extends Task {
 	
 	public void setOutputFilePath(Path outputFilePath) {
 		this.outputFilePath = outputFilePath;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 }
