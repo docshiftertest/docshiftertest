@@ -1,6 +1,7 @@
 package com.docshifter.core.messaging.queue.sender;
 
 import com.docshifter.core.task.DctmTask;
+import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 
 public interface IMessageSender extends IMessageSenderOrPublisher {
@@ -22,5 +23,7 @@ public interface IMessageSender extends IMessageSenderOrPublisher {
 	void sendTask(String queueName, Task task, int priority) ;
 
 	int getMessageCount();
+	
+	SyncTask sendSyncTask(long ChainConfigurationID, Task task) ;
 
 }

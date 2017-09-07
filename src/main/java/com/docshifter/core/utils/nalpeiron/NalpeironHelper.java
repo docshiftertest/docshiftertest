@@ -395,7 +395,7 @@ public class NalpeironHelper {
                     ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
 
             if (i < 0) {
-                throw new DocShifterLicenseException("could not open nalp library", new NalpError(i, nalp.callNalpGetErrorMsg(i)));
+                throw new DocShifterLicenseException("could not open nalp library" + nalp.callNalpGetErrorMsg(i), new NalpError(i, nalp.callNalpGetErrorMsg(i)));
             }
         } catch (NalpError error) {
             logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + "code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);

@@ -4,12 +4,14 @@ import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
 import com.docshifter.core.task.DctmTask;
+import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import org.apache.log4j.Logger;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
+import javax.lang.model.type.UnknownTypeException;
 import java.util.Properties;
 
 /**
@@ -24,33 +26,71 @@ public class AMQPSender implements IMessageSender {
 	private Queue docshifterQueue;
 
 	private static final int DEFAULT_PRIORITY= 2;
+	
+	private static final int SYNC_PRIORITY= 4;
 
 	public AMQPSender(RabbitTemplate rabbitTemplate, Queue docshifterQueue) {
 		this.rabbitTemplate = rabbitTemplate;
 		this.docshifterQueue = docshifterQueue;
 	}
-
-
-	private void sendTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task, int priority)  {
-		DocshifterMessage message=new DocshifterMessage(
+	
+	
+	private SyncTask sendSyncTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task) {
+		Object response = sendTask(type, queue, chainConfigurationID, task, SYNC_PRIORITY);
+		
+		if (response instanceof DocshifterMessage == false) {
+			//TODO: update to good exception message
+			throw new IllegalArgumentException("Return unknown");
+		}
+		
+		DocshifterMessage message = (DocshifterMessage) response;
+		
+		if (message.getType() != DocshifterMessageType.RETURN) {
+			//TODO: update to good exception message
+			throw new IllegalArgumentException("Message type not supported: " + message.getType());
+		}
+		
+		if (message.getTask() instanceof  SyncTask) {
+			return (SyncTask) message.getTask();
+		} else {
+			throw new IllegalArgumentException("Message is returnMessage but task is not a SyncTask ");
+		}
+		
+		
+		
+	}
+	
+	private Object sendTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task, int priority) {
+		DocshifterMessage message = new DocshifterMessage(
 				type,
 				task,
 				chainConfigurationID);
-
+		
 		logger.debug("type=" + type.name(), null);
 		logger.debug("task=" + task.getId(), null);
-
-		if (task == null){
+		
+		if (task == null) {
 			logger.debug("task=NULL ERROR", null);
 		}
 		logger.debug("chainConfigID=" + chainConfigurationID, null);
-
-		logger.info("Sending message: " + message.toString()+" for file: "+task.getSourceFilePath(),null);
-
-		rabbitTemplate.convertAndSend(queue, message, message1 -> {
-			message1.getMessageProperties().setPriority(priority);
-			return message1;
-		});
+		
+		logger.info("Sending message: " + message.toString() + " for file: " + task.getSourceFilePath(), null);
+		
+		if (type !=DocshifterMessageType.SYNC) {
+			rabbitTemplate.convertAndSend(queue, message, message1 -> {
+				message1.getMessageProperties().setPriority(priority);
+				return message1;
+			});
+			return null;
+		} else {
+			
+			return rabbitTemplate.convertSendAndReceive(queue, message, message1 -> {
+				message1.getMessageProperties().setPriority(SYNC_PRIORITY);
+				return message1;
+			});
+		}
+		
+		
 	}
 
 	private void sendTask(DocshifterMessageType type, long chainConfigurationID, Task task, int priority)  {
@@ -109,7 +149,12 @@ public class AMQPSender implements IMessageSender {
 	public void sendTask(String queueName, Task task, int priority)  {
 		sendTask(DocshifterMessageType.DEFAULT, queueName, 0, task, priority);
 	}
-
+	
+	@Override
+	public SyncTask sendSyncTask(long chainConfigurationID, Task task) {
+		return sendSyncTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfigurationID, task);
+	}
+	
 	@Override
 	@Deprecated
 	public void close() {
