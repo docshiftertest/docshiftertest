@@ -13,19 +13,19 @@ public class ChainConfiguration {
 	private String description;
 	private String printerName;
 	private String queueName;
-	private String errormailHost;
-	private String errormailDestination;
-	private String errormailOrigin;
+	
+	private long timeout;
 	
 	private boolean enabled;
 
 	@ManyToOne(cascade=CascadeType.ALL)
 	private Node rootNode;
-
+	
+	
 	public ChainConfiguration() {}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-							  String errormailOrigin, String errormailDestination, String errormailHost)
+							  long timeout)
 	{
 		this.name = name;
 		this.description = description;
@@ -33,9 +33,7 @@ public class ChainConfiguration {
 		this.printerName = printerName;
 		this.queueName = queueName;
 		this.rootNode = rootNode;
-		this.errormailDestination = errormailDestination;
-		this.errormailHost = errormailHost;
-		this.errormailOrigin = errormailOrigin;
+		this.timeout = timeout;
 	}
 	public String getDescription()
 	{
@@ -105,27 +103,11 @@ public class ChainConfiguration {
 		this.queueName = queueName;
 	}
 
-	public String getErrormailHost() {
-		return errormailHost;
+	public long getTimeout() {
+		return timeout;
 	}
-
-	public void setErrormailHost(String errormailHost) {
-		this.errormailHost = errormailHost;
-	}
-
-	public String getErrormailDestination() {
-		return errormailDestination;
-	}
-
-	public void setErrormailDestination(String errormailDestination) {
-		this.errormailDestination = errormailDestination;
-	}
-
-	public String getErrormailOrigin() {
-		return errormailOrigin;
-	}
-
-	public void setErrormailOrigin(String errormailOrigin) {
-		this.errormailOrigin = errormailOrigin;
+	
+	public void setTimeout(long timeout) {
+		this.timeout = timeout;
 	}
 }

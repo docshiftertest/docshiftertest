@@ -14,9 +14,8 @@ public abstract class NodeWrapper {
 	private String printerName;
 	private boolean configurationEnabled;
 
-	private String errormailHost;
-	private String errormailDestination;
-	private String errormailOrigin;
+	
+	private long timeout = 0;
 	
 	private ModuleWrapper moduleWrapper;
 
@@ -38,9 +37,7 @@ public abstract class NodeWrapper {
 		this.queueName = chainConfiguration.getQueueName();
 		this.printerName = chainConfiguration.getPrinterName();
 		this.configurationEnabled = chainConfiguration.isEnabled();
-		this.errormailDestination = chainConfiguration.getErrormailDestination();
-		this.errormailHost = chainConfiguration.getErrormailHost();
-		this.errormailOrigin = chainConfiguration.getErrormailOrigin();
+		this.timeout = chainConfiguration.getTimeout();
 
 		this.moduleWrapper = new ModuleWrapper(n.getModuleConfiguration());
 	}
@@ -90,28 +87,12 @@ public abstract class NodeWrapper {
 	public ModuleWrapper getModuleWrapper(){
 		return this.moduleWrapper;
 	}
-
-	public String getErrormailHost() {
-		return errormailHost;
+	
+	public long getTimeout() {
+		return timeout;
 	}
-
-	public void setErrormailHost(String errormailHost) {
-		this.errormailHost = errormailHost;
-	}
-
-	public String getErrormailDestination() {
-		return errormailDestination;
-	}
-
-	public void setErrormailDestination(String errormailDestination) {
-		this.errormailDestination = errormailDestination;
-	}
-
-	public String getErrormailOrigin() {
-		return errormailOrigin;
-	}
-
-	public void setErrormailOrigin(String errormailOrigin) {
-		this.errormailOrigin = errormailOrigin;
+	
+	public void setTimeout(long timeout) {
+		this.timeout = timeout;
 	}
 }
