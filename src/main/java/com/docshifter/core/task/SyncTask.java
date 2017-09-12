@@ -10,6 +10,8 @@ public class SyncTask extends Task {
 	protected Path outputFilePath;
 	protected String fileName;
 
+	public SyncTask() {	}
+
 	public SyncTask(Path filePath, WorkFolder wf) {
 		super(filePath, wf);
 	}
