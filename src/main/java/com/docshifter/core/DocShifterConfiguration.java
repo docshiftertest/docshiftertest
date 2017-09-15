@@ -12,6 +12,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -33,6 +34,9 @@ import java.util.Map;
         "com.docshifter.monitoring.repo"})
 @EntityScan({"com.docshifter.core.config", "com.docshifter.monitoring.entities"})
 public class DocShifterConfiguration {
+
+	@Value("${rabbitmq.replytimeout:300}")
+	private int rabbitReplyTimeout;
 
     @Autowired
     public GeneralConfigService generalConfigService;
@@ -64,6 +68,7 @@ public class DocShifterConfiguration {
     public RabbitTemplate rabbitTemplate() {
         RabbitTemplate template = new RabbitTemplate(connectionFactory());
         template.setMessageConverter(jsonMessageConverter());
+        template.setReplyTimeout(rabbitReplyTimeout);
         return template;
     }
 
