@@ -90,7 +90,11 @@ public class AMQPSender implements IMessageSender {
 				message1.getMessageProperties().setPriority(SYNC_PRIORITY);
 				return message1;
 			});
-			logger.debug("return on rabbit 'convertSendAndReceive': obj type" + obj.getClass().getSimpleName());
+			if (obj != null) {
+				logger.debug("return on rabbit 'convertSendAndReceive': obj type" + obj.getClass().getSimpleName());
+			} else {
+				logger.debug("return on rabbit 'convertSendAndReceive': obj is null");
+			}
 			return obj;
 		} else {
 			rabbitTemplate.convertAndSend(queue, message, message1 -> {
