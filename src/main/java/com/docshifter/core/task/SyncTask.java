@@ -9,11 +9,13 @@ public class SyncTask extends Task {
 	
 	protected Path outputFilePath;
 	protected String fileName;
+	protected boolean discardReturnFile;
 
-	public SyncTask() {	}
+	public SyncTask() { }
 
-	public SyncTask(Path filePath, WorkFolder wf) {
+	public SyncTask(Path filePath, WorkFolder wf, boolean discardReturnFile) {
 		super(filePath, wf);
+		this.discardReturnFile = discardReturnFile;
 	}
 	
 	public Path getOutputFilePath() {
@@ -30,5 +32,9 @@ public class SyncTask extends Task {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+
+	public boolean isDiscardReturnFile() {
+		return discardReturnFile;
 	}
 }
