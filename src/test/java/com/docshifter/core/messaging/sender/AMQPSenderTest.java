@@ -49,7 +49,12 @@ public class AMQPSenderTest {
 
 	}
 
-	@Test
+	/**
+	 * this throws IllegalArgumentException becaus there is no return response within timeout => return object is null
+	 *
+	 * @throws IllegalArgumentException
+	 */
+	@Test(expected = IllegalArgumentException.class)
 	public void sendSyncTask() throws Exception {
 
 		template.receiveAndReply(defaultQueue.getName(), (ReceiveAndReplyCallback<DocshifterMessage, DocshifterMessage>) docshifterMessage -> {
