@@ -88,7 +88,14 @@ public class WorkFolder implements Serializable {
 
 	public Path getNewFilePath(String filename, String extension) {
 
-		filename = FileUtils.shortenFileName(filename);
+		return getNewFilePath(filename,extension, true);
+	}
+
+	public Path getNewFilePath(String filename, String extension, boolean shortenFileName) {
+
+		if (shortenFileName) {
+			filename = FileUtils.shortenFileName(filename);
+		}
 		filename = FileUtils.removeIllegalFilesystemCharacters(filename);
 
 		Path newPath = Paths.get(folder.toString(), filename + "." + extension);
