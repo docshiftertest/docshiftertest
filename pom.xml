@@ -10,6 +10,12 @@
     <properties>
         <maven.compile.source>1.7</maven.compile.source>
         <maven.compile.target>1.7</maven.compile.target>
+
+        <aspose.email.version>17.8</aspose.email.version>
+        <aspose.email.classifier>jdk16</aspose.email.classifier>
+
+        <aspose.pdf.version>17.7</aspose.pdf.version>
+        <aspose.pdf.classifier></aspose.pdf.classifier>
     </properties>
 
     <distributionManagement>
@@ -70,8 +76,8 @@
         <dependency>
             <groupId>com.aspose</groupId>
             <artifactId>aspose-email</artifactId>
-            <version>17.7</version>
-            <classifier>jdk16</classifier>
+            <version>${aspose.email.version}</version>
+            <classifier>${aspose.email.classifier}</classifier>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -233,10 +239,9 @@
         <dependency>
             <groupId>com.aspose</groupId>
             <artifactId>aspose-pdf</artifactId>
-            <version>11.2.0</version>
-            <!--<classifier>jdk16</classifier>-->
+            <version>${aspose.pdf.version}</version>
+            <classifier>${aspose.pdf.classifier}</classifier>
         </dependency>
-
     </dependencies>
 
 
