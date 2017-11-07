@@ -33,6 +33,10 @@ public class Parameter
 		this.required = required;
 		this.valuesJson = valuesJson;
 	}
+
+    public Parameter(String name, String description, ParameterTypes type, Boolean required) {
+	    this(name, description, type, required, null);
+    }
 	
 	public Parameter(String name, String description, ParameterTypes type) {
 		this(name, description, type, false, null);
