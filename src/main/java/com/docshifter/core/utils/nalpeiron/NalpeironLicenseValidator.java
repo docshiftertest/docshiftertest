@@ -19,23 +19,28 @@ public class NalpeironLicenseValidator implements Runnable {
 		this.nalpeironHelper = nalpeironHelper;
 	}
 
+	private boolean firstRun = true;
+
+	private boolean offlineActivation = false;
+
 	@Override
 	public final void run() {
 		validateLicenseStatus();
 	}
 
 	public final void validateLicenseStatus() {
-		boolean offlineActivation = false;
+		if (firstRun) {
+			try {
+				Properties prop = new Properties();
+				//load a properties file from class path, inside static method
+				prop.load(getClass().getClassLoader().getResourceAsStream("application.properties"));
 
-		try {
-			Properties prop = new Properties();
-			//load a properties file from class path, inside static method
-			prop.load(getClass().getClassLoader().getResourceAsStream("application.properties"));
-
-			logger.trace("nalpeiron.offlineactivation property value: " + prop.getProperty("nalpeiron.offlineactivation"));
-			offlineActivation = Boolean.valueOf(prop.getProperty("nalpeiron.offlineactivation", "false"));
-		} catch (IOException ex) {
-			logger.error("failed to extract boolean nalpeiron.offlineactivation propperty value from application.properties", ex);
+				logger.trace("nalpeiron.offlineactivation property value: " + prop.getProperty("nalpeiron.offlineactivation"));
+				offlineActivation = Boolean.valueOf(prop.getProperty("nalpeiron.offlineactivation", "false"));
+				firstRun = false;
+			} catch (IOException ex) {
+				logger.error("failed to extract boolean nalpeiron.offlineactivation propperty value from application.properties", ex);
+			}
 		}
 
 		try {
