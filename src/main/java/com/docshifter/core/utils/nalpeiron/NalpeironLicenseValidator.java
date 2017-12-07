@@ -2,7 +2,9 @@ package com.docshifter.core.utils.nalpeiron;
 
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
+
+import java.io.IOException;
+import java.util.Properties;
 
 public class NalpeironLicenseValidator implements Runnable {
 
@@ -17,20 +19,27 @@ public class NalpeironLicenseValidator implements Runnable {
 		this.nalpeironHelper = nalpeironHelper;
 	}
 
-	@Value("${nalpeiron.offlineactivation:false}")
-	private boolean offlineactivation;
-
 	@Override
 	public final void run() {
 		validateLicenseStatus();
 	}
 
 	public final void validateLicenseStatus() {
-		try {
-			boolean offlineActivation = false;
+		boolean offlineActivation = false;
 
-			if (offlineactivation) {
-				offlineActivation = true;
+		try {
+			Properties prop = new Properties();
+			//load a properties file from class path, inside static method
+			prop.load(getClass().getClassLoader().getResourceAsStream("application.properties"));
+
+			logger.trace("nalpeiron.offlineactivation property value: " + prop.getProperty("nalpeiron.offlineactivation"));
+			offlineActivation = Boolean.valueOf(prop.getProperty("nalpeiron.offlineactivation", "false"));
+		} catch (IOException ex) {
+			logger.error("failed to extract boolean nalpeiron.offlineactivation propperty value from application.properties", ex);
+		}
+
+		try {
+			if (offlineActivation) {
 				logger.debug("Offline activation mode has been set, will forgo all connection attempts to the server and will try to activate offline");
 			}
 
