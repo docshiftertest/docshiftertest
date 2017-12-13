@@ -35,11 +35,14 @@ public class NalpeironHelper {
 
     private final String workDir;
 
+    private final boolean offlineActivation;
+
     private final ScheduledExecutorService licenseValidationScheduler = Executors.newSingleThreadScheduledExecutor();
     private final ScheduledExecutorService analyticsSenderScheduler = Executors.newSingleThreadScheduledExecutor();
 
 
-    public NalpeironHelper(NALP nalp, NSA nsa, NSL nsl, String workDir) {
+    public NalpeironHelper(NALP nalp, NSA nsa, NSL nsl, String workDir, boolean offlineActivation) {
+        this.offlineActivation = offlineActivation;
 
         this.nalp = nalp;
         this.nsa = nsa;
@@ -68,7 +71,7 @@ public class NalpeironHelper {
 
     public void validateLicenseAndInitiatePeriodicChecking() {
         //validate the license and start the periodic checking
-        NalpeironLicenseValidator validator = new NalpeironLicenseValidator(this, resolveLicenseNo());
+        NalpeironLicenseValidator validator = new NalpeironLicenseValidator(this, resolveLicenseNo(), offlineActivation);
         validator.validateLicenseStatus();
         licenseValidationScheduler.scheduleAtFixedRate(validator, 1, licenseDurationMinutes, TimeUnit.MINUTES);
     }
