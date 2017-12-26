@@ -2,23 +2,24 @@ package com.docshifter.core.utils.nalpeiron;
 
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
+
+import java.io.IOException;
+import java.util.Properties;
 
 public class NalpeironLicenseValidator implements Runnable {
 
 	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NalpeironLicenseValidator.class.getName());
 
 	private String licenseNo;
+	private boolean offlineActivation;
 
 	private final NalpeironHelper nalpeironHelper;
 
-	public NalpeironLicenseValidator(NalpeironHelper nalpeironHelper, String licenseNo) {
+	public NalpeironLicenseValidator(NalpeironHelper nalpeironHelper, String licenseNo, boolean offlineActivation) {
 		this.licenseNo = licenseNo;
 		this.nalpeironHelper = nalpeironHelper;
+		this.offlineActivation = offlineActivation;
 	}
-
-	@Value("${nalpeiron.offlineactivation:false}")
-	private boolean offlineactivation;
 
 	@Override
 	public final void run() {
@@ -26,15 +27,13 @@ public class NalpeironLicenseValidator implements Runnable {
 	}
 
 	public final void validateLicenseStatus() {
-		try {
-			boolean offlineActivation = false;
+		boolean validLicense;
+		NalpeironHelper.LicenseStatus licenseStatus;
 
-			if (offlineactivation) {
-				offlineActivation = true;
+		try {
+			if (offlineActivation) {
 				logger.debug("Offline activation mode has been set, will forgo all connection attempts to the server and will try to activate offline");
 			}
-
-			boolean validLicense = false;
 
 			//test for online connection
 			boolean hasConnection = true;
@@ -46,8 +45,6 @@ public class NalpeironLicenseValidator implements Runnable {
 					logger.debug("No connection to the Nalpeiron server could be established, will try offline activation");
 				}
 			}
-
-			NalpeironHelper.LicenseStatus licenseStatus;
 
 			if (!offlineActivation && hasConnection) {
 				// ALWAYS DO ONLINE CHECKING WHEN HAVING CONNECTION
@@ -107,7 +104,7 @@ public class NalpeironLicenseValidator implements Runnable {
 			}
 
 			if (validLicense) {
-				//process extra fields after validationg license
+				//process extra fields after validating license
 			} else {
 				// license could not be validate, close application
 				int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
