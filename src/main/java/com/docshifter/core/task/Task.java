@@ -29,29 +29,7 @@ public class Task implements Serializable {
 	protected ArrayList<String> messages = new ArrayList<>();
 	protected Map<String, Object> data = new HashMap<>();
 
-
-	//For the Russia Time Stamping
-/*	public Task() {
-
-		//08 June 2016
-		final long end = 1465992000;
-		final long now = System.currentTimeMillis()/1000L;
-
-		//01 March 2016
-		final long start = 1456833600;
-
-		logger.info("THIS TRIALVERSION WILL END ON 01/06/2016", null);
-		if (now-start < 0) {
-			logger.info("TRIAL EXPIRED", null);
-			System.exit(9);
-		}
-
-		if (now > end) {
-			logger.info("TRIAL EXPIRED", null);
-			System.exit(9);
-		}
-	}
-*/
+	
 	public Task() {
 	}
 

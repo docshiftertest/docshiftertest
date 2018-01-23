@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.docshifter</groupId>
 	<artifactId>beans</artifactId>
-	<version>6.1.0${build.type}</version>
+	<version>6.1.1${build.type}</version>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -18,7 +18,7 @@
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 
         <monitoring.version>6.0.1${build.type}</monitoring.version>
-		<docbyteutils.version>1.0</docbyteutils.version>
+		<docbyteutils.version>1.2</docbyteutils.version>
 	</properties>
 
 
