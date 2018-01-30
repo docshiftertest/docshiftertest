@@ -17,7 +17,7 @@
 		<maven.compile.target>1.8</maven.compile.target>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 
-        <monitoring.version>6.0.1${build.type}</monitoring.version>
+        <monitoring.version>6.1.1${build.type}</monitoring.version>
 		<docbyteutils.version>1.2</docbyteutils.version>
 	</properties>
 
