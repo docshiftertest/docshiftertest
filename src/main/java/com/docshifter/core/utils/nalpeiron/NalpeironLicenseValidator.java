@@ -114,9 +114,9 @@ public class NalpeironLicenseValidator implements Runnable {
 			}
 
 		} catch (DocShifterLicenseException ex) {
-			int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-			logger.debug(" NALP ERRROCODE: " + ex.getNalpErrorCode() + "NALP ERROR MESSGAG: " + ex.getNalpErrorMsg());
-			logger.fatal("Exception while trying to validate the nalpeiron license, closing the application", ex);
+			int errorCode = -455;//we need to exit with non zero error so yajsw will restart the service and validtion will be retriggered
+			logger.debug(" NALP ERRROCODE: " + ex.getNalpErrorCode() + " NALP ERROR MESSGAG: " + ex.getNalpErrorMsg());
+			logger.fatal("Exception while trying to validate the nalpeiron license, exiting with error", ex);
 
 			System.exit(errorCode);
 		}
