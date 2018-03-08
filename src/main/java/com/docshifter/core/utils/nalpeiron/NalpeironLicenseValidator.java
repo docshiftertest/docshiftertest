@@ -59,6 +59,7 @@ public class NalpeironLicenseValidator implements Runnable {
 
 	private boolean isValidExtraFields(NalpeironHelper nalpeironHelper) {
 		//TODO
+		//nalpeironHelper.getUDFValue("")
 		return true;
 	}
 
@@ -82,7 +83,7 @@ public class NalpeironLicenseValidator implements Runnable {
 				licenseStatus = nalpeironHelper.importCertificate(licenseNo, activationAnswer);
 
 				//if the license status ha s value below 0, then the current license could not validate, try getting a new one
-				if (!(licenseStatus.getValue() > 0)) {
+				if (licenseStatus.getValue() <= 0) {
 					// license import failed.
 					logger.info("The license could not be activated offline, import of DSLicenseActivationAnswer.txt failed");
 					validLicense = false;
