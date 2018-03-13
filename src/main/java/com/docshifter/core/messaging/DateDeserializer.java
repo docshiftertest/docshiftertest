@@ -10,14 +10,10 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import java.io.IOException;
 import java.text.DateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 public class DateDeserializer extends UntypedObjectDeserializer {
 	
-	DateFormat formatter = new ISO8601DateFormat();
+	private final DateFormat formatter = new ISO8601DateFormat();
 	
 	@Override
 	public Object deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
