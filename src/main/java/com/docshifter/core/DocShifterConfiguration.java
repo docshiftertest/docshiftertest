@@ -3,7 +3,11 @@ package com.docshifter.core;
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.service.ConfigurationService;
 import com.docshifter.core.config.service.GeneralConfigService;
+import com.docshifter.core.messaging.DateDeserializer;
 import com.docshifter.core.work.WorkFolderManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -58,10 +62,16 @@ public class DocShifterConfiguration {
 
     @Bean
     public MessageConverter jsonMessageConverter() {
-		Jackson2JsonMessageConverter conv = new Jackson2JsonMessageConverter();
-
-
-		return conv;
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		mapper.setDateFormat(new ISO8601DateFormat());
+		DateDeserializer.regObjectMapper(mapper);
+    	
+    	Jackson2JsonMessageConverter conv = new Jackson2JsonMessageConverter();
+    	conv.setJsonObjectMapper(mapper);
+    	
+		
+    	return conv;
     }
 
     @Bean

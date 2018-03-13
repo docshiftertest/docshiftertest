@@ -83,6 +83,10 @@ public class NalpeironService {
     private String libDir;// Workfolder for nalpeiron license and cache files
     @Value("${nalpeiron.workdir:./license/}")
     private String WorkDir;// Workfolder for nalpeiron license and cache files
+
+    @Value("${nalpeiron.offlineactivation:false}")
+    private boolean offlineActivation;// will force to do the activation in oofline mode, will forgo all connection attempts to the server
+
     private final boolean NSAEnable = true; // Enable Analytics
     private final boolean NSLEnable = true; // Enable Licensing
 
@@ -134,7 +138,7 @@ public class NalpeironService {
 
             logger.debug("opened NSL()", null);
 
-            helper = new NalpeironHelper(nalp, nsa, nsl, WorkDir);
+            helper = new NalpeironHelper(nalp, nsa, nsl, WorkDir, offlineActivation);
 
             logger.debug("initialized NalpeironHelper", null);
 

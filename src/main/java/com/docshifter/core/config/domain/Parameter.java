@@ -1,9 +1,6 @@
 package com.docshifter.core.config.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Parameter
@@ -16,6 +13,8 @@ public class Parameter
 	private String description;
 	private String type;
 	private Boolean required;
+	@Column(length = 1000)
+	private String valuesJson;
 	
 	public Boolean getRequired() {
 		return required;
@@ -26,20 +25,25 @@ public class Parameter
 	}
 	public Parameter() {}
 	
-	public Parameter(String name, String description, ParameterTypes type, Boolean required)
+	public Parameter(String name, String description, ParameterTypes type, Boolean required, String valuesJson)
 	{
 		this.name = name;
 		this.description = description;
 		this.type = type.toString();
 		this.required = required;
+		this.valuesJson = valuesJson;
 	}
+
+    public Parameter(String name, String description, ParameterTypes type, Boolean required) {
+	    this(name, description, type, required, null);
+    }
 	
 	public Parameter(String name, String description, ParameterTypes type) {
-		this(name, description, type, false);
+		this(name, description, type, false, null);
 	}
 
 	public Parameter(String name, ParameterTypes type) {
-		this(name, null, type, false);
+		this(name, null, type, false, null);
 	}
 
 	public void setId(long id)
@@ -82,7 +86,15 @@ public class Parameter
 		return type;
 	}
 
-	@Override
+    public String getValuesJson() {
+        return valuesJson;
+    }
+
+    public void setValuesJson(String valuesJson) {
+        this.valuesJson = valuesJson;
+    }
+
+    @Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;

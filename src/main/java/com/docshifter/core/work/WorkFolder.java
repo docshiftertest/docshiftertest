@@ -1,6 +1,7 @@
 package com.docshifter.core.work;
 
 import com.docbyte.utils.FileUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -41,6 +42,7 @@ public class WorkFolder implements Serializable {
 		this(workfolder, errorFolder, null);
 	}
 
+	@JsonIgnore
 	public boolean isRoot() {
         return parent == null;
     }
