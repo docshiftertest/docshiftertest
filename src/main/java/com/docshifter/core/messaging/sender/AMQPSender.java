@@ -11,7 +11,6 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-import javax.lang.model.type.UnknownTypeException;
 import java.util.Properties;
 
 /**

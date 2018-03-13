@@ -2,8 +2,6 @@ package com.docshifter.core.messaging.sender;
 
 import com.docshifter.core.TestController;
 import com.docshifter.core.messaging.message.DocshifterMessage;
-import com.docshifter.core.messaging.message.DocshifterMessageType;
-import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.work.WorkFolder;
 import org.junit.Before;
@@ -11,7 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.ReceiveAndReplyCallback;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,33 +18,32 @@ import java.nio.file.Paths;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestController.class)
 public class AMQPSenderTest {
-
-
+	
+	
 	AMQPSender sender;
-
+	
 	@Autowired
 	Queue defaultQueue;
-
+	
 	@Autowired
 	RabbitTemplate template;
 	
 	
 	@Autowired
 	private AmqpAdmin amqpAdmin;
-
-
+	
+	
 	@Before
 	public void setUp() throws Exception {
 		sender = new AMQPSender(template, defaultQueue);
 		amqpAdmin.purgeQueue(defaultQueue.getName(), false);
 	}
-
+	
 	@Test
 	public void sendTask() throws Exception {
 		Task task = new Task(Paths.get("target/test-classes/ds/work/.empty"),
@@ -58,20 +54,20 @@ public class AMQPSenderTest {
 		Date test = new Date();
 		
 		
-		task.getData().put("testDate" , test);
+		task.getData().put("testDate", test);
 		
 		sender.sendTask(defaultQueue.getName(), task);
 		
 		DocshifterMessage response = (DocshifterMessage) template.receiveAndConvert(defaultQueue.getName());
 		assertTrue(response.getTask().getData().get("testDate") instanceof Date);
-		assertEquals(test.toString(), ((Date)response.getTask().getData().get("testDate")).toString());
+		assertEquals(test.toString(), ((Date) response.getTask().getData().get("testDate")).toString());
 	}
-
+	
 	@Test
 	public void sendDocumentumTask() throws Exception {
-
+	
 	}
-
+	
 	/**
 	 * this throws IllegalArgumentException becaus there is no return response within timeout => return object is null
 	 *
@@ -101,10 +97,10 @@ public class AMQPSenderTest {
 		SyncTask returntask = sender.sendSyncTask(1, task);
 
 		assertNotNull(returntask);*/
-
+		
 		//TODO: fixe test setup
 		//https://dzone.com/articles/mocking-rabbitmq-for-integration-tests
-
+		
 	}
-
+	
 }
