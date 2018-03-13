@@ -9,6 +9,7 @@ import com.docshifter.core.work.WorkFolder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.ReceiveAndReplyCallback;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -17,8 +18,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.nio.file.Paths;
+import java.util.Date;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestController.class)
@@ -32,16 +36,35 @@ public class AMQPSenderTest {
 
 	@Autowired
 	RabbitTemplate template;
+	
+	
+	@Autowired
+	private AmqpAdmin amqpAdmin;
 
 
 	@Before
 	public void setUp() throws Exception {
 		sender = new AMQPSender(template, defaultQueue);
+		amqpAdmin.purgeQueue(defaultQueue.getName(), false);
 	}
 
 	@Test
 	public void sendTask() throws Exception {
-
+		Task task = new Task(Paths.get("target/test-classes/ds/work/.empty"),
+				new WorkFolder(
+						Paths.get("target/test-classes/ds/work"),
+						Paths.get("target/test-classes/ds/error")
+				));
+		Date test = new Date();
+		
+		
+		task.getData().put("testDate" , test);
+		
+		sender.sendTask(defaultQueue.getName(), task);
+		
+		DocshifterMessage response = (DocshifterMessage) template.receiveAndConvert(defaultQueue.getName());
+		assertTrue(response.getTask().getData().get("testDate") instanceof Date);
+		assertEquals(test.toString(), ((Date)response.getTask().getData().get("testDate")).toString());
 	}
 
 	@Test
