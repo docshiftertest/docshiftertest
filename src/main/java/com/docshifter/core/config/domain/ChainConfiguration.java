@@ -36,7 +36,7 @@ public class ChainConfiguration {
 		this.queueName = queueName;
 		this.rootNode = rootNode;
 		this.timeout = timeout;
-		this.priority = priority == null ? 2 : priority;
+		this.priority = priority;
 	}
 	public String getDescription()
 	{
@@ -115,10 +115,10 @@ public class ChainConfiguration {
 	}
 
 	public Integer getPriority() {
-		return priority==null?2:priority;
+		return priority;
 	}
 
 	public void setPriority(Integer priority) {
-		this.priority = priority == null ? 2 : priority;
+		this.priority = priority;
 	}
 }
