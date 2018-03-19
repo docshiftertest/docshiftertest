@@ -15,7 +15,7 @@ public class ChainConfiguration {
 	private String queueName;
 
 	private long timeout;
-	@Column(columnDefinition = "int(1) default 2")
+	@Column(columnDefinition = "int default 2")
 	private  Integer priority;
 
 	private boolean enabled;
