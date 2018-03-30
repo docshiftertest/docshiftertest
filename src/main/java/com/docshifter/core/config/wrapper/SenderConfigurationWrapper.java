@@ -7,7 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 public class SenderConfigurationWrapper extends NodeWrapper {
+
+	private static final Logger logger = Logger.getLogger(SenderConfigurationWrapper.class);
 
 	public SenderConfigurationWrapper(Node n, ChainConfigurationRepository chainConfigurationRepository) {
 		super(n, chainConfigurationRepository);
@@ -50,12 +54,18 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 
 	public int getInt(String name, int defaultValue){
 		Map<String, String> allParams = getModuleWrapper().params;
-		
-		if (allParams.containsKey(name)) {
-			return Integer.parseInt(allParams.get(name));
-		} else {
-			return defaultValue;
+		int result = defaultValue;
+		try {
+			if (allParams.containsKey(name)) {
+				result = Integer.parseInt(allParams.get(name));
+			}
 		}
+		catch (NumberFormatException niffy) {
+			// Just log it, we already set the default value
+			logger.warn("Used default value: " + defaultValue + " as we couldn't parse the provided value: [" + allParams.get(name) + "] for parameter: [" + name + "]");
+			logger.trace(niffy);
+		}
+		return result;
 	}
 	
 	public boolean getBoolean(String name) {
