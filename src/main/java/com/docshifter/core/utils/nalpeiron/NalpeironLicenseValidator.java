@@ -13,7 +13,7 @@ public class NalpeironLicenseValidator implements Runnable {
 	private final NalpeironHelper nalpeironHelper;
 
 	public NalpeironLicenseValidator(NalpeironHelper nalpeironHelper, String licenseNo, boolean offlineActivation) {
-		this.licenseNo = licenseNo;
+		this.licenseNo = licenseNo.trim();
 		this.nalpeironHelper = nalpeironHelper;
 		this.offlineActivation = offlineActivation;
 	}
