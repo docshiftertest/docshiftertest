@@ -180,7 +180,7 @@ public class DBTests {
 		n7 = new Node(null, mc7);
 
 
-		chc1 = new ChainConfiguration("testchain", "desc", true, n1, null, null, 60);
+		chc1 = new ChainConfiguration("testchain", "desc", true, n1, null, null, 60, 2);
 
 		chainConfigurationRepository.save(chc1);
 
