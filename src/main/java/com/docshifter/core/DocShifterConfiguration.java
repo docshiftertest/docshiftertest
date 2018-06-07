@@ -67,9 +67,7 @@ public class DocShifterConfiguration {
 		mapper.setDateFormat(new ISO8601DateFormat());
 		DateDeserializer.regObjectMapper(mapper);
     	
-    	Jackson2JsonMessageConverter conv = new Jackson2JsonMessageConverter();
-    	conv.setJsonObjectMapper(mapper);
-    	
+    	Jackson2JsonMessageConverter conv = new Jackson2JsonMessageConverter(mapper);
 		
     	return conv;
     }

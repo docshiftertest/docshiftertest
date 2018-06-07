@@ -42,7 +42,7 @@ public class GeneralConfigService {
 
 		System.out.print(this.globalSettingsRepository.count());
 		
-		GlobalSettings config = this.globalSettingsRepository.findOne(1l);
+		GlobalSettings config = this.globalSettingsRepository.findById(1l).get();
 
 		if(config != null){
 			params.put(Constants.MQ_SYSTEM, config.getMqSystem());
