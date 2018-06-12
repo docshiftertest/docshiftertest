@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Value object which represents a GeneralConfiguration. Code to communicated with the configuration server should be put in here.
@@ -42,9 +43,10 @@ public class GeneralConfigService {
 
 		System.out.print(this.globalSettingsRepository.count());
 		
-		GlobalSettings config = this.globalSettingsRepository.findById(1l).get();
+		Optional<GlobalSettings> configOpt = this.globalSettingsRepository.findById(1l);
 
-		if(config != null){
+		if(configOpt.isPresent()) {
+			GlobalSettings config = configOpt.get();
 			params.put(Constants.MQ_SYSTEM, config.getMqSystem());
 			params.put(Constants.MQ_URL, config.getMqURL());
 			params.put(Constants.MQ_QUEUE, config.getMqQueue());
