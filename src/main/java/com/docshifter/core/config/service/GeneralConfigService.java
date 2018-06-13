@@ -41,8 +41,9 @@ public class GeneralConfigService {
 		this.globalSettingsRepository = globalSettingsRepository;
 		params = new HashMap<String, String>();
 
-		System.out.print(this.globalSettingsRepository.count());
-		
+		System.out.println(this.globalSettingsRepository.count());
+
+
 		Optional<GlobalSettings> configOpt = this.globalSettingsRepository.findById(1l);
 
 		if(configOpt.isPresent()) {
