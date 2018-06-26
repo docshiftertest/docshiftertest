@@ -89,8 +89,8 @@ public class ConfigurationService {
 	public SenderConfigurationWrapper getSenderConfiguration(long uid) {
 		// return new SenderConfigurationWrapper(senderConfigurationDAO.get((int)
 		// uid));
-		ChainConfiguration cc=chainConfigurationRepository.findOne(uid);
-		return new SenderConfigurationWrapper(nodeRepository.findOne(cc.getRootNode().getId()), chainConfigurationRepository);
+		ChainConfiguration cc=chainConfigurationRepository.findById(uid).get();
+		return new SenderConfigurationWrapper(nodeRepository.findById(cc.getRootNode().getId()).get(), chainConfigurationRepository);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class ConfigurationService {
 
 	public ChainConfiguration getTransformationConfiguration(
 			long uid) {
-		return chainConfigurationRepository.findOne(uid);
+		return chainConfigurationRepository.findById(uid).get();
 	}
 
 	// TODO throw exception if the configuration is not found
