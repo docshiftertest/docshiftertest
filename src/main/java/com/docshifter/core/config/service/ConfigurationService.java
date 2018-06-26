@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -86,11 +87,24 @@ public class ConfigurationService {
 	 * @param uid a long representing the UID of the requested
 	 *        SenderConfiguration.
 	 */
-	public SenderConfigurationWrapper getSenderConfiguration(long uid) {
-		// return new SenderConfigurationWrapper(senderConfigurationDAO.get((int)
-		// uid));
-		ChainConfiguration cc=chainConfigurationRepository.findById(uid).get();
-		return new SenderConfigurationWrapper(nodeRepository.findById(cc.getRootNode().getId()).get(), chainConfigurationRepository);
+	public Optional<SenderConfigurationWrapper> getSenderConfiguration(long uid) {
+		Optional<ChainConfiguration> cc=chainConfigurationRepository.findById(uid);
+		if (cc.isPresent()) {
+			Optional<Node> noddy = nodeRepository.findById(cc.get().getRootNode().getId());
+			if (noddy.isPresent()) {
+				return Optional.of(new SenderConfigurationWrapper(noddy.get(), 
+						chainConfigurationRepository));
+			}
+			else {
+				logger.error("Could not find Node in nodeRepository using ID: " + 
+					cc.get().getRootNode().getId() +
+					" for ChainConfiguration ID: " + uid);
+			}
+		}
+		else {
+			logger.error("Could not find ChainConfiguration using ID: " + uid);
+		}
+		return Optional.empty();
 	}
 
 	/**
@@ -111,9 +125,9 @@ public class ConfigurationService {
 		return senders;
 	}
 
-	public ChainConfiguration getTransformationConfiguration(
+	public Optional<ChainConfiguration> getTransformationConfiguration(
 			long uid) {
-		return chainConfigurationRepository.findById(uid).get();
+		return chainConfigurationRepository.findById(uid);
 	}
 
 	// TODO throw exception if the configuration is not found
