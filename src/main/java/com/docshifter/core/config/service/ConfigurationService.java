@@ -87,13 +87,12 @@ public class ConfigurationService {
 	 * @param uid a long representing the UID of the requested
 	 *        SenderConfiguration.
 	 */
-	public Optional<SenderConfigurationWrapper> getSenderConfiguration(long uid) {
+	public SenderConfigurationWrapper getSenderConfiguration(long uid) {
 		Optional<ChainConfiguration> cc=chainConfigurationRepository.findById(uid);
 		if (cc.isPresent()) {
 			Optional<Node> noddy = nodeRepository.findById(cc.get().getRootNode().getId());
 			if (noddy.isPresent()) {
-				return Optional.of(new SenderConfigurationWrapper(noddy.get(), 
-						chainConfigurationRepository));
+				return new SenderConfigurationWrapper(noddy.get(), chainConfigurationRepository);
 			}
 			else {
 				logger.error("Could not find Node in nodeRepository using ID: " + 
@@ -104,7 +103,7 @@ public class ConfigurationService {
 		else {
 			logger.error("Could not find ChainConfiguration using ID: " + uid);
 		}
-		return Optional.empty();
+		return null;
 	}
 
 	/**
@@ -125,9 +124,9 @@ public class ConfigurationService {
 		return senders;
 	}
 
-	public Optional<ChainConfiguration> getTransformationConfiguration(
+	public ChainConfiguration getTransformationConfiguration(
 			long uid) {
-		return chainConfigurationRepository.findById(uid);
+		return chainConfigurationRepository.findById(uid).get();
 	}
 
 	// TODO throw exception if the configuration is not found
