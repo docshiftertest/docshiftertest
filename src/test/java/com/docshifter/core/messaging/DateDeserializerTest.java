@@ -1,7 +1,9 @@
 package com.docshifter.core.messaging;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -11,6 +13,7 @@ import java.util.Date;
 import static org.junit.Assert.*;
 import static org.springframework.util.Assert.isInstanceOf;
 
+@RunWith(SpringRunner.class)
 @SpringBootTest
 public class DateDeserializerTest {
 	
