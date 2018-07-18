@@ -16,6 +16,7 @@ public abstract class NodeWrapper {
 
 	
 	private long timeout = 0;
+	private int priority=2;
 	
 	private ModuleWrapper moduleWrapper;
 
@@ -38,6 +39,7 @@ public abstract class NodeWrapper {
 		this.printerName = chainConfiguration.getPrinterName();
 		this.configurationEnabled = chainConfiguration.isEnabled();
 		this.timeout = chainConfiguration.getTimeout();
+		this.priority = chainConfiguration.getPriority();
 
 		this.moduleWrapper = new ModuleWrapper(n.getModuleConfiguration());
 	}
@@ -94,5 +96,13 @@ public abstract class NodeWrapper {
 	
 	public void setTimeout(long timeout) {
 		this.timeout = timeout;
+	}
+
+	public int getPriority() {
+		return priority;
+	}
+
+	public void setPriority(int priority) {
+		this.priority = priority;
 	}
 }
