@@ -50,13 +50,6 @@ public class Task implements Serializable {
 		this.workFolder = workFolder;
 	}
 
-
-	//temp to show sending a task through jms works (ObjectMessage)
-	public String toString() {
-
-		return sourceFilePath.toAbsolutePath().toString();
-	}
-
 	public Path getSourceFilePath() {
 		return sourceFilePath;
 	}
@@ -104,5 +97,18 @@ public class Task implements Serializable {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+	
+	@Override
+	public String toString() {
+		return "Task{" +
+				"id='" + id + '\'' +
+				", workFolder=" + workFolder +
+				", sourceFilePath=" + sourceFilePath +
+				", name='" + name + '\'' +
+				", folderStructure='" + folderStructure + '\'' +
+				", messages=" + messages +
+				", data=" + data +
+				'}';
 	}
 }

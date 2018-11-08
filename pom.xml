@@ -131,7 +131,6 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.25</version>
 		</dependency>
 
 
@@ -192,7 +191,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -200,7 +198,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.6</version>
 				<configuration>
 					<excludes>
 						<exclude>**/application.properties</exclude>
@@ -219,7 +216,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.5.3</version>
 				<executions>
 					<execution>
 						<id>make-assembly</id>
