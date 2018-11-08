@@ -280,6 +280,7 @@
                 <configuration>
                     <repository>eu.gcr.io/docbyte-dev-194014/docshifter/docshifter-base</repository>
                     <tag>${project.version}</tag>
+                    <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
 					<buildArgs>
 						<DEPENDENCY>${artifactId}-${version}</DEPENDENCY>
 					</buildArgs>
