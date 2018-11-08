@@ -57,7 +57,6 @@ public class Module {
 		this.name = name;
 		this.classname = classname;
 		this.type = type;
-		this.condition = condition;
 		this.parameters = parameters;
 	}
 
