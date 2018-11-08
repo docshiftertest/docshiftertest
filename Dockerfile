@@ -1,6 +1,6 @@
 # DocShifter-base
 #
-# VERSION       6.1.1
+# VERSION       6.2.0
 
 # using the OpenJDK image
 FROM openjdk:10
