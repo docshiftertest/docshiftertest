@@ -1,7 +1,7 @@
 package com.docshifter.core.config.wrapper;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.reset;
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import javax.naming.ConfigurationException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import com.docshifter.core.config.domain.ChainConfiguration;
 import com.docshifter.core.config.domain.ChainConfigurationRepository;
 import com.docshifter.core.config.domain.Module;
@@ -28,10 +28,10 @@ public class SenderConfigurationWrapperTest {
 	private static final String DOCSHIFTER = "docshifter";
 
 	@Mock
-	ChainConfigurationRepository chainConfigRepo;
+	private ChainConfigurationRepository chainConfigRepo;
 
 	@Mock
-	ChainConfiguration chainConfig;
+	private ChainConfiguration chainConfig;
 
 	// This is not Mocked, we build one for the test
 	private ModuleConfiguration moduleConfiguration;

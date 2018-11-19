@@ -33,27 +33,33 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 	}
 	
 	public String getString(String name) {
+		logger.debug("Calling getString(" + name + ", null)");
 		return getString(name, null);
 	}
 	
 	public String getString(String name, String defaultValue) {
 		//TODO: add general config params id necessary
 		Map<String, String> allParams = getModuleWrapper().params;
+		logger.debug("getString(" + name + ", " + defaultValue + ") called");
 		
 		if (allParams.containsKey(name)) {
+			logger.debug("containsKey so returning: " + allParams.get(name)); 
 			return allParams.get(name);
 		} else {
+			logger.debug("returning (defaultValue): " + defaultValue);
 			return defaultValue;
 		}
 		
 	}
 	
 	public int getInt(String name) {
+		logger.debug("Calling getInt(" + name + ", 0)");
 		return getInt(name, 0);
 	}
 
 	public int getInt(String name, int defaultValue){
 		Map<String, String> allParams = getModuleWrapper().params;
+		logger.debug("getInt(" + name + ", " + defaultValue + ") called");
 		int result = defaultValue;
 		try {
 			if (allParams.containsKey(name)) {
