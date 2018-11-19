@@ -33,9 +33,6 @@ public class SenderConfigurationWrapperTest {
 	@Mock
 	private ChainConfiguration chainConfig;
 
-	// This is not Mocked, we build one for the test
-	private ModuleConfiguration moduleConfiguration;
-
 	/**
 	 * Test for empty String in an Integer param, previously this was throwing a NumberFormatException
 	 * @throws ConfigurationException
@@ -148,7 +145,7 @@ public class SenderConfigurationWrapperTest {
 
 	private SenderConfigurationWrapper setupForConfigTest(Map<Parameter, String> paramMap) throws ConfigurationException {
 		// Manually build the ModuleConfiguration with a custom ParamMap
-		moduleConfiguration = new ModuleConfiguration(new Module(), "Some Module", "Indescribable", paramMap);
+		ModuleConfiguration moduleConfiguration = new ModuleConfiguration(new Module(), "Some Module", "Indescribable", paramMap);
 		Node node = new Node(null, moduleConfiguration);
 		when(chainConfigRepo.findByRootNode(any(Node.class))).thenReturn(chainConfig);
 		SenderConfigurationWrapper config = new SenderConfigurationWrapper(node, chainConfigRepo);
