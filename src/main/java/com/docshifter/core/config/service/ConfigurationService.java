@@ -2,7 +2,14 @@ package com.docshifter.core.config.service;
 
 
 import com.docshifter.core.config.wrapper.SenderConfigurationWrapper;
-import com.docshifter.core.config.domain.*;
+import com.docshifter.core.config.domain.ChainConfiguration;
+import com.docshifter.core.config.domain.ChainConfigurationRepository;
+import com.docshifter.core.config.domain.Module;
+import com.docshifter.core.config.domain.ModuleConfiguration;
+import com.docshifter.core.config.domain.ModuleConfigurationRepository;
+import com.docshifter.core.config.domain.ModuleRepository;
+import com.docshifter.core.config.domain.Node;
+import com.docshifter.core.config.domain.NodeRepository;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;

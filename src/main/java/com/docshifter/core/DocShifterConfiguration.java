@@ -7,7 +7,6 @@ import com.docshifter.core.messaging.DateDeserializer;
 import com.docshifter.core.work.WorkFolderManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -20,9 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +28,6 @@ import java.util.Map;
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
  */
-@Configuration
 @ComponentScan(basePackages = {"com.docshifter.core", "com.docshifter.monitoring"})
 @EnableJpaRepositories(basePackages = {
         "com.docshifter.core.config.domain",
@@ -63,12 +59,9 @@ public class DocShifterConfiguration {
     @Bean
     public MessageConverter jsonMessageConverter() {
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		mapper.setDateFormat(new ISO8601DateFormat());
+		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		DateDeserializer.regObjectMapper(mapper);
-    	
     	Jackson2JsonMessageConverter conv = new Jackson2JsonMessageConverter(mapper);
-		
     	return conv;
     }
 
