@@ -29,9 +29,9 @@ import java.util.Map;
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
  */
 @ComponentScan(basePackages = {"com.docshifter.core", "com.docshifter.monitoring"})
-@EnableJpaRepositories(basePackages = {
-        "com.docshifter.core.config.domain",
-        "com.docshifter.monitoring.repo"})
+//@EnableJpaRepositories(basePackages = {
+//        "com.docshifter.core.config.domain",
+//        "com.docshifter.monitoring.repo"})
 @EntityScan({"com.docshifter.core.config", "com.docshifter.monitoring.entities"})
 public class DocShifterConfiguration {
 
