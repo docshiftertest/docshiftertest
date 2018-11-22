@@ -9,7 +9,7 @@
 
     <dependencySets>
         <dependencySet>
-            <outputDirectory>/lib-doc</outputDirectory>
+            <outputDirectory>lib-doc</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
             <scope>runtime</scope>
         </dependencySet>

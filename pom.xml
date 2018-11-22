@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.docshifter</groupId>
 	<artifactId>beans</artifactId>
-	<version>6.2.0${build.type}</version>
+	<version>${revision}${sha1}${changelist}</version>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.1.0.RELEASE</version>
 	</parent>
+
 	<properties>
+		<revision>6.2.0</revision>
+		<sha1/>
 		<hsqldb.version>2.3.4</hsqldb.version>
 		<java.version>11</java.version>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 
-        <monitoring.version>6.2.0${build.type}</monitoring.version>
-		<docbyteutils.version>1.5${build.type}</docbyteutils.version>
+        <monitoring.version>6.2.0${changelist}</monitoring.version>
+		<docbyteutils.version>1.5${changelist}</docbyteutils.version>
 	</properties>
 
 
@@ -176,14 +180,7 @@
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-rest-core</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-
-
 	</dependencies>
-
 
 	<build>
 		<plugins>
@@ -276,7 +273,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<build.type>-SNAPSHOT</build.type>
+				<changelist>-SNAPSHOT</changelist>
 			</properties>
 		</profile>
 		<profile>
@@ -285,7 +282,7 @@
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
-				<build.type>-SNAPSHOT</build.type>
+				<changelist>-SNAPSHOT</changelist>
 			</properties>
 			<build>
 				<plugins>
@@ -329,7 +326,7 @@
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
-				<build.type></build.type>
+				<changelist/>
 			</properties>
 			<build>
 				<plugins>
