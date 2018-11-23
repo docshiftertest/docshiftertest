@@ -136,7 +136,7 @@ public class WorkFolder implements Serializable {
 		// default serialization
 //		oos.defaultWriteObject();
 		// write the object
-		List ser = new ArrayList();
+		List<Serializable> ser = new ArrayList<>();
 		ser.add(this.folder.toString());
 		ser.add(this.parent);
 		ser.add(this.errorFolder.toString());

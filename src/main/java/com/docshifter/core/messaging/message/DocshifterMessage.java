@@ -1,6 +1,5 @@
 package com.docshifter.core.messaging.message;
 
-import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.Task;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
