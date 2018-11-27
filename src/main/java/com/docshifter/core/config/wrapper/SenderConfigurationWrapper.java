@@ -1,20 +1,19 @@
 package com.docshifter.core.config.wrapper;
 
 
-import com.docshifter.core.config.domain.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
+import com.docshifter.core.config.domain.ChainConfigurationRepository;
+import com.docshifter.core.config.domain.Node;
 
 public class SenderConfigurationWrapper extends NodeWrapper {
 
 	private static final Logger logger = Logger.getLogger(SenderConfigurationWrapper.class);
 
-	public SenderConfigurationWrapper(Node n, ChainConfigurationRepository chainConfigurationRepository) {
-		super(n, chainConfigurationRepository);
+	public SenderConfigurationWrapper(Node node, ChainConfigurationRepository chainConfigurationRepository) {
+		super(node, chainConfigurationRepository);
 	}
 	
 	public SenderConfigurationWrapper() {
@@ -24,8 +23,8 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 	public List<ReceiverConfigurationWrapper> getApplicableReceiverConfigBeans(){
 		final List<ReceiverConfigurationWrapper> list = new ArrayList<ReceiverConfigurationWrapper>();
 
-		getNode().iterateOverNode( n-> {
-				ReceiverConfigurationWrapper b = new ReceiverConfigurationWrapper(n, chainConfigurationRepository);
+		getNode().iterateOverNode( node-> {
+				ReceiverConfigurationWrapper b = new ReceiverConfigurationWrapper(node, chainConfigurationRepository);
 				list.add(b);
 		});
 		

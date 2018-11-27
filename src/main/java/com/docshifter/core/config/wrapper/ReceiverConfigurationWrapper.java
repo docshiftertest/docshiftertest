@@ -6,8 +6,8 @@ import com.docshifter.core.config.domain.Node;
 
 public class ReceiverConfigurationWrapper extends NodeWrapper {
 
-	public ReceiverConfigurationWrapper(Node n, ChainConfigurationRepository chainConfigurationRepository) {
-		super(n, chainConfigurationRepository);
+	public ReceiverConfigurationWrapper(Node node, ChainConfigurationRepository chainConfigurationRepository) {
+		super(node, chainConfigurationRepository);
 	}
 
 }
