@@ -1,6 +1,7 @@
 package com.docshifter.core.config.domain;
 
 import org.springframework.data.repository.CrudRepository;
+
 import java.util.List;
 
 /**
