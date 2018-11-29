@@ -110,7 +110,7 @@ public class ConfigurationService {
 		else {
 			logger.error("Could not find ChainConfiguration (Workflow) using ID: " + uid +
 					". This may be because you have added/deleted Workflows and there " + 
-					" are still messages on the Q referrring to the old Workflow!");
+					" are still messages on the Q referring to the old Workflow!");
 		}
 		return null;
 	}
