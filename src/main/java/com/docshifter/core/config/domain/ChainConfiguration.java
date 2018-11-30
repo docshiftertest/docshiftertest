@@ -27,8 +27,12 @@ public class ChainConfiguration {
 	public ChainConfiguration() {}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-							  long timeout, Integer priority)
-	{
+			  long timeout, long priority) {
+		this(name, description, enabled, rootNode, printerName, queueName, timeout, Integer.valueOf((int) priority));
+	}
+
+	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
+							  long timeout, int priority) {
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
@@ -38,14 +42,13 @@ public class ChainConfiguration {
 		this.timeout = timeout;
 		this.priority = priority;
 	}
-	public String getDescription()
-	{
+
+	public String getDescription() {
 		return description;
 	}
 
 
-	public long getId()
-	{
+	public long getId() {
 		return id;
 	}
 
@@ -56,37 +59,30 @@ public class ChainConfiguration {
 	}
 
 
-	public Node getRootNode()
-	{
+	public Node getRootNode() {
 		return rootNode;
 	}
 
-	public boolean isEnabled()
-	{
+	public boolean isEnabled() {
 		return enabled;
 	}
 
-	public void setDescription(String description)
-	{
+	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	public void setEnabled(boolean enabled)
-	{
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
-	public void setId(long id)
-	{
+	public void setId(long id) {
 		this.id = id;
 	}
-	public void setName(String name)
-	{
+	public void setName(String name) {
 		this.name = name;
 	}
 
-	public void setRootNode(Node rootNode)
-	{
+	public void setRootNode(Node rootNode) {
 		this.rootNode = rootNode;
 	}
 
@@ -120,5 +116,9 @@ public class ChainConfiguration {
 
 	public void setPriority(Integer priority) {
 		this.priority = priority;
+	}
+
+	public void setPriority(long priority) {
+		this.setPriority(Integer.valueOf((int) priority));
 	}
 }

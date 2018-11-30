@@ -24,9 +24,9 @@ public class AMQPSender implements IMessageSender {
 	private RabbitTemplate rabbitTemplate;
 	private Queue docshifterQueue;
 
-	private static final int DEFAULT_PRIORITY= 2;
+	public static final int DEFAULT_PRIORITY= 2;
 	
-	private static final int SYNC_PRIORITY= 4;
+	public static final int SYNC_PRIORITY= 4;
 
 	public AMQPSender(RabbitTemplate rabbitTemplate, Queue docshifterQueue) {
 		this.rabbitTemplate = rabbitTemplate;
