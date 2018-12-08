@@ -17,7 +17,7 @@
 		<revision>6.2.0</revision>
 		<sha1/>
 		<hsqldb.version>2.3.4</hsqldb.version>
-		<java.version>11</java.version>
+		<java.version>1.8</java.version>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 
         <monitoring.version>6.2.0${changelist}</monitoring.version>
@@ -179,7 +179,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<forceJavacCompilerUse>true</forceJavacCompilerUse>
-					<release>11</release>
+					<release>1.8</release>
 				</configuration>
 			</plugin>
 			<plugin>
