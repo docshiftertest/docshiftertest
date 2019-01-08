@@ -20,8 +20,7 @@ import java.nio.file.Paths;
 @Service
 public class WorkFolderManager {
 
-	private static final Logger logger = Logger.getLogger(new Object() { }.getClass().getEnclosingClass());
-
+	private static final Logger logger = Logger.getLogger(WorkFolderManager.class);
 
 	private Path workfolder;
 	private Path errorfolder;
@@ -29,32 +28,40 @@ public class WorkFolderManager {
 	@Autowired
 	public WorkFolderManager(GeneralConfigService generalConfiguration) throws ConfigurationException {
 
-		System.out.println(generalConfiguration);
-		System.out.println(Constants.TEMPFOLDER);
-		System.out.println(generalConfiguration.getString(Constants.TEMPFOLDER));
-		System.out.println(Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)));
-		System.out.println(Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)).toAbsolutePath());
-		System.out.println(generalConfiguration);
-		System.out.println(Constants.ERRORFOLDER);
-		System.out.println(generalConfiguration.getString(Constants.ERRORFOLDER));
-		System.out.println(Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)));
-		System.out.println(Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)).toAbsolutePath());
-
-
+		logger.info(generalConfiguration);
+		logger.info(Constants.TEMPFOLDER);
+		logger.info(generalConfiguration.getString(Constants.TEMPFOLDER));
+		logger.info(Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)));
+		logger.info(Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)).toAbsolutePath());
+		logger.info(generalConfiguration);
+		logger.info(Constants.ERRORFOLDER);
+		logger.info(generalConfiguration.getString(Constants.ERRORFOLDER));
+		logger.info(Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)));
+		logger.info(Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)).toAbsolutePath());
 
 		workfolder = Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)).toAbsolutePath();
 		errorfolder = Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)).toAbsolutePath();
 
 		if (!Files.isDirectory(workfolder)) {
-			throw new ConfigurationException("Workfolder is badly configured: " +workfolder);
+			try {
+				Files.createDirectories(workfolder);
+			}
+			catch (IOException ioe) {
+				logger.error("Trying to create workfolder at [" + workfolder + "] got IOException: " + ioe);
+				throw new ConfigurationException("Workfolder is badly configured: " + workfolder);
+			}
 		}
 
 		if (!Files.isDirectory(errorfolder)) {
-			throw new ConfigurationException("Errorfolder is badly configured " + errorfolder);
+			try {
+				Files.createDirectories(errorfolder);
+			}
+			catch (IOException ioe) {
+				logger.error("Trying to create errorfolder at [" + errorfolder + "] got IOException: " + ioe);
+				throw new ConfigurationException("Errorfolder is badly configured: " + errorfolder);
+			}
 		}
-
 	}
-
 
 	public synchronized WorkFolder getNewWorkfolder(String name) throws IOException {
 		return new WorkFolder(getNewPath(workfolder, name), getNewPath(errorfolder, name));
@@ -78,28 +85,25 @@ public class WorkFolderManager {
 		}
 
 		Files.createDirectory(specificWorkFolder);
-
-
 		return specificWorkFolder;
-
 	}
 
 	public void deleteWorkfolder(WorkFolder folder) {
 		deleteWorkfolder(folder, false);
 	}
+
 	public void deleteWorkfolder(WorkFolder folder, boolean force) {
 		if (!folder.isRoot()) {
 			deleteWorkfolder(folder.getParent(), force);
 			folder.setParent(null);
 		}
-
 		deletePath(folder.getFolder(), force);
-
 	}
 
 	public void deleteErrorfolder(WorkFolder folder){
 		deleteErrorfolder(folder, false);
 	}
+
 	public void deleteErrorfolder(WorkFolder folder, boolean force) {
 		if (!folder.isRoot()) {
 			deleteErrorfolder(folder.getParent(), force);
@@ -111,8 +115,6 @@ public class WorkFolderManager {
 		} else {
 			deletePath(folder.getErrorFolder(), force);
 		}
-
-
 	}
 
 	public void copyToErrorFolder(WorkFolder folder) throws Exception{
