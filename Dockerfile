@@ -3,7 +3,7 @@
 # VERSION       6.2.0
 
 # using the OpenJDK image
-FROM openjdk:10
+FROM openjdk:11-jre
 
 MAINTAINER DocByte support@docbyte.com
 
