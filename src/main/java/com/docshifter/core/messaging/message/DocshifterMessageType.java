@@ -7,5 +7,6 @@ public enum DocshifterMessageType {
 	DEFAULT,
 	SYNC,
 	DCTM,
+	VEEVA,
 	RETURN
 }

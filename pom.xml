@@ -14,14 +14,14 @@
 	</parent>
 
 	<properties>
-		<revision>6.2.1</revision>
+		<revision>6.2.2</revision>
 		<sha1/>
 		<hsqldb.version>2.3.4</hsqldb.version>
 		<java.version>1.8</java.version>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 
         <monitoring.version>6.2.1${changelist}</monitoring.version>
-		<docbyteutils.version>1.5${changelist}</docbyteutils.version>
+		<docbyteutils.version>1.7${changelist}</docbyteutils.version>
 	</properties>
 
 

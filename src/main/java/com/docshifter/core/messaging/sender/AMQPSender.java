@@ -6,6 +6,7 @@ import com.docshifter.core.messaging.queue.sender.IMessageSender;
 import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
+import com.docshifter.core.task.VeevaTask;
 import org.apache.log4j.Logger;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -150,6 +151,16 @@ public class AMQPSender implements IMessageSender {
 	@Override
 	public void sendDocumentumTask(long chainConfigurationID, DctmTask task, int priority)  {
 		sendTask(DocshifterMessageType.DCTM, docshifterQueue.getName(), chainConfigurationID, task, priority);
+	}
+
+	@Override
+	public void sendVeevaTask(long chainConfigurationID,VeevaTask task) {
+		sendTask(DocshifterMessageType.VEEVA, docshifterQueue.getName(), chainConfigurationID, task, DEFAULT_PRIORITY);
+	}
+
+	@Override
+	public void sendVeevaTask(long chainConfigurationID,VeevaTask task, int priority) {
+		sendTask(DocshifterMessageType.VEEVA, docshifterQueue.getName(), chainConfigurationID, task, priority);
 	}
 
 	@Override
