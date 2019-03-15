@@ -1,6 +1,12 @@
 package com.docshifter.core.config.domain;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class ChainConfiguration {
@@ -120,5 +126,29 @@ public class ChainConfiguration {
 
 	public void setPriority(long priority) {
 		this.setPriority(Integer.valueOf((int) priority));
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sBuf = new StringBuilder();
+		sBuf.append("ChainConfiguration = {");
+		sBuf.append("Name: ");
+		sBuf.append(this.name);
+		sBuf.append(", Description: ");
+		sBuf.append(this.description);
+		sBuf.append(", Enabled: ");
+		sBuf.append(this.enabled);
+		sBuf.append(", Printer Name: ");
+		sBuf.append(this.printerName);
+		sBuf.append(", Queue Name: ");
+		sBuf.append(this.queueName);
+		sBuf.append(", Root Node: ");
+		sBuf.append(this.rootNode);
+		sBuf.append(", Timeout: ");
+		sBuf.append(this.timeout);
+		sBuf.append(", Priority: ");
+		sBuf.append(this.priority);
+		sBuf.append("}");
+		return sBuf.toString();
 	}
 }
