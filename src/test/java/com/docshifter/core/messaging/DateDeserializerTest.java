@@ -44,7 +44,7 @@ public class DateDeserializerTest {
 		assertNotNull(dateObj);
 		isInstanceOf(Date.class, dateObj);
 		Instant date = ((Date) dateObj).toInstant();
-		ZonedDateTime zdt = ZonedDateTime.ofInstant(date, ZoneId.systemDefault());
+		ZonedDateTime zdt = ZonedDateTime.ofInstant(date, ZoneId.of("CET"));
 		
 		assertEquals(2017, zdt.getYear());
 		assertEquals(11, zdt.getMonthValue());
@@ -65,7 +65,7 @@ public class DateDeserializerTest {
 		isInstanceOf(Date.class, dateObj);
 		
 		Instant date = ((Date) dateObj).toInstant();
-		ZonedDateTime zdt = ZonedDateTime.ofInstant(date, ZoneId.systemDefault());
+		ZonedDateTime zdt = ZonedDateTime.ofInstant(date, ZoneId.of("CET"));
 		
 		assertEquals(1991, zdt.getYear());
 		assertEquals(9, zdt.getMonthValue());
