@@ -22,7 +22,7 @@ import java.util.Map;
 @Conditional(IsNotInDockerCondition.class)
 public class NalpeironService implements ILicensingService {
 
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NalpeironService.class.getName());
+    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ILicensingService.class.getName());
 
     //These private ints are unique to your product and must
     // be set here to the values corresponding to your product.

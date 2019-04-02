@@ -11,10 +11,10 @@ import java.util.Map;
 @Conditional(IsInDockerCondition.class)
 public class MockLicensingService implements ILicensingService {
 
-	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(MockLicensingService.class.getName());
+	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ILicensingService.class.getName());
 
 	public MockLicensingService() {
-		logger.info("Container environment detected. Licensing service disabled.");
+		logger.info("Container environment detected. Licensing service disabled, make sure you are authorized to use this software.");
 	}
 
 	@Override
