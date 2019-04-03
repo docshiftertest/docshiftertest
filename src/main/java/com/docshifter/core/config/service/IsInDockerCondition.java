@@ -14,7 +14,7 @@ public class IsInDockerCondition implements Condition {
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
 		// https://stackoverflow.com/a/52581380
 		try (Stream<String> stream = Files.lines(Paths.get("/proc/1/cgroup"))) {
-			return stream.anyMatch(line -> line.contains("/docker"));
+			return stream.anyMatch(line -> line.contains("/docker") || line.contains("/kubepods"));
 		} catch (IOException e) {
 			return false;
 		}
