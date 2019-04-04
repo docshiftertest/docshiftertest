@@ -237,30 +237,33 @@
 					</execution>
 				</executions>
 			</plugin>
-
-            <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>dockerfile-maven-plugin</artifactId>
-                <version>1.4.9</version>
-                <executions>
-                    <execution>
-                        <id>default</id>
-                        <goals>
-                            <goal>build</goal>
-                            <goal>push</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <repository>eu.gcr.io/docbyte-dev-194014/docshifter/docshifter-base</repository>
-                    <tag>${project.version}</tag>
-                    <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
-					<buildArgs>
-						<DEPENDENCY>${project.artifactId}-${project.version}</DEPENDENCY>
-					</buildArgs>
-                </configuration>
-            </plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.spotify</groupId>
+					<artifactId>dockerfile-maven-plugin</artifactId>
+					<version>1.4.9</version>
+					<executions>
+						<execution>
+							<id>default</id>
+							<goals>
+								<goal>build</goal>
+								<goal>push</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<repository>eu.gcr.io/docbyte-dev-194014/docshifter/docshifter-base</repository>
+						<tag>${project.version}</tag>
+						<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+						<buildArgs>
+							<DEPENDENCY>${project.artifactId}-${project.version}</DEPENDENCY>
+						</buildArgs>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<profiles>
@@ -314,6 +317,10 @@
 						</execution>
 						</executions>
 					</plugin>
+					<plugin>
+						<groupId>com.spotify</groupId>
+						<artifactId>dockerfile-maven-plugin</artifactId>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
@@ -345,6 +352,10 @@
 								</configuration>
 							</execution>
 						</executions>
+					</plugin>
+					<plugin>
+						<groupId>com.spotify</groupId>
+						<artifactId>dockerfile-maven-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>
