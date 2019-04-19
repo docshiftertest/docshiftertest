@@ -238,15 +238,15 @@ public class Module {
 	
 	@Override
 	public String toString() {
-		return "Module{" +
-				"id=" + id +
-				", name='" + name + '\'' +
-				", classname='" + classname + '\'' +
-				", description='" + description + '\'' +
-				", type='" + type + '\'' +
-				", condition='" + condition + '\'' +
-				", inputFiletype='" + inputFiletype + '\'' +
-				", outputFileType='" + outputFileType + '\'' +
+		return "{" +
+				"\"id\": " + id +
+				", \"name\": \"" + name + '\"' +
+				", \"classname\": \"" + classname + '\"' +
+				", \"description\": \"" + description + '\"' +
+				", \"type\": \"" + type + '\"' +
+				", \"condition\": \"" + condition + '\"' +
+				", \"inputFiletype\": \"" + inputFiletype + '\"' +
+				", \"outputFileType\": \"" + outputFileType + '\"' +
 				'}';
 	}
 	

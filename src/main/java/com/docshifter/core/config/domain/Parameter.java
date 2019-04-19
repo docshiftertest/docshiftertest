@@ -1,6 +1,10 @@
 package com.docshifter.core.config.domain;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
 public class Parameter
@@ -123,5 +127,17 @@ public class Parameter
 		} else if (!type.equals(other.type))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "{" +
+				"\"id\": " + id +
+				", \"name\": \"" + name + '\"' +
+				", \"description\": \"" + description + '\"' +
+				", \"type\": \"" + type + '\"' +
+				", \"required\": \"" + required + '\"' +
+				", \"valuesJson\": \"" + valuesJson + '\"' +
+				'}';
 	}
 }

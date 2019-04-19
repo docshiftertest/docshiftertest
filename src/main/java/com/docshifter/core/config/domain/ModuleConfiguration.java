@@ -2,17 +2,24 @@ package com.docshifter.core.config.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyClass;
+import javax.persistence.Transient;
 
 @Entity
 public class ModuleConfiguration {
-
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +34,6 @@ public class ModuleConfiguration {
 	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
 	@MapKeyClass(Parameter.class)
 	private Map<Parameter, String> parameterValues = new HashMap<Parameter, String>();
-
-
-
 
 	public ModuleConfiguration() {}
 
@@ -52,7 +56,7 @@ public class ModuleConfiguration {
 		this.description = description;
 		this.parameterValues = parameterValues;
 	}
-
+	
 	public void setId(long id)
 	{
 		this.id = id;
@@ -190,5 +194,40 @@ public class ModuleConfiguration {
 		}
 		
 		return equals && this.module.equals(moduleConf.getModule());
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sBuf = new StringBuilder();
+		sBuf.append("{");
+		sBuf.append("\"ID\": ");
+		sBuf.append(this.getId());
+		sBuf.append(", \"Name\": \"");
+		sBuf.append(this.getName());
+		sBuf.append("\", \"Description\": \"");
+		sBuf.append(this.getDescription());
+		sBuf.append("\", \"ParameterValues\": ");
+		if (this.getParameterValues() == null) {
+			sBuf.append("null");
+		}
+		else {
+			sBuf.append("[");
+			for (Parameter param : this.getParameterValues().keySet()) {
+				sBuf.append("{\"Parameter\": ");
+				sBuf.append(param.toString());
+				sBuf.append(", \"value\": \"");
+				sBuf.append(this.getParameterValues().get(param));
+				sBuf.append("\"}, ");
+			}
+			if (this.getParameterValues().size() > 0) {
+				sBuf.setLength(sBuf.length() - 2);
+			}
+			sBuf.append("]");
+		}
+		sBuf.append(", ");
+		sBuf.append("\"Module\": ");
+		sBuf.append(this.getModule().toString());
+		sBuf.append("}");
+		return sBuf.toString();
 	}
 }
