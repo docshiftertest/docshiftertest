@@ -122,7 +122,9 @@ public class WorkFolderManager {
 	}
 
 	private boolean deletePath(Path dir, boolean force) {
+		logger.warn("Into deletePath(" + dir.toString() + ", " + force +")");
 		if (Files.isDirectory(dir)) {
+			logger.debug("Is directory...");
 			try (DirectoryStream<Path> ds = Files.newDirectoryStream(dir)) {
 
 				for (Path child : ds)
@@ -131,17 +133,22 @@ public class WorkFolderManager {
 							return false;
 						}
 					} else {
+						logger.debug("Returning false because force is not set?");
 						return false;
 					}
 			} catch (IOException ex) {
+				logger.warn("deletePath(" + dir.toString() + ") in 'for Path', caught IOException: " + ex);
 				return false;
 			}
 		}
+		logger.debug("Will delete [" + dir.toString() + "], if exists...");
 		try {
 			Files.deleteIfExists(dir);
 		} catch (IOException ex) {
+			logger.warn("deletePath(" + dir.toString() + ") after 'deleteIfExists', caught IOException: " + ex);
 			return false;
 		}
+		logger.debug("Returning true!");
 		return true;
 	}
 }
