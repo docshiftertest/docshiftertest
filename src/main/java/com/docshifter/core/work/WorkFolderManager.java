@@ -136,16 +136,16 @@ public class WorkFolderManager {
 						logger.debug("Returning false because force is not set?");
 						return false;
 					}
-			} catch (IOException ex) {
-				logger.warn("deletePath(" + dir.toString() + ") in 'for Path', caught IOException: " + ex);
+			} catch (IOException ioe) {
+				logger.warn("deletePath(" + dir.toString() + ") in 'for Path', caught IOException: " + ioe);
 				return false;
 			}
 		}
 		logger.debug("Will delete [" + dir.toString() + "], if exists...");
 		try {
 			Files.deleteIfExists(dir);
-		} catch (IOException ex) {
-			logger.warn("deletePath(" + dir.toString() + ") after 'deleteIfExists', caught IOException: " + ex);
+		} catch (IOException ioe) {
+			logger.warn("deletePath(" + dir.toString() + ") after 'deleteIfExists', caught IOException: " + ioe);
 			return false;
 		}
 		logger.debug("Returning true!");
