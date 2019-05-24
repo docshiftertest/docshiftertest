@@ -101,5 +101,4 @@ public class DocShifterConfiguration {
 		return new Queue(Constants.SYNC_QUEUE);
 
 	}
-
 }

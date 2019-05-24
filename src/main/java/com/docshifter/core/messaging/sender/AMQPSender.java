@@ -1,5 +1,7 @@
 package com.docshifter.core.messaging.sender;
 
+import com.docshifter.core.config.domain.QueueMonitor;
+import com.docshifter.core.config.domain.QueueMonitorRepository;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
@@ -11,7 +13,7 @@ import org.apache.log4j.Logger;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Properties;
 
 /**
@@ -24,6 +26,8 @@ public class AMQPSender implements IMessageSender {
 
 	private RabbitTemplate rabbitTemplate;
 	private Queue docshifterQueue;
+	@Autowired
+	private QueueMonitorRepository queueMonitorRepository;
 
 	public static final int DEFAULT_PRIORITY= 2;
 	
@@ -60,9 +64,6 @@ public class AMQPSender implements IMessageSender {
 		} else {
 			throw new IllegalArgumentException("Message is returnMessage but task is not a SyncTask, task class is of class " + task.getClass().getSimpleName());
 		}
-		
-		
-		
 	}
 	
 	private Object sendTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task, int priority) {
@@ -71,19 +72,21 @@ public class AMQPSender implements IMessageSender {
 				task,
 				chainConfigurationID);
 		
-		logger.debug("type=" + type.name());
-		logger.debug("task=" + task.getId());
-		logger.debug("task.class=" + task.getClass().getSimpleName());
-		logger.debug("message.task.class=" + message.getTask().getClass().getSimpleName());
-
-
 		if (task == null) {
 			logger.debug("task=NULL ERROR", null);
 		}
+		else {
+			logger.debug("task.Id=" + task.getId());
+			logger.debug("task.class=" + task.getClass().getSimpleName());
+			logger.debug("message.task.class=" + message.getTask().getClass().getSimpleName());
+		}
+		logger.debug("type=" + type.name());
 		logger.debug("chainConfigID=" + chainConfigurationID, null);
-		
+
 		logger.info("Sending message: " + message.toString() + " for file: " + task.getSourceFilePath(), null);
-		
+		QueueMonitor qMon = new QueueMonitor(type.name(), queue, chainConfigurationID, task.getId(), task.getSourceFilePath(), priority);
+		queueMonitorRepository.save(qMon);
+
 		if (DocshifterMessageType.SYNC.equals(type)) {
 			Object obj = rabbitTemplate.convertSendAndReceive(queue, message, message1 -> {
 				logger.debug("'rabbitTemplate.convertSendAndReceive': message.task type=" + message.getTask().getClass().getSimpleName());
@@ -105,15 +108,6 @@ public class AMQPSender implements IMessageSender {
 			return null;
 		}
 	}
-
-	private void sendTask(DocshifterMessageType type, long chainConfigurationID, Task task, int priority)  {
-		sendTask(type, docshifterQueue.getName(), chainConfigurationID, task, priority);
-	}
-
-	private void sendTask(DocshifterMessageType type, Task task, int priority)  {
-		sendTask(type, docshifterQueue.getName(), 0, task, priority);
-	}
-
 
 	public int getMessageCount(){
 		RabbitAdmin rabbitAdmin=new RabbitAdmin(rabbitTemplate.getConnectionFactory());
