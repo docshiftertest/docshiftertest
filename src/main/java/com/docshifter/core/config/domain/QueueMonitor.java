@@ -7,8 +7,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Entity
 public class QueueMonitor {
+
+	private static Logger logger = LoggerFactory.getLogger(QueueMonitor.class);
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -28,19 +33,40 @@ public class QueueMonitor {
 
 	public QueueMonitor() {}
 
+	/**
+	 * Convenience Constructor for a Queued QueueMonitor record with Task Source as a Path
+	 * @param type
+	 * @param queue
+	 * @param configId
+	 * @param taskId
+	 * @param taskSource
+	 * @param priority
+	 */
 	public QueueMonitor(String type, String queue, long configId, String taskId, Path taskSource, int priority) {
 		this(type, queue, configId, taskId, taskSource.toString(), priority);
 	}
 
+	/**
+	 * Constructor for a Queued QueueMonitor record.
+	 * Be sure to use set...() as the setters have auto-truncation to avoid that we try to store more than 255 characters in our
+	 *     varchar(255) fields! Not everything is set here, as this is a Queued record that didin't finish yet... so processing
+	 *     time, result (success/fail) etc. are not known yet.
+	 * @param type
+	 * @param queue
+	 * @param configId
+	 * @param taskId
+	 * @param taskSource
+	 * @param priority
+	 */
 	public QueueMonitor(String type, String queue, long configId, String taskId, String taskSource, int priority) {
-		this.timeStampStarted = Instant.now().getEpochSecond();
-		this.type = type;
-		this.queue = queue;
-		this.configId = configId;
-		this.taskId = taskId;
-		this.taskSource = taskSource;
-		this.priority = priority;
-		this.state = QueueMonitorState.QUEUED.toString();
+		this.setTimeStampStarted(Instant.now().getEpochSecond());
+		this.setType(type);
+		this.setQueue(queue);
+		this.setConfigId(configId);
+		this.setTaskId(taskId);
+		this.setTaskSource(taskSource);
+		this.setPriority(priority);
+		this.setState(QueueMonitorState.QUEUED.toString());
 	}
 
 	public long getTimeStampStarted() {
@@ -64,7 +90,13 @@ public class QueueMonitor {
 	}
 
 	public void setType(String type) {
-		this.type = type;
+		if (type != null && type.length() > 255) {
+			logger.warn("Type was truncated to 255 characters. Original: " + type);
+			this.type = type.substring(0, 255);
+		}
+		else {
+			this.type = type;
+		}
 	}
 
 	public String getQueue() {
@@ -72,7 +104,13 @@ public class QueueMonitor {
 	}
 
 	public void setQueue(String queue) {
-		this.queue = queue;
+		if (queue != null && queue.length() > 255) {
+			logger.warn("Queue Name was truncated to 255 characters. Original: " + queue);
+			this.queue = queue.substring(0, 255);
+		}
+		else {
+			this.queue = queue;
+		}
 	}
 
 	public Long getConfigId() {
@@ -88,7 +126,13 @@ public class QueueMonitor {
 	}
 
 	public void setTaskId(String taskId) {
-		this.taskId = taskId;
+		if (taskId != null && taskId.length() > 255) {
+			logger.warn("Task Id was truncated to 255 characters. Original: " + taskId);
+			this.taskId = taskId.substring(0, 255);
+		}
+		else {
+			this.taskId = taskId;
+		}
 	}
 
 	public String getTaskSource() {
@@ -96,7 +140,13 @@ public class QueueMonitor {
 	}
 
 	public void setTaskSource(String taskSource) {
-		this.taskSource = taskSource;
+		if (taskSource != null && taskSource.length() > 255) {
+			logger.warn("Task Source was truncated to 255 characters. Original: " + taskSource);
+			this.taskSource = taskSource.substring(0, 255);
+		}
+		else {
+			this.taskSource = taskSource;
+		}
 	}
 
 	public Integer getPriority() {
@@ -116,7 +166,13 @@ public class QueueMonitor {
 	}
 
 	public void setState(String state) {
-		this.state = state;
+		if (state != null && state.length() > 255) {
+			logger.warn("State was truncated to 255 characters. Original: " + state);
+			this.state = state.substring(0, 255);
+		}
+		else {
+			this.state = state;
+		}
 	}
 
 	public long getDuration() {
@@ -140,7 +196,13 @@ public class QueueMonitor {
 	}
 
 	public void setErrorMessage(String errorMessage) {
-		this.errorMessage = errorMessage;
+		if (errorMessage != null && errorMessage.length() > 255) {
+			logger.warn("Error Message was truncated to 255 characters. Original: " + errorMessage);
+			this.errorMessage = errorMessage.substring(0, 255);
+		}
+		else {
+			this.errorMessage = errorMessage;
+		}
 	}
 
 	@Override
