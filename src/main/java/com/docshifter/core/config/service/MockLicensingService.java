@@ -25,23 +25,26 @@ public class MockLicensingService implements ILicensingService {
 		keys.put("c0414684-ac05-4bcd-8810-c54f8e00e52a", new GregorianCalendar(2019, Calendar.JUNE, 30, 23, 59, 59).getTime());
 	}
 
-	@Value("${dsLicenseCode}")
+	@Value("${ds.license.code}")
 	private String licenseCode;
 
 	public MockLicensingService() throws DocShifterLicenseException {
 		logger.info("Container environment detected.");
 
 		if (StringUtils.isBlank(licenseCode)) {
-			throw new DocShifterLicenseException("No license code found. Make sure you have set the DS_LICENSE_CODE environment variable.");
+			logger.fatal("No license code found. Make sure you have set the DS_LICENSE_CODE environment variable.");
+			System.exit(0);
 		}
 
 		if (!keys.containsKey(licenseCode)) {
-			throw new DocShifterLicenseException(licenseCode + " is an invalid license code.");
+			logger.fatal(licenseCode + " is an invalid license code.");
+			System.exit(0);
 		}
 
 		Date expiryDate = keys.get(licenseCode);
 		if (expiryDate != null && new Date().compareTo(expiryDate) > 0) {
-			throw new DocShifterLicenseException("License code " + licenseCode + " has expired.");
+			logger.fatal("License code " + licenseCode + " has expired.");
+			System.exit(0);
 		}
 
 		logger.info("License validated.");
