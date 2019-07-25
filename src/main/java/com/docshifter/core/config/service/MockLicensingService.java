@@ -25,7 +25,7 @@ public class MockLicensingService implements ILicensingService {
 		keys.put("c0414684-ac05-4bcd-8810-c54f8e00e52a", new GregorianCalendar(2019, Calendar.JUNE, 30, 23, 59, 59).getTime());
 	}
 
-	@Value("${ds.license.code}")
+	@Value("${DS_LICENSE_CODE}")
 	private String licenseCode;
 
 	public MockLicensingService() throws DocShifterLicenseException {
