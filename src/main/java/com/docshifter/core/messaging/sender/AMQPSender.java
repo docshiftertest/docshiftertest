@@ -59,10 +59,13 @@ public class AMQPSender implements IMessageSender {
 			throw new IllegalArgumentException("Message type not supported: " + message.getType());
 		}
 		
+		if (message.getTask() == null) {
+			throw new IllegalArgumentException("Message is returnMessage but task is not a SyncTask, is is NULL!!");
+		}
 		if (message.getTask() instanceof  SyncTask) {
 			return (SyncTask) message.getTask();
 		} else {
-			throw new IllegalArgumentException("Message is returnMessage but task is not a SyncTask, task class is of class " + task.getClass().getSimpleName());
+			throw new IllegalArgumentException("Message is returnMessage but task is not a SyncTask, task class is of class: " + task.getClass().getSimpleName());
 		}
 	}
 	

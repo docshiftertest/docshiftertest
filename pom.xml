@@ -20,7 +20,7 @@
 		<java.version>1.8</java.version>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 
-        <monitoring.version>6.2.2.2${changelist}</monitoring.version>
+        <monitoring.version>6.2.3${changelist}</monitoring.version>
 		<docbyteutils.version>1.8${changelist}</docbyteutils.version>
 	</properties>
 

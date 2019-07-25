@@ -7,7 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class Parameter
+public class Parameter implements Comparable<Parameter>
 {
 
 	@Id
@@ -139,5 +139,18 @@ public class Parameter
 				", \"required\": \"" + required + '\"' +
 				", \"valuesJson\": \"" + valuesJson + '\"' +
 				'}';
+	}
+
+	@Override
+	public int compareTo(Parameter o) {
+		if (this.getName() != null && o.getName() != null) {
+			return this.getName().compareTo(o.getName());
+		}
+		else if (this.getDescription() != null && o.getDescription() != null) {
+			return this.getDescription().compareTo(o.getDescription());
+		}
+		else {
+			return Long.compare(this.getId(), o.getId());
+		}
 	}
 }

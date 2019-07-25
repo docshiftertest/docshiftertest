@@ -3,6 +3,7 @@ package com.docshifter.core.config.domain;
 import com.docbyte.utils.Logger;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -107,13 +108,15 @@ public class Module {
 	@JsonIgnore
 	@Transient
 	public List<Parameter> getParametersAsList() {
-		return new ArrayList<Parameter>(this.getParameters());
+		List<Parameter> paramList = new ArrayList<>(this.getParameters());
+		Collections.sort(paramList);
+		return paramList;
 	}
 
 	@JsonIgnore
 	@Transient
 	public Parameter getParameter(String name) {
-		Logger.debug("Getting poarameter for name: " + name, null);
+		Logger.debug("Getting parameter for name: " + name, null);
 		for (Parameter param : parameters) {
 			if (param == null) {
 				Logger.warn("Param was NULL getting parameter using name: " + name, null);
