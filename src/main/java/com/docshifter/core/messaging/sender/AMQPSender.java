@@ -26,16 +26,16 @@ public class AMQPSender implements IMessageSender {
 
 	private RabbitTemplate rabbitTemplate;
 	private Queue docshifterQueue;
-	@Autowired
 	private QueueMonitorRepository queueMonitorRepository;
 
 	public static final int DEFAULT_PRIORITY= 2;
 	
 	public static final int SYNC_PRIORITY= 4;
 
-	public AMQPSender(RabbitTemplate rabbitTemplate, Queue docshifterQueue) {
+	public AMQPSender(RabbitTemplate rabbitTemplate, Queue docshifterQueue, QueueMonitorRepository queueMonitorRepository) {
 		this.rabbitTemplate = rabbitTemplate;
 		this.docshifterQueue = docshifterQueue;
+		this.queueMonitorRepository = queueMonitorRepository;
 	}
 	
 	
