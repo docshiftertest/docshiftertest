@@ -1,8 +1,6 @@
 package com.docshifter.core.config.service;
 
-import com.docshifter.core.exceptions.DocShifterLicenseException;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -23,13 +21,13 @@ public class MockLicensingService implements ILicensingService {
 	static {
 		keys.put("b6b1edf7-8e7c-4209-9911-8f630114be4d", null);
 		keys.put("c0414684-ac05-4bcd-8810-c54f8e00e52a", new GregorianCalendar(2019, Calendar.JUNE, 30, 23, 59, 59).getTime());
+		keys.put("6cd941e1-2549-4bc6-91c1-b6c26f466bfc", new GregorianCalendar(2019, Calendar.OCTOBER, 15, 23, 59, 59).getTime());
+		keys.put("cea963d8-a2a9-4926-8493-f52121a46101", new GregorianCalendar(2019, Calendar.NOVEMBER, 30, 23, 59, 59).getTime());
 	}
 
-	@Value("${DS_LICENSE_CODE}")
-	private String licenseCode;
-
-	public MockLicensingService() throws DocShifterLicenseException {
+	public MockLicensingService() {
 		logger.info("Container environment detected.");
+		String licenseCode = System.getenv("DS_LICENSE_CODE");
 
 		if (StringUtils.isBlank(licenseCode)) {
 			logger.fatal("No license code found. Make sure you have set the DS_LICENSE_CODE environment variable.");
