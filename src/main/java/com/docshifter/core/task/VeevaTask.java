@@ -2,14 +2,13 @@ package com.docshifter.core.task;
 
 import com.docshifter.core.work.WorkFolder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /***/
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "className")
 public class VeevaTask extends Task implements Serializable {
+
+	private static final long serialVersionUID = -2850556403171817586L;
 
 	protected String task_id = "";
 	protected String items_id;    //unique file identifier: files are inside binders
