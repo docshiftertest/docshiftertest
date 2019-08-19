@@ -8,11 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.naming.ConfigurationException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/11/15.
@@ -47,8 +50,27 @@ public class WorkFolderManager {
 				Files.createDirectories(workfolder);
 			}
 			catch (IOException ioe) {
-				logger.error("Trying to create workfolder at [" + workfolder + "] got IOException: " + ioe);
-				throw new ConfigurationException("Workfolder is badly configured: " + workfolder);
+				logger.warn("Workfolder: " + workfolder + " returned false for 'isDirectory()' but could not be created");
+			}
+		}
+		// Either workfolder did not exist and has now been created or for some reason isDirectory returned false...
+		// so either it was a file or is a network path that messes with the result of isDirectory... so in a
+		// WinBlows environment you might want to consider using Log on as... for the services
+		// Anyhoo, this should sort the wheat from the chaff... try to create a file under the workfolder
+		Path tmpFilePath = Paths.get(workfolder.toString(), "tmp_" + Objects.toString(System.currentTimeMillis()));
+		try {
+			new FileOutputStream(new File(tmpFilePath.toString())).close();
+		}
+		catch (IOException ioe) {
+			logger.error("Trying to create a temp file: [" + tmpFilePath + "] under workfolder [" + workfolder + "] got IOException: " + ioe);
+			throw new ConfigurationException("Workfolder: [" + workfolder + "] is badly configured, got IOException: " + ioe);
+		}
+		finally {
+			try {
+				Files.deleteIfExists(tmpFilePath);
+			}
+			catch (IOException ioe) {
+				logger.warn("Also got IOException: " + ioe + " trying to delete the file: " + tmpFilePath + " from workfolder: " + workfolder);
 			}
 		}
 
@@ -57,8 +79,25 @@ public class WorkFolderManager {
 				Files.createDirectories(errorfolder);
 			}
 			catch (IOException ioe) {
-				logger.error("Trying to create errorfolder at [" + errorfolder + "] got IOException: " + ioe);
-				throw new ConfigurationException("Errorfolder is badly configured: " + errorfolder);
+				logger.warn("Errorfolder: " + errorfolder + " returned false for 'isDirectory()' but could not be created");
+			}
+		}
+		// See above, we use same logic for errorfolder as for workfolder 
+		// Now try to create a file under the errorfolder
+		tmpFilePath = Paths.get(errorfolder.toString(), "tmp_" + Objects.toString(System.currentTimeMillis()));
+		try {
+			new FileOutputStream(new File(tmpFilePath.toString())).close();
+		}
+		catch (IOException ioe) {
+			logger.error("Trying to create a temp file: [" + tmpFilePath + "] under errorfolder [" + errorfolder + "] got IOException: " + ioe);
+			throw new ConfigurationException("Errorfolder: [" + errorfolder + "] is badly configured, got IOException: " + ioe);
+		}
+		finally {
+			try {
+				Files.deleteIfExists(tmpFilePath);
+			}
+			catch (IOException ioe) {
+				logger.warn("Also got IOException: " + ioe + " trying to delete the file: " + tmpFilePath + " from errorfolder: " + errorfolder);
 			}
 		}
 	}
