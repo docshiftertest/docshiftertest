@@ -22,7 +22,7 @@ public class QueueMonitor {
 	private long timeStampStarted;
 	private String type;
 	private String queue;
-	private Long configId;
+	private Long moduleConfigurationId;
 	private String taskId;
 	private String taskSource;
 	private Integer priority;
@@ -30,6 +30,8 @@ public class QueueMonitor {
 	private long duration;
 	private Boolean success;
 	private String errorMessage;
+	private String senderHost;
+	private String receiverHost;
 
 	public QueueMonitor() {}
 
@@ -41,9 +43,10 @@ public class QueueMonitor {
 	 * @param taskId
 	 * @param taskSource
 	 * @param priority
+	 * @param senderHost
 	 */
-	public QueueMonitor(String type, String queue, long configId, String taskId, Path taskSource, int priority) {
-		this(type, queue, configId, taskId, taskSource.toString(), priority);
+	public QueueMonitor(String type, String queue, long configId, String taskId, Path taskSource, int priority, String senderHost) {
+		this(type, queue, configId, taskId, taskSource.toString(), priority, senderHost);
 	}
 
 	/**
@@ -57,16 +60,18 @@ public class QueueMonitor {
 	 * @param taskId
 	 * @param taskSource
 	 * @param priority
+	 * @param senderHost
 	 */
-	public QueueMonitor(String type, String queue, long configId, String taskId, String taskSource, int priority) {
+	public QueueMonitor(String type, String queue, long moduleConfigurationId, String taskId, String taskSource, int priority, String senderHost) {
 		this.setTimeStampStarted(Instant.now().getEpochSecond());
 		this.setType(type);
 		this.setQueue(queue);
-		this.setConfigId(configId);
+		this.setModuleConfigurationId(moduleConfigurationId);
 		this.setTaskId(taskId);
 		this.setTaskSource(taskSource);
 		this.setPriority(priority);
 		this.setState(QueueMonitorState.QUEUED.toString());
+		this.setSenderHost(senderHost);
 	}
 
 	public long getTimeStampStarted() {
@@ -113,12 +118,12 @@ public class QueueMonitor {
 		}
 	}
 
-	public Long getConfigId() {
-		return configId;
+	public Long getModuleConfigurationId() {
+		return moduleConfigurationId;
 	}
 
-	public void setConfigId(Long configId) {
-		this.configId = configId;
+	public void setModuleConfigurationId(Long moduleConfigurationId) {
+		this.moduleConfigurationId = moduleConfigurationId;
 	}
 
 	public String getTaskId() {
@@ -205,6 +210,22 @@ public class QueueMonitor {
 		}
 	}
 
+	public String getSenderHost() {
+		return senderHost;
+	}
+
+	public void setSenderHost(String senderHost) {
+		this.senderHost = senderHost;
+	}
+
+	public String getReceiverHost() {
+		return receiverHost;
+	}
+
+	public void setReceiverHost(String receiverHost) {
+		this.receiverHost = receiverHost;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sBuf = new StringBuilder();
@@ -215,12 +236,16 @@ public class QueueMonitor {
 		sBuf.append(this.state.toString());
 		sBuf.append(", Started: ");
 		sBuf.append(this.timeStampStarted);
+		sBuf.append(", Sender Host: ");
+		sBuf.append(this.senderHost);
+		sBuf.append(", Receiver Host: ");
+		sBuf.append(this.receiverHost);
 		sBuf.append(", Type: ");
 		sBuf.append(this.type);
 		sBuf.append(", Queue: ");
 		sBuf.append(this.queue);
-		sBuf.append(", Config Id: ");
-		sBuf.append(this.configId);
+		sBuf.append(", Module Configuration Id: ");
+		sBuf.append(this.moduleConfigurationId);
 		sBuf.append(", Task Id: ");
 		sBuf.append(this.taskId);
 		sBuf.append(", Task Source: ");

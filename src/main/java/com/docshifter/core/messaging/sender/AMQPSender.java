@@ -13,7 +13,8 @@ import org.apache.log4j.Logger;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Properties;
 
 /**
@@ -87,7 +88,14 @@ public class AMQPSender implements IMessageSender {
 		logger.debug("chainConfigID=" + chainConfigurationID, null);
 
 		logger.info("Sending message: " + message.toString() + " for file: " + task.getSourceFilePath(), null);
-		QueueMonitor qMon = new QueueMonitor(type.name(), queue, chainConfigurationID, task.getId(), task.getSourceFilePath(), priority);
+		String hostname = "localhost";
+		try {
+			hostname = InetAddress.getLocalHost().getHostName();
+		}
+		catch (UnknownHostException uncle) {
+			logger.warn("Couldn't get hostname of the DocShifter machine, so will default to localhost (for queue_monitor)");
+		}
+		QueueMonitor qMon = new QueueMonitor(type.name(), queue, chainConfigurationID, task.getId(), task.getSourceFilePath(), priority, hostname);
 		queueMonitorRepository.save(qMon);
 
 		if (DocshifterMessageType.SYNC.equals(type)) {
