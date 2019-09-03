@@ -21,7 +21,7 @@
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 
         <monitoring.version>6.2.3.1${changelist}</monitoring.version>
-		<docbyteutils.version>1.10${changelist}</docbyteutils.version>
+		<docbyteutils.version>1.11${changelist}</docbyteutils.version>
 	</properties>
 
 
