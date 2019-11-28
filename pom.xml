@@ -14,7 +14,7 @@
 	</parent>
 
 	<properties>
-		<revision>6.2.3.5</revision>
+		<revision>6.2.3.6</revision>
 		<sha1/>
 		<hsqldb.version>2.3.4</hsqldb.version>
 		<java.version>1.8</java.version>
@@ -170,7 +170,22 @@
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-rest-core</artifactId>
 		</dependency>
-	</dependencies>
+
+	<!-- jasypt to encrypt properties -->
+	<dependency>
+		<groupId>com.github.ulisesbocchio</groupId>
+		<artifactId>jasypt-spring-boot-starter</artifactId>
+		<version>2.1.2</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.jasypt</groupId>
+		<artifactId>jasypt</artifactId>
+		<version>1.9.3</version>
+		<scope>compile</scope>
+	</dependency>
+	
+</dependencies>
 
 	<build>
 		<plugins>
@@ -223,47 +238,9 @@
 							</descriptors>
 						</configuration>
 					</execution>
-					<execution>
-						<id>make-assembly-docker</id> <!-- this is used for inheritance merges -->
-						<phase>package</phase> <!-- bind to the packaging phase -->
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>src/main/assembly/assembly-docker.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
 				</executions>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>com.spotify</groupId>
-					<artifactId>dockerfile-maven-plugin</artifactId>
-					<version>1.4.10</version>
-					<executions>
-						<execution>
-							<id>default</id>
-							<goals>
-								<goal>build</goal>
-								<goal>push</goal>
-							</goals>
-						</execution>
-					</executions>
-					<configuration>
-						<repository>eu.gcr.io/docbyte-dev-194014/docshifter/docshifter-base</repository>
-						<tag>${project.version}</tag>
-						<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
-						<buildArgs>
-							<DEPENDENCY>${project.artifactId}-${project.version}</DEPENDENCY>
-						</buildArgs>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 
 	<profiles>
@@ -303,36 +280,21 @@
 									</descriptors>
 								</configuration>
 							</execution>
-							<execution>
-							<id>make-assembly-docker</id> <!-- this is used for inheritance merges -->
-							<phase>package</phase> <!-- bind to the packaging phase -->
-							<goals>
-								<goal>single</goal>
-							</goals>
-							<configuration>
-								<descriptors>
-									<descriptor>src/main/assembly/assembly-docker.xml</descriptor>
-								</descriptors>
-							</configuration>
-						</execution>
 						</executions>
-					</plugin>
-					<plugin>
-						<groupId>com.spotify</groupId>
-						<artifactId>dockerfile-maven-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
-		<profile>
-			<id>release</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<properties>
-				<changelist/>
-			</properties>
-			<build>
+	<profile>
+		<id>release</id>
+		<activation>
+			<activeByDefault>false</activeByDefault>
+		</activation>
+		<properties>
+			<changelist />
+		</properties>
+		<build>
+			<pluginManagement>
 				<plugins>
 					<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
@@ -351,15 +313,47 @@
 									</descriptors>
 								</configuration>
 							</execution>
+							<execution>
+								<id>make-assembly-docker</id> <!-- this is used for inheritance merges -->
+								<phase>package</phase> <!-- bind to the packaging phase -->
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/assembly-docker.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
 						</executions>
 					</plugin>
+
 					<plugin>
 						<groupId>com.spotify</groupId>
 						<artifactId>dockerfile-maven-plugin</artifactId>
+						<version>1.4.10</version>
+						<executions>
+							<execution>
+								<id>default</id>
+								<goals>
+									<goal>build</goal>
+									<goal>push</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<repository>eu.gcr.io/docbyte-dev-194014/docshifter/docshifter-base</repository>
+							<tag>${project.version}</tag>
+							<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+							<buildArgs>
+								<DEPENDENCY>${project.artifactId}-${project.version}</DEPENDENCY>
+							</buildArgs>
+						</configuration>
 					</plugin>
 				</plugins>
-			</build>
-		</profile>
+			</pluginManagement>
+		</build>
+	</profile>
 	</profiles>
 
 </project>
