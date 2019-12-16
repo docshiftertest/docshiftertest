@@ -1,12 +1,10 @@
 package com.docshifter.core;
 
-import com.docshifter.core.config.Constants;
-import com.docshifter.core.config.service.ConfigurationService;
-import com.docshifter.core.config.service.GeneralConfigService;
-import com.docshifter.core.messaging.DateDeserializer;
-import com.docshifter.core.work.WorkFolderManager;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -21,16 +19,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import com.docshifter.core.config.Constants;
+import com.docshifter.core.config.service.ConfigurationService;
+import com.docshifter.core.config.service.GeneralConfigService;
+import com.docshifter.core.messaging.DateDeserializer;
+import com.docshifter.core.work.WorkFolderManager;
+import com.docshifter.security.utils.SecurityUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
  */
 @Configuration
-@ComponentScan(basePackages = {"com.docshifter.core", "com.docshifter.monitoring"})
+@ComponentScan(basePackages = {"com.docshifter.core", "com.docshifter.monitoring","com.docshifter.security"})
 @EnableJpaRepositories(basePackages = {
         "com.docshifter.core.config.domain",
         "com.docshifter.monitoring.repo"})
@@ -54,7 +57,7 @@ public class DocShifterConfiguration {
 
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory(generalConfigService.getString(Constants.MQ_URL));
         connectionFactory.setUsername(generalConfigService.getString(Constants.MQ_USER));
-        connectionFactory.setPassword(generalConfigService.getString(Constants.MQ_PASSWORD));
+        connectionFactory.setPassword(SecurityUtils.decryptMessage(generalConfigService.getString(Constants.MQ_PASSWORD),null, null,DocShifterConfiguration.class));
         return connectionFactory;
     }
 

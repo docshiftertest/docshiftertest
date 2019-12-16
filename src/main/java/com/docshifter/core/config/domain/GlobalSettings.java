@@ -5,6 +5,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.docshifter.security.Encrypted;
+
 @Entity
 public class GlobalSettings
 {
@@ -16,6 +18,7 @@ public class GlobalSettings
 	private String mqURL;
 	private String mqQueue;
 	private String mqUser;
+	@Encrypted
 	private String mqUserPassword;
 
 	private String defaultTempFolder;

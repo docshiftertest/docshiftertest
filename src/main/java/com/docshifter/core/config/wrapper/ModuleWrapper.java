@@ -1,10 +1,9 @@
 package com.docshifter.core.config.wrapper;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
-import com.docshifter.core.config.domain.*;
+import com.docshifter.core.config.domain.ModuleConfiguration;
 
 public class ModuleWrapper {
 
@@ -12,27 +11,26 @@ public class ModuleWrapper {
 	private String type;
 	private String name;
 	private String description;
-	
-	public ModuleWrapper(ModuleConfiguration config){
+
+	public ModuleWrapper(ModuleConfiguration config) {
 		this.type = config.getModule().getType();
-		//this.name = config.getName();
+		// this.name = config.getName();
 		this.name = config.getModule().getClassname();
 		this.description = config.getDescription();
-		
+
 		params = new HashMap<String, String>();
 
+		config.getParameterValues().entrySet().forEach(p -> {
 
-		Iterator<Parameter> it = config.getParameterValues().keySet().iterator();
-		while(it.hasNext()){
-			Parameter key = it.next();
-			String value = config.getParameterValues().get(key);
-			params.put(key.getName(), value);
-		}
+			params.put(p.getKey().getName(), p.getValue());
+
+		});
 	}
-	
-	public String toString(){
+
+	public String toString() {
 		return name;
 	}
+
 	/**
 	 * @param name the name of the requested parameter
 	 * @return the String value linked to the requested parameter
@@ -40,18 +38,20 @@ public class ModuleWrapper {
 	public String getString(String name) {
 		return params.get(name);
 	}
+
 	/**
 	 * @param name the name of the requested parameter
 	 * @return the int value linked to the requested parameter
 	 */
-	public int getInt(String name){
+	public int getInt(String name) {
 		return Integer.parseInt(params.get(name));
 	}
+
 	/**
 	 * @param name the name of the requested parameter
 	 * @return the boolean value linked to the requested parameter
 	 */
-	public Boolean getBoolean(String name){
+	public Boolean getBoolean(String name) {
 		if (params.get(name) == null) {
 			return null;
 		}
@@ -100,11 +100,8 @@ public class ModuleWrapper {
 		this.description = description;
 	}
 
-
-	public Map<String,String> getParamMap() {
+	public Map<String, String> getParamMap() {
 		return this.params;
 	}
-	
-	
-	
+
 }

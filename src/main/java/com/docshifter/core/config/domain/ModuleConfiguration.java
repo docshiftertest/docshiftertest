@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -18,6 +19,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyClass;
 import javax.persistence.Transient;
 
+import com.docshifter.security.Encrypted;
 @Entity
 public class ModuleConfiguration {
 
@@ -33,6 +35,7 @@ public class ModuleConfiguration {
 	@JsonIgnore
 	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
 	@MapKeyClass(Parameter.class)
+	@Encrypted
 	private Map<Parameter, String> parameterValues = new HashMap<Parameter, String>();
 
 	public ModuleConfiguration() {}
@@ -56,7 +59,7 @@ public class ModuleConfiguration {
 		this.description = description;
 		this.parameterValues = parameterValues;
 	}
-	
+
 	public void setId(long id)
 	{
 		this.id = id;
@@ -94,7 +97,7 @@ public class ModuleConfiguration {
 	{
 		for(Parameter existingParam : this.getParameterValues().keySet())
 		{
-			if(existingParam.getId() == param.getId())
+			if (existingParam.getId() == param.getId())
 				this.getParameterValues().put(existingParam, value);
 		}
 	}
@@ -109,7 +112,7 @@ public class ModuleConfiguration {
 	@Transient
 	public void addParameterValue(Parameter param, String value)
 	{
-		this.getParameterValues().put(param, value);
+		this.getParameterValues().put(param,value);
 	}
 
 	public String getName() {
@@ -128,41 +131,6 @@ public class ModuleConfiguration {
 		this.description = description;
 	}
 
-	/*
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((module == null) ? 0 : module.hashCode());
-		result = prime * result
-				+ ((parameterValues == null) ? 0 : parameterValues.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ModuleConfiguration other = (ModuleConfiguration) obj;
-		if (module == null) {
-			if (other.module != null)
-				return false;
-		} else if (!module.equals(other.module))
-			return false;
-		if (parameterValues == null) {
-			if (other.parameterValues != null)
-				return false;
-		} else if (!parameterValues.equals(other.parameterValues))
-			return false;
-		return true;
-	}
-	*/
-
-
 	@SuppressWarnings("rawtypes")
 	@JsonProperty("parameters")
 	@Transient
@@ -173,10 +141,11 @@ public class ModuleConfiguration {
 
 		for(Map.Entry<Parameter, String> entry: parameterValues.entrySet())
 		{
-		parameter = new HashMap<String, String>();
-		parameter.put("id",String.valueOf(entry.getKey().getId()));
-		parameter.put("value",entry.getValue());
-		parameters.add(parameter);
+			parameter = new HashMap<String, String>();
+			parameter.put("id", String.valueOf(entry.getKey().getId()));
+			parameter.put("value", entry.getValue());
+			
+			parameters.add(parameter);
 		}
 
 		return parameters;
@@ -187,12 +156,12 @@ public class ModuleConfiguration {
 
 		boolean equals = true;
 
-		for(Parameter param : this.parameterValues.keySet()){
-			if(!parameterValues.get(param).equals(moduleConf.getParameterValues().get(param))){
+		for (Parameter param : this.parameterValues.keySet()) {
+			if (!parameterValues.get(param).equals(moduleConf.getParameterValues().get(param))) {
 				equals = false;
 			}
 		}
-		
+
 		return equals && this.module.equals(moduleConf.getModule());
 	}
 

@@ -19,9 +19,8 @@
 		<hsqldb.version>2.3.4</hsqldb.version>
 		<java.version>1.8</java.version>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-
-        <monitoring.version>6.2.3.1${changelist}</monitoring.version>
 		<docbyteutils.version>1.14${changelist}</docbyteutils.version>
+		<monitoring.version>6.2.3.1${changelist}</monitoring.version>
 	</properties>
 
 
@@ -70,11 +69,6 @@
 			<artifactId>core</artifactId>
 			<version>${docbyteutils.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>com.docshifter.monitoring</groupId>
-            <artifactId>monitoring</artifactId>
-            <version>${monitoring.version}</version>
-        </dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
@@ -126,7 +120,6 @@
 			<artifactId>slf4j-log4j12</artifactId>
 		</dependency>
 
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-amqp</artifactId>
@@ -171,20 +164,13 @@
 			<artifactId>spring-data-rest-core</artifactId>
 		</dependency>
 
-	<!-- jasypt to encrypt properties -->
-	<dependency>
-		<groupId>com.github.ulisesbocchio</groupId>
-		<artifactId>jasypt-spring-boot-starter</artifactId>
-		<version>2.1.2</version>
-	</dependency>
-
-	<dependency>
-		<groupId>org.jasypt</groupId>
-		<artifactId>jasypt</artifactId>
-		<version>1.9.3</version>
-		<scope>compile</scope>
-	</dependency>
-	
+		<!-- jasypt to encrypt properties -->
+		<dependency>
+			<groupId>com.github.ulisesbocchio</groupId>
+			<artifactId>jasypt-spring-boot-starter</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		
 </dependencies>
 
 <build>
