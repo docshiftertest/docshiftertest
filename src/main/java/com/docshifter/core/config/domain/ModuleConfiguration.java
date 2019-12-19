@@ -1,5 +1,6 @@
 package com.docshifter.core.config.domain;
 
+import com.docshifter.core.security.Encrypted;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
@@ -18,8 +19,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyClass;
 import javax.persistence.Transient;
-
-import com.docshifter.security.Encrypted;
 @Entity
 public class ModuleConfiguration {
 

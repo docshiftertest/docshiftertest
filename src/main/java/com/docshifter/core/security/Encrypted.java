@@ -1,14 +1,14 @@
 /**
  * 
  */
-package com.docshifter.security;
+package com.docshifter.core.security;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.docshifter.security.utils.SecurityUtils;
+import com.docshifter.core.security.utils.SecurityUtils;
 
 /**
  * Indicates that this property will be a candidate for encryption.

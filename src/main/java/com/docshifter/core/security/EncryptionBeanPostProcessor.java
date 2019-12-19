@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.docshifter.security;
+package com.docshifter.core.security;
 
 import javax.persistence.EntityManagerFactory;
 
