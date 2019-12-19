@@ -20,9 +20,10 @@ public class MockLicensingService implements ILicensingService {
 	private static final Map<String, Date> keys = new HashMap<>();
 	static {
 		keys.put("b6b1edf7-8e7c-4209-9911-8f630114be4d", null);
-		keys.put("c0414684-ac05-4bcd-8810-c54f8e00e52a", new GregorianCalendar(2019, Calendar.JUNE, 30, 23, 59, 59).getTime());
-		keys.put("6cd941e1-2549-4bc6-91c1-b6c26f466bfc", new GregorianCalendar(2019, Calendar.OCTOBER, 15, 23, 59, 59).getTime());
-		keys.put("cea963d8-a2a9-4926-8493-f52121a46101", new GregorianCalendar(2019, Calendar.NOVEMBER, 30, 23, 59, 59).getTime());
+		keys.put("bfd7af58-2266-11ea-843b-98fa9b42e1ca", new GregorianCalendar(2020, Calendar.MARCH, 31, 23, 59, 59).getTime());
+		keys.put("b10df310-2266-11ea-b177-98fa9b42e1ca", new GregorianCalendar(2020, Calendar.JUNE, 30, 23, 59, 59).getTime());
+		keys.put("a14b8870-2266-11ea-874c-98fa9b42e1ca", new GregorianCalendar(2020, Calendar.OCTOBER, 31, 23, 59, 59).getTime());
+		keys.put("8f59e896-2266-11ea-8f74-98fa9b42e1ca", new GregorianCalendar(2020, Calendar.DECEMBER, 31, 23, 59, 59).getTime());
 	}
 
 	public MockLicensingService() {

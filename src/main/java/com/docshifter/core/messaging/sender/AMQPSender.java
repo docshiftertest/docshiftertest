@@ -61,7 +61,7 @@ public class AMQPSender implements IMessageSender {
 		}
 		
 		if (message.getTask() == null) {
-			throw new IllegalArgumentException("Message is returnMessage but task is not a SyncTask, is is NULL!!");
+			throw new IllegalArgumentException("Message is returnMessage but task is not a SyncTask, it is NULL!!");
 		}
 		if (message.getTask() instanceof  SyncTask) {
 			return (SyncTask) message.getTask();
