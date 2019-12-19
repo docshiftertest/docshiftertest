@@ -1,13 +1,13 @@
 /**
  * 
  */
-package com.docshifter.security.utils;
+package com.docshifter.core.security.utils;
 
 import java.lang.reflect.Field;
 
 import org.springframework.core.annotation.AnnotationUtils;
 
-import com.docshifter.security.Encrypted;
+import com.docshifter.core.security.Encrypted;
 
 /**
  * Utility that takes all the fields which are annotated with @Encrypted and
@@ -23,9 +23,9 @@ public class EncryptionUtils {
 	}
 
 	public static int getPropertyIndex(String name, String[] properties) {
-		for (int i = 0; i < properties.length; i++) {
-			if (name.equals(properties[i])) {
-				return i;
+		for (int idx  = 0; idx  < properties.length; idx  ++) {
+			if (name.equals(properties[idx ])) {
+				return idx ;
 			}
 		}
 		throw new IllegalArgumentException("No property was found for name " + name);

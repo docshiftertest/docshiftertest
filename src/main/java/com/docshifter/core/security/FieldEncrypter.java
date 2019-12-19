@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.docshifter.security;
+package com.docshifter.core.security;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
 import com.docshifter.core.config.domain.Parameter;
-import com.docshifter.security.utils.EncryptionUtils;
-import com.docshifter.security.utils.SecurityProperties;
-import com.docshifter.security.utils.SecurityUtils;
+import com.docshifter.core.security.utils.EncryptionUtils;
+import com.docshifter.core.security.utils.SecurityProperties;
+import com.docshifter.core.security.utils.SecurityUtils;
 
 /**
- * Utility to encrypt the fields annoted with {@link Encrypted}.
+ * Utility to encrypt the fields annotated with {@link Encrypted}.
  * 
  * @author Created by juan.marques on 09/12/2019.
  */

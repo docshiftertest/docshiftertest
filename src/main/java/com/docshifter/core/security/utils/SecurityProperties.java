@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.docshifter.security.utils;
+package com.docshifter.core.security.utils;
 
 /**
  * Security properties.

@@ -25,7 +25,6 @@ import com.docshifter.core.config.service.ConfigurationService;
 import com.docshifter.core.config.service.GeneralConfigService;
 import com.docshifter.core.messaging.DateDeserializer;
 import com.docshifter.core.work.WorkFolderManager;
-import com.docshifter.security.utils.SecurityUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -33,7 +32,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
  */
 @Configuration
-@ComponentScan(basePackages = {"com.docshifter.core", "com.docshifter.monitoring","com.docshifter.security"})
+@ComponentScan(basePackages = {"com.docshifter.core", "com.docshifter.monitoring"})
 @EnableJpaRepositories(basePackages = {
         "com.docshifter.core.config.domain",
         "com.docshifter.monitoring.repo"})
@@ -57,7 +56,7 @@ public class DocShifterConfiguration {
 
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory(generalConfigService.getString(Constants.MQ_URL));
         connectionFactory.setUsername(generalConfigService.getString(Constants.MQ_USER));
-        connectionFactory.setPassword(SecurityUtils.decryptMessage(generalConfigService.getString(Constants.MQ_PASSWORD),null, null,DocShifterConfiguration.class));
+        connectionFactory.setPassword(generalConfigService.getString(Constants.MQ_PASSWORD));
         return connectionFactory;
     }
 

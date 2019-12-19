@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.docshifter.security;
+package com.docshifter.core.security;
 
 import java.util.Map;
 
@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 
 import com.docshifter.core.config.domain.ModuleConfiguration;
 import com.docshifter.core.config.domain.Parameter;
-import com.docshifter.security.utils.SecurityProperties;
-import com.docshifter.security.utils.SecurityUtils;
+import com.docshifter.core.security.utils.SecurityProperties;
+import com.docshifter.core.security.utils.SecurityUtils;
 
 /**
  * Encryption event listener.

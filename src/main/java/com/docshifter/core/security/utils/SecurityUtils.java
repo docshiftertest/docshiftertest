@@ -1,10 +1,11 @@
 /**
  * 
  */
-package com.docshifter.security.utils;
+package com.docshifter.core.security.utils;
 
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 import org.jasypt.salt.RandomSaltGenerator;
@@ -15,6 +16,7 @@ import com.ulisesbocchio.jasyptspringboot.encryptor.SimplePBEStringEncryptor;
 
 /**
  * Utility to encrypt / decrypt messages.
+ * 
  * @author Created by juan.marques on 04/12/2019.
  */
 public class SecurityUtils {
@@ -29,30 +31,27 @@ public class SecurityUtils {
 	 * 
 	 * @param encryptedMessage the encrypted message.
 	 * @param algorithm        the algorithm to decrypt the message.
-	 * @param secret           the given secret to decrypt
+	 * @param secret           the given secret to decrypt or pass null to use the
+	 *                         VM provided secret
 	 * @param logClass         the class to be logged.
 	 * @return decrypted message.
 	 */
-	public static <T> String decryptMessage(String encryptedMessage, String algorithm, String secret,
-			Class<? extends Object> logClass) {
+	public static <T> String decryptMessage(String encryptedMessage, String algorithm, String secret, T logClass) {
 
 		SimplePBEByteEncryptor delegate = new SimplePBEByteEncryptor();
 
 		SimplePBEStringEncryptor decrypt = new SimplePBEStringEncryptor(delegate);
 
-		delegate.setSaltGenerator(new RandomSaltGenerator());
-		delegate.setIterations(1000);
-
 		String decryptedMessage = null;
 
-		if (algorithm != null && !algorithm.isEmpty()) {
+		if (StringUtils.isNotEmpty(algorithm)) {
 			delegate.setAlgorithm(algorithm);
 		} else {
 			logger.debug("Using the default algorithm...");
 			delegate.setAlgorithm(SecurityProperties.DEFAULT_ALGORITHM.getValue());
 		}
 
-		if (secret != null && !secret.isEmpty()) {
+		if (StringUtils.isNotEmpty(secret)) {
 			delegate.setPassword(secret);
 		} else {
 			// Get the vm given secret
@@ -70,7 +69,8 @@ public class SecurityUtils {
 				logger.debug("The password is in plain text...");
 				decryptedMessage = encryptedMessage;
 			} else {
-				logger.info(e.getStackTrace());
+				logger.debug(e);
+				throw new EncryptionOperationNotPossibleException("Ocurred an error trying to decrypt " + logClass);
 			}
 		}
 		logger.debug("Decryption completed for " + logClass);
@@ -82,8 +82,9 @@ public class SecurityUtils {
 	 * PBEWITHHMACSHA384ANDAES_256.
 	 * 
 	 * @param <T>       the class to be logged.
-	 * @param algorithm the algorithm to decrypt the message.
-	 * @param secret    the given secret to decrypt
+	 * @param algorithm the algorithm to encrypt the message.
+	 * @param secret    the given secret to encrypt or pass null to use the VM
+	 *                  provided secret
 	 * @param message   the encrypted message.
 	 * @param logClass  the class to be logged.
 	 * 
@@ -98,14 +99,14 @@ public class SecurityUtils {
 
 		String encryptedMessage = null;
 
-		if (algorithm != null && !algorithm.isEmpty()) {
+		if (StringUtils.isNotEmpty(algorithm)) {
 			delegate.setAlgorithm(algorithm);
 		} else {
 			logger.debug("Using the default algorithm...");
 			delegate.setAlgorithm(SecurityProperties.DEFAULT_ALGORITHM.getValue());
 		}
 
-		if (secret != null && !secret.isEmpty()) {
+		if (StringUtils.isNotEmpty(secret)) {
 			delegate.setPassword(secret);
 		} else {
 			// Get the vm given secret
@@ -117,8 +118,10 @@ public class SecurityUtils {
 			logger.debug("Starting encryption for " + logClass);
 			encryptedMessage = encrypt.encrypt(message);
 		} catch (Exception e) {
-			logger.info(e);
+			logger.debug(e);
+			throw new EncryptionOperationNotPossibleException("Ocurred an error trying to encrypt " + logClass);
 		}
+
 		logger.debug("Encryption completed for " + logClass);
 
 		return encryptedMessage;
