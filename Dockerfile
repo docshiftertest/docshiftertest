@@ -1,9 +1,9 @@
 # DocShifter-base
 #
-# VERSION       6.2.1
+# VERSION       6.2.4.1
 
-# using the OpenJDK image
-FROM openjdk:11-jre
+# using the openjdk11-openj9 image
+FROM adoptopenjdk/openjdk11-openj9
 
 LABEL maintainer="DocShifter, support@docshifter.com"
 
