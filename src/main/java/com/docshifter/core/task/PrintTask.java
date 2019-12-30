@@ -11,6 +11,7 @@ public class PrintTask extends Task {
 
 
 	private String filename;
+	private String sentBy;
 	
 	public PrintTask(){
 		super();
@@ -35,7 +36,10 @@ public class PrintTask extends Task {
 	public void setFilePath(Path filename) {
 		this.sourceFilePath = filename;
 	}
-
-
-
+	public String getSentBy(){
+		return this.sentBy;
+	}
+	public void setSentBy(String sentBy) {
+		this.sentBy = sentBy;
+	}
 }
