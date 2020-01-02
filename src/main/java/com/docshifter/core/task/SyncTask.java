@@ -6,7 +6,7 @@ import java.nio.file.Path;
 
 public class SyncTask extends Task {
 	
-	
+	private static final long serialVersionUID = -419818551015529367L;
 	protected Path outputFilePath;
 	protected String fileName;
 	protected boolean discardReturnFile;

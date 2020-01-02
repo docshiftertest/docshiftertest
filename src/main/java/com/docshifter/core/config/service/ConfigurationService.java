@@ -2,7 +2,14 @@ package com.docshifter.core.config.service;
 
 
 import com.docshifter.core.config.wrapper.SenderConfigurationWrapper;
-import com.docshifter.core.config.domain.*;
+import com.docshifter.core.config.domain.ChainConfiguration;
+import com.docshifter.core.config.domain.ChainConfigurationRepository;
+import com.docshifter.core.config.domain.Module;
+import com.docshifter.core.config.domain.ModuleConfiguration;
+import com.docshifter.core.config.domain.ModuleConfigurationRepository;
+import com.docshifter.core.config.domain.ModuleRepository;
+import com.docshifter.core.config.domain.Node;
+import com.docshifter.core.config.domain.NodeRepository;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -87,10 +95,24 @@ public class ConfigurationService {
 	 *        SenderConfiguration.
 	 */
 	public SenderConfigurationWrapper getSenderConfiguration(long uid) {
-		// return new SenderConfigurationWrapper(senderConfigurationDAO.get((int)
-		// uid));
-		ChainConfiguration cc=chainConfigurationRepository.findOne(uid);
-		return new SenderConfigurationWrapper(nodeRepository.findOne(cc.getRootNode().getId()), chainConfigurationRepository);
+		Optional<ChainConfiguration> cc=chainConfigurationRepository.findById(uid);
+		if (cc.isPresent()) {
+			Optional<Node> noddy = nodeRepository.findById(cc.get().getRootNode().getId());
+			if (noddy.isPresent()) {
+				return new SenderConfigurationWrapper(noddy.get(), chainConfigurationRepository);
+			}
+			else {
+				logger.error("Could not find Node in nodeRepository using ID: " + 
+					cc.get().getRootNode().getId() +
+					" for ChainConfiguration ID: " + uid);
+			}
+		}
+		else {
+			logger.error("Could not find ChainConfiguration (Workflow) using ID: " + uid +
+					". This may be because you have added/deleted Workflows and there " + 
+					" are still messages on the Q referring to the old Workflow!");
+		}
+		return null;
 	}
 
 	/**
@@ -113,7 +135,7 @@ public class ConfigurationService {
 
 	public ChainConfiguration getTransformationConfiguration(
 			long uid) {
-		return chainConfigurationRepository.findOne(uid);
+		return chainConfigurationRepository.findById(uid).get();
 	}
 
 	// TODO throw exception if the configuration is not found

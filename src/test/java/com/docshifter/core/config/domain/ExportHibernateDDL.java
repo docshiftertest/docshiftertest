@@ -2,13 +2,13 @@ package com.docshifter.core.config.domain;
 
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
-
+import org.hibernate.tool.schema.TargetType;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -104,14 +104,13 @@ public class ExportHibernateDDL {
 			}
 		}
 
-		SchemaExport export = new SchemaExport(
-				(MetadataImplementor) metadata.buildMetadata()
-		);
+		SchemaExport export = new SchemaExport();
+
 
 		export.setDelimiter(";");
 		export.setOutputFile(directory + "ddl_" + dialect.name().toLowerCase() + ".sql");
 		export.setFormat(true);
-		export.execute(true, false, false, false);
+		export.execute(EnumSet.of(TargetType.SCRIPT), SchemaExport.Action.BOTH, metadata.buildMetadata());
 	}
 
 	private static enum Dialect {

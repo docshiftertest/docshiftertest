@@ -1,16 +1,20 @@
 package com.docshifter.core.messaging.sender;
 
+import com.docshifter.core.config.domain.QueueMonitor;
+import com.docshifter.core.config.domain.QueueMonitorRepository;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
 import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
+import com.docshifter.core.task.VeevaTask;
 import org.apache.log4j.Logger;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Properties;
 
 /**
@@ -23,14 +27,16 @@ public class AMQPSender implements IMessageSender {
 
 	private RabbitTemplate rabbitTemplate;
 	private Queue docshifterQueue;
+	private QueueMonitorRepository queueMonitorRepository;
 
-	private static final int DEFAULT_PRIORITY= 2;
+	public static final int DEFAULT_PRIORITY= 2;
 	
-	private static final int SYNC_PRIORITY= 4;
+	public static final int SYNC_PRIORITY= 4;
 
-	public AMQPSender(RabbitTemplate rabbitTemplate, Queue docshifterQueue) {
+	public AMQPSender(RabbitTemplate rabbitTemplate, Queue docshifterQueue, QueueMonitorRepository queueMonitorRepository) {
 		this.rabbitTemplate = rabbitTemplate;
 		this.docshifterQueue = docshifterQueue;
+		this.queueMonitorRepository = queueMonitorRepository;
 	}
 	
 	
@@ -54,14 +60,14 @@ public class AMQPSender implements IMessageSender {
 			throw new IllegalArgumentException("Message type not supported: " + message.getType());
 		}
 		
+		if (message.getTask() == null) {
+			throw new IllegalArgumentException("Message is returnMessage but task is not a SyncTask, it is NULL!!");
+		}
 		if (message.getTask() instanceof  SyncTask) {
 			return (SyncTask) message.getTask();
 		} else {
-			throw new IllegalArgumentException("Message is returnMessage but task is not a SyncTask, task class is of class " + task.getClass().getSimpleName());
+			throw new IllegalArgumentException("Message is returnMessage but task is not a SyncTask, task class is of class: " + task.getClass().getSimpleName());
 		}
-		
-		
-		
 	}
 	
 	private Object sendTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task, int priority) {
@@ -70,19 +76,28 @@ public class AMQPSender implements IMessageSender {
 				task,
 				chainConfigurationID);
 		
-		logger.debug("type=" + type.name());
-		logger.debug("task=" + task.getId());
-		logger.debug("task.class=" + task.getClass().getSimpleName());
-		logger.debug("message.task.class=" + message.getTask().getClass().getSimpleName());
-
-
 		if (task == null) {
 			logger.debug("task=NULL ERROR", null);
 		}
+		else {
+			logger.debug("task.Id=" + task.getId());
+			logger.debug("task.class=" + task.getClass().getSimpleName());
+			logger.debug("message.task.class=" + message.getTask().getClass().getSimpleName());
+		}
+		logger.debug("type=" + type.name());
 		logger.debug("chainConfigID=" + chainConfigurationID, null);
-		
+
 		logger.info("Sending message: " + message.toString() + " for file: " + task.getSourceFilePath(), null);
-		
+		String hostname = "localhost";
+		try {
+			hostname = InetAddress.getLocalHost().getHostName();
+		}
+		catch (UnknownHostException uncle) {
+			logger.warn("Couldn't get hostname of the DocShifter machine, so will default to localhost (for queue_monitor)");
+		}
+		QueueMonitor qMon = new QueueMonitor(type.name(), queue, chainConfigurationID, task.getId(), task.getSourceFilePath(), priority, hostname);
+		queueMonitorRepository.save(qMon);
+
 		if (DocshifterMessageType.SYNC.equals(type)) {
 			Object obj = rabbitTemplate.convertSendAndReceive(queue, message, message1 -> {
 				logger.debug("'rabbitTemplate.convertSendAndReceive': message.task type=" + message.getTask().getClass().getSimpleName());
@@ -104,15 +119,6 @@ public class AMQPSender implements IMessageSender {
 			return null;
 		}
 	}
-
-	private void sendTask(DocshifterMessageType type, long chainConfigurationID, Task task, int priority)  {
-		sendTask(type, docshifterQueue.getName(), chainConfigurationID, task, priority);
-	}
-
-	private void sendTask(DocshifterMessageType type, Task task, int priority)  {
-		sendTask(type, docshifterQueue.getName(), 0, task, priority);
-	}
-
 
 	public int getMessageCount(){
 		RabbitAdmin rabbitAdmin=new RabbitAdmin(rabbitTemplate.getConnectionFactory());
@@ -150,6 +156,16 @@ public class AMQPSender implements IMessageSender {
 	@Override
 	public void sendDocumentumTask(long chainConfigurationID, DctmTask task, int priority)  {
 		sendTask(DocshifterMessageType.DCTM, docshifterQueue.getName(), chainConfigurationID, task, priority);
+	}
+
+	@Override
+	public void sendVeevaTask(long chainConfigurationID,VeevaTask task) {
+		sendTask(DocshifterMessageType.VEEVA, docshifterQueue.getName(), chainConfigurationID, task, DEFAULT_PRIORITY);
+	}
+
+	@Override
+	public void sendVeevaTask(long chainConfigurationID,VeevaTask task, int priority) {
+		sendTask(DocshifterMessageType.VEEVA, docshifterQueue.getName(), chainConfigurationID, task, priority);
 	}
 
 	@Override

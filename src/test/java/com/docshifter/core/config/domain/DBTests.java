@@ -2,7 +2,6 @@ package com.docshifter.core.config.domain;
 
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -180,7 +179,7 @@ public class DBTests {
 		n7 = new Node(null, mc7);
 
 
-		chc1 = new ChainConfiguration("testchain", "desc", true, n1, null, null, 60);
+		chc1 = new ChainConfiguration("testchain", "desc", true, n1, null, null, 60, 2);
 
 		chainConfigurationRepository.save(chc1);
 

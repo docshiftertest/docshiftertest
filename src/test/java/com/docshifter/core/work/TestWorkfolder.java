@@ -1,18 +1,14 @@
 package com.docshifter.core.work;
 
-import static org.junit.Assert.*;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
-
-import javax.naming.ConfigurationException;
-
 import com.docshifter.core.TestController;
 import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-
 import com.docshifter.core.work.WorkFolder;
 import com.docshifter.core.work.WorkFolderManager;
 import org.junit.runner.RunWith;

@@ -38,7 +38,7 @@ public class Node {
 		}
 		if(childNodes==null)
 		{
-			this.childNodes=new HashSet<Node>();
+			this.childNodes=new HashSet<>();
 		}
 		this.moduleConfiguration = moduleConfiguration;
 	}

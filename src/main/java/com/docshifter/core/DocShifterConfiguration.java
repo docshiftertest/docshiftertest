@@ -1,13 +1,10 @@
 package com.docshifter.core;
 
-import com.docshifter.core.config.Constants;
-import com.docshifter.core.config.service.ConfigurationService;
-import com.docshifter.core.config.service.GeneralConfigService;
-import com.docshifter.core.messaging.DateDeserializer;
-import com.docshifter.core.work.WorkFolderManager;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -23,10 +20,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.docshifter.core.config.Constants;
+import com.docshifter.core.config.service.ConfigurationService;
+import com.docshifter.core.config.service.GeneralConfigService;
+import com.docshifter.core.messaging.DateDeserializer;
+import com.docshifter.core.work.WorkFolderManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
@@ -63,14 +63,9 @@ public class DocShifterConfiguration {
     @Bean
     public MessageConverter jsonMessageConverter() {
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		mapper.setDateFormat(new ISO8601DateFormat());
+		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		DateDeserializer.regObjectMapper(mapper);
-    	
-    	Jackson2JsonMessageConverter conv = new Jackson2JsonMessageConverter();
-    	conv.setJsonObjectMapper(mapper);
-    	
-		
+    	Jackson2JsonMessageConverter conv = new Jackson2JsonMessageConverter(mapper);
     	return conv;
     }
 
@@ -108,5 +103,4 @@ public class DocShifterConfiguration {
 		return new Queue(Constants.SYNC_QUEUE);
 
 	}
-
 }

@@ -2,7 +2,6 @@ package com.docshifter.core.config.service;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 /**

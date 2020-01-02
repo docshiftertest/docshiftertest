@@ -1,9 +1,13 @@
 package com.docshifter.core.config.domain;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
-public class Parameter
+public class Parameter implements Comparable<Parameter>
 {
 
 	@Id
@@ -123,5 +127,30 @@ public class Parameter
 		} else if (!type.equals(other.type))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "{" +
+				"\"id\": " + id +
+				", \"name\": \"" + name + '\"' +
+				", \"description\": \"" + description + '\"' +
+				", \"type\": \"" + type + '\"' +
+				", \"required\": \"" + required + '\"' +
+				", \"valuesJson\": \"" + valuesJson + '\"' +
+				'}';
+	}
+
+	@Override
+	public int compareTo(Parameter o) {
+		if (this.getName() != null && o.getName() != null) {
+			return this.getName().compareTo(o.getName());
+		}
+		else if (this.getDescription() != null && o.getDescription() != null) {
+			return this.getDescription().compareTo(o.getDescription());
+		}
+		else {
+			return Long.compare(this.getId(), o.getId());
+		}
 	}
 }

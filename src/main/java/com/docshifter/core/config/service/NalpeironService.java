@@ -8,6 +8,7 @@ import com.nalpeiron.nalplibrary.NSL;
 import com.nalpeiron.nalplibrary.NalpError;
 import org.apache.commons.lang.SystemUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +19,10 @@ import java.util.Map;
 
 @Service
 @Profile("licensing")
-public class NalpeironService {
+@Conditional(IsNotInDockerCondition.class)
+public class NalpeironService implements ILicensingService {
 
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NalpeironService.class.getName());
+    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ILicensingService.class.getName());
 
     //These private ints are unique to your product and must
     // be set here to the values corresponding to your product.

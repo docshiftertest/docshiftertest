@@ -8,11 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.naming.ConfigurationException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/11/15.
@@ -20,8 +23,7 @@ import java.nio.file.Paths;
 @Service
 public class WorkFolderManager {
 
-	private static final Logger logger = Logger.getLogger(new Object() { }.getClass().getEnclosingClass());
-
+	private static final Logger logger = Logger.getLogger(WorkFolderManager.class);
 
 	private Path workfolder;
 	private Path errorfolder;
@@ -29,32 +31,76 @@ public class WorkFolderManager {
 	@Autowired
 	public WorkFolderManager(GeneralConfigService generalConfiguration) throws ConfigurationException {
 
-		System.out.println(generalConfiguration);
-		System.out.println(Constants.TEMPFOLDER);
-		System.out.println(generalConfiguration.getString(Constants.TEMPFOLDER));
-		System.out.println(Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)));
-		System.out.println(Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)).toAbsolutePath());
-		System.out.println(generalConfiguration);
-		System.out.println(Constants.ERRORFOLDER);
-		System.out.println(generalConfiguration.getString(Constants.ERRORFOLDER));
-		System.out.println(Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)));
-		System.out.println(Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)).toAbsolutePath());
-
-
+		logger.info(generalConfiguration);
+		logger.info(Constants.TEMPFOLDER);
+		logger.info(generalConfiguration.getString(Constants.TEMPFOLDER));
+		logger.info(Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)));
+		logger.info(Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)).toAbsolutePath());
+		logger.info(generalConfiguration);
+		logger.info(Constants.ERRORFOLDER);
+		logger.info(generalConfiguration.getString(Constants.ERRORFOLDER));
+		logger.info(Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)));
+		logger.info(Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)).toAbsolutePath());
 
 		workfolder = Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)).toAbsolutePath();
 		errorfolder = Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)).toAbsolutePath();
 
 		if (!Files.isDirectory(workfolder)) {
-			throw new ConfigurationException("Workfolder is badly configured: " +workfolder);
+			try {
+				Files.createDirectories(workfolder);
+			}
+			catch (IOException ioe) {
+				logger.warn("Workfolder: " + workfolder + " returned false for 'isDirectory()' but could not be created");
+			}
+		}
+		// Either workfolder did not exist and has now been created or for some reason isDirectory returned false...
+		// so either it was a file or is a network path that messes with the result of isDirectory... so in a
+		// WinBlows environment you might want to consider using Log on as... for the services
+		// Anyhoo, this should sort the wheat from the chaff... try to create a file under the workfolder
+		Path tmpFilePath = Paths.get(workfolder.toString(), "tmp_" + Objects.toString(System.currentTimeMillis()));
+		try {
+			new FileOutputStream(new File(tmpFilePath.toString())).close();
+		}
+		catch (IOException ioe) {
+			logger.error("Trying to create a temp file: [" + tmpFilePath + "] under workfolder [" + workfolder + "] got IOException: " + ioe);
+			throw new ConfigurationException("Workfolder: [" + workfolder + "] is badly configured, got IOException: " + ioe);
+		}
+		finally {
+			try {
+				Files.deleteIfExists(tmpFilePath);
+			}
+			catch (IOException ioe) {
+				logger.warn("Also got IOException: " + ioe + " trying to delete the file: " + tmpFilePath + " from workfolder: " + workfolder);
+			}
 		}
 
 		if (!Files.isDirectory(errorfolder)) {
-			throw new ConfigurationException("Errorfolder is badly configured " + errorfolder);
+			try {
+				Files.createDirectories(errorfolder);
+			}
+			catch (IOException ioe) {
+				logger.warn("Errorfolder: " + errorfolder + " returned false for 'isDirectory()' but could not be created");
+			}
 		}
-
+		// See above, we use same logic for errorfolder as for workfolder 
+		// Now try to create a file under the errorfolder
+		tmpFilePath = Paths.get(errorfolder.toString(), "tmp_" + Objects.toString(System.currentTimeMillis()));
+		try {
+			new FileOutputStream(new File(tmpFilePath.toString())).close();
+		}
+		catch (IOException ioe) {
+			logger.error("Trying to create a temp file: [" + tmpFilePath + "] under errorfolder [" + errorfolder + "] got IOException: " + ioe);
+			throw new ConfigurationException("Errorfolder: [" + errorfolder + "] is badly configured, got IOException: " + ioe);
+		}
+		finally {
+			try {
+				Files.deleteIfExists(tmpFilePath);
+			}
+			catch (IOException ioe) {
+				logger.warn("Also got IOException: " + ioe + " trying to delete the file: " + tmpFilePath + " from errorfolder: " + errorfolder);
+			}
+		}
 	}
-
 
 	public synchronized WorkFolder getNewWorkfolder(String name) throws IOException {
 		return new WorkFolder(getNewPath(workfolder, name), getNewPath(errorfolder, name));
@@ -78,28 +124,25 @@ public class WorkFolderManager {
 		}
 
 		Files.createDirectory(specificWorkFolder);
-
-
 		return specificWorkFolder;
-
 	}
 
 	public void deleteWorkfolder(WorkFolder folder) {
 		deleteWorkfolder(folder, false);
 	}
+
 	public void deleteWorkfolder(WorkFolder folder, boolean force) {
 		if (!folder.isRoot()) {
 			deleteWorkfolder(folder.getParent(), force);
 			folder.setParent(null);
 		}
-
 		deletePath(folder.getFolder(), force);
-
 	}
 
 	public void deleteErrorfolder(WorkFolder folder){
 		deleteErrorfolder(folder, false);
 	}
+
 	public void deleteErrorfolder(WorkFolder folder, boolean force) {
 		if (!folder.isRoot()) {
 			deleteErrorfolder(folder.getParent(), force);
@@ -111,8 +154,6 @@ public class WorkFolderManager {
 		} else {
 			deletePath(folder.getErrorFolder(), force);
 		}
-
-
 	}
 
 	public void copyToErrorFolder(WorkFolder folder) throws Exception{
@@ -120,7 +161,9 @@ public class WorkFolderManager {
 	}
 
 	private boolean deletePath(Path dir, boolean force) {
+		logger.warn("Into deletePath(" + dir.toString() + ", " + force +")");
 		if (Files.isDirectory(dir)) {
+			logger.debug("Is directory...");
 			try (DirectoryStream<Path> ds = Files.newDirectoryStream(dir)) {
 
 				for (Path child : ds)
@@ -129,17 +172,22 @@ public class WorkFolderManager {
 							return false;
 						}
 					} else {
+						logger.debug("Returning false because force is not set?");
 						return false;
 					}
-			} catch (IOException ex) {
+			} catch (IOException ioe) {
+				logger.warn("deletePath(" + dir.toString() + ") in 'for Path', caught IOException: " + ioe);
 				return false;
 			}
 		}
+		logger.debug("Will delete [" + dir.toString() + "], if exists...");
 		try {
 			Files.deleteIfExists(dir);
-		} catch (IOException ex) {
+		} catch (IOException ioe) {
+			logger.warn("deletePath(" + dir.toString() + ") after 'deleteIfExists', caught IOException: " + ioe);
 			return false;
 		}
+		logger.debug("Returning true!");
 		return true;
 	}
 }

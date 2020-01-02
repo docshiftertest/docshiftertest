@@ -101,9 +101,17 @@ public class WorkFolder implements Serializable {
 		filename = FileUtils.removeIllegalFilesystemCharacters(filename);
 
 		Path newPath = Paths.get(folder.toString(), filename + "." + extension);
-		while (Files.exists(newPath))
-		{
-			newPath = Paths.get(folder.toString(), filename + "_" + Objects.toString(System.currentTimeMillis()) + "." + extension);
+		String now;
+		while (Files.exists(newPath)) {
+			now = Objects.toString(System.currentTimeMillis());
+			newPath = Paths.get(folder.toString(), now);
+			try {
+				Files.createDirectories(newPath);
+			} catch (IOException e) {
+				logger.error("Could not create directory:" + newPath, null);
+				return null;
+			}
+			newPath = Paths.get(newPath.toString(), filename + "." + extension);
 		}
 
 		return newPath;
@@ -136,7 +144,7 @@ public class WorkFolder implements Serializable {
 		// default serialization
 //		oos.defaultWriteObject();
 		// write the object
-		List ser = new ArrayList();
+		List<Serializable> ser = new ArrayList<>();
 		ser.add(this.folder.toString());
 		ser.add(this.parent);
 		ser.add(this.errorFolder.toString());
