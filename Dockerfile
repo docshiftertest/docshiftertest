@@ -3,7 +3,7 @@
 # VERSION       6.2.4.1
 
 # using the openjdk11-openj9 image
-FROM adoptopenjdk/openjdk11-openj9
+FROM adoptopenjdk:11-jre-openj9
 
 LABEL maintainer="DocShifter, support@docshifter.com"
 
