@@ -26,11 +26,11 @@
 	<distributionManagement>
 		<repository>
 			<id>releases</id>
-			<url>https://mvn.docbyte.com/artifactory/releases</url>
+			<url>http://ec2-34-254-95-61.eu-west-1.compute.amazonaws.com:8081/repository/releases/</url>
 		</repository>
 		<snapshotRepository>
 			<id>snapshots</id>
-			<url>https://mvn.docbyte.com/artifactory/snapshots</url>
+			<url>http://ec2-34-254-95-61.eu-west-1.compute.amazonaws.com:8081/repository/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
@@ -38,7 +38,7 @@
 		<repository>
 			<id>internal</id>
 			<name>Archiva Managed Internal Repository</name>
-			<url>https://mvn.docbyte.com/artifactory/releases/</url>
+			<url>http://ec2-34-254-95-61.eu-west-1.compute.amazonaws.com:8081/repository/releases/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -52,7 +52,7 @@
 		<pluginRepository>
 			<id>internal</id>
 			<name>Archiva Managed Internal Repository</name>
-			<url>https://mvn.docbyte.com/artifactory/plugins/</url>
+			<url>http://ec2-34-254-95-61.eu-west-1.compute.amazonaws.com:8081/repository/plugins/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -243,7 +243,7 @@
 				<plugin>
 					<groupId>com.spotify</groupId>
 					<artifactId>dockerfile-maven-plugin</artifactId>
-					<version>1.4.10</version>
+					<version>1.4.13</version>
 					<executions>
 						<execution>
 							<id>default</id>
@@ -254,7 +254,7 @@
 						</execution>
 					</executions>
 					<configuration>
-						<repository>eu.gcr.io/docbyte-dev-194014/docshifter/docshifter-base</repository>
+						<repository>978459874896.dkr.ecr.eu-west-1.amazonaws.com/docshifter/docshifter-base</repository>
 						<tag>${project.version}</tag>
 						<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
 						<buildArgs>
