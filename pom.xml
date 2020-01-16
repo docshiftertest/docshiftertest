@@ -280,6 +280,10 @@
 		<profile>
 			<id>release</id>
 			<activation>
+				<property>
+	                <name>env.PROFILE</name>
+	                <value>release</value>
+	            </property>
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
