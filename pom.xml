@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.docshifter</groupId>
@@ -15,7 +16,7 @@
 
 	<properties>
 		<revision>6.2.4.1</revision>
-		<sha1/>
+		<sha1 />
 		<hsqldb.version>2.3.4</hsqldb.version>
 		<java.version>1.8</java.version>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
@@ -169,10 +170,10 @@
 			<artifactId>jasypt-spring-boot-starter</artifactId>
 			<version>3.0.0</version>
 		</dependency>
-		
-</dependencies>
 
-<build>
+	</dependencies>
+
+	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -198,12 +199,11 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<forkMode>once</forkMode>
-					<!--  As of jdk11 we will need the extra illegal-access permit doohickey
-							NOTA BENE!!! The illegal-access flag has to be preceded by 2 minus
-							signs (without space between) but you can't put that in a comment in the pom!
-					<argLine>-Djava.library.path=${project.build.directory}/classes/license/ - -illegal-access=permit</argLine>
-					-->
-					<!--  but for now, we don't need it and can't specify it -->
+					<!-- As of jdk11 we will need the extra illegal-access permit doohickey 
+						NOTA BENE!!! The illegal-access flag has to be preceded by 2 minus signs 
+						(without space between) but you can't put that in a comment in the pom! <argLine>-Djava.library.path=${project.build.directory}/classes/license/ 
+						- -illegal-access=permit</argLine> -->
+					<!-- but for now, we don't need it and can't specify it -->
 					<argLine>-Djava.library.path=${project.build.directory}/classes/license/</argLine>
 				</configuration>
 			</plugin>
@@ -302,23 +302,7 @@
 									</descriptors>
 								</configuration>
 							</execution>
-							<execution>
-							<id>make-assembly-docker</id> <!-- this is used for inheritance merges -->
-							<phase>package</phase> <!-- bind to the packaging phase -->
-							<goals>
-								<goal>single</goal>
-							</goals>
-							<configuration>
-								<descriptors>
-									<descriptor>src/main/assembly/assembly-docker.xml</descriptor>
-								</descriptors>
-							</configuration>
-						</execution>
 						</executions>
-					</plugin>
-					<plugin>
-						<groupId>com.spotify</groupId>
-						<artifactId>dockerfile-maven-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>
@@ -329,7 +313,7 @@
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
-				<changelist/>
+				<changelist />
 			</properties>
 			<build>
 				<plugins>
@@ -347,6 +331,18 @@
 									<finalName>Docshifter-Beans</finalName>
 									<descriptors>
 										<descriptor>src/main/assembly/assembly.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>make-assembly-docker</id> <!-- this is used for inheritance merges -->
+								<phase>package</phase> <!-- bind to the packaging phase -->
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/assembly-docker.xml</descriptor>
 									</descriptors>
 								</configuration>
 							</execution>
