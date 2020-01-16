@@ -223,18 +223,6 @@
 							</descriptors>
 						</configuration>
 					</execution>
-					<execution>
-						<id>make-assembly-docker</id> <!-- this is used for inheritance merges -->
-						<phase>package</phase> <!-- bind to the packaging phase -->
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>src/main/assembly/assembly-docker.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
 				</executions>
 			</plugin>
 		</plugins>
@@ -249,6 +237,7 @@
 							<id>default</id>
 							<goals>
 								<goal>build</goal>
+								<goal>push</goal>
 							</goals>
 						</execution>
 					</executions>
