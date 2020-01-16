@@ -207,36 +207,6 @@
 					<argLine>-Djava.library.path=${project.build.directory}/classes/license/</argLine>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<finalName>Docshifter-Beans</finalName>
-							<descriptors>
-								<descriptor>src/main/assembly/assembly.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-					<execution>
-						<id>make-assembly-docker</id> <!-- this is used for inheritance merges -->
-						<phase>package</phase> <!-- bind to the packaging phase -->
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>src/main/assembly/assembly-docker.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -249,13 +219,13 @@
 							<id>default</id>
 							<goals>
 								<goal>build</goal>
+								<goal>push</goal>
 							</goals>
 						</execution>
 					</executions>
 					<configuration>
 						<repository>978459874896.dkr.ecr.eu-west-1.amazonaws.com/docshifter/docshifter-base</repository>
 						<tag>${project.version}</tag>
-						<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
 						<buildArgs>
 							<DEPENDENCY>${project.artifactId}-${project.version}</DEPENDENCY>
 						</buildArgs>
