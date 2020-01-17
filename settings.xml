@@ -29,11 +29,6 @@
       <username>teamcity</username>
       <password>V25C8QNBFJ9s</password>
     </server>
-	    <server>
-        <id>978459874896.dkr.ecr.eu-west-1.amazonaws.com</id>
-        <username>AKIA6HUGA2ZIJFKXELUH</username>
-        <password>qZ8bpsqPHakVIFjw4lByFgWhe82KhiERLzRzODMi</password>
-    </server>
   </servers>
   <profiles>
     <profile>
