@@ -24,45 +24,6 @@
 	</properties>
 
 
-	<distributionManagement>
-		<repository>
-			<id>releases</id>
-			<url>http://ec2-34-254-95-61.eu-west-1.compute.amazonaws.com:8081/repository/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>snapshots</id>
-			<url>http://ec2-34-254-95-61.eu-west-1.compute.amazonaws.com:8081/repository/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
-	<repositories>
-		<repository>
-			<id>internal</id>
-			<name>Archiva Managed Internal Repository</name>
-			<url>http://ec2-34-254-95-61.eu-west-1.compute.amazonaws.com:8081/repository/releases/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>internal</id>
-			<name>Archiva Managed Internal Repository</name>
-			<url>http://ec2-34-254-95-61.eu-west-1.compute.amazonaws.com:8081/repository/plugins/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.docbyte.utils</groupId>
@@ -210,6 +171,10 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.8</version>
+				</plugin>
 				<plugin>
 					<groupId>com.spotify</groupId>
 					<artifactId>dockerfile-maven-plugin</artifactId>
