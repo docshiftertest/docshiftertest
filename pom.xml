@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.docshifter</groupId>
@@ -15,7 +16,7 @@
 
 	<properties>
 		<revision>6.2.4.1</revision>
-		<sha1/>
+		<sha1 />
 		<hsqldb.version>2.3.4</hsqldb.version>
 		<java.version>1.8</java.version>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
@@ -26,11 +27,11 @@
 	<distributionManagement>
 		<repository>
 			<id>releases</id>
-			<url>https://mvn.docbyte.com/artifactory/releases</url>
+			<url>https://mvn.docshifter.com/repository/releases/</url>
 		</repository>
 		<snapshotRepository>
 			<id>snapshots</id>
-			<url>https://mvn.docbyte.com/artifactory/snapshots</url>
+			<url>https://mvn.docshifter.com/repository/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
@@ -38,7 +39,7 @@
 		<repository>
 			<id>internal</id>
 			<name>Archiva Managed Internal Repository</name>
-			<url>https://mvn.docbyte.com/artifactory/releases/</url>
+			<url>https://mvn.docshifter.com/repository/releases/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -52,7 +53,7 @@
 		<pluginRepository>
 			<id>internal</id>
 			<name>Archiva Managed Internal Repository</name>
-			<url>https://mvn.docbyte.com/artifactory/plugins/</url>
+			<url>https://mvn.docshifter.com/repository/plugins/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -169,10 +170,10 @@
 			<artifactId>jasypt-spring-boot-starter</artifactId>
 			<version>3.0.0</version>
 		</dependency>
-		
-</dependencies>
 
-<build>
+	</dependencies>
+
+	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -198,44 +199,13 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<forkMode>once</forkMode>
-					<!--  As of jdk11 we will need the extra illegal-access permit doohickey
-							NOTA BENE!!! The illegal-access flag has to be preceded by 2 minus
-							signs (without space between) but you can't put that in a comment in the pom!
-					<argLine>-Djava.library.path=${project.build.directory}/classes/license/ - -illegal-access=permit</argLine>
-					-->
-					<!--  but for now, we don't need it and can't specify it -->
+					<!-- As of jdk11 we will need the extra illegal-access permit doohickey 
+						NOTA BENE!!! The illegal-access flag has to be preceded by 2 minus signs 
+						(without space between) but you can't put that in a comment in the pom! <argLine>-Djava.library.path=${project.build.directory}/classes/license/ 
+						- -illegal-access=permit</argLine> -->
+					<!-- but for now, we don't need it and can't specify it -->
 					<argLine>-Djava.library.path=${project.build.directory}/classes/license/</argLine>
 				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<finalName>Docshifter-Beans</finalName>
-							<descriptors>
-								<descriptor>src/main/assembly/assembly.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-					<execution>
-						<id>make-assembly-docker</id> <!-- this is used for inheritance merges -->
-						<phase>package</phase> <!-- bind to the packaging phase -->
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>src/main/assembly/assembly-docker.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 		<pluginManagement>
@@ -243,7 +213,7 @@
 				<plugin>
 					<groupId>com.spotify</groupId>
 					<artifactId>dockerfile-maven-plugin</artifactId>
-					<version>1.4.10</version>
+					<version>1.4.13</version>
 					<executions>
 						<execution>
 							<id>default</id>
@@ -254,9 +224,8 @@
 						</execution>
 					</executions>
 					<configuration>
-						<repository>eu.gcr.io/docbyte-dev-194014/docshifter/docshifter-base</repository>
+						<repository>978459874896.dkr.ecr.eu-west-1.amazonaws.com/docshifter/docshifter-base</repository>
 						<tag>${project.version}</tag>
-						<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
 						<buildArgs>
 							<DEPENDENCY>${project.artifactId}-${project.version}</DEPENDENCY>
 						</buildArgs>
@@ -303,23 +272,7 @@
 									</descriptors>
 								</configuration>
 							</execution>
-							<execution>
-							<id>make-assembly-docker</id> <!-- this is used for inheritance merges -->
-							<phase>package</phase> <!-- bind to the packaging phase -->
-							<goals>
-								<goal>single</goal>
-							</goals>
-							<configuration>
-								<descriptors>
-									<descriptor>src/main/assembly/assembly-docker.xml</descriptor>
-								</descriptors>
-							</configuration>
-						</execution>
 						</executions>
-					</plugin>
-					<plugin>
-						<groupId>com.spotify</groupId>
-						<artifactId>dockerfile-maven-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>
@@ -327,10 +280,14 @@
 		<profile>
 			<id>release</id>
 			<activation>
+				<property>
+	                <name>env.PROFILE</name>
+	                <value>release</value>
+	            </property>
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
-				<changelist/>
+				<changelist />
 			</properties>
 			<build>
 				<plugins>
@@ -348,6 +305,18 @@
 									<finalName>Docshifter-Beans</finalName>
 									<descriptors>
 										<descriptor>src/main/assembly/assembly.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>make-assembly-docker</id> <!-- this is used for inheritance merges -->
+								<phase>package</phase> <!-- bind to the packaging phase -->
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/assembly-docker.xml</descriptor>
 									</descriptors>
 								</configuration>
 							</execution>
