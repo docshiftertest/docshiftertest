@@ -17,7 +17,7 @@ public class Parameter implements Comparable<Parameter>
 	private String description;
 	private String type;
 	private Boolean required;
-	@Column(length = 1000)
+	@Column(length = 100000)
 	private String valuesJson;
 	
 	public Boolean getRequired() {
