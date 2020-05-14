@@ -1,15 +1,20 @@
 package com.docshifter.core.messaging.message;
 
+import java.io.Serializable;
+
+import org.springframework.stereotype.Component;
+
 import com.docshifter.core.task.Task;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
-import java.io.Serializable;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 5/20/16.
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "className")
+@Component
 public class DocshifterMessage implements Serializable {
+
+
 	private DocshifterMessageType type;
 	private Task task;
 	private Long configId;
