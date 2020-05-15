@@ -31,8 +31,8 @@ public class DctmMetaDataConsts {
 	/* Individual Notification */
 	public static final String USER_EMAIL_COLUMN = "user_address";
 
+	public static final String RENDITION_REQUESTED_BY = "rendition_requested_by";
 	public static final String LAST_CHECKED_IN_USER = "last_checked_in_user";
-	public static final String LAST_MODIFIER_USER = "last_modifier_user";
 	public static final String ALL_EMAILS = "all_emails_address";
 		
 	public static final String GENERIC_EMAIL_ADDRESS_NOT_FOUND_MSG = "Could not find e-mail address for Last checked in user or/and Last modifier user";
