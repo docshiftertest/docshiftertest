@@ -35,11 +35,11 @@ public class DctmMetaDataConsts {
 	public static final String LAST_CHECKED_IN_USER = "last_checked_in_user";
 	public static final String ALL_EMAILS = "all_emails_address";
 		
-	public static final String GENERIC_EMAIL_ADDRESS_NOT_FOUND_MSG = "Could not find e-mail address for Last checked in user or/and Last modifier user";
+	public static final String GENERIC_EMAIL_ADDRESS_NOT_FOUND_MSG = "Could not find e-mail address for Last checked in user or/and rendition requested by";
 	
-	public static final String LAST_CHECKED_IN_USER_EMAIL_ADDRESS_NOT_FOUND_MSG = "Could not find e-mail address for Last checked in user";
+	public static final String RENDITION_REQUESTED_BY_EMAIL_ADDRESS_NOT_FOUND = "Could not find e-mail address for rendition requested by user.";
 	
-	public static final String LAST_MODIFIER_USER_EMAIL_ADDRESS_NOT_FOUND_MSG = "Could not find e-mail address for last modifier user";
+	public static final String LAST_CHECKED_IN_USER_EMAIL_ADDRESS_NOT_FOUND = "Could not find e-mail address for for Last checked in user.";
 	
 	
 }
