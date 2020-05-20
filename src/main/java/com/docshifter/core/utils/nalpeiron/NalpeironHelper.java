@@ -135,7 +135,7 @@ public class NalpeironHelper {
         }
 
         if (!foundNalpLib) {
-            logger.fatal("The " + nalpLibName + " file used for your operating system cammot be found in the included java library paths. Stopping Application", null);
+            logger.fatal("The " + nalpLibName + " file used for your operating system cannot be found in the included java library paths. Stopping Application", null);
             System.exit(0);
         }
     }
