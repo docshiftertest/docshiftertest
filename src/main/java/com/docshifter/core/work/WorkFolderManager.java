@@ -35,8 +35,6 @@ public class WorkFolderManager {
 		logger.debug("Temp (Work) folder: " + tempFolder);
 		logger.debug("Error folder: " + errorFolder);
 		
-		//File tempFolderDir = new File(tempFolder);
-		//File errorFolderDir = new File(errorFolder);
 		boolean workFolderResult = validateFolder("Work", tempFolder);
 		boolean errorFolderResult = validateFolder("Error", errorFolder);
 		if (!workFolderResult) {
@@ -98,12 +96,10 @@ public class WorkFolderManager {
 			}
 		}
 
-		// Anyhoo, this should sort the wheat from the chaff... see if the folder is writable
+		
 		if (result) {
-			//while (folderPath.endsWith("/") || folderPath.endsWith("\\")) {
-			//	folderPath = folderPath.substring(0, folderPath.length() - 1);
-			//}
 			File tst = new File(folderPath);
+			// Anyhoo, this should sort the wheat from the chaff... see if the folder is writable
 			if (tst.canWrite()) {
 				logger.debug(workOrError + "folder on [" + folderPath + "] is writable. We're good to go!");
 			}
@@ -125,8 +121,6 @@ public class WorkFolderManager {
 
 
 	private Path getNewPath(Path root, String name)  throws IOException {
-
-		//Files.createDirectories(root);
 
 		name = FileUtils.removeIllegalFilesystemCharacters(name);
 
