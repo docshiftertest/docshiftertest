@@ -6,16 +6,13 @@ import com.docshifter.core.config.service.GeneralConfigService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.naming.ConfigurationException;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/11/15.
@@ -31,75 +28,87 @@ public class WorkFolderManager {
 	@Autowired
 	public WorkFolderManager(GeneralConfigService generalConfiguration) throws ConfigurationException {
 
-		logger.info(generalConfiguration);
-		logger.info(Constants.TEMPFOLDER);
-		logger.info(generalConfiguration.getString(Constants.TEMPFOLDER));
-		logger.info(Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)));
-		logger.info(Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)).toAbsolutePath());
-		logger.info(generalConfiguration);
-		logger.info(Constants.ERRORFOLDER);
-		logger.info(generalConfiguration.getString(Constants.ERRORFOLDER));
-		logger.info(Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)));
-		logger.info(Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)).toAbsolutePath());
+		logger.debug("Temp (Work) folder param name: " + Constants.TEMPFOLDER);
+		logger.debug("Error folder param name: " + Constants.ERRORFOLDER);
+		String tempFolder = generalConfiguration.getString(Constants.TEMPFOLDER);
+		String errorFolder = generalConfiguration.getString(Constants.ERRORFOLDER);
+		logger.debug("Temp (Work) folder: " + tempFolder);
+		logger.debug("Error folder: " + errorFolder);
+		
+		boolean workFolderResult = validateFolder("Work", tempFolder);
+		boolean errorFolderResult = validateFolder("Error", errorFolder);
+		if (!workFolderResult) {
+			checkFatal("Work", tempFolder);
+		}
+		else {
+			workfolder = Paths.get(tempFolder).toAbsolutePath();
+		}
+		if (!errorFolderResult) {
+			checkFatal("Error", errorFolder);
+		}
+		else {
+			errorfolder = Paths.get(errorFolder).toAbsolutePath();
+		}
+	}
 
-		workfolder = Paths.get(generalConfiguration.getString(Constants.TEMPFOLDER)).toAbsolutePath();
-		errorfolder = Paths.get(generalConfiguration.getString(Constants.ERRORFOLDER)).toAbsolutePath();
+	private void checkFatal(String workOrError, String folderPath) throws ConfigurationException {
+		String errorMessage = "There is an error with the configuration of the " 
+				+ workOrError 
+				+ " folder [" 
+				+ folderPath 
+				+ "]! Please check and correct";
+		Exception exc = new Exception();
+		exc.fillInStackTrace();
+		StackTraceElement[] traces = exc.getStackTrace();
+		StackTraceElement trace = traces[traces.length - 1];
+		logger.debug(trace.toString());
+		if (trace.toString().startsWith("com.docshifter.console.DocShifterConsole")) {
+			logger.warn(errorMessage);
+		}
+		else {
+			logger.error(errorMessage);
+			throw new ConfigurationException(errorMessage);
+		}
+	}
 
-		if (!Files.isDirectory(workfolder)) {
+	private boolean validateFolder(String workOrError, String folderPath) {
+		boolean result = true;
+		
+		while (folderPath.endsWith("/") || folderPath.endsWith("\\")) {
+			folderPath = folderPath.substring(0, folderPath.length() - 1);
+		}
+		File folderFile = new File(folderPath);
+		if (!folderFile.exists()) {
+			logger.debug(workOrError + "folder: " + folderPath + " does not exist. Will try to create it.");
 			try {
-				Files.createDirectories(workfolder);
+				Files.createDirectories(Paths.get(folderPath));
 			}
 			catch (IOException ioe) {
-				logger.warn("Workfolder: " + workfolder + " returned false for 'isDirectory()' but could not be created");
+				logger.error(workOrError + "folder: " + folderPath + " did not exist but then could not be created. " +
+						"IOException was: " + ioe);
+				result = false;
 			}
 		}
-		// Either workfolder did not exist and has now been created or for some reason isDirectory returned false...
-		// so either it was a file or is a network path that messes with the result of isDirectory... so in a
-		// WinBlows environment you might want to consider using Log on as... for the services
-		// Anyhoo, this should sort the wheat from the chaff... try to create a file under the workfolder
-		Path tmpFilePath = Paths.get(workfolder.toString(), "tmp_" + Objects.toString(System.currentTimeMillis()));
-		try {
-			new FileOutputStream(new File(tmpFilePath.toString())).close();
-		}
-		catch (IOException ioe) {
-			logger.error("Trying to create a temp file: [" + tmpFilePath + "] under workfolder [" + workfolder + "] got IOException: " + ioe);
-			throw new ConfigurationException("Workfolder: [" + workfolder + "] is badly configured, got IOException: " + ioe);
-		}
-		finally {
-			try {
-				Files.deleteIfExists(tmpFilePath);
-			}
-			catch (IOException ioe) {
-				logger.warn("Also got IOException: " + ioe + " trying to delete the file: " + tmpFilePath + " from workfolder: " + workfolder);
+		else {
+			if (Files.isRegularFile(Paths.get(folderPath))) {
+				logger.error(workOrError + "folder on [" + folderPath + "] is a regular file, not a directory!");
+				result = false;
 			}
 		}
 
-		if (!Files.isDirectory(errorfolder)) {
-			try {
-				Files.createDirectories(errorfolder);
+		
+		if (result) {
+			File tst = new File(folderPath);
+			// Anyhoo, this should sort the wheat from the chaff... see if the folder is writable
+			if (tst.canWrite()) {
+				logger.debug(workOrError + "folder on [" + folderPath + "] is writable. We're good to go!");
 			}
-			catch (IOException ioe) {
-				logger.warn("Errorfolder: " + errorfolder + " returned false for 'isDirectory()' but could not be created");
-			}
-		}
-		// See above, we use same logic for errorfolder as for workfolder 
-		// Now try to create a file under the errorfolder
-		tmpFilePath = Paths.get(errorfolder.toString(), "tmp_" + Objects.toString(System.currentTimeMillis()));
-		try {
-			new FileOutputStream(new File(tmpFilePath.toString())).close();
-		}
-		catch (IOException ioe) {
-			logger.error("Trying to create a temp file: [" + tmpFilePath + "] under errorfolder [" + errorfolder + "] got IOException: " + ioe);
-			throw new ConfigurationException("Errorfolder: [" + errorfolder + "] is badly configured, got IOException: " + ioe);
-		}
-		finally {
-			try {
-				Files.deleteIfExists(tmpFilePath);
-			}
-			catch (IOException ioe) {
-				logger.warn("Also got IOException: " + ioe + " trying to delete the file: " + tmpFilePath + " from errorfolder: " + errorfolder);
+			else {
+				logger.error(workOrError + "folder on [" + folderPath + "] is not writable!");
+				result = false;
 			}
 		}
+		return result;
 	}
 
 	public synchronized WorkFolder getNewWorkfolder(String name) throws IOException {
@@ -112,8 +121,6 @@ public class WorkFolderManager {
 
 
 	private Path getNewPath(Path root, String name)  throws IOException {
-
-		//Files.createDirectories(root);
 
 		name = FileUtils.removeIllegalFilesystemCharacters(name);
 
