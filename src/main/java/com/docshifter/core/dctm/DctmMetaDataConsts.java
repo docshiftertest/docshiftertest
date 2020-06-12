@@ -41,5 +41,8 @@ public class DctmMetaDataConsts {
 	
 	public static final String LAST_CHECKED_IN_USER_EMAIL_ADDRESS_NOT_FOUND = "Could not find e-mail address for for Last checked in user.";
 	
+	/* CONST used in Task Data Option to handle virtual doc*/
+	public static final String PROCESS_VIRTUAL_DOC = "process_vd";
+	
 	
 }
