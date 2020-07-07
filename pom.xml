@@ -164,6 +164,13 @@
 			<artifactId>spring-data-rest-core</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.12</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- jasypt to encrypt properties -->
 		<dependency>
 			<groupId>com.github.ulisesbocchio</groupId>

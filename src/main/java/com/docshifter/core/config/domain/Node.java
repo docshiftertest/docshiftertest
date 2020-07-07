@@ -16,7 +16,7 @@ public class Node {
 	private long id;
 
 	//@ManyToOne()
-	@ManyToOne(cascade = CascadeType.REMOVE)
+	@ManyToOne(cascade =CascadeType.ALL)
 	@JsonIgnore()
 	private Node parentNode;
 
@@ -25,7 +25,7 @@ public class Node {
 	private Set<Node> childNodes=null;
 
 	//@ManyToOne
-	@ManyToOne(cascade = CascadeType.REMOVE)
+	@ManyToOne(cascade = CascadeType.ALL)
 	private ModuleConfiguration moduleConfiguration;
 	
 	public Node(){}
