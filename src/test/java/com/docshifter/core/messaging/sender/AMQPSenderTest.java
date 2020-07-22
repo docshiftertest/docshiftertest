@@ -55,7 +55,7 @@ public class AMQPSenderTest {
 	
 	@Test
 	public void sendTask() throws Exception {
-		Task task = new Task(Paths.get("target/test-classes/ds/work/.empty"),
+		Task task = new Task(Paths.get("target/test-classes/ds/work/.empty").toString(),
 				new WorkFolder(
 						Paths.get("target/test-classes/ds/work"),
 						Paths.get("target/test-classes/ds/error")

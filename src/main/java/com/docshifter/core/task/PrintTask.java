@@ -17,7 +17,7 @@ public class PrintTask extends Task {
 		super();
 	}
 	
-	public PrintTask(Path filePath){
+	public PrintTask(String filePath){
 		this.sourceFilePath=filePath;
 		//this.name="filesystem task";
 		//this.item_id=filePath;
@@ -27,13 +27,13 @@ public class PrintTask extends Task {
 	public String getFilename() {
 		return filename;
 	}
-	public Path getFilePath(){
+	public String getFilePath(){
 		return this.sourceFilePath;
 	}
 	public void setFilename(String filename) {
 		this.filename = filename;
 	}
-	public void setFilePath(Path filename) {
+	public void setFilePath(String filename) {
 		this.sourceFilePath = filename;
 	}
 	public String getSentBy(){

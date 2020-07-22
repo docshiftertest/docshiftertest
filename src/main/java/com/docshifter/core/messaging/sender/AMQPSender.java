@@ -13,6 +13,8 @@ import org.apache.log4j.Logger;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.jms.core.JmsTemplate;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
@@ -28,6 +30,7 @@ public class AMQPSender implements IMessageSender {
 	private RabbitTemplate rabbitTemplate;
 	private Queue docshifterQueue;
 	private QueueMonitorRepository queueMonitorRepository;
+	private JmsTemplate jmsTemplate;
 
 	public static final int DEFAULT_PRIORITY= 2;
 	
@@ -40,6 +43,13 @@ public class AMQPSender implements IMessageSender {
 	}
 	
 	
+	public AMQPSender(JmsTemplate jmsTemplate, Queue docshifterQueue, QueueMonitorRepository queueMonitorRepository) {
+		this.jmsTemplate = jmsTemplate;
+		this.docshifterQueue = docshifterQueue;
+		this.queueMonitorRepository = queueMonitorRepository;
+	}
+
+
 	private SyncTask sendSyncTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task) {
 		Object response = sendTask(type, queue, chainConfigurationID, task, SYNC_PRIORITY);
 
@@ -111,8 +121,8 @@ public class AMQPSender implements IMessageSender {
 			}
 			return obj;
 		} else {
-			rabbitTemplate.convertAndSend(queue, message, message1 -> {
-				message1.getMessageProperties().setPriority(priority);
+			jmsTemplate.convertAndSend(queue, message, message1 -> {
+				message1.setJMSPriority(priority);
 				logger.debug("'rabbitTemplate.convertAndSend': message.task type=" + message.getTask().getClass().getSimpleName());
 				return message1;
 			});

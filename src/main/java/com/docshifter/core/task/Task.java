@@ -23,7 +23,7 @@ public class Task implements Serializable {
 	private static final long serialVersionUID = 4087826709318179760L;
 	protected String id;
 	protected WorkFolder workFolder;
-	protected Path sourceFilePath;
+	protected String sourceFilePath;
 	protected String name;
 	protected String folderStructure;
 	protected ArrayList<String> messages = new ArrayList<>();
@@ -34,7 +34,7 @@ public class Task implements Serializable {
 	}
 
 
-	public Task(Path filePath, WorkFolder wf) {
+	public Task(String filePath, WorkFolder wf) {
 		this.sourceFilePath = filePath;
 		this.workFolder = wf;
 	}
@@ -50,10 +50,10 @@ public class Task implements Serializable {
 		this.workFolder = workFolder;
 	}
 
-	public Path getSourceFilePath() {
+	public String getSourceFilePath() {
 		return sourceFilePath;
 	}
-	public void setSourceFilePath(Path sourceFilePath) {
+	public void setSourceFilePath(String sourceFilePath) {
 		this.sourceFilePath = sourceFilePath;
 	}
 
