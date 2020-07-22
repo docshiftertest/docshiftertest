@@ -3,6 +3,7 @@
  */
 package com.docshifter.core.security.utils;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -65,11 +66,11 @@ public class SecurityUtils {
 
 		} catch (Exception e) {
 			if (e instanceof EncryptionOperationNotPossibleException || e instanceof IllegalArgumentException
-					|| e instanceof NegativeArraySizeException) {
-				logger.debug("The password is in plain text...");
+					|| e instanceof NegativeArraySizeException || e instanceof IOException) {
+				logger.debug("The password is in plain text...tried to decrypted: " +encryptedMessage);
 				decryptedMessage = encryptedMessage;
 			} else {
-				logger.debug(e);
+				logger.debug(e + "encryptedMessage" + encryptedMessage);
 				throw new EncryptionOperationNotPossibleException("Ocurred an error trying to decrypt " + logClass);
 			}
 		}
