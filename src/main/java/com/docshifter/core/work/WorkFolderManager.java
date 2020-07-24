@@ -57,12 +57,10 @@ public class WorkFolderManager {
 				+ " folder [" 
 				+ folderPath 
 				+ "]! Please check and correct";
-		Exception exc = new Exception();
-		exc.fillInStackTrace();
-		StackTraceElement[] traces = exc.getStackTrace();
-		StackTraceElement trace = traces[traces.length - 1];
-		logger.debug(trace.toString());
-		if (trace.toString().startsWith("com.docshifter.console.DocShifterConsole")) {
+
+		String applicationName = System.getProperty("program.name");
+		logger.debug("App name : " + applicationName);
+		if (applicationName.equalsIgnoreCase("DocShifterConsole")) {
 			logger.warn(errorMessage);
 		}
 		else {
