@@ -71,7 +71,7 @@ public class SecurityUtils {
 				decryptedMessage = encryptedMessage;
 			} else {
 				logger.debug(e + "encryptedMessage" + encryptedMessage);
-				throw new EncryptionOperationNotPossibleException("Ocurred an error trying to decrypt " + logClass);
+				throw new EncryptionOperationNotPossibleException("Occurred an error trying to decrypt " + logClass);
 			}
 		}
 		logger.debug("Decryption completed for " + logClass);
@@ -120,7 +120,7 @@ public class SecurityUtils {
 			encryptedMessage = encrypt.encrypt(message);
 		} catch (Exception e) {
 			logger.debug(e);
-			throw new EncryptionOperationNotPossibleException("Ocurred an error trying to encrypt " + logClass);
+			throw new EncryptionOperationNotPossibleException("Occurred an error trying to encrypt " + logClass);
 		}
 
 		logger.debug("Encryption completed for " + logClass);

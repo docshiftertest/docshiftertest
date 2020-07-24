@@ -3,6 +3,8 @@ package com.docshifter.core.work;
 import com.docbyte.utils.FileUtils;
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.service.GeneralConfigService;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,7 +62,8 @@ public class WorkFolderManager {
 
 		String applicationName = System.getProperty("program.name");
 		logger.debug("App name : " + applicationName);
-		if (applicationName.equalsIgnoreCase("DocShifterConsole")) {
+		
+		if ((!StringUtils.isBlank(applicationName)) && applicationName.equalsIgnoreCase("DocShifterConsole")) {
 			logger.warn(errorMessage);
 		}
 		else {
