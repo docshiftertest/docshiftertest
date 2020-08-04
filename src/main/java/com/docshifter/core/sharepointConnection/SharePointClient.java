@@ -126,7 +126,29 @@ public class SharePointClient {
 		return response.getBody();
 	}
 
-	public JSONObject uploadFile(String folder, Resource resource, JSONObject jsonMetadata,
+	public JSONObject uploadFile(String folder, Resource resource,
+			boolean overrideExistingFile, String fileName) throws Exception {
+		log.debug("Uploading file {} to folder {}", fileName, folder);
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("type", "SP.ListItem");
+
+		headers = headerHelper.getPostHeaders("");
+		headers.remove("Content-Length");
+
+		byte[] resBytes = IOUtils.readFully(resource.getInputStream(), (int) resource.contentLength());
+
+		RequestEntity<byte[]> requestEntity = new RequestEntity<>(resBytes, headers, HttpMethod.POST,
+				this.tokenHelper.getSharepointSiteUrl("/_api/web/GetFolderByServerRelativeUrl('" + folder
+						+ "')/Files/add(url='" + fileName + "',overwrite=" + overrideExistingFile + ")"));
+
+		ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
+
+		log.debug("Updated file metadata Status {}", responseEntity.getStatusCode());
+		
+		return new JSONObject(responseEntity.getStatusCode());
+	}
+	
+	public JSONObject uploadFileAndUpdateMetaData(String folder, Resource resource, JSONObject jsonMetadata,
 			boolean overrideExistingFile, String fileName) throws Exception {
 		log.debug("Uploading file {} to folder {}", fileName, folder);
 		JSONObject jsonObject = new JSONObject();

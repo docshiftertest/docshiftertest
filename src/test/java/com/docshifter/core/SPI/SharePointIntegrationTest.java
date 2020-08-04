@@ -34,7 +34,8 @@ public class SharePointIntegrationTest {
 
 	private SharePointClient cli;
 
-	//TODO - Move credentials to application properties and replace to our own SP server.
+	// TODO - Move credentials to application properties and replace to our own SP
+	// server.
 	@Before
 	public void before() {
 		cli = SharePointClient.createSharePointClient("docshifter@docshifterdev.onmicrosoft.com", "3iGAq609LhrW",
@@ -87,13 +88,13 @@ public class SharePointIntegrationTest {
 		JSONArray jArray = allFiles.getJSONObject("d").getJSONArray("results");
 
 		for (Object json : jArray) {
-			
+
 			String relativeUrl = ((JSONObject) json).getString("ServerRelativeUrl");
-			
+
 			log.info("File: " + relativeUrl);
-			
+
 			JSONObject update = cli.updateFileMetadata(relativeUrl, new JSONObject("{ProcessedByDS: true}"));
-			
+
 			assertEquals(204, update.get("statusCodeValue"));
 
 		}
@@ -146,12 +147,18 @@ public class SharePointIntegrationTest {
 	}
 
 	@Test
-	public void uploadFileTest() throws Exception {
+	public void uploadFileAndUpdateMetaDataTest() throws Exception {
 		log.info("Running uploadFileTest()");
 
 		Resource r = cli.downloadFile("/Shared Documents/docshifter-62-installation-guide.pdf");
-		cli.uploadFile("/Shared Documents", r, new JSONObject("{ProcessedByDS: false}"), true, "docshifter-62-installation-guide.docx");
+		cli.uploadFileAndUpdateMetaData("/Shared Documents", r, new JSONObject("{ProcessedByDS: false}"), true,
+				"docshifter-62-installation-guide.docx");
+	}
 
+	@Test
+	public void updateFileTest() throws Exception {
+		Resource r = cli.downloadFile("/Shared Documents/docshifter-62-installation-guide.pdf");
+		cli.uploadFile("/Shared Documents/Output", r, true, "docshifter-62-installation-guide.docx");
 	}
 
 	@Test
