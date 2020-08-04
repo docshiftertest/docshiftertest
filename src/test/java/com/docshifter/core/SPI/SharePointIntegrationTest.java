@@ -11,12 +11,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -45,7 +45,8 @@ public class SharePointIntegrationTest {
 	@Test
 	public void testConnection() throws Exception {
 		log.info("Running testConnection()");
-		assertNotNull(cli.getHeaderHelper());
+		assertNotNull(cli.getHeaderHelper());		
+		assertTrue(!cli.getTokenHelper().isTokenExpired());
 	}
 
 	@Test
@@ -80,6 +81,8 @@ public class SharePointIntegrationTest {
 
 	@Test
 	public void updateFileMetadataTest() throws JSONException, Exception {
+
+		log.info("Running updateFileMetadataTest()");
 
 		String folder = "/Shared Documents";
 
@@ -143,7 +146,12 @@ public class SharePointIntegrationTest {
 
 	@Test
 	public void getFilePropertiesTest() throws Exception {
-		log.info(cli.getFilesProperties("/Shared Documents", "/docshifter-62-installation-guide.pdf"));
+		log.info("Running getFilePropertiesTest()");
+		JSONObject properties = (JSONObject) cli
+				.getFilesProperties("/Shared Documents", "/docshifter-62-installation-guide.pdf").get("d");
+
+		assertTrue(StringUtils.isNotBlank((String) properties.get("vti_x005f_listid")));
+
 	}
 
 	@Test
@@ -151,21 +159,36 @@ public class SharePointIntegrationTest {
 		log.info("Running uploadFileTest()");
 
 		Resource r = cli.downloadFile("/Shared Documents/docshifter-62-installation-guide.pdf");
-		cli.uploadFileAndUpdateMetaData("/Shared Documents", r, new JSONObject("{ProcessedByDS: false}"), true,
+		JSONObject update = cli.uploadFileAndUpdateMetaData("/Shared Documents", r,
+				new JSONObject("{ProcessedByDS: false,Title: 'New Title'}"), true,
 				"docshifter-62-installation-guide.docx");
+
+		assertEquals(204, update.get("statusCodeValue"));
 	}
 
 	@Test
-	public void updateFileTest() throws Exception {
+	public void uploadFileTest() throws Exception {
+		log.info("Running uploadFileTest()");
 		Resource r = cli.downloadFile("/Shared Documents/docshifter-62-installation-guide.pdf");
-		cli.uploadFile("/Shared Documents/Output", r, true, "docshifter-62-installation-guide.docx");
+		JSONObject upload = cli.uploadFile("/Shared Documents/Output", r, true,
+				"docshifter-62-installation-guide.docx");
+
+		assertEquals(true, upload.get("2xxSuccessful"));
 	}
 
 	@Test
-	@Ignore
 	public void createFolderTest() throws Exception {
-		cli.createFolder("/Shared Documents", "Output", null);
+		log.info("Running createFolderTest()");
+		JSONObject folder = cli.createFolder("/Shared Documents", "Test", null);
+		assertEquals(true, folder.get("2xxSuccessful"));
+	}
 
+	@Test
+	public void deleteFolderTest() throws Exception {
+		log.info("Running deleteFolderTest()");
+		JSONObject folder = cli.deleteFolder("/Shared Documents/Test");
+
+		assertEquals(true, folder.get("2xxSuccessful"));
 	}
 
 }

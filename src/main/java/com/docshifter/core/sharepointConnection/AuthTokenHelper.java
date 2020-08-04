@@ -2,9 +2,14 @@ package com.docshifter.core.sharepointConnection;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -29,11 +34,12 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 public class AuthTokenHelper {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AuthTokenHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(AuthTokenHelper.class);
 	private final String spSiteUri;
 	private String formDigestValue;
 	private final String domain;
 	private List<String> cookies;
+	private String tokenExpirationDate;
 	private String payload = "<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"\n"
 			+ "      xmlns:a=\"http://www.w3.org/2005/08/addressing\"\n"
 			+ "      xmlns:u=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n"
@@ -78,13 +84,77 @@ public class AuthTokenHelper {
 
 		ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
 		String securityToken = responseEntity.getBody();
-		String clave1 = "<wsse:BinarySecurityToken";
-		String clave2 = "</wsse:BinarySecurityToken>";
-		securityToken = Objects.requireNonNull(securityToken).substring(securityToken.indexOf(clave1));
+		String tokenKey1 = "<wsse:BinarySecurityToken";
+		String tokenKey2 = "</wsse:BinarySecurityToken>";
+
+		securityToken = securityToken.substring(securityToken.indexOf(tokenKey1));
 		securityToken = securityToken.substring(securityToken.indexOf(">") + 1);
-		securityToken = securityToken.substring(0, securityToken.indexOf(clave2));
+		securityToken = securityToken.substring(0, securityToken.indexOf(tokenKey2));
+
+		this.tokenExpirationDate = responseEntity.getBody();
+		
+		String lifeTimeKey1 = "<wst:Lifetime>";
+		String lifeTimeKey2 = "</wst:Lifetime>";
+		this.tokenExpirationDate = this.tokenExpirationDate.substring(this.tokenExpirationDate.indexOf(lifeTimeKey1));
+		this.tokenExpirationDate = this.tokenExpirationDate.substring(this.tokenExpirationDate.indexOf(">") + 1);
+		this.tokenExpirationDate = this.tokenExpirationDate.substring(0,this.tokenExpirationDate.indexOf(lifeTimeKey2));
 
 		return securityToken;
+	}
+
+	public boolean isTokenExpired() {
+
+		Map<String, String> createdAndExpireDate = getCreatedAndExpiresDate();
+
+		String createdDateString = createdAndExpireDate.get("createdDate");
+		String expiresDateString = createdAndExpireDate.get("expiresDate");
+
+		logger.debug("Created Date: " + createdDateString);
+		logger.debug("Expires Date: " + expiresDateString);
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").withZone(ZoneId.systemDefault());;
+		
+		Instant createdDate = Instant.from(formatter.parse(createdDateString));
+		Instant expiresDate = Instant.from(formatter.parse(expiresDateString));
+		
+		if(createdDate.isAfter(expiresDate)) {
+			logger.debug("Token is expired....");
+			return true;
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * Method to filter created and expires dates from response body
+	 * 
+	 * @return Map<String,String> with created and expires date
+	 */
+	private Map<String, String> getCreatedAndExpiresDate() {
+
+		Map<String, String> createdAndExpireDate = new HashMap<>();
+
+		String createdDate = StringUtils.EMPTY;
+		String expiresDate = StringUtils.EMPTY;
+		String createdDateKey1 = "<wsu:Created>";
+		String createdDateKey2 = "</wsu:Created>";
+		String expiresDateKey1 = "<wsu:Expires>";
+		String expiresDateKey2 = "</wsu:Expires>";
+
+		createdDate = this.tokenExpirationDate.substring(this.tokenExpirationDate.indexOf(createdDateKey1));
+		createdDate = createdDate.substring(createdDate.indexOf(">") + 1);
+		createdDate = createdDate.substring(0, createdDate.indexOf(createdDateKey2));
+
+		expiresDate = this.tokenExpirationDate.substring(this.tokenExpirationDate.indexOf(expiresDateKey1));
+		expiresDate = expiresDate.substring(expiresDate.indexOf(">") + 1);
+		expiresDate = expiresDate.substring(0, expiresDate.indexOf(expiresDateKey2));
+
+		createdAndExpireDate.put("createdDate", createdDate);
+		createdAndExpireDate.put("expiresDate", expiresDate);
+
+		return createdAndExpireDate;
+
 	}
 
 	protected List<String> getSignInCookies(String securityToken) throws Exception {
@@ -146,8 +216,8 @@ public class AuthTokenHelper {
 	}
 
 	/**
-	 * Mounts the sharepoint online site url with params, composed by the protocol, domain and
-	 * spSiteUri
+	 * Mounts the sharepoint online site url with params, composed by the protocol,
+	 * domain and spSiteUri
 	 *
 	 */
 	public URI getSharepointSiteUrlWithParam(String apiPath, String parameterName, String parameterValue)

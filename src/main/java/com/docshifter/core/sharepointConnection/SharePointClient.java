@@ -50,7 +50,9 @@ public class SharePointClient {
 			this.tokenHelper.init();
 			this.headerHelper = new HeadersHelper(this.tokenHelper);
 		} catch (Exception e) {
-			log.error("Initialization failed!! Please check the user, pass, domain and spSiteUri parameters you provided");
+			log.error(
+					"Initialization failed!! Please check the user, pass, domain and spSiteUri parameters you provided");
+			log.debug("Authentication has failed", e);
 		}
 	}
 
@@ -58,8 +60,12 @@ public class SharePointClient {
 		return new SharePointClient(user, passwd, domain, spSiteUrl);
 	}
 
-	public void refreshToken() throws Exception {
-		this.tokenHelper.init();
+	public void refreshToken() {
+		try {
+			this.tokenHelper.init();
+		} catch (Exception e) {
+			log.debug("Token could not be refreshed", e);
+		}
 	}
 
 	/**
@@ -126,8 +132,8 @@ public class SharePointClient {
 		return response.getBody();
 	}
 
-	public JSONObject uploadFile(String folder, Resource resource,
-			boolean overrideExistingFile, String fileName) throws Exception {
+	public JSONObject uploadFile(String folder, Resource resource, boolean overrideExistingFile, String fileName)
+			throws Exception {
 		log.debug("Uploading file {} to folder {}", fileName, folder);
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("type", "SP.ListItem");
@@ -144,10 +150,10 @@ public class SharePointClient {
 		ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
 
 		log.debug("Updated file metadata Status {}", responseEntity.getStatusCode());
-		
+
 		return new JSONObject(responseEntity.getStatusCode());
 	}
-	
+
 	public JSONObject uploadFileAndUpdateMetaData(String folder, Resource resource, JSONObject jsonMetadata,
 			boolean overrideExistingFile, String fileName) throws Exception {
 		log.debug("Uploading file {} to folder {}", fileName, folder);
@@ -184,7 +190,8 @@ public class SharePointClient {
 						"/_api/web/GetFileByServerRelativeUrl('" + serverRelFileUrl + "')/listitemallfields"));
 		ResponseEntity<String> responseEntity1 = restTemplate.exchange(requestEntity1, String.class);
 		log.debug("Updated file metadata Status {}", responseEntity1.getStatusCode());
-		return jsonFileInfo;
+
+		return new JSONObject(responseEntity1);
 	}
 
 	public JSONObject updateFileMetadata(String fileServerRelatUrl, JSONObject jsonMetadata) throws Exception {
@@ -242,7 +249,7 @@ public class SharePointClient {
 				this.tokenHelper.getSharepointSiteUrl(
 						"/_api/web/GetFolderByServerRelativeUrl('" + baseFolderRemoteRelativeUrl + "')/folders"));
 		ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
-		return new JSONObject(responseEntity.getBody());
+		return new JSONObject(responseEntity.getStatusCode());
 	}
 
 	/**
@@ -264,14 +271,16 @@ public class SharePointClient {
 		return new JSONObject(responseEntity);
 	}
 
-	public Boolean removeFolder(String folderRemoteRelativeUrl) throws Exception {
+	public JSONObject deleteFolder(String folderRemoteRelativeUrl) throws Exception {
 		log.debug("Deleting folder {}", folderRemoteRelativeUrl);
 		headers = headerHelper.getDeleteHeaders();
 
 		RequestEntity<String> requestEntity = new RequestEntity<>("", headers, HttpMethod.POST, this.tokenHelper
 				.getSharepointSiteUrl("/_api/web/GetFolderByServerRelativeUrl('" + folderRemoteRelativeUrl + "')"));
-		restTemplate.exchange(requestEntity, String.class);
-		return Boolean.TRUE;
+
+		ResponseEntity<String> response = restTemplate.exchange(requestEntity, String.class);
+
+		return new JSONObject(response.getStatusCode());
 	}
 
 	public JSONObject getAllFilesFromFolder(String folder) throws Exception {
@@ -306,9 +315,12 @@ public class SharePointClient {
 
 		return new JSONObject(responseEntity.getBody());
 	}
-	
+
 	public HeadersHelper getHeaderHelper() {
 		return headerHelper;
 	}
 
+	public AuthTokenHelper getTokenHelper() {
+		return tokenHelper;
+	}
 }
