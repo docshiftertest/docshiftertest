@@ -15,6 +15,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriUtils;
 
+import com.docshifter.core.http.error.handler.HttpResponseErrorHandler;
+
 /**
  * @author Juan Marques created on 29/07/2020
  */
@@ -35,6 +37,7 @@ public class SharePointClient {
 	 */
 	private SharePointClient(String user, String passwd, String domain, String spSiteUrl) {
 		this.restTemplate = new RestTemplate();
+		restTemplate.setErrorHandler(new HttpResponseErrorHandler());
 		String spSiteUrl1 = spSiteUrl;
 		if (spSiteUrl1.endsWith("/")) {
 			log.debug("spSiteUri ends with /, removing character");
@@ -149,7 +152,7 @@ public class SharePointClient {
 
 		ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
 
-		log.debug("Updated file metadata Status {}", responseEntity.getStatusCode());
+		log.debug("Updated file metadata Status {} , response body {}", responseEntity.getStatusCode(),responseEntity.getBody());
 
 		return new JSONObject(responseEntity.getStatusCode());
 	}

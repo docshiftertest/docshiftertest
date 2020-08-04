@@ -175,6 +175,16 @@ public class SharePointIntegrationTest {
 
 		assertEquals(true, upload.get("2xxSuccessful"));
 	}
+	
+	@Test
+	public void uploadFileFailTest() throws Exception {
+		log.info("Running uploadFileTest()");
+		Resource r = cli.downloadFile("/Shared Documents/docshifter-62-installation-guide.pdf");
+		JSONObject upload = cli.uploadFile("/Shared Documents/Output2", r, true,
+				"docshifter-62-installation-guide.docx");
+
+		assertEquals(false, upload.get("2xxSuccessful"));
+	}
 
 	@Test
 	public void createFolderTest() throws Exception {
