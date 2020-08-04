@@ -163,7 +163,7 @@ public class SharePointIntegrationTest {
 				new JSONObject("{ProcessedByDS: false,Title: 'New Title'}"), true,
 				"docshifter-62-installation-guide.docx");
 
-		assertEquals(204, update.get("statusCodeValue"));
+		assertEquals(true, update.get("2xxSuccessful"));
 	}
 
 	@Test

@@ -2,6 +2,8 @@ package com.docshifter.core.sharepointConnection;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
@@ -180,21 +182,32 @@ public class SharePointClient {
 		log.debug("Retrieved response from server with json");
 
 		JSONObject jsonFileInfo = new JSONObject(fileInfoStr);
-		String serverRelFileUrl = jsonFileInfo.getJSONObject("d").getString("ServerRelativeUrl");
+		
+		List<String> jsonKeys = new ArrayList<>();		
+		jsonFileInfo.keySet().forEach(jsonKeys::add);
+		
+		if (!jsonKeys.contains("error")) {
+			String serverRelFileUrl = jsonFileInfo.getJSONObject("d").getString("ServerRelativeUrl");
 
-		log.debug("File uploaded to URI", serverRelFileUrl);
-		String metadata = jsonMetadata.toString();
-		headers = headerHelper.getUpdateHeaders(metadata);
+			log.debug("File uploaded to URI", serverRelFileUrl);
+			String metadata = jsonMetadata.toString();
+			headers = headerHelper.getUpdateHeaders(metadata);
 
-		log.debug("Updating file adding metadata {}", jsonMetadata);
+			log.debug("Updating file adding metadata {}", jsonMetadata);
 
-		RequestEntity<String> requestEntity1 = new RequestEntity<>(metadata, headers, HttpMethod.POST,
-				this.tokenHelper.getSharepointSiteUrl(
-						"/_api/web/GetFileByServerRelativeUrl('" + serverRelFileUrl + "')/listitemallfields"));
-		ResponseEntity<String> responseEntity1 = restTemplate.exchange(requestEntity1, String.class);
-		log.debug("Updated file metadata Status {}", responseEntity1.getStatusCode());
+			RequestEntity<String> requestEntity1 = new RequestEntity<>(metadata, headers, HttpMethod.POST,
+					this.tokenHelper.getSharepointSiteUrl(
+							"/_api/web/GetFileByServerRelativeUrl('" + serverRelFileUrl + "')/listitemallfields"));
+			ResponseEntity<String> responseEntity1 = restTemplate.exchange(requestEntity1, String.class);
 
-		return new JSONObject(responseEntity1);
+			log.debug("Updated file metadata Status {} , response body {}", responseEntity1.getStatusCode(),
+					responseEntity1.getBody());
+
+			return new JSONObject(responseEntity1.getStatusCode());
+		}
+		else {
+			return new JSONObject(responseEntity.getStatusCode());
+		}
 	}
 
 	public JSONObject updateFileMetadata(String fileServerRelatUrl, JSONObject jsonMetadata) throws Exception {
