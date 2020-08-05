@@ -3,8 +3,11 @@ package com.docshifter.core.sharepointConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,32 +95,46 @@ public class AuthTokenHelper {
 		securityToken = securityToken.substring(0, securityToken.indexOf(tokenKey2));
 
 		this.tokenExpirationDate = responseEntity.getBody();
-		
+
 		String lifeTimeKey1 = "<wst:Lifetime>";
 		String lifeTimeKey2 = "</wst:Lifetime>";
 		this.tokenExpirationDate = this.tokenExpirationDate.substring(this.tokenExpirationDate.indexOf(lifeTimeKey1));
 		this.tokenExpirationDate = this.tokenExpirationDate.substring(this.tokenExpirationDate.indexOf(">") + 1);
-		this.tokenExpirationDate = this.tokenExpirationDate.substring(0,this.tokenExpirationDate.indexOf(lifeTimeKey2));
+		this.tokenExpirationDate = this.tokenExpirationDate.substring(0,
+				this.tokenExpirationDate.indexOf(lifeTimeKey2));
 
 		return securityToken;
 	}
 
+	/**
+	 * Check the token validation.
+	 * @return true if the token has expired otherwise false.
+	 */
 	public boolean isTokenExpired() {
 
 		Map<String, String> createdAndExpireDate = getCreatedAndExpiresDate();
 
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+				.withZone(ZoneId.systemDefault());
+
 		String createdDateString = createdAndExpireDate.get("createdDate");
 		String expiresDateString = createdAndExpireDate.get("expiresDate");
-
-		logger.debug("Created Date: " + createdDateString);
-		logger.debug("Expires Date: " + expiresDateString);
-
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").withZone(ZoneId.systemDefault());;
 		
-		Instant createdDate = Instant.from(formatter.parse(createdDateString));
-		Instant expiresDate = Instant.from(formatter.parse(expiresDateString));
+		ZonedDateTime createdDate = ZonedDateTime.of(LocalDateTime.parse(createdDateString, formatter),
+				ZoneId.systemDefault());
 		
-		if(createdDate.isAfter(expiresDate)) {
+		ZonedDateTime expiresDate = ZonedDateTime.of(LocalDateTime.parse(expiresDateString, formatter),
+				ZoneId.systemDefault());
+
+		Instant instant = Instant.now();
+		
+		Instant expiresIntant = Instant.parse(expiresDateString);		
+		logger.debug("Token duration: " + ChronoUnit.SECONDS.between(createdDate, expiresDate) + " seconds");
+		
+		long tokenExpiresIn = ChronoUnit.SECONDS.between(instant, Instant.parse(expiresDateString));
+		logger.debug("Token will expires in: " + tokenExpiresIn + " seconds");
+
+		if (instant.isAfter(expiresIntant)) {
 			logger.debug("Token is expired....");
 			return true;
 		}
