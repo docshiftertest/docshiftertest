@@ -188,9 +188,10 @@ public class SharePointGraphIntegrationTest {
 	}
 
 	@Test
+	@Ignore
 	public void uploadFileTest() throws IOException {
 
-		File initialFile = new File("/home/juan/Desktop/Gevonden routes - De Lijn.pdf");
+		File initialFile = new File("");
 		InputStream targetStream = new FileInputStream(initialFile);
 
 		this.graphClient.uploadFile("c20e62c3-b9f3-4434-b7d1-4a520291e2ff", targetStream, targetStream.available(),
