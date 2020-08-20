@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import com.docbyte.utils.FileUtils;
 import com.docshifter.core.graphAPI.GraphClient;
 import com.docshifter.core.graphAPI.MSGraphAuthenticationBuilder;
 import com.google.gson.Gson;
@@ -180,8 +181,7 @@ public class SharePointGraphIntegrationTest {
 		if (url != null) {
 
 			webURL = url.getPath();
-
-			return webURL.substring(StringUtils.ordinalIndexOf(webURL, "/", 2));
+			return FileUtils.getNameWithoutExtension(webURL.substring(StringUtils.ordinalIndexOf(webURL, "/", 2)));
 		}
 
 		return StringUtils.EMPTY;

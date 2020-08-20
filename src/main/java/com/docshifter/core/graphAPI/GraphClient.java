@@ -90,12 +90,12 @@ public class GraphClient {
 
 			@Override
 			public void success(DriveItem result) {
-				log.info("File " + result.name + " successfully upload ");
+				log.info("File " + result.name + " successfully uploaded ");
 			}
 
 			@Override
 			public void failure(ClientException ex) {
-				log.error("Failed to upload file to " + itemPath,ex);
+				log.error("Failed to upload the file to " + itemPath,ex);
 			}
 
 			@Override
