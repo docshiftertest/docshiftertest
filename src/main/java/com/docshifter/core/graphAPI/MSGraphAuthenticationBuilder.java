@@ -18,7 +18,7 @@ import com.microsoft.graph.requests.extensions.GraphServiceClient;
 public class MSGraphAuthenticationBuilder {
 
 	private static final List<String> SCOPES = Collections
-			.unmodifiableList(Arrays.asList("https://graph.microsoft.com/.default"));
+			.unmodifiableList(Collections.singletonList("https://graph.microsoft.com/.default"));
 
 	public static IGraphServiceClient createGraphClient(String clientId, String clientSecret, String tenant,
 			NationalCloud nationalCloud) {

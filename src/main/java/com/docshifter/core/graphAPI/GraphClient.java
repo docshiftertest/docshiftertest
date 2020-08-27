@@ -21,6 +21,7 @@ import com.microsoft.graph.models.extensions.UploadSession;
 import com.microsoft.graph.options.QueryOption;
 import com.microsoft.graph.requests.extensions.IDriveItemCollectionPage;
 import com.microsoft.graph.requests.extensions.IDriveItemCollectionRequestBuilder;
+import com.microsoft.graph.requests.extensions.IFieldValueSetRequest;
 import com.microsoft.graph.requests.extensions.IListCollectionPage;
 import com.microsoft.graph.requests.extensions.IListCollectionRequestBuilder;
 import com.microsoft.graph.requests.extensions.IListItemCollectionPage;
@@ -35,7 +36,7 @@ public class GraphClient {
 	
 	private final Logger log = Logger.getLogger(GraphClient.class);
 
-	private IGraphServiceClient graphClient;
+	private final IGraphServiceClient graphClient;
 
 	private static final String SITE_ID = "root";
 
@@ -184,9 +185,7 @@ public class GraphClient {
 	public void getAllListRequestpages(List<com.microsoft.graph.models.extensions.List> allItems,
 			IListCollectionPage lstCollectionPage) {
 
-		for (com.microsoft.graph.models.extensions.List item : lstCollectionPage.getCurrentPage()) {
-			allItems.add(item);
-		}
+		allItems.addAll(lstCollectionPage.getCurrentPage());
 
 		IListCollectionRequestBuilder nextPage = lstCollectionPage.getNextPage();
 		if (nextPage != null) {
