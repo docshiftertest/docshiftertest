@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,13 +50,18 @@ public class SharePointGraphIntegrationTest {
 	private final Logger log = Logger.getLogger(SharePointGraphIntegrationTest.class);
 
 	private GraphClient graphClient;
+	
+	private static String site = "demo";
 
 	@Before
 	public void before() {
 
 		graphClient = new GraphClient(MSGraphAuthenticationBuilder.createGraphClient(
-				"f82bc587-b081-42d7-a8e1-4c93452d9a3c", "3O1p8_T2XatR-PCRd18ywH~DU_tEx.m433",
-				"a545304d-99b4-4706-8c12-f626a2d2a3cb", NationalCloud.Global));
+				"c01820bd-f5ab-4a94-8fcc-1c47d6b264f5", "Cf12Tr0~7P7D.Kof0_Rb6k81_bZ9J8Cl6k",
+				"fdfaf67a-261f-4fc8-bc26-fa14aa7691e1", NationalCloud.Global));
+
+		if (site.equalsIgnoreCase("demo"))
+			site = graphClient.retrieveSiteId(site);
 	}
 
 	@Test
@@ -69,20 +73,23 @@ public class SharePointGraphIntegrationTest {
 		IListCollectionPage collectionPage = null;
 
 		try {
-			collectionPage = graphClient.getLibrary();
+			collectionPage = graphClient.getLibrary(site);
 		} catch (ClientException e) {
 			log.error("ohh noo" + e.getMessage());
 		}
 		assertNull(collectionPage);
 	}
 
+
 	@Test
+	@Ignore("Needs to fix the download from sharepoint site")
 	public void getAllContentFromSpecificFolderTest() {
-		String listId = "fd4b0a4f-4ab3-4ca3-9bdb-7addbc3e5ee0";
-		String folderName = "Output";
+
+		String folderName = "Test";
+		String listId = "ff734552-d791-430f-8fd3-1a50add792e1";
 
 		List<DriveItem> items = new ArrayList<>();
-		graphClient.getAllItemDriveCollectionPage(items, graphClient.getAllDriveItems(listId), folderName);
+		graphClient.getAllItemDriveCollectionPage(items, graphClient.getAllDriveItems(listId, site), folderName);
 
 		DriveItem item = items.stream().findFirst().orElseThrow(NoSuchElementException::new);
 
@@ -93,7 +100,7 @@ public class SharePointGraphIntegrationTest {
 
 		List<DriveItem> lstChildItems = new ArrayList<>();
 		graphClient.getAllItemDriveCollectionPage(lstChildItems,
-				graphClient.getAllContentFromSpecificFolder(listId, driveItemId), StringUtils.EMPTY);
+				graphClient.getAllContentFromSpecificFolder(listId, driveItemId, site), StringUtils.EMPTY);
 
 		for (DriveItem childFolderItems : lstChildItems) {
 			if (childFolderItems.file != null) {
@@ -106,7 +113,10 @@ public class SharePointGraphIntegrationTest {
 					// Updating field
 					FieldValueSet fieldValueSet = new FieldValueSet();
 					fieldValueSet.additionalDataManager().put("ProcessedByDS",new JsonPrimitive(Boolean.TRUE));
-					downloadFile(graphClient.getFileByDriveId(listId, childFolderItems.id), childFolderItems.name);
+					
+					InputStream fileInputStream = graphClient.getFileByDriveId(childFolderItems.id, site,listId);
+
+					downloadFile(fileInputStream, childFolderItems.name);
 				}
 			}
 
@@ -133,13 +143,13 @@ public class SharePointGraphIntegrationTest {
 
 		List<ListItem> allItems = new ArrayList<>();
 
-		graphClient.getLibrary().getCurrentPage().forEach(c -> {
+		graphClient.getLibrary(site).getCurrentPage().forEach(c -> {
 
 			if (c.name.equalsIgnoreCase("Shared Documents")) {
 				log.info(c.id);
 				log.info(c.name);
 				log.info("    \n");
-				graphClient.getLibraryItems(c.id, allItems, "Document");
+				graphClient.getLibraryItems(c.id, allItems, "Document", site);
 			}
 		});
 
@@ -187,17 +197,6 @@ public class SharePointGraphIntegrationTest {
 		return StringUtils.EMPTY;
 	}
 
-	@Test
-	@Ignore
-	public void uploadFileTest() throws IOException {
-
-		File initialFile = new File("");
-		InputStream targetStream = new FileInputStream(initialFile);
-
-		this.graphClient.uploadFile("c20e62c3-b9f3-4434-b7d1-4a520291e2ff", targetStream, targetStream.available(),
-				"folder1/folder2/folder3/DeLijn.pdf");
-	}
-
 	public void downloadAllFiles(List<ListItem> list, String libraryId) {
 
 		list.forEach(r -> {
@@ -217,7 +216,7 @@ public class SharePointGraphIntegrationTest {
 					String fileName = fields.get("LinkFilename");
 					log.info(fileName + "    \n");
 
-					InputStream inputStream = graphClient.getFile(libraryId, r.id);
+					InputStream inputStream = graphClient.getFile(libraryId, r.id, site);
 
 					File file = new File("./target/test-classes/ds/work/" + fileName);
 
@@ -248,10 +247,10 @@ public class SharePointGraphIntegrationTest {
 		DriveItem driveItemChildCallBack = null;
 
 		try {
-			driveItemParentCallBack = graphClient.createRootFolder("fd4b0a4f-4ab3-4ca3-9bdb-7addbc3e5ee0", driveItem);
+			driveItemParentCallBack = graphClient.createRootFolder("fd4b0a4f-4ab3-4ca3-9bdb-7addbc3e5ee0", driveItem, site);
 
 			driveItemChildCallBack = graphClient.createChildrenFolder("fd4b0a4f-4ab3-4ca3-9bdb-7addbc3e5ee0",
-					driveItemParentCallBack.name, driveItem);
+					driveItemParentCallBack.name, driveItem, site);
 		} catch (ClientException ex) {
 			log.info(ex);
 		}
