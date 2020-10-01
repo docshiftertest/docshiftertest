@@ -7,8 +7,6 @@ import java.util.List;
 /**
  * Created by michiel.vandriessche@docbyte.com on 8/19/16.
  */
-//@Repository
-//@RepositoryRestResource
 public interface ParameterRepository extends CrudRepository<Parameter, Long> {
 
 

@@ -19,35 +19,30 @@ public class Parameter implements Comparable<Parameter>
 	private Boolean required;
 	@Column(length = 100000)
 	private String valuesJson;
+	private String parameterGroup;
 	
-	public Boolean getRequired() {
-		return required;
-	}
-
-	public void setRequired(Boolean required) {
-		this.required = required;
-	}
 	public Parameter() {}
 	
-	public Parameter(String name, String description, ParameterTypes type, Boolean required, String valuesJson)
+	public Parameter(String name, String description, ParameterTypes type, Boolean required, String valuesJson,String parameterGroup)
 	{
 		this.name = name;
 		this.description = description;
 		this.type = type.toString();
 		this.required = required;
 		this.valuesJson = valuesJson;
+		this.parameterGroup = parameterGroup;
 	}
 
     public Parameter(String name, String description, ParameterTypes type, Boolean required) {
-	    this(name, description, type, required, null);
+	    this(name, description, type, required, null,null);
     }
 	
 	public Parameter(String name, String description, ParameterTypes type) {
-		this(name, description, type, false, null);
+		this(name, description, type, false, null,null);
 	}
 
 	public Parameter(String name, ParameterTypes type) {
-		this(name, null, type, false, null);
+		this(name, null, type, false, null,null);
 	}
 
 	public void setId(long id)
@@ -97,8 +92,24 @@ public class Parameter implements Comparable<Parameter>
     public void setValuesJson(String valuesJson) {
         this.valuesJson = valuesJson;
     }
+    
+	public Boolean getRequired() {
+		return required;
+	}
 
-    @Override
+	public void setRequired(Boolean required) {
+		this.required = required;
+	}
+
+    public String getParameterGroup() {
+		return parameterGroup;
+	}
+
+	public void setParameterGroup(String parameterGroup) {
+		this.parameterGroup = parameterGroup;
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -138,6 +149,7 @@ public class Parameter implements Comparable<Parameter>
 				", \"type\": \"" + type + '\"' +
 				", \"required\": \"" + required + '\"' +
 				", \"valuesJson\": \"" + valuesJson + '\"' +
+				", \"parameterGroup\": \"" + parameterGroup + '\"' +
 				'}';
 	}
 
