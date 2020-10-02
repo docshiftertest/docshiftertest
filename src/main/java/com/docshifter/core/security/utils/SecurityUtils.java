@@ -63,10 +63,10 @@ public class SecurityUtils {
 
 		} catch (Exception e) {
 			if (e instanceof EncryptionOperationNotPossibleException || e instanceof IllegalArgumentException || e instanceof NegativeArraySizeException) {
-				logger.debug("The password is in plain text...tried to decrypt: " + encryptedMessage);
+				logger.debug("The password is in plain text...: " + e);
 				decryptedMessage = encryptedMessage;
 			} else {
-				logger.debug(e + "encryptedMessage" + encryptedMessage);
+				logger.info(e);
 				throw new EncryptionOperationNotPossibleException("Occurred an error trying to decrypt " + logClass);
 			}
 		}

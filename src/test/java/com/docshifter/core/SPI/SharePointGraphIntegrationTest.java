@@ -82,11 +82,10 @@ public class SharePointGraphIntegrationTest {
 
 
 	@Test
-	@Ignore("Needs to fix the download from sharepoint site")
 	public void getAllContentFromSpecificFolderTest() {
 
 		String folderName = "Test";
-		String listId = "ff734552-d791-430f-8fd3-1a50add792e1";
+		String listId = "48aa2e0d-0599-4be3-976d-4296f601ac34";
 
 		List<DriveItem> items = new ArrayList<>();
 		graphClient.getAllItemDriveCollectionPage(items, graphClient.getAllDriveItems(listId, site), folderName);
@@ -111,12 +110,14 @@ public class SharePointGraphIntegrationTest {
 				if (!processedByDS) {
 
 					// Updating field
-					FieldValueSet fieldValueSet = new FieldValueSet();
-					fieldValueSet.additionalDataManager().put("ProcessedByDS",new JsonPrimitive(Boolean.TRUE));
+					updateFields(listId, fields.get("id"), graphClient,true);
 					
 					InputStream fileInputStream = graphClient.getFileByDriveId(childFolderItems.id, site,listId);
 
 					downloadFile(fileInputStream, childFolderItems.name);
+					
+//					Updating field to false to get the file again
+					updateFields(listId, fields.get("id"), graphClient,false);
 				}
 			}
 
@@ -124,6 +125,21 @@ public class SharePointGraphIntegrationTest {
 				getAllFiles(listId, childFolderItems.id);
 			}
 		}
+
+	}
+	
+	/**
+	 * Update column
+	 * 
+	 * @param listId
+	 * @param itemId
+	 * @param graphClient
+	 */
+	public void updateFields(String listId, String itemId, GraphClient graphClient,boolean processed) {
+		FieldValueSet fieldValueSet = new FieldValueSet();
+		fieldValueSet.additionalDataManager().put("ProcessedByDS", new JsonPrimitive(processed));
+
+		graphClient.updateFields(listId, itemId, fieldValueSet, site);
 
 	}
 
@@ -145,7 +161,7 @@ public class SharePointGraphIntegrationTest {
 
 		graphClient.getLibrary(site).getCurrentPage().forEach(c -> {
 
-			if (c.name.equalsIgnoreCase("Shared Documents")) {
+			if (c.name.equalsIgnoreCase("InputDev")) {
 				log.info(c.id);
 				log.info(c.name);
 				log.info("    \n");
@@ -195,42 +211,6 @@ public class SharePointGraphIntegrationTest {
 		}
 
 		return StringUtils.EMPTY;
-	}
-
-	public void downloadAllFiles(List<ListItem> list, String libraryId) {
-
-		list.forEach(r -> {
-
-			if (r.contentType.name.equalsIgnoreCase("Document")) {
-
-				log.info(r.webUrl);
-				log.info(r.id);
-				log.info(r.contentType.name);
-				Map<String, String> fields = jsonToMap(r.getRawObject().get("fields"));
-
-				boolean processedByDS = Boolean.parseBoolean(fields.getOrDefault("ProcessedByDS", "false"));
-
-				log.info("Already processed: " + processedByDS);
-				if (!processedByDS) {
-
-					String fileName = fields.get("LinkFilename");
-					log.info(fileName + "    \n");
-
-					InputStream inputStream = graphClient.getFile(libraryId, r.id, site);
-
-					File file = new File("./target/test-classes/ds/work/" + fileName);
-
-					try (FileOutputStream outputStream = new FileOutputStream(file)) {
-						IOUtils.copy(inputStream, outputStream);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-
-				}
-			}
-
-		});
-
 	}
 
 	@Test

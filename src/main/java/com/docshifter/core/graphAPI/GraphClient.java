@@ -2,24 +2,29 @@ package com.docshifter.core.graphAPI;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import com.microsoft.graph.logger.LoggerLevel;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.microsoft.graph.concurrency.ChunkedUploadProvider;
 import com.microsoft.graph.concurrency.IProgressCallback;
 import com.microsoft.graph.core.ClientException;
+import com.microsoft.graph.models.extensions.Drive;
 import com.microsoft.graph.models.extensions.DriveItem;
 import com.microsoft.graph.models.extensions.DriveItemUploadableProperties;
 import com.microsoft.graph.models.extensions.FieldValueSet;
 import com.microsoft.graph.models.extensions.IGraphServiceClient;
 import com.microsoft.graph.models.extensions.ItemReference;
 import com.microsoft.graph.models.extensions.ListItem;
+import com.microsoft.graph.models.extensions.Site;
 import com.microsoft.graph.models.extensions.UploadSession;
 import com.microsoft.graph.options.QueryOption;
+import com.microsoft.graph.requests.extensions.IDriveCollectionPage;
+import com.microsoft.graph.requests.extensions.IDriveCollectionRequestBuilder;
 import com.microsoft.graph.requests.extensions.IDriveItemCollectionPage;
 import com.microsoft.graph.requests.extensions.IDriveItemCollectionRequestBuilder;
 import com.microsoft.graph.requests.extensions.IListCollectionPage;
@@ -41,14 +46,16 @@ public class GraphClient {
 
 	public GraphClient(IGraphServiceClient graphClient) {
 		this.graphClient = graphClient;
-		//graphClient.setServiceRoot("https://graph.microsoft.com/beta");
-		graphClient.getLogger().setLoggingLevel(LoggerLevel.DEBUG);
+	}	
+	
+	public IGraphServiceClient getGraphClient() {
+		return graphClient;
 	}
 
 	/**
 	 *
 	 *
-	 * @param siteId TODO
+	 * @param siteId the sharepoint site id
 	 * @return IListCollectionPage all libraries from the root
 	 * @apiNote Graph API on SharePoint list do not support filtering or ordering
 	 *          results.
@@ -59,14 +66,25 @@ public class GraphClient {
 	
 	/**
 	 * Find the site id by given site name.
-	 * @param siteId as String
+	 * @param siteName the sharepoint site name
 	 * @return the site id
 	 */
-	public String retrieveSiteId(String siteId) {
+	public String retrieveSiteId(String siteName) {		
 
-		if (!StringUtils.isBlank(siteId) && !siteId.equalsIgnoreCase(DEFAULT_SITE)) {
-			return this.graphClient.sites().buildRequest().get().getCurrentPage().stream()
-					.filter(i -> i.displayName.equalsIgnoreCase(siteId)).findFirst().get().sharepointIds.siteId;
+		if (!StringUtils.isBlank(siteName) && !siteName.equalsIgnoreCase(DEFAULT_SITE)) {
+			
+			
+			String siteID = StringUtils.EMPTY;
+			
+			List<Site> sites = this.graphClient.sites().buildRequest().get().getCurrentPage();
+			
+			for (Site site : sites) {
+				if (site.displayName != null && site.displayName.equalsIgnoreCase(siteName)) {
+					siteID = site.sharepointIds.siteId;
+				}
+			}
+			
+			return siteID;
 		}
 
 		return DEFAULT_SITE;
@@ -88,7 +106,7 @@ public class GraphClient {
 	 * @param fileStream
 	 * @param streamSize
 	 * @param itemPath
-	 * @param siteId TODO
+	 * @param siteId the sharepoint site id
 	 * @throws IOException
 	 */
 	public void uploadFile(String listId, InputStream fileStream, long streamSize, String itemPath, String siteId) throws IOException {
@@ -131,7 +149,7 @@ public class GraphClient {
 	 * @param itemID
 	 * @param name
 	 * @param parentReference
-	 * @param siteId TODO
+	 * @param siteId the sharepoint site id
 	 */
 	public void copyStructure(String libraryID, String itemID, String name, ItemReference parentReference, String siteId) {
 
@@ -145,7 +163,7 @@ public class GraphClient {
 	 * @param lstItems    the list to aggregate the ListItems
 	 * @param contentType the content type name E.G "Document" or "Folder" or empty
 	 *                    string to add all contents without filter
-	 * @param siteId TODO
+	 * @param siteId the sharepoint site id
 	 */
 	public void getLibraryItems(String libraryId, List<ListItem> lstItems, String contentType, String siteId) {
 		getAllItemCollectionPages(lstItems, this.getAllContentsInfoFromLibrary(libraryId, siteId), contentType);
@@ -217,7 +235,7 @@ public class GraphClient {
 	 * Get page collection from the library expanding the fields.
 	 * 
 	 * @param libraryId the id of the library that you want to explore
-	 * @param siteId TODO
+	 * @param siteId the sharepoint site id
 	 * @return Page Collection of the provided library.
 	 */
 	public IListItemCollectionPage getAllContentsInfoFromLibrary(String libraryId, String siteId) {
@@ -229,7 +247,7 @@ public class GraphClient {
 	 * 
 	 * @param listId   the library id
 	 * @param folderId the specific folder id
-	 * @param siteId TODO
+	 * @param siteId the sharepoint site id
 	 * @return listItem expanding fields.
 	 */
 	public IDriveItemCollectionPage getAllContentFromSpecificFolder(String listId, String folderId, String siteId) {
@@ -241,7 +259,7 @@ public class GraphClient {
 	 * 
 	 * @param listId the library id.
 	 * @param itemId the object id from sharepoint
-	 * @param siteId TODO
+	 * @param siteId the sharepoint site id
 	 * @return InputStream - the downloaded file
 	 */
 	public InputStream getFile(String listId, String itemId, String siteId) {
@@ -251,23 +269,54 @@ public class GraphClient {
 	/**
 	 * 
 	 * @param itemDriveId the item drive id
-	 * @param siteId TODO
+	 * @param siteId the sharepoint site id
 	 * @return InputStream - the downloaded file
 	 */
-	public InputStream getFileByDriveId(String itemDriveId, String siteId,String listID) {
-		return this.graphClient.drive().list().drive().items(itemDriveId).content().buildRequest().get();
-	}
+	public InputStream getFileByDriveId(String itemDriveId, String siteId, String list) {
 
-	public InputStream getFileByPath(String path,String siteId){
-		return this.graphClient.drive().root().itemWithPath(path).content().buildRequest().get();
-				//.itemWithPath(path).content().buildRequest().get();
+		Optional<String> listName;
+		ArrayList<com.microsoft.graph.models.extensions.List> lists = new ArrayList<>();
+		this.getAllListRequestpages(lists, this.getLibrary(siteId));
+
+		listName = lists.stream().filter(library -> library.id.equalsIgnoreCase(list)).map(m -> m.name)
+				.reduce((a, b) -> a + b);
+
+		String driveID = retrieveDriveCollectionId(this.graphClient.sites(siteId).drives().buildRequest().get(),
+				listName.get());
+
+		return this.graphClient.drives(driveID).items(itemDriveId).content().buildRequest().get();
+	}
+	
+	/**
+	 * Look for all pages in the request and find the right drive id
+	 * 
+	 * @param driveCollectionPage the drive collection with all drivers
+	 * @param listName the list to search for the drive
+	 * @return the drive id
+	 */
+	public String retrieveDriveCollectionId(IDriveCollectionPage driveCollectionPage, String listName) {
+
+		for (Drive item : driveCollectionPage.getCurrentPage()) {
+
+			if (item.name.equalsIgnoreCase(listName)) {
+
+				return item.id;
+			}
+
+			IDriveCollectionRequestBuilder nextPage = driveCollectionPage.getNextPage();
+			if (nextPage != null) {
+				retrieveDriveCollectionId(nextPage.buildRequest().get(), listName);
+			}
+
+		}
+		return StringUtils.EMPTY;
 	}
 
 	/**
 	 * @param listId           the libraryID
 	 * @param parentFolderPath the parent folder path
 	 * @param driveItem        the object to be created
-	 * @param siteId TODO
+	 * @param siteId the sharepoint site id
 	 * @return {@link DriveItem}
 	 */
 	public DriveItem createChildrenFolder(String listId, String parentFolderPath, DriveItem driveItem, String siteId) {
@@ -278,7 +327,7 @@ public class GraphClient {
 	/**
 	 * @param listId    the libraryID
 	 * @param driveItem the object to be created
-	 * @param siteId TODO
+	 * @param siteId the sharepoint site id
 	 * @return {@link DriveItem}
 	 */
 	public DriveItem createRootFolder(String listId, DriveItem driveItem, String siteId) {
