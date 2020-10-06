@@ -1,15 +1,5 @@
 package com.docshifter.core.graphAPI;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
 import com.microsoft.graph.concurrency.ChunkedUploadProvider;
 import com.microsoft.graph.concurrency.IProgressCallback;
 import com.microsoft.graph.core.ClientException;
@@ -32,311 +22,425 @@ import com.microsoft.graph.requests.extensions.IListCollectionRequestBuilder;
 import com.microsoft.graph.requests.extensions.IListItemCollectionPage;
 import com.microsoft.graph.requests.extensions.IListItemCollectionRequestBuilder;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 /**
  * @author Juan Marques created on 06/08/2020
- *
- *@apiNote To use beta api please set graphClient.setServiceRoot("https://graph.microsoft.com/beta");
+ * @apiNote To use beta api please set graphClient.setServiceRoot("https://graph.microsoft.com/beta");
  */
 public class GraphClient {
-	
-	private final Logger log = Logger.getLogger(GraphClient.class);
 
-	private final IGraphServiceClient graphClient;
-	private final static String DEFAULT_SITE = "root";
+    private final static String DEFAULT_SITE = "root";
+    private final Logger log = Logger.getLogger(GraphClient.class);
+    private final IGraphServiceClient graphClient;
 
-	public GraphClient(IGraphServiceClient graphClient) {
-		this.graphClient = graphClient;
-	}	
-	
-	public IGraphServiceClient getGraphClient() {
-		return graphClient;
-	}
+    public GraphClient(IGraphServiceClient graphClient) {
+        this.graphClient = graphClient;
+    }
 
-	/**
-	 *
-	 *
-	 * @param siteId the sharepoint site id
-	 * @return IListCollectionPage all libraries from the root
-	 * @apiNote Graph API on SharePoint list do not support filtering or ordering
-	 *          results.
-	 */
-	public IListCollectionPage getLibrary(String siteId) {
-		return this.graphClient.sites(siteId).lists().buildRequest().select("name,id").get();
-	}
-	
-	/**
-	 * Find the site id by given site name.
-	 * @param siteName the sharepoint site name
-	 * @return the site id
-	 */
-	public String retrieveSiteId(String siteName) {		
+    /**
+     * Retrieve List collection from given site.
+     *
+     * @param siteId the sharepoint site id
+     * @return IListCollectionPage all libraries from the given site or root
+     * @apiNote Graph API on SharePoint list do not support filtering or ordering
+     * results.
+     */
+    public IListCollectionPage getLibrary(String siteId) {
+        return this.graphClient
+                .sites(siteId)
+                .lists()
+                .buildRequest()
+                .select("name,id")
+                .get();
+    }
 
-		if (!StringUtils.isBlank(siteName) && !siteName.equalsIgnoreCase(DEFAULT_SITE)) {
-			
-			
-			String siteID = StringUtils.EMPTY;
-			
-			List<Site> sites = this.graphClient.sites().buildRequest().get().getCurrentPage();
-			
-			for (Site site : sites) {
-				if (site.displayName != null && site.displayName.equalsIgnoreCase(siteName)) {
-					siteID = site.sharepointIds.siteId;
-				}
-			}
-			
-			return siteID;
-		}
+    /**
+     * Find the site id by given site name.
+     *
+     * @param siteName the sharepoint site name
+     * @return the site id
+     */
+    public String retrieveSiteId(String siteName) {
 
-		return DEFAULT_SITE;
-	}
+        if (!StringUtils.isBlank(siteName) && !siteName.equalsIgnoreCase(DEFAULT_SITE)) {
 
-	public IDriveItemCollectionPage getAllDriveItems(String listID, String siteId) {
-		return this.graphClient.sites(siteId).lists(listID).drive().root().children().buildRequest().select("id,name")
-				.get();
-	}
-	
-	public FieldValueSet updateFields(String listId, String itemId, FieldValueSet fieldValueSet, String siteId) {
 
-		return this.graphClient.sites(siteId).lists(listId).items(itemId).fields().buildRequest().patch(fieldValueSet);
-	}
+            String siteID = StringUtils.EMPTY;
 
-	/**
-	 * 
-	 * @param listId
-	 * @param fileStream
-	 * @param streamSize
-	 * @param itemPath
-	 * @param siteId the sharepoint site id
-	 * @throws IOException
-	 */
-	public void uploadFile(String listId, InputStream fileStream, long streamSize, String itemPath, String siteId) throws IOException {
+            List <Site> sites = this.graphClient.sites().buildRequest().get().getCurrentPage();
 
-		UploadSession uploadSession = graphClient.sites(siteId).lists(listId).drive().root().itemWithPath(itemPath)
-				.createUploadSession(new DriveItemUploadableProperties()).buildRequest().post();
+            for (Site site : sites) {
+                if (site.displayName != null && site.displayName.equalsIgnoreCase(siteName)) {
+                    siteID = site.sharepointIds.siteId;
+                }
+            }
 
-		ChunkedUploadProvider<DriveItem> chunkedUploadProvider = new ChunkedUploadProvider<>(uploadSession,
-				graphClient, fileStream, streamSize, DriveItem.class);
+            return siteID;
+        }
 
-		// Config parameter is an array of integers
-		// customConfig[0] indicates the max slice size
-		// Max slice size must be a multiple of 320 KiB
-		int[] customConfig = { 320 * 1024 };
+        return DEFAULT_SITE;
+    }
 
-		// Do the upload
-		chunkedUploadProvider.upload(new IProgressCallback<DriveItem>() {
+    /**
+     * Retrieve a drive item collection from an given site and library.
+     *
+     * @param listID the list/library list id.
+     * @param siteId the sharepoint site id.
+     * @return drive item collection
+     */
+    public IDriveItemCollectionPage getAllDriveItems(String listID, String siteId) {
+        return this.graphClient
+                .sites(siteId)
+                .lists(listID)
+                .drive().root()
+                .children()
+                .buildRequest()
+                .select("id,name")
+                .get();
+    }
 
-			@Override
-			public void success(DriveItem result) {
-				log.info("File " + result.name + " successfully uploaded ");
-			}
+    /**
+     * Update an given field
+     *
+     * @param listId        the list/library list id.
+     * @param itemId        the sharepoint item that you want to update.
+     * @param fieldValueSet the actual field with the new value.
+     * @param siteId        the sharepoint site id.
+     * @return the updated FieldValueSet
+     */
+    public FieldValueSet updateFields(String listId, String itemId, FieldValueSet fieldValueSet, String siteId) {
 
-			@Override
-			public void failure(ClientException ex) {
-				log.error("Failed to upload the file to " + itemPath,ex);
-			}
+        return this.graphClient
+                .sites(siteId)
+                .lists(listId)
+                .items(itemId)
+                .fields()
+                .buildRequest()
+                .patch(fieldValueSet);
+    }
 
-			@Override
-			public void progress(long current, long max) {
+    /**
+     * Creates a upload session to upload large files to sharepoint
+     *
+     * @param listId     the list/library list id.
+     * @param fileStream the file converted to stream.
+     * @param streamSize the file stream size
+     * @param itemPath   the given webUrl that we used to recreate the folder structure.
+     * @param siteId     the sharepoint site id
+     * @throws IOException if we got an kind of problems while uploading the file to sharepoint
+     */
+    public void uploadFile(String listId, InputStream fileStream, long streamSize, String itemPath, String siteId) throws IOException {
 
-			}
-		}, customConfig);
-	}
+        //Creates an upload session
+        UploadSession uploadSession = graphClient
+                .sites(siteId)
+                .lists(listId)
+                .drive().root()
+                .itemWithPath(itemPath)
+                .createUploadSession(new DriveItemUploadableProperties())
+                .buildRequest().post();
 
-	/**
-	 * Copy folder.
-	 * 
-	 * @param libraryID
-	 * @param itemID
-	 * @param name
-	 * @param parentReference
-	 * @param siteId the sharepoint site id
-	 */
-	public void copyStructure(String libraryID, String itemID, String name, ItemReference parentReference, String siteId) {
+        //Defines the chuck to upload
+        ChunkedUploadProvider <DriveItem> chunkedUploadProvider = new ChunkedUploadProvider <>(uploadSession,
+                graphClient, fileStream, streamSize, DriveItem.class);
 
-		graphClient.sites(siteId).lists(libraryID).drive().items(itemID).copy(name, parentReference).buildRequest()
-				.post();
-	}
+        // Config parameter is an array of integers
+        // customConfig[0] indicates the max slice size
+        // Max slice size must be a multiple of 320 KiB
+        int[] customConfig = {320 * 1024};
 
-	/**
-	 * 
-	 * @param libraryId   libraryId the id of the library that you want to explore
-	 * @param lstItems    the list to aggregate the ListItems
-	 * @param contentType the content type name E.G "Document" or "Folder" or empty
-	 *                    string to add all contents without filter
-	 * @param siteId the sharepoint site id
-	 */
-	public void getLibraryItems(String libraryId, List<ListItem> lstItems, String contentType, String siteId) {
-		getAllItemCollectionPages(lstItems, this.getAllContentsInfoFromLibrary(libraryId, siteId), contentType);
-	}
+        // Do the upload
+        chunkedUploadProvider.upload(new IProgressCallback <DriveItem>() {
 
-	/**
-	 * Iterate all lstICollectionPage pages and add to list.
-	 * 
-	 * @param allItems           the list to aggregate the ListItems
-	 * @param lstICollectionPage page collection from graph query.
-	 * @param contentType        the content type name E.G "Document" or "Folder" or
-	 *                           empty string to add all contents without filter
-	 */
-	public void getAllItemCollectionPages(List<ListItem> allItems, IListItemCollectionPage lstICollectionPage,
-			String contentType) {
+            @Override
+            public void success(DriveItem result) {
+                log.info("File " + result.name + " successfully uploaded ");
+            }
 
-		for (ListItem item : lstICollectionPage.getCurrentPage()) {
+            @Override
+            public void failure(ClientException ex) {
+                log.error("Failed to upload the file to " + itemPath, ex);
+            }
 
-			if (item.contentType.name.equalsIgnoreCase(contentType)) {
-				allItems.add(item);
-			} else if (StringUtils.isBlank(contentType)) {
-				allItems.add(item);
-			}
-		}
+            @Override
+            public void progress(long current, long max) {
+                log.trace("Currently loaded :" + current + " of " + max);
+            }
+        }, customConfig);
+    }
 
-		IListItemCollectionRequestBuilder nextPage = lstICollectionPage.getNextPage();
-		if (nextPage != null) {
-			getAllItemCollectionPages(allItems, nextPage.buildRequest().get(), contentType);
-		}
-	}
+    /**
+     * Copy folder structure.
+     *
+     * @param libraryId       The id of the library that you want to explore
+     * @param itemId          @param itemId the sharepoint item that you want to update.
+     * @param name            the folder name
+     * @param parentReference the parent of given folder
+     * @param siteId          the sharepoint site id
+     */
+    public void copyStructure(String libraryId, String itemId, String name, ItemReference parentReference, String siteId) {
 
-	/**
-	 * Iterate all lstICollectionPage pages and add to list.
-	 * 
-	 * @param allItems            the list to aggregate the DriveItems
-	 * @param iBaseCollectionPage page collection from graph query.
-	 * @param folderName          only add the folder that you want or leave blank
-	 *                            to get all
-	 */
-	public void getAllItemDriveCollectionPage(List<DriveItem> allItems, IDriveItemCollectionPage iBaseCollectionPage,
-			String folderName) {
+        this.graphClient.sites(siteId)
+                .lists(libraryId)
+                .drive()
+                .items(itemId)
+                .copy(name, parentReference)
+                .buildRequest()
+                .post();
+    }
 
-		for (DriveItem item : iBaseCollectionPage.getCurrentPage()) {
+    /**
+     * Retrieve all items from given library/list.
+     *
+     * @param libraryId   The id of the library that you want to explore
+     * @param lstItems    the list to aggregate the ListItems
+     * @param contentType the content type name E.G "Document" or "Folder" or empty
+     *                    string to add all contents without filter
+     * @param siteId      the sharepoint site id
+     */
+    public void getLibraryItems(String libraryId, List <ListItem> lstItems, String contentType, String siteId) {
+        getAllItemCollectionPages(lstItems, this.getAllContentsInfoFromLibrary(libraryId, siteId), contentType);
+    }
 
-			if (item.name.equalsIgnoreCase(folderName)) {
-				allItems.add(item);
-			} else if (StringUtils.isBlank(folderName)) {
-				allItems.add(item);
-			}
-		}
-		IDriveItemCollectionRequestBuilder nextPage = iBaseCollectionPage.getNextPage();
-		if (nextPage != null) {
-			getAllItemDriveCollectionPage(allItems, nextPage.buildRequest().get(), folderName);
-		}
-	}
+    /**
+     * Iterate all lstICollectionPage pages and add to list.
+     *
+     * @param allItems           the list to aggregate the ListItems
+     * @param lstICollectionPage page collection from graph query.
+     * @param contentType        the content type name E.G "Document" or "Folder" or
+     *                           empty string to add all contents without filter
+     */
+    public void getAllItemCollectionPages(List <ListItem> allItems, IListItemCollectionPage lstICollectionPage,
+                                          String contentType) {
 
-	public void getAllListRequestpages(List<com.microsoft.graph.models.extensions.List> allItems,
-			IListCollectionPage lstCollectionPage) {
+        for (ListItem item : lstICollectionPage.getCurrentPage()) {
 
-		allItems.addAll(lstCollectionPage.getCurrentPage());
+            if (item.contentType.name.equalsIgnoreCase(contentType)) {
+                allItems.add(item);
+            } else if (StringUtils.isBlank(contentType)) {
+                allItems.add(item);
+            }
+        }
 
-		IListCollectionRequestBuilder nextPage = lstCollectionPage.getNextPage();
-		if (nextPage != null) {
-			getAllListRequestpages(allItems, nextPage.buildRequest().get());
-		}
-	}
+        IListItemCollectionRequestBuilder nextPage = lstICollectionPage.getNextPage();
+        if (nextPage != null) {
+            getAllItemCollectionPages(allItems, nextPage.buildRequest().get(), contentType);
+        }
+    }
 
-	/**
-	 * Get page collection from the library expanding the fields.
-	 * 
-	 * @param libraryId the id of the library that you want to explore
-	 * @param siteId the sharepoint site id
-	 * @return Page Collection of the provided library.
-	 */
-	public IListItemCollectionPage getAllContentsInfoFromLibrary(String libraryId, String siteId) {
-		return this.graphClient.sites(siteId).lists(libraryId).items().buildRequest().expand("fields").get();
-	}
+    /**
+     * Iterate all lstICollectionPage pages and add to list.
+     *
+     * @param allItems            the list to aggregate the DriveItems
+     * @param iBaseCollectionPage page collection from graph query.
+     * @param folderName          only add the folder that you want or leave blank
+     *                            to get all
+     */
+    public void getAllItemDriveCollectionPage(List <DriveItem> allItems, IDriveItemCollectionPage iBaseCollectionPage,
+                                              String folderName) {
 
-	/**
-	 * Get item list from the library expanding the fields.
-	 * 
-	 * @param listId   the library id
-	 * @param folderId the specific folder id
-	 * @param siteId the sharepoint site id
-	 * @return listItem expanding fields.
-	 */
-	public IDriveItemCollectionPage getAllContentFromSpecificFolder(String listId, String folderId, String siteId) {
-		return this.graphClient.sites(siteId).lists(listId).drive().items(folderId).children().buildRequest()
-				.expand("ListItem").get();
-	}
+        for (DriveItem item : iBaseCollectionPage.getCurrentPage()) {
 
-	/**
-	 * 
-	 * @param listId the library id.
-	 * @param itemId the object id from sharepoint
-	 * @param siteId the sharepoint site id
-	 * @return InputStream - the downloaded file
-	 */
-	public InputStream getFile(String listId, String itemId, String siteId) {
-		return this.graphClient.sites(siteId).lists(listId).items(itemId).driveItem().content().buildRequest().get();
-	}
+            if (item.name.equalsIgnoreCase(folderName)) {
+                allItems.add(item);
+            } else if (StringUtils.isBlank(folderName)) {
+                allItems.add(item);
+            }
+        }
+        IDriveItemCollectionRequestBuilder nextPage = iBaseCollectionPage.getNextPage();
+        if (nextPage != null) {
+            getAllItemDriveCollectionPage(allItems, nextPage.buildRequest().get(), folderName);
+        }
+    }
 
-	/**
-	 * 
-	 * @param itemDriveId the item drive id
-	 * @param siteId the sharepoint site id
-	 * @return InputStream - the downloaded file
-	 */
-	public InputStream getFileByDriveId(String itemDriveId, String siteId, String list) {
+    /**
+     * Iterate all IListCollectionPage pages and add to list.
+     *
+     * @param allItems          the list to aggregate the DriveItems
+     * @param lstCollectionPage the given page collection from the request.
+     */
+    public void getAllListRequestpages(List <com.microsoft.graph.models.extensions.List> allItems,
+                                       IListCollectionPage lstCollectionPage) {
 
-		Optional<String> listName;
-		ArrayList<com.microsoft.graph.models.extensions.List> lists = new ArrayList<>();
-		this.getAllListRequestpages(lists, this.getLibrary(siteId));
+        allItems.addAll(lstCollectionPage.getCurrentPage());
 
-		listName = lists.stream().filter(library -> library.id.equalsIgnoreCase(list)).map(m -> m.name)
-				.reduce((a, b) -> a + b);
+        IListCollectionRequestBuilder nextPage = lstCollectionPage.getNextPage();
+        if (nextPage != null) {
+            getAllListRequestpages(allItems, nextPage.buildRequest().get());
+        }
+    }
 
-		String driveID = retrieveDriveCollectionId(this.graphClient.sites(siteId).drives().buildRequest().get(),
-				listName.get());
+    /**
+     * Get page collection from the library expanding the fields.
+     *
+     * @param libraryId the id of the library that you want to explore
+     * @param siteId    the sharepoint site id
+     * @return Page Collection of the provided library.
+     */
+    public IListItemCollectionPage getAllContentsInfoFromLibrary(String libraryId, String siteId) {
+        return this.graphClient
+                .sites(siteId)
+                .lists(libraryId)
+                .items()
+                .buildRequest()
+                .expand("fields")
+                .get();
+    }
 
-		return this.graphClient.drives(driveID).items(itemDriveId).content().buildRequest().get();
-	}
-	
-	/**
-	 * Look for all pages in the request and find the right drive id
-	 * 
-	 * @param driveCollectionPage the drive collection with all drivers
-	 * @param listName the list to search for the drive
-	 * @return the drive id
-	 */
-	public String retrieveDriveCollectionId(IDriveCollectionPage driveCollectionPage, String listName) {
+    /**
+     * Get item list from the library expanding the fields.
+     *
+     * @param listId   the list/library list id.
+     * @param folderId the specific folder id
+     * @param siteId   the sharepoint site id
+     * @return listItem expanding fields.
+     */
+    public IDriveItemCollectionPage getAllContentFromSpecificFolder(String listId, String folderId, String siteId) {
+        return this.graphClient
+                .sites(siteId)
+                .lists(listId)
+                .drive()
+                .items(folderId)
+                .children()
+                .buildRequest()
+                .expand("ListItem").get();
+    }
 
-		for (Drive item : driveCollectionPage.getCurrentPage()) {
+    /**
+     * Download the file from sharepoint.
+     *
+     * @param listId the list/library list id.
+     * @param itemId the object id from sharepoint
+     * @param siteId the sharepoint site id
+     * @return InputStream - the downloaded file
+     */
+    public InputStream getFile(String listId, String itemId, String siteId) {
+        return this.graphClient
+                .sites(siteId)
+                .lists(listId)
+                .items(itemId)
+                .driveItem()
+                .content()
+                .buildRequest()
+                .get();
+    }
 
-			if (item.name.equalsIgnoreCase(listName)) {
+    /**
+     * @param itemDriveId the item drive id
+     * @param siteId      the sharepoint site id
+     * @return InputStream - the downloaded file
+     */
+    public InputStream getFileByDriveId(String itemDriveId, String siteId, String list) {
 
-				return item.id;
-			}
+        String driveId = StringUtils.EMPTY;
+        ArrayList <com.microsoft.graph.models.extensions.List> lists = new ArrayList <>();
 
-			IDriveCollectionRequestBuilder nextPage = driveCollectionPage.getNextPage();
-			if (nextPage != null) {
-				retrieveDriveCollectionId(nextPage.buildRequest().get(), listName);
-			}
+        //Retrieving all lists from given site.
+        this.getAllListRequestpages(lists, this.getLibrary(siteId));
 
-		}
-		return StringUtils.EMPTY;
-	}
+        //Getting the listName from given list
+        Optional <String> listName = lists.stream()
+                .filter(library -> library.id.equalsIgnoreCase(list))
+                .map(m -> m.name)
+                .reduce((a, b) -> a + b);
 
-	/**
-	 * @param listId           the libraryID
-	 * @param parentFolderPath the parent folder path
-	 * @param driveItem        the object to be created
-	 * @param siteId the sharepoint site id
-	 * @return {@link DriveItem}
-	 */
-	public DriveItem createChildrenFolder(String listId, String parentFolderPath, DriveItem driveItem, String siteId) {
-		return this.graphClient.sites(siteId).lists(listId).drive().root().itemWithPath(parentFolderPath).children()
-				.buildRequest().post(driveItem);
-	}
+        //Retrieving the right drive id by given list name
+        IDriveCollectionPage driveCollection = this.graphClient
+                .sites(siteId)
+                .drives()
+                .buildRequest().get();
 
-	/**
-	 * @param listId    the libraryID
-	 * @param driveItem the object to be created
-	 * @param siteId the sharepoint site id
-	 * @return {@link DriveItem}
-	 */
-	public DriveItem createRootFolder(String listId, DriveItem driveItem, String siteId) {
-		return this.graphClient.sites(siteId).lists(listId).drive().root().children().buildRequest().post(driveItem);
-	}
+        //If listName is not present will thrown an error in the api
+        if (listName.isPresent()) {
+            driveId = retrieveDriveCollectionId(driveCollection, listName.get());
+        }
 
-	public List<QueryOption> buildQueryOptions(String name, String value) {
-		return Collections.unmodifiableList(Collections.singletonList(new QueryOption(name, value)));
+        return this.graphClient.drives(driveId)
+                .items(itemDriveId)
+                .content()
+                .buildRequest()
+                .get();
+    }
 
-	}
+    /**
+     * Look for all pages in the request and find the right drive id
+     *
+     * @param driveCollectionPage the drive collection with all drivers
+     * @param listName            the list to search for the drive
+     * @return the drive id
+     */
+    public String retrieveDriveCollectionId(IDriveCollectionPage driveCollectionPage, String listName) {
+
+        for (Drive item : driveCollectionPage.getCurrentPage()) {
+
+            if (item.name.equalsIgnoreCase(listName)) {
+
+                return item.id;
+            }
+
+            IDriveCollectionRequestBuilder nextPage = driveCollectionPage.getNextPage();
+            if (nextPage != null) {
+                retrieveDriveCollectionId(nextPage.buildRequest().get(), listName);
+            }
+
+        }
+        return StringUtils.EMPTY;
+    }
+
+    /**
+     * @param listId           the list/library list id.
+     * @param parentFolderPath the parent folder path
+     * @param driveItem        the object to be created
+     * @param siteId           the sharepoint site id
+     * @return {@link DriveItem}
+     */
+    public DriveItem createChildrenFolder(String listId, String parentFolderPath, DriveItem driveItem, String siteId) {
+        return this.graphClient
+                .sites(siteId)
+                .lists(listId)
+                .drive()
+                .root()
+                .itemWithPath(parentFolderPath)
+                .children()
+                .buildRequest()
+                .post(driveItem);
+    }
+
+    /**
+     * @param listId    the list/library list id.
+     * @param driveItem the object to be created
+     * @param siteId    the sharepoint site id
+     * @return the created item.
+     */
+    public DriveItem createRootFolder(String listId, DriveItem driveItem, String siteId) {
+        return this.graphClient
+                .sites(siteId)
+                .lists(listId)
+                .drive().root()
+                .children()
+                .buildRequest()
+                .post(driveItem);
+    }
+
+    /**
+     * Used to build queries to send within the build request.
+     *
+     * @param name  the param that you want to filter
+     * @param value the value to be filtered
+     * @return a list with the requested QueryOption
+     */
+    public List <QueryOption> buildQueryOptions(String name, String value) {
+        return Collections.unmodifiableList(Collections.singletonList(new QueryOption(name, value)));
+
+    }
 
 }
