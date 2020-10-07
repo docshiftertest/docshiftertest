@@ -61,7 +61,7 @@ public class SharePointGraphIntegrationTest {
 				"fdfaf67a-261f-4fc8-bc26-fa14aa7691e1", NationalCloud.Global));
 
 		if (site.equalsIgnoreCase("demo"))
-			site = graphClient.retrieveSiteId(site);
+			site = graphClient.getSharepoint().retrieveSiteId(site);
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class SharePointGraphIntegrationTest {
 		IListCollectionPage collectionPage = null;
 
 		try {
-			collectionPage = graphClient.getLibrary(site);
+			collectionPage = graphClient.getSharepoint().getLibrary(site);
 		} catch (ClientException e) {
 			log.error("ohh noo" + e.getMessage());
 		}
@@ -88,7 +88,7 @@ public class SharePointGraphIntegrationTest {
 		String listId = "48aa2e0d-0599-4be3-976d-4296f601ac34";
 
 		List<DriveItem> items = new ArrayList<>();
-		graphClient.getAllItemDriveCollectionPage(items, graphClient.getAllDriveItems(listId, site), folderName);
+		graphClient.getSharepoint().getAllItemDriveCollectionPage(items, graphClient.getSharepoint().getAllDriveItems(listId, site), folderName);
 
 		DriveItem item = items.stream().findFirst().orElseThrow(NoSuchElementException::new);
 
@@ -98,8 +98,8 @@ public class SharePointGraphIntegrationTest {
 	public void getAllFiles(String listId, String driveItemId) {
 
 		List<DriveItem> lstChildItems = new ArrayList<>();
-		graphClient.getAllItemDriveCollectionPage(lstChildItems,
-				graphClient.getAllContentFromSpecificFolder(listId, driveItemId, site), StringUtils.EMPTY);
+		graphClient.getSharepoint().getAllItemDriveCollectionPage(lstChildItems,
+				graphClient.getSharepoint().getAllContentFromSpecificFolder(listId, driveItemId, site), StringUtils.EMPTY);
 
 		for (DriveItem childFolderItems : lstChildItems) {
 			if (childFolderItems.file != null) {
@@ -112,11 +112,11 @@ public class SharePointGraphIntegrationTest {
 					// Updating field
 					updateFields(listId, fields.get("id"), graphClient,true);
 					
-					InputStream fileInputStream = graphClient.getFileByDriveId(childFolderItems.id, site,listId);
+					InputStream fileInputStream = graphClient.getSharepoint().getFileByDriveId(childFolderItems.id, site,listId);
 
 					downloadFile(fileInputStream, childFolderItems.name);
 					
-//					Updating field to false to get the file again
+         			//Updating field to false to get the file again
 					updateFields(listId, fields.get("id"), graphClient,false);
 				}
 			}
@@ -133,13 +133,13 @@ public class SharePointGraphIntegrationTest {
 	 * 
 	 * @param listId
 	 * @param itemId
-	 * @param graphClient
+	 * @param graphClient.getSharepoint()
 	 */
 	public void updateFields(String listId, String itemId, GraphClient graphClient,boolean processed) {
 		FieldValueSet fieldValueSet = new FieldValueSet();
 		fieldValueSet.additionalDataManager().put("ProcessedByDS", new JsonPrimitive(processed));
 
-		graphClient.updateFields(listId, itemId, fieldValueSet, site);
+		graphClient.getSharepoint().updateFields(listId, itemId, fieldValueSet, site);
 
 	}
 
@@ -159,13 +159,13 @@ public class SharePointGraphIntegrationTest {
 
 		List<ListItem> allItems = new ArrayList<>();
 
-		graphClient.getLibrary(site).getCurrentPage().forEach(c -> {
+		graphClient.getSharepoint().getLibrary(site).getCurrentPage().forEach(c -> {
 
 			if (c.name.equalsIgnoreCase("InputDev")) {
 				log.info(c.id);
 				log.info(c.name);
 				log.info("    \n");
-				graphClient.getLibraryItems(c.id, allItems, "Document", site);
+				graphClient.getSharepoint().getLibraryItems(c.id, allItems, "Document", site);
 			}
 		});
 
@@ -227,9 +227,9 @@ public class SharePointGraphIntegrationTest {
 		DriveItem driveItemChildCallBack = null;
 
 		try {
-			driveItemParentCallBack = graphClient.createRootFolder("fd4b0a4f-4ab3-4ca3-9bdb-7addbc3e5ee0", driveItem, site);
+			driveItemParentCallBack = graphClient.getSharepoint().createRootFolder("fd4b0a4f-4ab3-4ca3-9bdb-7addbc3e5ee0", driveItem, site);
 
-			driveItemChildCallBack = graphClient.createChildrenFolder("fd4b0a4f-4ab3-4ca3-9bdb-7addbc3e5ee0",
+			driveItemChildCallBack = graphClient.getSharepoint().createChildrenFolder("fd4b0a4f-4ab3-4ca3-9bdb-7addbc3e5ee0",
 					driveItemParentCallBack.name, driveItem, site);
 		} catch (ClientException ex) {
 			log.info(ex);
