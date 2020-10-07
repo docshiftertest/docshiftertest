@@ -39,7 +39,7 @@ import com.microsoft.graph.requests.extensions.IListItemCollectionRequestBuilder
  */
 public class Sharepoint {
 	
-	private final static String DEFAULT_SITE = "root";
+	public final static String DEFAULT_SITE = "root";
 	private final Logger log = Logger.getLogger(Sharepoint.class);
 	private final IGraphServiceClient graphClient;
 
