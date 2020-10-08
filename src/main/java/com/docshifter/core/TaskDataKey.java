@@ -5,7 +5,7 @@ package com.docshifter.core;
  * @author Juan Marques created on 08/10/2020
  *
  */
-public enum TaskData {
+public enum TaskDataKey {
 
 	DOCUMENT_BOUNDARY_TEXT,
 	ADD_BOUNDARY_TITLE,
