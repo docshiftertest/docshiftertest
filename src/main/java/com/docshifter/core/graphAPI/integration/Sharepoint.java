@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriUtils;
 
 import com.microsoft.graph.concurrency.ChunkedUploadProvider;
 import com.microsoft.graph.concurrency.IProgressCallback;
@@ -27,6 +29,8 @@ import com.microsoft.graph.requests.extensions.IDriveCollectionPage;
 import com.microsoft.graph.requests.extensions.IDriveCollectionRequestBuilder;
 import com.microsoft.graph.requests.extensions.IDriveItemCollectionPage;
 import com.microsoft.graph.requests.extensions.IDriveItemCollectionRequestBuilder;
+import com.microsoft.graph.requests.extensions.IDriveItemSearchCollectionPage;
+import com.microsoft.graph.requests.extensions.IDriveItemSearchCollectionRequestBuilder;
 import com.microsoft.graph.requests.extensions.IListCollectionPage;
 import com.microsoft.graph.requests.extensions.IListCollectionRequestBuilder;
 import com.microsoft.graph.requests.extensions.IListItemCollectionPage;
@@ -39,8 +43,8 @@ import com.microsoft.graph.requests.extensions.IListItemCollectionRequestBuilder
  */
 public class Sharepoint {
 	
-	public final static String DEFAULT_SITE = "root";
-	private final Logger log = Logger.getLogger(Sharepoint.class);
+	public static final String DEFAULT_SITE = "root";
+	private static final Logger log = LoggerFactory.getLogger(Sharepoint.class);
 	private final IGraphServiceClient graphClient;
 
 	/**
@@ -81,7 +85,7 @@ public class Sharepoint {
     public String retrieveSiteId(String siteName) {
     	
     	if(log.isDebugEnabled()) {
-        	log.debug("Getting site id from :" + siteName);
+        	log.debug("Getting site id from :",siteName);
     	}
 
         if (!StringUtils.isBlank(siteName) && !siteName.equalsIgnoreCase(DEFAULT_SITE)) {
@@ -120,6 +124,25 @@ public class Sharepoint {
                 .select("id,name")
                 .get();
     }
+    
+	/**
+	 * Retrieve all drive item from an given site and library.
+	 * 
+	 * @apiNote We search using StringUtils.EMPTY to get all items
+	 * @param listID the list/library list id.
+	 * @param siteId the sharepoint site id.
+	 * @return drive item search collection
+	 */
+	public IDriveItemSearchCollectionPage searchAllDriveItems(String listID, String siteId) {
+		return this.graphClient
+				.sites(siteId)
+				.lists(listID)
+				.drive()
+				.root()
+				.search(StringUtils.EMPTY)
+				.buildRequest()
+				.get();
+	}
 
     /**
      * Update an given field
@@ -176,17 +199,17 @@ public class Sharepoint {
 
             @Override
             public void success(DriveItem result) {
-                log.info("File " + result.name + " successfully uploaded ");
+                log.info("File {} successfully uploaded " , result.name );
             }
 
             @Override
             public void failure(ClientException ex) {
-                log.error("Failed to upload the file to " + itemPath, ex);
+                log.error("Failed to upload the file to {} Exception {}", itemPath, ex);
             }
 
             @Override
             public void progress(long current, long max) {
-                log.trace("Currently loaded :" + current + " of " + max);
+				log.trace("Currently loaded {} of {}:", current, max);
             }
         }, customConfig);
     }
@@ -273,6 +296,50 @@ public class Sharepoint {
         if (nextPage != null) {
             getAllItemDriveCollectionPage(allItems, nextPage.buildRequest().get(), folderName);
         }
+    }
+    
+    /**
+     * We search in all search collections for the right drive item from given folder
+    * @param allItems            the list to aggregate the DriveItems
+     * @param itemSearchCollectionPage page search collection from graph query.
+     * @param folderName          only add the folder that you want or leave blank
+     *                            to get all
+     */
+    public void getAllPagesFromSearchCollection(List <DriveItem> allItems, IDriveItemSearchCollectionPage itemSearchCollectionPage,
+                                              String folderName) {
+    	
+		for (DriveItem item : itemSearchCollectionPage.getCurrentPage()) {
+			
+			if (item.name.equalsIgnoreCase(folderName)) {
+				allItems.add(item);
+			} else if (StringUtils.isBlank(folderName)) {
+				allItems.add(item);
+				
+			  //If the folder name contains "/" then we encode the given folder and compare against webURL.
+			} else if (folderName.contains("/")) {
+				if (item.webUrl.contains(encodeFolderPath(folderName))) {
+					
+					if(log.isDebugEnabled()) {
+						log.debug("Item name: {} ", item.name);
+						log.debug("Item weburl: {} ", item.webUrl);
+					}
+					allItems.add(item);
+				}
+			}
+		}
+    	IDriveItemSearchCollectionRequestBuilder nextPage = itemSearchCollectionPage.getNextPage();
+        if (nextPage != null) {
+        	getAllPagesFromSearchCollection(allItems, nextPage.buildRequest().get(), folderName);
+        }
+    }
+    
+    /**
+     * We encode the given folder from workflow to compare against weburl.
+     * @param folderPath the folder path from workflow E.G. eCTD Sample Content/Module 2/27 Clinical Summary
+     * @return the encoded folder path E.G eCTD%20Sample%20Content/Module%202/27%20Clinical%20Summary
+     */
+    private String encodeFolderPath(String folderPath) {
+        return UriUtils.encodePath(folderPath, "UTF-8");
     }
 
     /**
@@ -375,6 +442,12 @@ public class Sharepoint {
         //If listName is not present will thrown an error in the api
         if (listName.isPresent()) {
             driveId = retrieveDriveCollectionId(driveCollection, listName.get());
+            
+            // This might happens when you have a list that has a different internal name from what shows in the browser
+            if(StringUtils.isBlank(driveId)) {
+            	log.error("Couldn't retrieve drive id from list {} please check the given list name" , listName.get());
+            	return null;
+            }
         }
 
         return this.graphClient.drives(driveId)
