@@ -172,10 +172,11 @@ public class Sharepoint {
      * @param streamSize the file stream size
      * @param itemPath   the given webUrl that we used to recreate the folder structure.
      * @param siteId     the sharepoint site id
+     * @param fieldValueSet fields to be updated.
      * @throws IOException if we got an kind of problems while uploading the file to sharepoint
      */
-    public void uploadFile(String listId, InputStream fileStream, long streamSize, String itemPath, String siteId) throws IOException {
-
+    public void uploadFile(String listId, InputStream fileStream, long streamSize, String itemPath, String siteId,FieldValueSet fieldValueSet) throws IOException {
+    	
         //Creates an upload session
         UploadSession uploadSession = graphClient
                 .sites(siteId)
@@ -200,6 +201,15 @@ public class Sharepoint {
             @Override
             public void success(DriveItem result) {
                 log.info("File {} successfully uploaded " , result.name );
+        		
+                
+        		ListItem item = getListItem(result.id , siteId, listId);
+
+        		if(log.isDebugEnabled()) {
+        			log.debug("Updating.... {} " , result.name);
+        		}
+        		
+                updateFields(listId, item.id, fieldValueSet, siteId);
             }
 
             @Override
@@ -232,6 +242,22 @@ public class Sharepoint {
                 .copy(name, parentReference)
                 .buildRequest()
                 .post();
+    }
+    
+    /**
+     * Used to retrieve the item id from sharepoint.
+     * @param driveId the item drive id
+     * @param the sharepoint site id
+     * @param listId The id of the library that you want to explore.
+     * @return the list id
+     */
+    public ListItem getListItem(String driveId,String siteId,String listId) {
+    	return this.graphClient.sites(siteId)
+    	.lists(listId)
+    	.drive()
+    	.items(driveId)
+    	.listItem().buildRequest()
+    	.get();
     }
 
     /**
