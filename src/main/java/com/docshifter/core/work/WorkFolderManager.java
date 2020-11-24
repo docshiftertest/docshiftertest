@@ -3,6 +3,8 @@ package com.docshifter.core.work;
 import com.docbyte.utils.FileUtils;
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.service.GeneralConfigService;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,12 +59,11 @@ public class WorkFolderManager {
 				+ " folder [" 
 				+ folderPath 
 				+ "]! Please check and correct";
-		Exception exc = new Exception();
-		exc.fillInStackTrace();
-		StackTraceElement[] traces = exc.getStackTrace();
-		StackTraceElement trace = traces[traces.length - 1];
-		logger.debug(trace.toString());
-		if (trace.toString().startsWith("com.docshifter.console.DocShifterConsole")) {
+
+		String applicationName = System.getProperty("program.name");
+		logger.debug("App name : " + applicationName);
+		
+		if ((!StringUtils.isBlank(applicationName)) && applicationName.equalsIgnoreCase("DocShifterConsole")) {
 			logger.warn(errorMessage);
 		}
 		else {

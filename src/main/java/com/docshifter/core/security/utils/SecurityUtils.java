@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.docshifter.core.security.utils;
 
 import java.io.IOException;
@@ -65,13 +62,12 @@ public class SecurityUtils {
 			decryptedMessage = decrypt.decrypt(encryptedMessage);
 
 		} catch (Exception e) {
-			if (e instanceof EncryptionOperationNotPossibleException || e instanceof IllegalArgumentException
-					|| e instanceof NegativeArraySizeException || e instanceof IOException) {
-				logger.debug("The password is in plain text...tried to decrypted: " +encryptedMessage);
+			if (e instanceof EncryptionOperationNotPossibleException || e instanceof IllegalArgumentException || e instanceof NegativeArraySizeException) {
+				logger.debug("The password is in plain text...: " + e);
 				decryptedMessage = encryptedMessage;
 			} else {
-				logger.debug(e + "encryptedMessage" + encryptedMessage);
-				throw new EncryptionOperationNotPossibleException("Ocurred an error trying to decrypt " + logClass);
+				logger.info(e);
+				throw new EncryptionOperationNotPossibleException("Occurred an error trying to decrypt " + logClass);
 			}
 		}
 		logger.debug("Decryption completed for " + logClass);
@@ -119,8 +115,8 @@ public class SecurityUtils {
 			logger.debug("Starting encryption for " + logClass);
 			encryptedMessage = encrypt.encrypt(message);
 		} catch (Exception e) {
-			logger.debug(e);
-			throw new EncryptionOperationNotPossibleException("Ocurred an error trying to encrypt " + logClass);
+			logger.info(e);
+			throw new EncryptionOperationNotPossibleException("Occurred an error trying to encrypt " + logClass);
 		}
 
 		logger.debug("Encryption completed for " + logClass);

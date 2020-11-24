@@ -20,10 +20,16 @@ public class MockLicensingService implements ILicensingService {
 	private static final Map<String, Date> keys = new HashMap<>();
 	static {
 		keys.put("b6b1edf7-8e7c-4209-9911-8f630114be4d", null);
-		keys.put("bfd7af58-2266-11ea-843b-98fa9b42e1ca", new GregorianCalendar(2020, Calendar.MARCH, 31, 23, 59, 59).getTime());
-		keys.put("b10df310-2266-11ea-b177-98fa9b42e1ca", new GregorianCalendar(2020, Calendar.JUNE, 30, 23, 59, 59).getTime());
 		keys.put("a14b8870-2266-11ea-874c-98fa9b42e1ca", new GregorianCalendar(2020, Calendar.OCTOBER, 31, 23, 59, 59).getTime());
 		keys.put("8f59e896-2266-11ea-8f74-98fa9b42e1ca", new GregorianCalendar(2020, Calendar.DECEMBER, 31, 23, 59, 59).getTime());
+		keys.put("f5c1668c-f587-475c-b6d1-b7ee2b5cbacd", new GregorianCalendar(2021, Calendar.MARCH, 31, 23, 59, 59).getTime());
+		keys.put("5f4f7686-e502-4a89-aa64-834f0220107e", new GregorianCalendar(2021, Calendar.JUNE, 30, 23, 59, 59).getTime());
+		keys.put("2beb15ee-8292-42b2-85f1-dab53d9f5255", new GregorianCalendar(2021, Calendar.SEPTEMBER, 30, 23, 59, 59).getTime());
+		keys.put("11206e6e-694b-43c7-906c-209134d3fadc", new GregorianCalendar(2021, Calendar.DECEMBER, 31, 23, 59, 59).getTime());
+		keys.put("22f37141-f6b1-4478-ae53-43ae15aae19a", new GregorianCalendar(2022, Calendar.MARCH, 31, 23, 59, 59).getTime());
+		keys.put("edd36cc0-9bf5-4c21-bf00-91e48f2e521d", new GregorianCalendar(2022, Calendar.JUNE, 30, 23, 59, 59).getTime());
+		keys.put("006208ca-2054-4175-a6bd-c406ebb0d8df", new GregorianCalendar(2022, Calendar.SEPTEMBER, 30, 23, 59, 59).getTime());
+		keys.put("b0b6d35c-fe3f-45fb-b795-24bc3453263d", new GregorianCalendar(2022, Calendar.DECEMBER, 31, 23, 59, 59).getTime());
 	}
 
 	public MockLicensingService() {

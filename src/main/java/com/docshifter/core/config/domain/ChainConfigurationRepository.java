@@ -9,8 +9,7 @@ import java.util.List;
 /**
  * Created by michiel.vandriessche@docbyte.com on 8/19/16.
  */
-//@Repository
-//@RepositoryRestResource
+
 public interface ChainConfigurationRepository extends CrudRepository<ChainConfiguration, Long> {
 
 	List<ChainConfiguration> findByEnabled(boolean enabled);
@@ -24,4 +23,8 @@ public interface ChainConfigurationRepository extends CrudRepository<ChainConfig
     @Modifying(flushAutomatically = true)
     @Query("update ChainConfiguration cc set cc.enabled = ?1 where cc.id = ?2")
     void enableWorkFlow(boolean enable, Long id);
+    
+    @Modifying(flushAutomatically = true)
+    @Query("update ChainConfiguration cc set cc.enabled = ?1")
+    void enableOrDisableAllWorkFlows(boolean enable);
 }
