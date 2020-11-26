@@ -9,8 +9,6 @@ import javax.jms.JMSException;
 
 public interface IMessageSender {
 
-	void sendTask(long ChainConfigurationID, Task task);
-
 	/**
 	 * 
 	 * @param ChainConfigurationID the workflow configurationID
@@ -21,8 +19,6 @@ public interface IMessageSender {
 	 */
 	void sendTask(long ChainConfigurationID, Task task, int priority);
 
-	void sendDocumentumTask(long ChainConfigurationID, DctmTask task);
-
 	/**
 	 * 
 	 * @param ChainConfigurationID the workflow configurationID
@@ -31,8 +27,6 @@ public interface IMessageSender {
 	 *                             && <= 9) Low (JMSPriority > 0 && < 4)
 	 */
 	void sendDocumentumTask(long ChainConfigurationID, DctmTask task, int priority);
-
-	void sendVeevaTask(long ChainConfigurationID, VeevaTask task);
 
 	/**
 	 * 
@@ -44,13 +38,7 @@ public interface IMessageSender {
 	 */
 	void sendVeevaTask(long ChainConfigurationID, VeevaTask task, int priority);
 
-	void sendPrintTask(Task task);
-
-	void sendTask(String queueName, Task task);
-
 	void sendPrintTask(Task task, int priority);
-
-	void sendTask(String queueName, Task task, int priority);
 
 	int getMessageCount() throws JMSException;
 

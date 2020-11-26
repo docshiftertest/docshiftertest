@@ -138,26 +138,6 @@ public class AMQPSender implements IMessageSender {
 	}
 
 	@Override
-	public void sendTask(long chainConfigurationID, Task task)  {
-		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfigurationID, task, DEFAULT_PRIORITY);
-	}
-
-	@Override
-	public void sendDocumentumTask(long chainConfigurationID, DctmTask task)  {
-		sendTask(DocshifterMessageType.DCTM, docshifterQueue.getName(), chainConfigurationID, task, DEFAULT_PRIORITY);
-	}
-
-	@Override
-	public void sendPrintTask(Task task)  {
-		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), 0, task, DEFAULT_PRIORITY);
-	}
-
-	@Override
-	public void sendTask(String queueName, Task task)  {
-		sendTask(DocshifterMessageType.DEFAULT, queueName, 0, task, DEFAULT_PRIORITY);
-	}
-
-	@Override
 	public void sendTask(long chainConfigurationID, Task task, int priority)  {
 		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfigurationID, task, priority);
 	}
@@ -168,11 +148,6 @@ public class AMQPSender implements IMessageSender {
 	}
 
 	@Override
-	public void sendVeevaTask(long chainConfigurationID,VeevaTask task) {
-		sendTask(DocshifterMessageType.VEEVA, docshifterQueue.getName(), chainConfigurationID, task, DEFAULT_PRIORITY);
-	}
-
-	@Override
 	public void sendVeevaTask(long chainConfigurationID,VeevaTask task, int priority) {
 		sendTask(DocshifterMessageType.VEEVA, docshifterQueue.getName(), chainConfigurationID, task, priority);
 	}
@@ -180,11 +155,6 @@ public class AMQPSender implements IMessageSender {
 	@Override
 	public void sendPrintTask(Task task, int priority)  {
 		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), 0, task, priority);
-	}
-
-	@Override
-	public void sendTask(String queueName, Task task, int priority)  {
-		sendTask(DocshifterMessageType.DEFAULT, queueName, 0, task, priority);
 	}
 	
 	@Override
