@@ -13,6 +13,6 @@ public class Constants {
 	public final static String OPENOFFICE_PORT = " ";
 
 
-    public final static String RELOAD_QUEUE = "docshifterReload";
+    public final static String RELOAD_QUEUE = "VirtualTopic.docshifterReload";
 	public final static String SYNC_QUEUE = "docshifterSync";
 }

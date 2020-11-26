@@ -13,7 +13,7 @@ public class SyncTask extends Task {
 
 	public SyncTask() { }
 
-	public SyncTask(String filePath, WorkFolder wf, boolean discardReturnFile) {
+	public SyncTask(Path filePath, WorkFolder wf, boolean discardReturnFile) {
 		super(filePath, wf);
 		this.discardReturnFile = discardReturnFile;
 	}

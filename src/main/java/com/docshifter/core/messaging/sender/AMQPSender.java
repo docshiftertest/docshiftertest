@@ -9,15 +9,15 @@ import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.VeevaTask;
+import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.log4j.Logger;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Properties;
+
+import javax.jms.JMSException;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 5/20/16.
@@ -27,31 +27,26 @@ public class AMQPSender implements IMessageSender {
 
 	private static final Logger logger = Logger.getLogger(new Object() { }.getClass().getEnclosingClass());
 
-	private RabbitTemplate rabbitTemplate;
-	private Queue docshifterQueue;
-	private QueueMonitorRepository queueMonitorRepository;
-	private JmsTemplate jmsTemplate;
+	private final ActiveMQQueue docshifterQueue;
+	private final QueueMonitorRepository queueMonitorRepository;
+	private final JmsTemplate jmsTemplate;
+	private final JmsMessagingTemplate messagingTemplate;
 
-	public static final int DEFAULT_PRIORITY= 2;
+	public static final int DEFAULT_PRIORITY = 4;
 	
-	public static final int SYNC_PRIORITY= 4;
-
-	public AMQPSender(RabbitTemplate rabbitTemplate, Queue docshifterQueue, QueueMonitorRepository queueMonitorRepository) {
-		this.rabbitTemplate = rabbitTemplate;
-		this.docshifterQueue = docshifterQueue;
-		this.queueMonitorRepository = queueMonitorRepository;
-	}
+	public static final int HIGHEST_PRIORITY = 9;
 	
-	
-	public AMQPSender(JmsTemplate jmsTemplate, Queue docshifterQueue, QueueMonitorRepository queueMonitorRepository) {
+	public AMQPSender(JmsTemplate jmsTemplate, JmsMessagingTemplate messagingTemplate, ActiveMQQueue docshifterQueue, QueueMonitorRepository queueMonitorRepository) {
 		this.jmsTemplate = jmsTemplate;
+		this.messagingTemplate = messagingTemplate;
 		this.docshifterQueue = docshifterQueue;
 		this.queueMonitorRepository = queueMonitorRepository;
 	}
 
 
-	private SyncTask sendSyncTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task) {
-		Object response = sendTask(type, queue, chainConfigurationID, task, SYNC_PRIORITY);
+	private SyncTask sendSyncTask(String queue, long chainConfigurationID, Task task) {
+
+		Object response = sendTask(DocshifterMessageType.SYNC, queue, chainConfigurationID, task, HIGHEST_PRIORITY);
 
 		if (response == null) {
 			//TODO: update to good exception message
@@ -109,33 +104,37 @@ public class AMQPSender implements IMessageSender {
 		queueMonitorRepository.save(qMon);
 
 		if (DocshifterMessageType.SYNC.equals(type)) {
-			Object obj = rabbitTemplate.convertSendAndReceive(queue, message, message1 -> {
-				logger.debug("'rabbitTemplate.convertSendAndReceive': message.task type=" + message.getTask().getClass().getSimpleName());
-				message1.getMessageProperties().setPriority(SYNC_PRIORITY);
-				return message1;
+			Object obj = messagingTemplate.convertSendAndReceive(queue,message,DocshifterMessage.class, messagePostProcessor -> {
+				messagingTemplate.getJmsTemplate().setPriority(HIGHEST_PRIORITY);
+				logger.debug("'messagingTemplate.convertSendAndReceive': message.task type=" + message.getTask().getClass().getSimpleName());
+				return messagePostProcessor;
 			});
 			if (obj != null) {
-				logger.debug("return on rabbit 'convertSendAndReceive': obj type" + obj.getClass().getSimpleName());
+				logger.debug("return on jms 'convertSendAndReceive': obj type" + obj.getClass().getSimpleName());
 			} else {
-				logger.debug("return on rabbit 'convertSendAndReceive': obj is null");
+				logger.debug("return on jms 'convertSendAndReceive': obj is null");
 			}
 			return obj;
 		} else {
-			jmsTemplate.convertAndSend(queue, message, message1 -> {
-				message1.setJMSPriority(priority);
-				logger.debug("'rabbitTemplate.convertAndSend': message.task type=" + message.getTask().getClass().getSimpleName());
-				return message1;
+			jmsTemplate.convertAndSend(queue, message, messagePostProcessor -> {
+				jmsTemplate.setPriority(priority);
+				logger.debug("'jmsTemplate.convertAndSend': message.task type=" + message.getTask().getClass().getSimpleName());
+				return messagePostProcessor;
 			});
 			return null;
 		}
 	}
 
-	public int getMessageCount(){
-		RabbitAdmin rabbitAdmin=new RabbitAdmin(rabbitTemplate.getConnectionFactory());
-		Properties props = rabbitAdmin.getQueueProperties(docshifterQueue.getName());
-		int messageCount = Integer.parseInt(props.get("QUEUE_MESSAGE_COUNT").toString());
-		logger.debug(docshifterQueue.getName() + " has " + messageCount + " messages", null);
-		return messageCount;
+  public int getMessageCount() throws JMSException {
+		/*
+		 * RabbitAdmin rabbitAdmin=new
+		 * RabbitAdmin(rabbitTemplate.getConnectionFactory()); Properties props =
+		 * rabbitAdmin.getQueueProperties(docshifterQueue.getName()); int messageCount =
+		 * Integer.parseInt(props.get("QUEUE_MESSAGE_COUNT").toString());
+		 * logger.debug(docshifterQueue.getName() + " has " + messageCount +
+		 * " messages", null);
+		 */
+		return 1;
 	}
 
 	@Override
@@ -190,18 +189,6 @@ public class AMQPSender implements IMessageSender {
 	
 	@Override
 	public SyncTask sendSyncTask(long chainConfigurationID, Task task) {
-		return sendSyncTask(DocshifterMessageType.SYNC, docshifterQueue.getName(), chainConfigurationID, task);
-	}
-	
-	@Override
-	@Deprecated
-	public void close() {
-		//No longer necessary done by Spring
-	}
-
-	@Override
-	@Deprecated
-	public void run() {
-		//No longer necessary done by Spring
+		return sendSyncTask(docshifterQueue.getName(), chainConfigurationID, task);
 	}
 }
