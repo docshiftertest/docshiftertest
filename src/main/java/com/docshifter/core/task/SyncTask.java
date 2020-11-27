@@ -10,12 +10,14 @@ public class SyncTask extends Task {
 	protected Path outputFilePath;
 	protected String fileName;
 	protected boolean discardReturnFile;
+	protected boolean keepReleasePathFiles;
 
 	public SyncTask() { }
 
-	public SyncTask(Path filePath, WorkFolder wf, boolean discardReturnFile) {
+	public SyncTask(Path filePath, WorkFolder wf, boolean discardReturnFile, boolean keepReleasePathFiles) {
 		super(filePath, wf);
 		this.discardReturnFile = discardReturnFile;
+		this.keepReleasePathFiles = keepReleasePathFiles;
 	}
 	
 	public Path getOutputFilePath() {
@@ -36,5 +38,9 @@ public class SyncTask extends Task {
 
 	public boolean isDiscardReturnFile() {
 		return discardReturnFile;
+	}
+
+	public boolean isKeepReleasePathFiles() {
+		return keepReleasePathFiles;
 	}
 }
