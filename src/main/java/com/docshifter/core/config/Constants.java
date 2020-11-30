@@ -15,4 +15,6 @@ public class Constants {
 
     public final static String RELOAD_QUEUE = "VirtualTopic.docshifterReload";
 	public final static String SYNC_QUEUE = "docshifterSync";
+	
+	public final static String DEFAULT_QUEUE = "docshifter";
 }
