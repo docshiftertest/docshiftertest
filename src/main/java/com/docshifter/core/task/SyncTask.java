@@ -2,27 +2,25 @@ package com.docshifter.core.task;
 
 import com.docshifter.core.work.WorkFolder;
 
-import java.nio.file.Path;
-
 public class SyncTask extends Task {
 	
 	private static final long serialVersionUID = -419818551015529367L;
-	protected Path outputFilePath;
+	protected String outputFilePath;
 	protected String fileName;
 	protected boolean discardReturnFile;
 
 	public SyncTask() { }
 
-	public SyncTask(Path filePath, WorkFolder wf, boolean discardReturnFile) {
+	public SyncTask(String filePath, WorkFolder wf, boolean discardReturnFile) {
 		super(filePath, wf);
 		this.discardReturnFile = discardReturnFile;
 	}
 	
-	public Path getOutputFilePath() {
+	public String getOutputFilePath() {
 		return outputFilePath;
 	}
 	
-	public void setOutputFilePath(Path outputFilePath) {
+	public void setOutputFilePath(String outputFilePath) {
 		this.outputFilePath = outputFilePath;
 	}
 
