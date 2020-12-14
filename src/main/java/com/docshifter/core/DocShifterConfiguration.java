@@ -3,12 +3,6 @@ package com.docshifter.core;
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.service.ConfigurationService;
 import com.docshifter.core.config.service.GeneralConfigService;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-import org.apache.activemq.artemis.api.jms.ActiveMQJMSConstants;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
@@ -20,13 +14,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
-import org.springframework.jms.support.converter.MessageConverter;
-import org.springframework.jms.support.converter.MessageType;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,39 +64,13 @@ public class DocShifterConfiguration {
 		return new org.springframework.jms.connection.CachingConnectionFactory(activeMQConnectionFactory());
 	}
 
-//	@Bean
-//	public MessageConverter jacksonJmsMessageConverter() {
-//		MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
-//		converter.setTargetType(MessageType.BYTES);
-//		converter.setTypeIdPropertyName("_type");
-//		ObjectMapper objectMapper = new ObjectMapper();
-//		objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
-//		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-//		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-//		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-//		converter.setObjectMapper(objectMapper);
-//		return converter;
-//	}
-
 	@Bean
 	public JmsTemplate jmsTemplate() {
 		JmsTemplate template = new JmsTemplate(cachingConnectionFactory());
 		template.setReceiveTimeout(queueReplyTimeout);
 	    template.setExplicitQosEnabled(true);
 	    template.setDeliveryPersistent(true);
-	   // template.setMessageConverter(jacksonJmsMessageConverter());
-	    template.setSessionAcknowledgeMode(ActiveMQJMSConstants.INDIVIDUAL_ACKNOWLEDGE);
 		return template;
-	}
-	
-	@Bean
-	public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() throws Throwable {
-	    DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-	    factory.setConnectionFactory(cachingConnectionFactory());
-	    factory.setSessionTransacted(true);
-	    factory.setSessionAcknowledgeMode(ActiveMQJMSConstants.INDIVIDUAL_ACKNOWLEDGE);
-	    //factory.setMessageConverter(jacksonJmsMessageConverter());
-	    return factory;
 	}
 
 	@Bean
