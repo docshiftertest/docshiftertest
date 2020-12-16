@@ -1,6 +1,6 @@
 package com.docshifter.core.work;
 
-import com.docbyte.utils.FileUtils;
+import com.docshifter.core.utils.FileUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.log4j.Logger;
 

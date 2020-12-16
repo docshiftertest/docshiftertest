@@ -30,7 +30,7 @@
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/src/main/resources/</directory>
-            <outputDirectory></outputDirectory>
+            <outputDirectory/>
             <includes>
                 <include>application.properties</include>
             </includes>
@@ -61,7 +61,7 @@
             <useProjectArtifact>true</useProjectArtifact>
             <scope>runtime</scope>
             <excludes>
-                <exclude>com.docshifter</exclude>
+                <exclude>com.docshifter:beans</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>
