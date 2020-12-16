@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.docshifter.core.notification;
+package com.docshifter.core.monitoring.utils;
 
 /**
  * @author Juan Marques

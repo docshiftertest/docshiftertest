@@ -19,7 +19,7 @@
 		<sha1 />
 		<hsqldb.version>2.3.4</hsqldb.version>
 		<java.version>1.8</java.version>
-		<monitoring.version>6.4${changelist}</monitoring.version>
+<!--		<monitoring.version>6.4${changelist}</monitoring.version>-->
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 
 		<aspose.cad.version>20.10</aspose.cad.version>
@@ -100,12 +100,37 @@
 	</pluginRepositories>
 
 	<dependencies>
-		<dependency>
+<!--		<dependency>
 			<groupId>com.docshifter</groupId>
 			<artifactId>monitoring</artifactId>
 			<version>${monitoring.version}</version>
-<!--			<scope>provided</scope>-->
+&lt;!&ndash;			<scope>provided</scope>&ndash;&gt;
+		</dependency>-->
+		<dependency>
+			<groupId>org.snmp4j</groupId>
+			<artifactId>snmp4j</artifactId>
+			<!-- This should be updated to 3.0.5 but appears to be missing the class
+				org.snmp4j.test.MultiThreadedTrapReceiver which is weird, and kind of scary! -->
+			<version>2.6.3</version>
 		</dependency>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.icegreen</groupId>
+			<artifactId>greenmail</artifactId>
+			<version>1.5.8</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+			<version>2.4.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.aspose</groupId>
 			<artifactId>aspose-cells</artifactId>

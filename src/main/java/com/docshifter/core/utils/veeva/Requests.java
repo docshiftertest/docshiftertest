@@ -605,7 +605,7 @@ public class Requests{
 			.append("\"; filename=\"")
 			.append(filename)
 			.append("\"")
-			.append(crlf)
+			.append(crlf);
 		body.append("Content-Type: application/octet-stream").append(crlf);
 		body.append("Content-Transfer-Encoding: binary").append(crlf);
 		body.append(crlf);

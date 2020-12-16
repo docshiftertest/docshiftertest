@@ -32,11 +32,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
  */
 @Configuration
-@ComponentScan(basePackages = {"com.docshifter.core", "com.docshifter.monitoring"})
+@ComponentScan(basePackages = {"com.docshifter.core", "com.docshifter.core.monitoring"})
 @EnableJpaRepositories(basePackages = {
         "com.docshifter.core.config.domain",
-        "com.docshifter.monitoring.repo"})
-@EntityScan({"com.docshifter.core.config", "com.docshifter.monitoring.entities"})
+        "com.docshifter.core.monitoring.repo"})
+@EntityScan({"com.docshifter.core.config", "com.docshifter.core.monitoring.entities"})
 public class DocShifterConfiguration {
 
 	@Value("${rabbitmq.replytimeout:300}")
