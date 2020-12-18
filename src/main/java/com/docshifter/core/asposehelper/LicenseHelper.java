@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class LicenseHelper {
 
-	private static final LicenseHelper licenseHelper = new LicenseHelper();
+
 	private static final Logger logger = Logger.getLogger(LicenseHelper.class);
 
 	private static String B64_5 =  "ZW5zZVR5cGU+RGV2ZWxvcGVyIE9FTTwvTGljZW5zZVR5cGU+DQ";
@@ -56,6 +56,8 @@ public class LicenseHelper {
 	private final com.aspose.ocr.License ocrLicense;
 	private final com.aspose.diagram.License diagramLicense;
 	private final com.aspose.cad.License cadLicense;
+
+	private static final LicenseHelper licenseHelper = new LicenseHelper();
 
 	public LicenseHelper() {
 		byte[] licenceBytes = Base64.getDecoder().decode(B64.getBytes(StandardCharsets.UTF_8));
