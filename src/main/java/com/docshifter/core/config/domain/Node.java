@@ -24,8 +24,7 @@ public class Node {
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "parentNode", cascade = CascadeType.ALL)
 	private Set<Node> childNodes=null;
 
-	//@ManyToOne
-	@ManyToOne(cascade = CascadeType.REMOVE)
+	@ManyToOne
 	private ModuleConfiguration moduleConfiguration;
 	
 	public Node(){}
@@ -43,6 +42,24 @@ public class Node {
 		this.moduleConfiguration = moduleConfiguration;
 	}
 
+	private Node deepCopyParent() {
+		if (isRoot()) {
+			return new Node(null, moduleConfiguration);
+		}
+		return new Node(parentNode.deepCopyParent(), moduleConfiguration);
+	}
+
+	public Node deepCopy() {
+		Node copiedNode = deepCopyParent();
+		deepCopyChildren(copiedNode);
+		return copiedNode;
+	}
+
+	private void deepCopyChildren(Node copiedNode) {
+		for (Node childNode : childNodes) {
+			childNode.deepCopyChildren(new Node(copiedNode, childNode.moduleConfiguration));
+		}
+	}
 
 	public long getId(){
 		return id;
@@ -64,23 +81,16 @@ public class Node {
 		this.childNodes.add(n);
 	}
 
-
-
 	public Set<Node> getChildNodes(){
 		return childNodes;
 	}
 	
 	public void setChildNodes(Set<Node> childNodes){
-		if(this.childNodes==null)
-		{
-			this.childNodes=childNodes;
+		if (childNodes == null) {
+			childNodes = new HashSet<>();
 		}
-		else{
-			this.childNodes.clear();
-			childNodes.addAll(childNodes);
-		}
+		this.childNodes = childNodes;
 	}
-
 
 	public ModuleConfiguration getModuleConfiguration(){
 		return moduleConfiguration;
@@ -136,7 +146,7 @@ public class Node {
 
 	@Transient
 	public int getTotalChildNodesCount(){
-		if(childNodes.size() == 0)
+		if(isLeaf())
 			return 0;
 		else{
 			int i = 0;
@@ -144,6 +154,21 @@ public class Node {
 				i += n.getTotalChildNodesCount();
 			return i;
 		}
+	}
+
+	@Transient
+	public boolean isRoot() {
+		return parentNode == null;
+	}
+
+	@Transient
+	@JsonIgnore
+	public Node getRoot() {
+		Node currNode = this;
+		while (!currNode.isRoot()) {
+			currNode = currNode.parentNode;
+		}
+		return currNode;
 	}
 
 	@Transient

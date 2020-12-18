@@ -26,7 +26,7 @@ public class ChainConfiguration {
 
 	private boolean enabled;
 
-	@ManyToOne(cascade=CascadeType.ALL)
+	@ManyToOne(cascade=CascadeType.ALL) // TODO: shouldn't this be OneToOne instead?
 	private Node rootNode;
 
 
