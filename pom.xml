@@ -19,14 +19,13 @@
 		<sha1 />
 		<hsqldb.version>2.3.4</hsqldb.version>
 		<java.version>1.8</java.version>
-<!--		<monitoring.version>6.4${changelist}</monitoring.version>-->
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 
 		<aspose.cad.version>20.10</aspose.cad.version>
 
 		<aspose.cells.version>20.10</aspose.cells.version>
 
-		<aspose.diagram.version>20.11</aspose.diagram.version>
+		<aspose.diagram.version>20.12</aspose.diagram.version>
 		<aspose.diagram.classifier>jdk16</aspose.diagram.classifier>
 
 		<aspose.email.version>20.11</aspose.email.version>
@@ -40,9 +39,8 @@
         <aspose.note.classifier>jdk17</aspose.note.classifier>
         -->
 
-		<aspose.ocr.version>17.11</aspose.ocr.version>
+		<aspose.ocr.version>20.11</aspose.ocr.version>
 
-		<!-- Kept back to 20.9 for regression in Tiff conversion in 20.10 -->
 		<aspose.pdf.version>20.11</aspose.pdf.version>
 		<aspose.pdf.classifier>jdk17</aspose.pdf.classifier>
 
@@ -100,12 +98,6 @@
 	</pluginRepositories>
 
 	<dependencies>
-<!--		<dependency>
-			<groupId>com.docshifter</groupId>
-			<artifactId>monitoring</artifactId>
-			<version>${monitoring.version}</version>
-&lt;!&ndash;			<scope>provided</scope>&ndash;&gt;
-		</dependency>-->
 		<dependency>
 			<groupId>org.snmp4j</groupId>
 			<artifactId>snmp4j</artifactId>
@@ -148,6 +140,7 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Aspose dependencies -->
 		<dependency>
 			<groupId>com.aspose</groupId>
 			<artifactId>aspose-cells</artifactId>
@@ -211,6 +204,7 @@
 			<version>${aspose.html.version}</version>
 			<classifier>${aspose.html.classifier}</classifier>
 		</dependency>
+
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
@@ -241,13 +235,13 @@
 			<version>2.6</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
 			<groupId>commons-pool</groupId>
 			<artifactId>commons-pool</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.jimfs</groupId>
+			<artifactId>jimfs</artifactId>
+			<version>1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
@@ -400,6 +394,22 @@
 					<!-- but for now, we don't need it and can't specify it -->
 					<argLine>-Djava.library.path=${project.build.directory}/classes/license/</argLine>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0.0</version>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>write-project-properties</goal>
+						</goals>
+						<configuration>
+							<outputFile>${project.build.outputDirectory}/aspose_versions.properties</outputFile>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<pluginManagement>
