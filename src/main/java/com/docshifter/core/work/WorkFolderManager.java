@@ -1,6 +1,6 @@
 package com.docshifter.core.work;
 
-import com.docbyte.utils.FileUtils;
+import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.service.GeneralConfigService;
 

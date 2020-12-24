@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import com.docbyte.utils.FileUtils;
+import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.graphAPI.GraphClient;
 import com.docshifter.core.graphAPI.MSGraphAuthenticationBuilder;
 import com.google.gson.Gson;
@@ -133,7 +133,8 @@ public class SharePointGraphIntegrationTest {
 	 * 
 	 * @param listId
 	 * @param itemId
-	 * @param graphClient.getSharepoint()
+	 * @param graphClient
+	 * @param processed
 	 */
 	public void updateFields(String listId, String itemId, GraphClient graphClient,boolean processed) {
 		FieldValueSet fieldValueSet = new FieldValueSet();

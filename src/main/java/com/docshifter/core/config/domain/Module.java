@@ -1,6 +1,6 @@
 package com.docshifter.core.config.domain;
 
-import com.docbyte.utils.Logger;
+import com.docshifter.core.utils.Logger;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Collections;

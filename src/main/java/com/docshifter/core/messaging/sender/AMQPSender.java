@@ -103,8 +103,8 @@ public class AMQPSender implements IMessageSender {
 		catch (UnknownHostException uncle) {
 			logger.warn("Couldn't get hostname of the DocShifter machine, so will default to localhost (for queue_monitor)");
 		}
-		QueueMonitor qMon = new QueueMonitor(type.name(), queue, chainConfigurationID, task.getId(), task.getSourceFilePath(), priority, hostname);
-		queueMonitorRepository.save(qMon);
+		//QueueMonitor qMon = new QueueMonitor(type.name(), queue, chainConfigurationID, task.getId(), task.getSourceFilePath(), priority, hostname);
+		//queueMonitorRepository.save(qMon);
 
 		if (DocshifterMessageType.SYNC.equals(type)) {
 			Object obj = messagingTemplate.convertSendAndReceive(queue,message,DocshifterMessage.class, messagePostProcessor -> {
