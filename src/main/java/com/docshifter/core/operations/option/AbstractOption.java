@@ -47,7 +47,7 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 		logger.debug("processing options json: " + conditionsString, null);
 
 		try {
-			conditions = new ObjectMapper().readValue(conditionsString,  new TypeReference<Map<String,Object>>() {} );
+			conditions = new ObjectMapper().readValue(conditionsString,  new TypeReference<Map<String,String>>() {} );
 		} catch (JsonParseException e) {
 			logger.error("Invalid JSON", e);
 		} catch (JsonMappingException e) {
