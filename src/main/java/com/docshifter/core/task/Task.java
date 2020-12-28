@@ -1,29 +1,20 @@
 package com.docshifter.core.task;
 
-import com.docshifter.core.work.WorkFolder;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import java.io.Serializable;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Value object which represents a dmi_queue_item object.
- * 
- * @author $Author$
- * @version $Rev$
- * Last Modification Date: $Date$
- *
- */
+import com.docshifter.core.work.WorkFolder;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "className")
 public class Task implements Serializable {
 
 	private static final long serialVersionUID = 4087826709318179760L;
 	protected String id;
 	protected WorkFolder workFolder;
-	protected Path sourceFilePath;
+	protected String sourceFilePath;
 	protected String name;
 	protected String folderStructure;
 	protected ArrayList<String> messages = new ArrayList<>();
@@ -34,7 +25,7 @@ public class Task implements Serializable {
 	}
 
 
-	public Task(Path filePath, WorkFolder wf) {
+	public Task(String filePath, WorkFolder wf) {
 		this.sourceFilePath = filePath;
 		this.workFolder = wf;
 	}
@@ -50,10 +41,10 @@ public class Task implements Serializable {
 		this.workFolder = workFolder;
 	}
 
-	public Path getSourceFilePath() {
+	public String getSourceFilePath() {
 		return sourceFilePath;
 	}
-	public void setSourceFilePath(Path sourceFilePath) {
+	public void setSourceFilePath(String sourceFilePath) {
 		this.sourceFilePath = sourceFilePath;
 	}
 
