@@ -28,7 +28,8 @@ public class AMQPSender implements IMessageSender {
 	private final QueueMonitorRepository queueMonitorRepository;
 	private final JmsTemplate jmsTemplate;
 	private final JmsMessagingTemplate messagingTemplate;
-	
+
+	public static final int DEFAULT_PRIORITY = 4;
 	public static final int HIGHEST_PRIORITY = 9;
 	
 	public AMQPSender(JmsTemplate jmsTemplate, JmsMessagingTemplate messagingTemplate, ActiveMQQueue docshifterQueue, QueueMonitorRepository queueMonitorRepository) {
