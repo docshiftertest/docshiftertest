@@ -3,6 +3,7 @@ package com.docshifter.core;
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.service.ConfigurationService;
 import com.docshifter.core.config.service.GeneralConfigService;
+import com.docshifter.core.messaging.sender.AMQPSender;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ public class DocShifterConfiguration {
 	public GeneralConfigService generalConfigService;
 	
 	public ConfigurationService configurationService;
+
 	
 	@Autowired
 	public DocShifterConfiguration(GeneralConfigService generalConfigService,
@@ -62,14 +65,15 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
-	public org.springframework.jms.connection.CachingConnectionFactory cachingConnectionFactory() {
-		return new org.springframework.jms.connection.CachingConnectionFactory(activeMQConnectionFactory());
+	public CachingConnectionFactory cachingConnectionFactory() {
+		return new CachingConnectionFactory(activeMQConnectionFactory());
 	}
 
 	@Bean
 	public JmsTemplate jmsTemplate() {
 		JmsTemplate template = new JmsTemplate(cachingConnectionFactory());
 		template.setReceiveTimeout(queueReplyTimeout);
+		// Set if the QOS values (deliveryMode, priority, timeToLive) should be used for sending a message
 	    template.setExplicitQosEnabled(true);
 	    template.setDeliveryPersistent(true);
 		return template;
@@ -85,30 +89,22 @@ public class DocShifterConfiguration {
 	public JmsTemplate jmsTemplateMulticast() {
 		JmsTemplate template = new JmsTemplate(cachingConnectionFactory());
 		template.setPubSubDomain(true);
-		template.setPriority(9);
+		template.setPriority(AMQPSender.HIGHEST_PRIORITY);
 		return template;
 	}
 
 	@Bean
-	public List<ActiveMQQueue> docShifterQueues() {
-		List<ActiveMQQueue> queueList = new ArrayList<>();
-		queueList.add(defaultQueue());
-
-		return queueList;
-	}
-
-	@Bean
 	public ActiveMQQueue defaultQueue() {
-		return new ActiveMQQueue(generalConfigService.getString(Constants.MQ_QUEUE),false);
+		return new ActiveMQQueue(generalConfigService.getString(Constants.MQ_QUEUE));
 	}
 
 	@Bean
 	public ActiveMQTopic reloadExchange() {
-		return new ActiveMQTopic(Constants.RELOAD_QUEUE,false);
+		return new ActiveMQTopic(Constants.RELOAD_QUEUE);
 	}
 
 	@Bean
 	public ActiveMQQueue syncQueue() {
-		return new ActiveMQQueue(Constants.SYNC_QUEUE,false);
+		return new ActiveMQQueue(Constants.SYNC_QUEUE);
 	}
 }

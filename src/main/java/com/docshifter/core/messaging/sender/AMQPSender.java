@@ -1,7 +1,5 @@
 package com.docshifter.core.messaging.sender;
 
-import com.docshifter.core.config.Constants;
-import com.docshifter.core.config.domain.QueueMonitor;
 import com.docshifter.core.config.domain.QueueMonitorRepository;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
@@ -12,15 +10,11 @@ import com.docshifter.core.task.Task;
 import com.docshifter.core.task.VeevaTask;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.log4j.Logger;
-import org.springframework.jms.core.BrowserCallback;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import javax.jms.JMSException;
-import javax.jms.QueueBrowser;
-import javax.jms.Session;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 5/20/16.
@@ -34,8 +28,6 @@ public class AMQPSender implements IMessageSender {
 	private final QueueMonitorRepository queueMonitorRepository;
 	private final JmsTemplate jmsTemplate;
 	private final JmsMessagingTemplate messagingTemplate;
-
-	public static final int DEFAULT_PRIORITY = 4;
 	
 	public static final int HIGHEST_PRIORITY = 9;
 	
@@ -129,18 +121,15 @@ public class AMQPSender implements IMessageSender {
 	}
 
   @Override
-  public int getMessageCount() throws JMSException {
+  public int getMessageCount() {
 	  
-	  return this.jmsTemplate.browse(Constants.DEFAULT_QUEUE, new BrowserCallback <Integer>() {
-          public Integer doInJms(final Session session, final QueueBrowser browser) throws JMSException {
-              int counter = 0;
-              while (browser.getEnumeration().hasMoreElements()) {
-                  counter += 1;
-              }
-              return counter;
-          }
-      });
-	  
+	  return this.jmsTemplate.browse(docshifterQueue.getName(), (session, browser) -> {
+		  int counter = 0;
+		  while (browser.getEnumeration().hasMoreElements()) {
+			  counter += 1;
+		  }
+		  return counter;
+	  });
 	}
 
 	@Override
