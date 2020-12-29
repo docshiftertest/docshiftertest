@@ -4,17 +4,17 @@ import com.docshifter.core.task.Task;
 import com.docshifter.core.monitoring.dtos.NotificationDto;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
 import com.docshifter.core.monitoring.services.NotificationService;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Log4j2
 public abstract class Warning {
 	public static final String GLOBAL_WARNING_IDENTIFIER = "WARNING_NOTIFICATION";
 	public static final String NEWLINE = System.getProperty("line.separator");
 	public static final String DEFAULT_GROUPING_MESSAGE = "Other notifications";
-	private static final Logger logger = Logger.getLogger(com.docshifter.core.monitoring.utils.Warning.class);
 
 	private final String warningTypeDesc;
 	private final String description;

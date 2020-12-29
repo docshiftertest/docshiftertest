@@ -2,7 +2,7 @@ package com.docshifter.core.work;
 
 import com.docshifter.core.utils.FileUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,10 +18,8 @@ import java.util.Objects;
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/11/15.
  */
+@Log4j2
 public class WorkFolder implements Serializable {
-
-	private static final Logger logger = Logger.getLogger(new Object() { }.getClass().getEnclosingClass());
-
 	private static final long serialVersionUID = 7938321829497848697L;
 	private Path folder;
 	private WorkFolder parent;
@@ -108,7 +106,7 @@ public class WorkFolder implements Serializable {
 			try {
 				Files.createDirectories(newPath);
 			} catch (IOException e) {
-				logger.error("Could not create directory:" + newPath, null);
+				log.error("Could not create directory: {}", newPath);
 				return null;
 			}
 			newPath = Paths.get(newPath.toString(), filename + "." + extension);
@@ -131,7 +129,7 @@ public class WorkFolder implements Serializable {
 		try {
 			Files.createDirectories(newPath);
 		} catch (IOException e) {
-			logger.error("Could not create directory:" + newPath, null);
+			log.error("Could not create directory: {}", newPath);
 			return null;
 		}
 

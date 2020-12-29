@@ -1,7 +1,8 @@
 package com.docshifter.core.config.domain;
 
-import com.docshifter.core.utils.Logger;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.extern.log4j.Log4j2;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
 @Entity
+@Log4j2
 public class Module {
 
 	@Id
@@ -116,15 +118,15 @@ public class Module {
 	@JsonIgnore
 	@Transient
 	public Parameter getParameter(String name) {
-		Logger.debug("Getting parameter for name: " + name, null);
+		log.debug("Getting parameter for name: {}", name);
 		for (Parameter param : parameters) {
 			if (param == null) {
-				Logger.warn("Param was NULL getting parameter using name: " + name, null);
+				log.warn("Param was NULL getting parameter using name: {}", name);
 			}
 			else {
 				if (param.getName() == null) {
-					Logger.warn("Param getName() was NULL getting parameter using name: "
-						+ name + ". Description is: " + param.getDescription(), null);
+					log.warn("Param getName() was NULL getting parameter using name: {}. Description is: {}", name,
+							param.getDescription());
 				}
 				if (name.equals(param.getName())) {
 					return param;

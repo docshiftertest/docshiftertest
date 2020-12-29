@@ -1,6 +1,6 @@
 package com.docshifter.core.utils.veeva;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,7 +20,7 @@ import java.util.Map;
  * @author Janire Fernandez
  *
  */
-@Log4j
+@Log4j2
 public class VeevaSessionManager implements ISessionManager<VeevaSession> {
 
 	private static final String API_VERSION = "v18.3";
@@ -74,7 +75,7 @@ public class VeevaSessionManager implements ISessionManager<VeevaSession> {
 			postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
 			//postData.append(String.valueOf(param.getValue()));
 		}
-		byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+		byte[] postDataBytes = postData.toString().getBytes(StandardCharsets.UTF_8);
 
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("POST");
@@ -88,14 +89,14 @@ public class VeevaSessionManager implements ISessionManager<VeevaSession> {
 		osw.close();
 
 		int responseCode = con.getResponseCode();
-		log.info("\nSent 'POST' request to URL : " + url);
-		log.info("Post parameters : " + new String(postDataBytes));
-		log.info("Response Code : " + responseCode);
+		log.info("Sent 'POST' request to URL: {}", url);
+		log.info("Post parameters: {}", new String(postDataBytes));
+		log.info("Response Code: {}", responseCode);
 	 
 		BufferedReader in = new BufferedReader(
 				new InputStreamReader(con.getInputStream()));
 		String inputLine;
-		StringBuffer response = new StringBuffer();
+		StringBuilder response = new StringBuilder();
 	
 		while ((inputLine = in.readLine()) != null) {
 			response.append(inputLine);

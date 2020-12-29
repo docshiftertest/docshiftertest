@@ -1,5 +1,7 @@
 package com.docshifter.core.utils;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,6 +16,7 @@ import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+@Log4j2
 public class Unzipper {
 
 	/**
@@ -43,13 +46,17 @@ public class Unzipper {
 		List<File> unzippedFiles = new ArrayList<>();
 
 		if (!directory.exists() && !directory.isDirectory()) {
-			Logger.info("directory.exists(): " + directory.exists()
-				+ " and directory.isDirectory(): " + directory.isDirectory()
-				+ " so will createDirectories for: " + directory.toPath(), null);
+			log.info("directory.exists(): {} and directory.isDirectory(): {} so will createDirectories for: {}",
+					directory.exists(),
+					directory.isDirectory(),
+					directory.toPath());
 			Files.createDirectories(directory.toPath());
 		}
 		for (File file : Objects.requireNonNull(directory.listFiles())) {
-			file.delete();
+			boolean success = file.delete();
+			if (!success) {
+				log.warn("Couldn't delete file {}", file);
+			}
 		}
 
 		//DS-438 use more broad char encoding to prevent problems with 'special characters'
@@ -77,14 +84,14 @@ public class Unzipper {
 						// Drop the reference to newFile?
 						newFile = null;
 					} catch (IOException e) {
-						Logger.info("Unzip failed", e);
+						log.info("Unzip failed", e);
 					}
 				}
 			}
 		} catch (IOException e) {
-			Logger.info("Unzip failed", e);
+			log.info("Unzip failed", e);
 		} catch (IllegalArgumentException e) {
-			Logger.info("Unzip failed, most likely due to character encoding", e);
+			log.info("Unzip failed, most likely due to character encoding", e);
 		}
 
 		return unzippedFiles;

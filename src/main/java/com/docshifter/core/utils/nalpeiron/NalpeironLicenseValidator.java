@@ -1,11 +1,11 @@
 package com.docshifter.core.utils.nalpeiron;
 
 import com.docshifter.core.exceptions.DocShifterLicenseException;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
 
+@Log4j2
 public class NalpeironLicenseValidator implements Runnable {
-
-	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NalpeironLicenseValidator.class.getName());
 
 	private String licenseNo;
 	private boolean offlineActivation;
@@ -43,15 +43,15 @@ public class NalpeironLicenseValidator implements Runnable {
 			if (!validLicense) {
 				// license could not be validate, close application
 				int errorCode = 0; //TODO: we need to exit with zero or yajsw will restart the service
-				logger.fatal("license could not be validated, closing application");
+				log.fatal("license could not be validated, closing application");
 
 				System.exit(errorCode);
 			}
 
 		} catch (DocShifterLicenseException ex) {
 			int errorCode = -455;//we need to exit with non zero error so yajsw will restart the service and validation will be run again
-			logger.debug(" NALP ERRROCODE: " + ex.getNalpErrorCode() + " NALP ERROR MESSGAG: " + ex.getNalpErrorMsg());
-			logger.fatal("Exception while trying to validate the nalpeiron license, exiting with error", ex);
+			log.debug(" NALP ERRORCODE: {} NALP ERROR MESSAGE: {}", ex.getNalpErrorCode(), ex.getNalpErrorMsg());
+			log.fatal("Exception while trying to validate the Nalpeiron license, exiting with error", ex);
 
 			System.exit(errorCode);
 		}
@@ -66,17 +66,17 @@ public class NalpeironLicenseValidator implements Runnable {
 	private static boolean isValidLicenseOffline(NalpeironHelper nalpeironHelper, String licenseNo, String xmlRegInfo) throws DocShifterLicenseException {
 		NalpeironHelper.LicenseStatus licenseStatus;
 		boolean validLicense;//DO OFFLINE CHECKING
-		logger.debug("Trying offline activation. Either there is no connection to the Nalpeiron server, or online activation failed");
+		log.debug("Trying offline activation. Either there is no connection to the Nalpeiron server, or online activation failed");
 
 		licenseStatus = nalpeironHelper.getLicenseStatus();
 		//log status
-		logger.info("Current license status is: " + licenseStatus.toString());
+		log.info("Current license status is: {}", licenseStatus.toString());
 
 		//if the license status ha s value below 0, then the current license could not validate, try activating or generating an offline activation request
 		if (licenseStatus.getValue() > 0) {
 			validLicense = true;
 		} else {
-			logger.info("License not activated. Trying to activate the license");
+			log.info("License not activated. Trying to activate the license");
 			String activationAnswer = nalpeironHelper.resolveLicenseActivationAnswer();
 
 			if (!StringUtils.isBlank(activationAnswer)) {
@@ -85,10 +85,10 @@ public class NalpeironLicenseValidator implements Runnable {
 				//if the license status ha s value below 0, then the current license could not validate, try getting a new one
 				if (licenseStatus.getValue() <= 0) {
 					// license import failed.
-					logger.info("The license could not be activated offline, import of DSLicenseActivationAnswer.txt failed");
+					log.info("The license could not be activated offline, import of DSLicenseActivationAnswer.txt failed");
 					validLicense = false;
 				} else {
-					logger.info("The license has been activated offline, import of DSLicenseActivationAnswer.txt successful");
+					log.info("The license has been activated offline, import of DSLicenseActivationAnswer.txt successful");
 					validLicense = true;
 				}
 			} else {
@@ -101,7 +101,7 @@ public class NalpeironLicenseValidator implements Runnable {
 					nalpeironHelper.writeLicenseActivationRequest(activationRequest);
 				}
 
-				logger.info("The license needs be activated offline, or you need to have an active internet connection. Activation request code written to DSLicenseActivationRequest.txt");
+				log.info("The license needs be activated offline, or you need to have an active internet connection. Activation request code written to DSLicenseActivationRequest.txt");
 				validLicense = false;
 			}
 		}
@@ -112,7 +112,7 @@ public class NalpeironLicenseValidator implements Runnable {
 	private static boolean isValidLicenseOnline(NalpeironHelper nalpeironHelper, String licenseNo, String xmlRegInfo) throws DocShifterLicenseException {
 		NalpeironHelper.LicenseStatus licenseStatus;
 		boolean validLicense;
-		logger.debug("Connection to the Nalpeiron server could be established, will try online activation");
+		log.debug("Connection to the Nalpeiron server could be established, will try online activation");
 
 		//check current license status
 		licenseStatus = nalpeironHelper.getLicenseStatus();
@@ -122,16 +122,17 @@ public class NalpeironLicenseValidator implements Runnable {
 		try {
 			newHeartbeatStatus = nalpeironHelper.getLicense(licenseNo, xmlRegInfo);
 		} catch (DocShifterLicenseException ex) {
-			logger.debug("Could not retrieve new license heartbeat successfully. NALP ERRROCODE: " + ex.getNalpErrorCode() + " NALP ERROR MESSGAG: " + ex.getNalpErrorMsg());
+			log.debug("Could not retrieve new license heartbeat successfully. NALP ERRORCODE: {} NALP ERROR MESSAGE: " +
+					"{}", ex.getNalpErrorCode(), ex.getNalpErrorMsg());
 		}
 
 		//if the license status or the heartbeat has value above 0, then the current license was validated
 		if (licenseStatus.getValue() > 0 || newHeartbeatStatus.getValue() > 0) {
-			logger.info("The license has been activated online, or your trial is active");
+			log.info("The license has been activated online, or your trial is active");
 			validLicense = true;
 		} else {
 			// license validation and hearth beat retrieval failed.
-			logger.info("The license could not be activated online, or your trial has expired");
+			log.info("The license could not be activated online, or your trial has expired");
 			validLicense = false;
 		}
 
@@ -140,7 +141,7 @@ public class NalpeironLicenseValidator implements Runnable {
 
 	private static boolean isOnlineActivation(NalpeironHelper nalpeironHelper, boolean offlineActivation) {
 		if (offlineActivation) {
-			logger.debug("Offline activation mode has been set, will forgo all connection attempts to the server and will try to activate offline");
+			log.debug("Offline activation mode has been set, will forgo all connection attempts to the server and will try to activate offline");
 		}
 
 		//test for online connection
@@ -150,7 +151,7 @@ public class NalpeironLicenseValidator implements Runnable {
 				nalpeironHelper.testNalpeironLicencingConnection();
 			} catch (DocShifterLicenseException e) {
 				hasConnection = false;
-				logger.debug("No connection to the Nalpeiron server could be established, will try offline activation");
+				log.debug("No connection to the Nalpeiron server could be established, will try offline activation");
 			}
 		}
 

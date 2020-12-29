@@ -1,7 +1,7 @@
 package com.docbyte.utils.veeva;
 
 import com.docshifter.core.utils.veeva.VeevaResponse;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,8 +14,7 @@ import java.util.Map;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-@Log4j
-
+@Log4j2
 public class RequestsTest {
 
 	private String invalidSessionResponse;

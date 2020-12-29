@@ -1,12 +1,10 @@
 package com.docshifter.core.asposehelper.utils.pdf;
 
 import com.aspose.pdf.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public final class OutlineUtils {
-	private static final Logger logger = LoggerFactory.getLogger(OutlineUtils.class);
-
 	private OutlineUtils() {}
 
 	public static ExplicitDestination extractExplicitDestination(OutlineItemCollection outline) {
@@ -24,15 +22,15 @@ public final class OutlineUtils {
 		// Check if destination is of right type
 		if (!(outlineDest instanceof ExplicitDestination)) {
 			if (outlineDest != null) {
-				logger.debug(outlineDest + " was not a ExplicitDestination: skipping. It's a "
-						+ outlineDest.getClass().getName());
+				log.debug("{} was not a ExplicitDestination: skipping. It's a {}", outlineDest,
+						outlineDest.getClass().getName());
 			}
 			return null;
 		}
 
 		ExplicitDestination bookmark = (ExplicitDestination)outlineDest;
-		logger.debug("Appropriate level " + outline.getLevel() + " bookmark found referring to page "
-				+ bookmark.getPageNumber());
+		log.debug("Appropriate level {} bookmark found referring to page {}", outline.getLevel(),
+				bookmark.getPageNumber());
 		return bookmark;
 	}
 

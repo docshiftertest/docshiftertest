@@ -1,5 +1,6 @@
 package com.docshifter.core.utils;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.SystemUtils;
 
@@ -17,6 +18,7 @@ import java.util.regex.Pattern;
  * Created by samnang.nop on 27/01/2016.
  *
  */
+@Log4j2
 public final class FileUtils {
 	
 	private static final String NEWLINE = System.getProperty("line.separator");
@@ -68,37 +70,20 @@ public final class FileUtils {
 
     public static void copyFile(File srcFile, File destFile) throws IOException {
         if (!srcFile.isDirectory()) {
-            Logger.info("copyfile-isfile", null);
-            Logger.info("srcfile= " + srcFile + " destfile= " + destFile, null);
-            FileInputStream inStream = null;
-            FileOutputStream outStream = null;
-            FileChannel inChannel = null;
-            FileChannel outChannel = null;
-            try {
-                inStream = new FileInputStream(srcFile);
-                inChannel = inStream.getChannel();
-                outStream = new FileOutputStream(destFile);
-                outChannel = outStream.getChannel();
+            log.info("copyfile-isfile");
+            log.info("srcfile= {} destfile= {}", srcFile, destFile);
+			try (FileInputStream inStream = new FileInputStream(srcFile);
+				 FileChannel inChannel = inStream.getChannel();
+				 FileOutputStream outStream = new FileOutputStream(destFile);
+				 FileChannel outChannel = outStream.getChannel()) {
 
-                outChannel.transferFrom(inChannel, 0, inChannel.size());
+				outChannel.transferFrom(inChannel, 0, inChannel.size());
 
-            } catch (IOException e) {
-                throw e;
-            } finally {
-                try {
-                    if (inChannel != null)
-                        inChannel.close();
-                    if (outChannel != null)
-                        outChannel.close();
-                    if (inStream != null)
-                        inStream.close();
-                    if (outStream != null)
-                        outStream.close();
-                } catch (Exception ex) {
-                }
-            }
+			} catch (IOException e) {
+				throw e;
+			}
         }else{
-            Logger.info("copyfile-isfolder--->copyfolder", null);
+            log.info("copyfile-isfolder--->copyfolder");
             copyFolder(srcFile, destFile);
         }
     }
@@ -279,24 +264,16 @@ public final class FileUtils {
 
     //FOLDER UTILS
     public static boolean checkFolderExist(Path path){
-
         if (!Files.exists(path)) {
-            if (Files.isDirectory(path)) {
-                return true;
-            }
-            return false;
-        }
+			return Files.isDirectory(path);
+		}
         return false;
     }
 
     public static boolean checkFolderExist(String path){
-
         if (!Files.exists(Paths.get(path))) {
-            if (Files.isDirectory(Paths.get(path))) {
-                return true;
-            }
-            return false;
-        }
+			return Files.isDirectory(Paths.get(path));
+		}
         return false;
     }
 
@@ -306,22 +283,25 @@ public final class FileUtils {
 
     public static void copyFolder(File src, File dest) throws IOException {
         if (src.isDirectory()) {
-            Logger.info("copyfolder-isdir", null);
+            log.info("copyfolder-isdir");
             // if directory does not exist, create it
             if (!dest.exists()) {
-                dest.mkdir();
-                Logger.info("Directory copied from " + src + "  to " + dest,
-                        null);
+                boolean success = dest.mkdir();
+                if (success) {
+					log.info("Directory copied from {}  to {}", src, dest);
+				} else {
+                	log.warn("Couldn't create directory at {}", dest);
+				}
             }
             // list all the directory contents
-            String files[] = src.list();
+            String[] files = src.list();
             if (files == null) {
-            	Logger.warn("Call to src.list() returned null for src: " + src.getPath(), null);
+            	log.warn("Call to src.list() returned null for src: {}", src.getPath());
             }
             else {
                 for (String file : files) {
                 	if (file == null) {
-                		Logger.warn("A file entry was null for src: " + src.getPath(), null);
+                		log.warn("A file entry was null for src: {}", src.getPath());
                 	}
                 	else {
                 		// construct the src and dest file structure
@@ -342,15 +322,22 @@ public final class FileUtils {
     public static boolean deleteDirectory(File dirPath) {
         if (dirPath.exists()) {
             File[] files = dirPath.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].isDirectory()) {
-                    deleteDirectory(files[i]);
-                } else {
-                    files[i].delete();
-                }
-            }
+            if (files == null) {
+            	log.warn("dirPath.listFiles() returned NULL! So {} cannot be deleted.", dirPath);
+            	return false;
+			}
+			for (File file : files) {
+				if (file.isDirectory()) {
+					deleteDirectory(file);
+				} else {
+					boolean success = file.delete();
+					if (!success) {
+						log.warn("Couldn't delete file {}", file);
+					}
+				}
+			}
         }
-        return (dirPath.delete());
+        return dirPath.delete();
     }
 
     public static String createFolderStucture(String rootFolderPath,
@@ -374,20 +361,20 @@ public final class FileUtils {
         in.close();
 
         // int line = 1;
-        for (int i = 0; i < data.length; i++) {
-            char ch = (char) (data[i] & 0xff);
-            if (ch > 127) {
-                return;
-            } else if (ch < 32) {
-                if (ch == '\n') {
-                    out.write('\r');
-                    out.write(ch);
-                    // line++;
-                }
-            } else {
-                out.write(ch);
-            }
-        }
+		for (byte datum : data) {
+			char ch = (char) (datum & 0xff);
+			if (ch > 127) {
+				return;
+			} else if (ch < 32) {
+				if (ch == '\n') {
+					out.write('\r');
+					out.write(ch);
+					// line++;
+				}
+			} else {
+				out.write(ch);
+			}
+		}
         byte[] changed = out.toByteArray();
         if (ByteUtils.compareNotNull(data, changed) != 0) {
             RandomAccessFile f = new RandomAccessFile(file, "rw");
@@ -428,18 +415,26 @@ public final class FileUtils {
     }
     
 	public static void cleanDirectory(File dir, String ignoreFolder) {
-		for (File file : dir.listFiles()) {
+		File[] files = dir.listFiles();
+		if (files == null) {
+			log.warn("dirPath.listFiles() returned NULL! So {} cannot be cleaned.", dir);
+			return;
+		}
+		for (File file : files) {
 			if (!file.getName().equalsIgnoreCase(ignoreFolder) || !file.getName().equalsIgnoreCase(ignoreFolder)) {
-				file.delete();
+				boolean success = file.delete();
+				if (!success) {
+					log.warn("Couldn't delete file {}", file);
+				}
 			}
 
 		}
 	}
 	
     public static String addExtensionToFilename(String fileName, String extension) {
-        Pattern p = Pattern.compile(new StringBuffer().append("\\.").append(extension).toString());
+        Pattern p = Pattern.compile("\\." + extension);
         Matcher o = p.matcher(fileName);
-        Boolean fileNameContainsExtension = o.find();
+        boolean fileNameContainsExtension = o.find();
         if (!fileNameContainsExtension) {
             fileName = fileName.concat(".").concat(extension);
         }
@@ -515,7 +510,7 @@ public final class FileUtils {
 	 * @return
 	 */
 	public static String fileToString(String fileName, int sizeLimit) {
-		return fileToString(fileName, sizeLimit);
+		return fileToString(fileName, null, sizeLimit);
 	}
 
 	/**
@@ -527,8 +522,11 @@ public final class FileUtils {
 	 * @return
 	 */
 	public static String fileToString(String fileName, String logMessagePrefix, int sizeLimit) {
+		if (logMessagePrefix == null) {
+			logMessagePrefix = "";
+		}
 		StringBuilder sBuf = new StringBuilder();
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(new File(fileName)))) {
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(fileName))) {
 			int bytesRead;
 			int totalBytesRead = 0;
 			StringBuilder sInp = new StringBuilder(); 
@@ -537,19 +535,19 @@ public final class FileUtils {
 				totalBytesRead += bytesRead;
 				sInp.append(new String(buffer, 0, bytesRead));
 			}
-			if (logMessagePrefix != null) {
-				sBuf.append(logMessagePrefix);
-			}
-			sBuf.append(" File content follows: ");
-			sBuf.append(NEWLINE);
-			sBuf.append(sInp);
-			sBuf.append(NEWLINE);
+			sBuf.append(logMessagePrefix)
+					.append(" File content follows: ")
+					.append(NEWLINE)
+					.append(sInp)
+					.append(NEWLINE);
 		}
 		catch (IOException ioe) {
-			sBuf.append(logMessagePrefix);
-			sBuf.append("But then we got an IO Exception trying to read the file: [" + fileName + "]!");
-			sBuf.append(NEWLINE);
-			sBuf.append(ioe);
+			sBuf.append(logMessagePrefix)
+					.append("But then we got an IO Exception trying to read the file: [")
+					.append(fileName)
+					.append("]!")
+					.append(NEWLINE)
+					.append(ioe);
 		}
 		return sBuf.toString();
 	}

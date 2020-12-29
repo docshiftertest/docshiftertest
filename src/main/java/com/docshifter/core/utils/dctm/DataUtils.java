@@ -1,10 +1,9 @@
 package com.docshifter.core.utils.dctm;
 
-import com.docshifter.core.utils.Logger;
 import com.documentum.fc.client.*;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfTime;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
 
 import java.text.ParseException;
@@ -13,7 +12,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Log4j
+@Log4j2
 public class DataUtils {
 
 	private static final String formatStrings[] = {
@@ -41,21 +40,21 @@ public class DataUtils {
 		Map<String, Object> rawLoadData = new HashMap<>();
 
 
-		Logger.debug("Starting data extraction", null);
+		log.debug("Starting data extraction");
 
 		for (int i = 0; i < fieldsArray.length; i++) {
 			String field = fieldsArray[i];
 
-			Logger.debug("found field: " + field + " will try to parse into fieldDefinition, returnName and clause", null);
+			log.debug("Found field: " + field + " will try to parse into fieldDefinition, returnName and clause");
 			
 			FieldInfo fieldInfo = extractFieldInfo(field);
 			String fieldDefinition = fieldInfo.getFieldDefinition();
 			String returnName = fieldInfo.getReturnName();
 			String clause = fieldInfo.getClause();
 
-			Logger.debug(String.format("fieldDefinition: %s; returnName: %s; clause: %s", fieldDefinition, returnName, clause), null);
+			log.debug("fieldDefinition: {}; returnName: {}; clause: {}", fieldDefinition, returnName, clause);
 
-			Logger.debug("object has field?" + fieldDefinition + ": " + sysobj.hasAttr(field), null);
+			log.debug("object has field? {}: {}", fieldDefinition, sysobj.hasAttr(field));
 			if (fieldDefinition.equalsIgnoreCase("full_folder_path")) {
 				IDfFolder folderObj = sysobj.getSession().getFolderBySpecification(sysobj.getFolderId(0).getId());
 				if (folderObj != null) {
@@ -63,14 +62,17 @@ public class DataUtils {
 				}
 			} else if (StringUtils.isNotBlank(clause)) {
 				rawLoadData.put(returnName, getFieldWithQuery(sysobj, fieldDefinition, clause));
-				Logger.debug("Field " + field + "is query and gave following result : " + Arrays.toString((Object[]) rawLoadData.get(returnName)), null);
+				log.debug("Field {} is query and gave following result: {}", () -> field,
+						() -> Arrays.toString((Object[]) rawLoadData.get(returnName)));
 			} else if (sysobj.hasAttr(fieldDefinition)) {
-				Logger.debug("Field " + fieldDefinition + "is repeating? : " + sysobj.isAttrRepeating(fieldDefinition), null);
-				if (sysobj.isAttrRepeating(fieldDefinition)) {
+				boolean isRepeating = sysobj.isAttrRepeating(fieldDefinition);
+				log.debug("Field {} is repeating? : {}", fieldDefinition, isRepeating);
+				if (isRepeating) {
 					rawLoadData.put(returnName, getRepeating(sysobj, fieldDefinition));
 				} else {
-					Logger.debug("Field " + fieldDefinition + " is of type : " + sysobj.getAttrDataType(fieldDefinition), null);
-					switch (sysobj.getAttrDataType(fieldDefinition)) {
+					int dataType = sysobj.getAttrDataType(fieldDefinition);
+					log.debug("Field {} is of type : {}", fieldDefinition, dataType);
+					switch (dataType) {
 						case IDfType.DF_STRING:
 							rawLoadData.put(returnName, sysobj.getString(fieldDefinition));
 							break;
@@ -104,27 +106,27 @@ public class DataUtils {
 		Map<String, Object> restructuredData = new HashMap<>();
 
 		for (Map.Entry<String, Object> entry : rawLoadData.entrySet()) {
-			Logger.info("data has been loaded from dctm. restructuring the data", null);
+			log.info("Data has been loaded from dctm. Restructuring the data");
 
 			String key = entry.getKey();
-			Logger.debug("processing entry: " + key, null);
+			log.debug("Processing entry: {}", key);
 			Object object = entry.getValue();
 			if (object == null) {
-				Logger.warn("Cannot process: object (entry value) was NULL, for entry key: " + entry.getKey(), null);
+				log.warn("Cannot process: object (entry value) was NULL, for entry key: {}", entry.getKey());
 				continue;
 			}
-			Logger.debug("value object.getClass(): " + object.getClass(), null);
-			Logger.debug("value object.getClass().getCanonicalName(): " + object.getClass().getCanonicalName(), null);
-			Logger.debug("value object.getClass().isArray(): " + object.getClass().isArray(), null);
-			Logger.debug("value object instanceof IDfTime: " + (object instanceof IDfTime), null);
+			log.debug("value object.getClass(): {}", object::getClass);
+			log.debug("value object.getClass().getCanonicalName(): {}", () -> object.getClass().getCanonicalName());
+			log.debug("value object.getClass().isArray(): {}", () -> object.getClass().isArray());
+			log.debug("value object instanceof IDfTime: {}", () -> (object instanceof IDfTime));
 
 			if (!object.getClass().isArray()) {
-				Logger.info("object for key '" + key + "' needs no further processing", null);
+				log.info("object for key '{}' needs no further processing", key);
 
 				restructuredData.put(key, object);
 			} else {
 				int arraySize = ((Object[]) object).length;
-				Logger.info("object for key '" + key + "' needs further processing, is array with size: " + arraySize, null);
+				log.info("object for key '{}' needs further processing, is array with size: {}", key, arraySize);
 
 				String mapKey = key;
 				if (key.contains(".")) {
@@ -138,14 +140,12 @@ public class DataUtils {
 				else {
 					childList = new ArrayList<>();
 				}
-				for (int j = 0; j < arraySize; j++) {
-					childList.add(((Object[]) object)[j]);
-				}
+				childList.addAll(Arrays.asList(((Object[]) object)).subList(0, arraySize));
 				restructuredData.put(mapKey, childList);
 			}
 		}
 
-		Logger.info("data restructuring completed", null);
+		log.info("Data restructuring completed");
 		return restructuredData;
 	}
 
@@ -233,62 +233,57 @@ public class DataUtils {
 	}
 
 	private static Object[] getRepeating(IDfSysObject sysobj, String field) throws DfException {
-
-		Logger.debug("Field " + field + " count is : " + sysobj.getValueCount(field), null);
-		Logger.debug("Field " + field + " is of type : " + sysobj.getAttrDataType(field), null);
-
 		int count = sysobj.getValueCount(field);
+		int dataType = sysobj.getAttrDataType(field);
 
-		switch (sysobj.getAttrDataType(field)) {
+		log.debug("Field {} count is : {}", field, count);
+		log.debug("Field {} is of type : {}", field, dataType);
+
+		switch (dataType) {
 			case IDfType.DF_STRING:
 				List<String> stringValues = new ArrayList<>();
 				for (int j = 0; j < count; j++) {
-					Logger.debug("Field " + field + " adding value : " + sysobj.getRepeatingString(field, j), null);
 					String val = sysobj.getRepeatingString(field, j);
+					log.debug("Field {} adding value: {}", field, sysobj.getRepeatingString(field, j));
 					if (StringUtils.isNotBlank(val)) {
 						stringValues.add(val);
 					}
-					Collections.sort(stringValues, new Comparator<String>() {
-						@Override
-						public int compare(String s1, String s2) {
-							return s1.compareToIgnoreCase(s2);
-						}
-					});
+					stringValues.sort(String::compareToIgnoreCase);
 				}
 				return stringValues.toArray();
 			case IDfType.DF_BOOLEAN:
 				Boolean[] boolValues = new Boolean[count];
 				for (int j = 0; j < count; j++) {
-					Logger.debug("Field " + field + " adding value : " + sysobj.getRepeatingBoolean(field, j), null);
 					boolValues[j] = sysobj.getRepeatingBoolean(field, j);
+					log.debug("Field {} adding value: {}", field, boolValues[j]);
 				}
 				return boolValues;
 			case IDfType.DF_DOUBLE:
 				Double[] doubleValues = new Double[count];
 				for (int j = 0; j < count; j++) {
-					Logger.debug("Field " + field + " adding value : " + sysobj.getRepeatingDouble(field, j), null);
 					doubleValues[j] = sysobj.getRepeatingDouble(field, j);
+					log.debug("Field {} adding value: {}", field, doubleValues[j]);
 				}
 				return doubleValues;
 			case IDfType.DF_ID:
 				String[] idValues = new String[count];
 				for (int j = 0; j < count; j++) {
-					Logger.debug("Field " + field + " adding value : " + sysobj.getRepeatingId(field, j), null);
 					idValues[j] = sysobj.getRepeatingId(field, j).getId();
+					log.debug("Field {} adding value: {}", field, idValues[j]);
 				}
 				return idValues;
 			case IDfType.DF_INTEGER:
 				Integer[] intValues = new Integer[count];
 				for (int j = 0; j < count; j++) {
-					Logger.debug("Field " + field + " adding value : " + sysobj.getRepeatingInt(field, j), null);
 					intValues[j] = sysobj.getRepeatingInt(field, j);
+					log.debug("Field {} adding value: {}", field, intValues[j]);
 				}
 				return intValues;
 			case IDfType.DF_TIME:
 				Date[] timeValues = new Date[count];
 				for (int j = 0; j < count; j++) {
-					Logger.debug("Field " + field + " adding value : " + sysobj.getRepeatingTime(field, j), null);
 					timeValues[j] = sysobj.getRepeatingTime(field, j).getDate();
+					log.debug("Field {} adding value: {}", field, timeValues[j]);
 				}
 				return timeValues;
 			default:
@@ -353,7 +348,7 @@ public class DataUtils {
 		}
 		
 		if (StringUtils.isBlank(returnName)) {
-			Logger.debug("no return name specified, setting to field definition", null);
+			log.debug("No return name specified, setting to field definition");
 			returnName = fieldDefinition;
 		}
 		return new FieldInfo(fieldDefinition, clause, returnName);

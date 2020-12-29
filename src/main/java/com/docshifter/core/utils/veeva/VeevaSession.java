@@ -3,12 +3,12 @@ package com.docshifter.core.utils.veeva;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.time.Instant;
 
-@Log4j
+@Log4j2
 public class VeevaSession implements ISession {
 	
 	private String sessionID;

@@ -8,14 +8,14 @@ import com.docshifter.core.utils.dctm.dto.DctmDTO;
 import com.documentum.fc.client.*;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.Map;
 import java.util.Set;
 
-@Log4j
+@Log4j2
 public class DctmRepository<T extends Object> {
 	
 	private final Class<T> clazz;
