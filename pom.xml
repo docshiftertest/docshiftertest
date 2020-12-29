@@ -105,6 +105,12 @@
 				org.snmp4j.test.MultiThreadedTrapReceiver which is weird, and kind of scary! -->
 			<version>2.6.3</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-artemis</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>

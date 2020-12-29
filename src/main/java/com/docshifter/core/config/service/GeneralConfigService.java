@@ -4,6 +4,7 @@ package com.docshifter.core.config.service;
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.domain.GlobalSettings;
 import com.docshifter.core.config.domain.GlobalSettingsRepository;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,9 @@ import java.util.Optional;
  */
 @Service
 public class GeneralConfigService {
+	
+	private static final Logger logger = Logger.getLogger(GeneralConfigService.class);
+	
 	protected Map<String, String> params;
 
 	private GlobalSettingsRepository globalSettingsRepository;
@@ -36,7 +40,7 @@ public class GeneralConfigService {
 		this.globalSettingsRepository = globalSettingsRepository;
 		params = new HashMap<String, String>();
 
-		System.out.println("GlobalSettingsRepository.count(): " + this.globalSettingsRepository.count());
+		logger.info("GlobalSettingsRepository.count(): " + this.globalSettingsRepository.count());
 		
 		Optional<GlobalSettings> optionalConfig = this.globalSettingsRepository.findById(1l);
 
