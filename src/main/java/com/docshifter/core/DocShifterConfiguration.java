@@ -1,32 +1,25 @@
 package com.docshifter.core;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
+import com.docshifter.core.config.Constants;
+import com.docshifter.core.config.service.ConfigurationService;
+import com.docshifter.core.config.service.GeneralConfigService;
+import com.docshifter.core.messaging.sender.AMQPSender;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
+import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
-import com.docshifter.core.config.Constants;
-import com.docshifter.core.config.service.ConfigurationService;
-import com.docshifter.core.config.service.GeneralConfigService;
-import com.docshifter.core.messaging.DateDeserializer;
-import com.docshifter.core.work.WorkFolderManager;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import org.springframework.jms.connection.CachingConnectionFactory;
+import org.springframework.jms.core.JmsMessagingTemplate;
+import org.springframework.jms.core.JmsTemplate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
@@ -39,68 +32,79 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @EntityScan({"com.docshifter.core.config", "com.docshifter.core.monitoring.entities"})
 public class DocShifterConfiguration {
 
-	@Value("${rabbitmq.replytimeout:300}")
-	private int rabbitReplyTimeout;
+	@Value("${queue.replytimeout:300}")
+	private int queueReplyTimeout;
 
-    @Autowired
-    public GeneralConfigService generalConfigService;
+	public GeneralConfigService generalConfigService;
+	
+	public ConfigurationService configurationService;
 
-    @Autowired
-    public ConfigurationService configurationService;
+	
+	@Autowired
+	public DocShifterConfiguration(GeneralConfigService generalConfigService,
+			ConfigurationService configurationService) {
+		this.generalConfigService = generalConfigService;
+		this.configurationService = configurationService;
+	}
+	
+	public DocShifterConfiguration () {
+		
+	}
 
-    @Autowired
-    public WorkFolderManager workFolderManager;
-
-    @Bean
-    public ConnectionFactory connectionFactory() {
-
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory(generalConfigService.getString(Constants.MQ_URL));
-        connectionFactory.setUsername(generalConfigService.getString(Constants.MQ_USER));
-        connectionFactory.setPassword(generalConfigService.getString(Constants.MQ_PASSWORD));
-        return connectionFactory;
-    }
-
-    @Bean
-    public MessageConverter jsonMessageConverter() {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-		DateDeserializer.regObjectMapper(mapper);
-    	Jackson2JsonMessageConverter conv = new Jackson2JsonMessageConverter(mapper);
-    	return conv;
-    }
-
-    @Bean
-    public RabbitTemplate rabbitTemplate() {
-        RabbitTemplate template = new RabbitTemplate(connectionFactory());
-        template.setMessageConverter(jsonMessageConverter());
-        template.setReplyTimeout(rabbitReplyTimeout);
-        return template;
-    }
-
-    @Bean
-    public List<Queue> docShifterQueues() {
-        List<Queue> queueList = new ArrayList<>();
-        queueList.add(defaultQueue());
-
-        return queueList;
-    }
-
-	@Bean
-	public Queue defaultQueue() {
-		Map<String, Object> args = new HashMap<>();
-		args.put("x-max-priority", 4);
-
-		return new Queue(generalConfigService.getString(Constants.MQ_QUEUE), true, false, false, args);
-    }
-
-	@Bean
-	public FanoutExchange reloadExchange() {
-		return new FanoutExchange(Constants.RELOAD_QUEUE);
+	/**
+	 * Creates the initial connection with the information stored in the database.
+	 * @return activemq connection factory
+	 */
+	public ActiveMQConnectionFactory activeMQConnectionFactory() {
+		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(generalConfigService.getString(Constants.MQ_URL));
+		connectionFactory.setUser(generalConfigService.getString(Constants.MQ_USER));
+		connectionFactory.setPassword(generalConfigService.getString(Constants.MQ_PASSWORD));		
+		//Forces consumers to ask for new messages instead buffering the messages.
+        connectionFactory.setConsumerWindowSize(0);
+		return connectionFactory;
 	}
 
 	@Bean
-	public Queue syncQueue() {
-		return new Queue(Constants.SYNC_QUEUE);
+	public CachingConnectionFactory cachingConnectionFactory() {
+		return new CachingConnectionFactory(activeMQConnectionFactory());
+	}
 
+	@Bean
+	public JmsTemplate jmsTemplate() {
+		JmsTemplate template = new JmsTemplate(cachingConnectionFactory());
+		template.setReceiveTimeout(queueReplyTimeout);
+		// Set if the QOS values (deliveryMode, priority, timeToLive) should be used for sending a message
+	    template.setExplicitQosEnabled(true);
+	    template.setDeliveryPersistent(true);
+		return template;
+	}
+
+	@Bean
+	@DependsOn("jmsTemplate")
+	public JmsMessagingTemplate messagingTemplate () {
+		return new JmsMessagingTemplate(jmsTemplate());
+	}
+
+	@Bean
+	public JmsTemplate jmsTemplateMulticast() {
+		JmsTemplate template = new JmsTemplate(cachingConnectionFactory());
+		template.setPubSubDomain(true);
+		template.setPriority(AMQPSender.HIGHEST_PRIORITY);
+		return template;
+	}
+
+	@Bean
+	public ActiveMQQueue defaultQueue() {
+		return new ActiveMQQueue(generalConfigService.getString(Constants.MQ_QUEUE));
+	}
+
+	@Bean
+	public ActiveMQTopic reloadExchange() {
+		return new ActiveMQTopic(Constants.RELOAD_QUEUE);
+	}
+
+	@Bean
+	public ActiveMQQueue syncQueue() {
+		return new ActiveMQQueue(Constants.SYNC_QUEUE);
 	}
 }

@@ -12,7 +12,9 @@ public class AsposeVersionUtilTest {
 		String actualVersion;
 		String pomVersion;
 		String[] testClasses = new String[] {"eMail", "slides", "Cells", "words", "PDF", 
-				"pdf", "Pdf", "imaging", "taSKs", "ocr", "diagram", "cad"};
+				"pdf", "Pdf", "imaging", "taSKs",
+				//"ocr",
+				"diagram", "cad"};
 		for (String testClass : testClasses) {
 			actualVersion = AsposeVersionUtil.getActualVersion(testClass);
 			pomVersion = AsposeVersionUtil.getVersionFromPom(testClass);

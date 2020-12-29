@@ -14,14 +14,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @Component
 public class DocshifterMessage implements Serializable {
 
-
 	private DocshifterMessageType type;
 	private Task task;
 	private Long configId;
 
 	public DocshifterMessage() {
 	}
-
 
 	public DocshifterMessage(DocshifterMessageType type, Task task, Long configId) {
 		this.type = type;
@@ -32,7 +30,6 @@ public class DocshifterMessage implements Serializable {
 	public Task getTask() {
 		return task;
 	}
-
 
 	public DocshifterMessageType getType() {
 		return type;
