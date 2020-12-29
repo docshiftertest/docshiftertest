@@ -198,4 +198,16 @@ public class WorkFolderManager {
 		logger.debug("Returning true!");
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sBuf = new StringBuilder();
+		sBuf.append("WorkFolderManager: ");
+		sBuf.append("Errorfolder=");
+		sBuf.append(this.errorfolder);
+		sBuf.append(", ");
+		sBuf.append("Workfolder=");
+		sBuf.append(this.workfolder);
+		return sBuf.toString();
+	}
 }

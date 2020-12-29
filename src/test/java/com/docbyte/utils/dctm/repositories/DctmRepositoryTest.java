@@ -13,11 +13,13 @@ import lombok.extern.log4j.Log4j;
 import java.util.Arrays;
 import java.util.HashSet;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @Log4j
 public class DctmRepositoryTest {
 
+	@Ignore("There's no Dctm repo to talk to right now")
 	@Test
 	public void findDocbaseWithEmptyQuery() throws Exception {
 		try (DctmSession session = DctmSessionUtils.getInstance().createSession( DctmConnectionDetails.fromProperties("repoTest.properties"))) {
@@ -31,10 +33,13 @@ public class DctmRepositoryTest {
 		}
 	}
 
+	@Ignore("There's no Dctm repo to talk to right now")
 	@Test
 	public void findByName() throws Exception {
 		findDocumentByName("TestDoc" + System.currentTimeMillis());
 	}
+
+	@Ignore("There's no Dctm repo to talk to right now")
 	@Test
 	public void findByNameWithQuotes() throws Exception {
 		findDocumentByName("Test'Doc" + System.currentTimeMillis());
@@ -70,6 +75,7 @@ public class DctmRepositoryTest {
 		}
 	}
 
+	@Ignore("There's no Dctm repo to talk to right now")
 	@Test
 	public void updateDocument() throws Exception {
 		IDfPersistentObject po= null;
@@ -109,17 +115,19 @@ public class DctmRepositoryTest {
 		}
 	}
 
+	@Ignore("There's no Dctm repo to talk to right now")
 	@Test
 	public void standardInsert() throws Exception  {
 		insertDocument("TestDoc" + System.currentTimeMillis());
 	}
-	
+
+	@Ignore("There's no Dctm repo to talk to right now")
 	@Test
 	public void insertWithQuote() throws Exception  {
 		insertDocument("Test'Doc" + System.currentTimeMillis());
 	}
-	
-	
+
+	@Ignore("There's no Dctm repo to talk to right now")
 	private void insertDocument(String name) throws Exception {
 		IDfPersistentObject po= null;
 
@@ -153,8 +161,8 @@ public class DctmRepositoryTest {
 				po.destroy();
 		}
 	}
-	
-	
+
+	@Ignore("There's no Dctm repo to talk to right now")
 	@Test
 	public void updateDocumentWithUpsert() throws Exception {
 		IDfPersistentObject po= null;
@@ -198,7 +206,8 @@ public class DctmRepositoryTest {
 				po.destroy();
 		}
 	}
-	
+
+	@Ignore("There's no Dctm repo to talk to right now")
 	@Test
 	public void insertDocumentWithUpsert() throws Exception {
 		IDfPersistentObject po= null;

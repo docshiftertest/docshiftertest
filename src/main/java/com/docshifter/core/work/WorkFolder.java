@@ -76,18 +76,6 @@ public class WorkFolder implements Serializable {
 		return folder.toString();
 	}
 
-
-	@Deprecated
-	public Path getFilePath(String filename) {
-		FileUtils.removeIllegalFilesystemCharacters(filename);
-		return folder.resolve(filename);
-	}
-
-	@Deprecated
-	public Path getFilePath(String filename, String extention) {
-		return this.getFilePath(filename + "." + extention);
-	}
-
 	public Path getNewFilePath(String filename, String extension) {
 
 		return getNewFilePath(filename,extension, true);

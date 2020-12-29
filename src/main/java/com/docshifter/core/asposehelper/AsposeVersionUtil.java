@@ -38,7 +38,7 @@ public class AsposeVersionUtil {
 		asposeMappings.put("pdf", com.aspose.pdf.Document.class);
 		asposeMappings.put("imaging", com.aspose.imaging.Image.class);
 		asposeMappings.put("tasks", com.aspose.tasks.Task.class);
-		asposeMappings.put("ocr", com.aspose.ocr.AsposeOCR.class);
+		//asposeMappings.put("ocr", com.aspose.ocr.AsposeOCR.class);
 		asposeMappings.put("diagram", com.aspose.diagram.Diagram.class);
 		asposeMappings.put("cad", com.aspose.cad.Image.class);
 		asposeMappings.put("html", com.aspose.html.HTMLDocument.class);

@@ -4,6 +4,7 @@ import com.docshifter.core.utils.dctm.*;
 import com.documentum.fc.client.IDfSysObject;
 import com.documentum.fc.common.DfId;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import java.util.Arrays;
 import java.util.Map;
@@ -53,6 +54,7 @@ public class DataUtilsTest {
 	
 	}
 
+	@Ignore("There's no Dctm repo to talk to right now")
     @Test
     public void getValuesByQuery() throws Exception {
         String fieldQuery = "dm_user.user_address|author.mail(dm_document.authors=dm_user.user_name)";
@@ -67,6 +69,7 @@ public class DataUtilsTest {
         }
     }
 
+	@Ignore("There's no Dctm repo to talk to right now")
     @Test
     public void getData() throws Exception {
     	try (DctmSession session = DctmSessionUtils.getInstance().createSession( DctmConnectionDetails.fromProperties("repoTest.properties"))) {

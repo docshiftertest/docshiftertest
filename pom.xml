@@ -23,7 +23,7 @@
 
 		<aspose.cad.version>20.10</aspose.cad.version>
 
-		<aspose.cells.version>20.10</aspose.cells.version>
+		<aspose.cells.version>20.11</aspose.cells.version>
 
 		<aspose.diagram.version>20.12</aspose.diagram.version>
 		<aspose.diagram.classifier>jdk16</aspose.diagram.classifier>
@@ -39,21 +39,21 @@
         <aspose.note.classifier>jdk17</aspose.note.classifier>
         -->
 
-		<aspose.ocr.version>20.11</aspose.ocr.version>
+<!--		<aspose.ocr.version>20.11</aspose.ocr.version>-->
 
-		<aspose.pdf.version>20.11</aspose.pdf.version>
+		<aspose.pdf.version>20.12</aspose.pdf.version>
 		<aspose.pdf.classifier>jdk17</aspose.pdf.classifier>
 
-		<aspose.slides.version>20.10</aspose.slides.version>
+		<aspose.slides.version>20.12</aspose.slides.version>
 		<aspose.slides.classifier>jdk16</aspose.slides.classifier>
 
 		<aspose.tasks.version>20.11</aspose.tasks.version>
 		<aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
 
-		<aspose.words.version>20.10</aspose.words.version>
+		<aspose.words.version>20.12</aspose.words.version>
 		<aspose.words.classifier>jdk17</aspose.words.classifier>
 
-		<aspose.html.version>20.9.1</aspose.html.version>
+		<aspose.html.version>20.12</aspose.html.version>
 		<aspose.html.classifier>jdk16</aspose.html.classifier>
 	</properties>
 
@@ -193,11 +193,11 @@
 			<version>${aspose.tasks.version}</version>
 			<classifier>${aspose.tasks.classifier}</classifier>
 		</dependency>
-		<dependency>
+<!--		<dependency>
 			<groupId>com.aspose</groupId>
 			<artifactId>aspose-ocr</artifactId>
 			<version>${aspose.ocr.version}</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>com.aspose</groupId>
 			<artifactId>aspose-html</artifactId>

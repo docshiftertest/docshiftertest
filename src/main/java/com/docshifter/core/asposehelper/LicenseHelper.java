@@ -53,7 +53,7 @@ public class LicenseHelper {
 	private final com.aspose.pdf.License pdfLicense;
 	private final com.aspose.imaging.License imgLicense;
 	private final com.aspose.tasks.License tasksLicense;
-	private final com.aspose.ocr.License ocrLicense;
+	//private final com.aspose.ocr.License ocrLicense;
 	private final com.aspose.diagram.License diagramLicense;
 	private final com.aspose.cad.License cadLicense;
 
@@ -79,7 +79,7 @@ public class LicenseHelper {
 		pdfLicense = new com.aspose.pdf.License();
 		imgLicense = new com.aspose.imaging.License();
 		tasksLicense = new com.aspose.tasks.License();
-		ocrLicense = new com.aspose.ocr.License();
+		//ocrLicense = new com.aspose.ocr.License();
 		diagramLicense = new com.aspose.diagram.License();
 		cadLicense = new com.aspose.cad.License();
 		logger.debug("Getting the input streams...");
@@ -92,9 +92,9 @@ public class LicenseHelper {
 			pdfLicense.setLicense(tmpFileFullPathStr);
 			imgLicense.setLicense(tmpFileFullPathStr);
 			tasksLicense.setLicense(tmpFileFullPathStr);
-			logger.debug("About to do OCR licence");
-			ocrLicense.setLicense(tmpFileFullPathStr);
-			logger.debug("OCR licence valid is: " + ocrLicense.isValid());
+			//logger.debug("About to do OCR licence");
+			//ocrLicense.setLicense(tmpFileFullPathStr);
+			//logger.debug("OCR licence valid is: " + ocrLicense.isValid());
 			cadLicense.setLicense(tmpFileFullPathStr);
 			diagramLicense.setLicense(tmpFileFullPathStr);
 			Files.deleteIfExists(tmpFileFullPath);
