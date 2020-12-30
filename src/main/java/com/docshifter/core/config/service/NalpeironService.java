@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +118,7 @@ public class NalpeironService implements ILicensingService {
 
     }
 
-    private final void openValidateNalpeironLibrary() {
+    private void openValidateNalpeironLibrary() {
         try {
             //generate a random number between 1 and 500 and use it to calculate the security offset
             int security = 1 + (int) (Math.random() * (501));
@@ -219,9 +220,11 @@ public class NalpeironService implements ILicensingService {
         helper.stopFeature(NALPEIRON_USERNAME, moduleId, clientData, fid);
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
+    @PreDestroy
+    private void cleanup() throws Throwable {
+        if (helper == null) {
+            return;
+        }
 
         //Stop the licenseValidationScheduler
         helper.stopLicenseValidationScheduler();

@@ -3,7 +3,6 @@ package com.docbyte.utils.veeva;
 import com.docshifter.core.utils.veeva.VeevaBadResponse;
 import com.docshifter.core.utils.veeva.VeevaLoginSuccess;
 import com.docshifter.core.utils.veeva.VeevaResponse;
-import lombok.extern.log4j.Log4j;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.net.UnknownHostException;
@@ -11,14 +10,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lombok.extern.log4j.Log4j2;
 import org.junit.Before;
 import org.junit.Test;
 
-@Log4j
 /**
  * Code moved from main() of VeevaSession
  *
  */
+@Log4j2
 public class VeevaSessionTest {
 
 	private Map<String, List<String>> jsonHeaders;

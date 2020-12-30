@@ -6,12 +6,12 @@ import com.documentum.fc.client.*;
 import com.documentum.fc.client.acs.IDfAcsRequest;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfLoginInfo;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 3/10/16.
  */
-@Log4j
+@Log4j2
 public class DctmSessionUtils {
 	
 	private IDfClient client;

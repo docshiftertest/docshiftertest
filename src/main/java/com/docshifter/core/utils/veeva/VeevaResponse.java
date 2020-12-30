@@ -3,7 +3,7 @@ package com.docshifter.core.utils.veeva;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Log4j
+@Log4j2
 public class VeevaResponse {
 	private static final String NEWLINE = System.getProperty("line.separator");
 	private static final String SUCCESS = "SUCCESS";
@@ -55,16 +55,18 @@ public class VeevaResponse {
 		// message...
 		String contentType = APP_JSON;
 		if (!headers.containsKey(CONTENT_TYPE)) {
-			log.error("Headers from Veeva did not contain a Content-Type! Headers received: " + dumpHeaders(headers));
+			log.error("Headers from Veeva did not contain a Content-Type! Headers received: {}", dumpHeaders(headers));
 		}
 		else {
 			List<String> contentTypes = headers.get(CONTENT_TYPE);
 			if (contentTypes.size() != 1) {
-				log.error("Headers from Veeva did not contain one (and only one) Content-Type! Headers received: " + dumpHeaders(headers));
+				log.error("Headers from Veeva did not contain one (and only one) Content-Type! Headers received: {}",
+						dumpHeaders(headers));
 			}
 			else {
 				if (StringUtils.isBlank(contentTypes.get(0))) {
-					log.error("Headers from Veeva returned a blank Content-Type! Headers received: " + dumpHeaders(headers));
+					log.error("Headers from Veeva returned a blank Content-Type! Headers received: {}",
+							dumpHeaders(headers));
 				}
 				else {
 					contentType = contentTypes.get(0);
@@ -86,7 +88,8 @@ public class VeevaResponse {
 				content = new String(contentBody, charset);
 			}
 			catch (UnsupportedEncodingException uxe) {
-				log.error("Got Unsupported Encoding Exception (" + uxe + ") getting the content using charset: " + charset + ". Will use default encoding...");
+				log.error("Got Unsupported Encoding Exception getting the content using charset: {}. Will use default" +
+						" encoding...", charset, uxe);
 				content = new String(contentBody);
 			}
 			if (SUCCESS.equals(VeevaResponse.getResponseStatus(content))) {
@@ -100,14 +103,15 @@ public class VeevaResponse {
 				return veevaResponse;
 			}
 			else {
-				log.error("Unrecognised Content-Type: " + contentType + " received from Veeva");
+				log.error("Unrecognised Content-Type: {} received from Veeva", contentType);
 			}
 		}
 		try {
 			content = new String(contentBody, charset);
 		}
 		catch (UnsupportedEncodingException uxe) {
-			log.error("Got Unsupported Encoding Exception (" + uxe + ") getting the content using charset: " + charset + ". Will use default encoding...");
+			log.error("Got Unsupported Encoding Exception getting the content using charset: {}. Will use default " +
+					"encoding...", charset, uxe);
 			content = new String(contentBody);
 		}
 		VeevaBadResponse badResponse = readFailure(content);
@@ -125,7 +129,7 @@ public class VeevaResponse {
 	public static VeevaResponse getLoginResult(String responseData) {
 		VeevaResponse result = null;
 		String responseStatus = getResponseStatus(responseData);
-		log.debug("getLoginResult(), responseStatus: " + responseStatus);
+		log.debug("getLoginResult(), responseStatus: {}", responseStatus);
 		if (SUCCESS.equals(responseStatus)) {
 			log.debug("getLoginResult() SUCCESS!");
 			result = readSuccess(responseData);
@@ -149,15 +153,15 @@ public class VeevaResponse {
 			result = mapper.readValue(responseData, VeevaLoginSuccess.class);
 		}
 		catch (JsonMappingException jiminy) {
-			log.error("Creating Login Success, caught JsonMappingException: " + jiminy);
+			log.error("Creating Login Success, caught JsonMappingException", jiminy);
 			jiminy.printStackTrace();
 		}
 		catch (JsonParseException jippy) {
-			log.error("Creating Login Success, caught JsonParseException: " + jippy);
+			log.error("Creating Login Success, caught JsonParseException", jippy);
 			jippy.printStackTrace();
 		}
 		catch (IOException ioe) {
-			log.error("Creating Login Success, caught IOException: " + ioe);
+			log.error("Creating Login Success, caught IOException", ioe);
 			ioe.printStackTrace();
 		}
 		return result;
@@ -170,15 +174,15 @@ public class VeevaResponse {
 			result = mapper.readValue(responseData, VeevaBadResponse.class);
 		}
 		catch (JsonMappingException jiminy) {
-			log.error("Creating Bad Response, caught JsonMappingException: " + jiminy);
+			log.error("Creating Bad Response, caught JsonMappingException", jiminy);
 			jiminy.printStackTrace();
 		}
 		catch (JsonParseException jippy) {
-			log.error("Creating Bad Response, caught JsonParseException: " + jippy);
+			log.error("Creating Bad Response, caught JsonParseException", jippy);
 			jippy.printStackTrace();
 		}
 		catch (IOException ioe) {
-			log.error("Creating Bad Response, caught IOException: " + ioe);
+			log.error("Creating Bad Response, caught IOException", ioe);
 			ioe.printStackTrace();
 		}
 		return result;

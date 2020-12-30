@@ -1,10 +1,9 @@
 package com.docbyte.utils.veeva;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.junit.Test;
 
-@Log4j
-
+@Log4j2
 public class VeevaSessionManagerTest {
 
 	@Test

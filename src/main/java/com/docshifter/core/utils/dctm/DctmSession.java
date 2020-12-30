@@ -6,13 +6,13 @@ import com.documentum.fc.client.acs.IDfAcsTransferPreferences;
 import com.documentum.fc.client.fulltext.IDfFtConfig;
 import com.documentum.fc.client.mq.IDfMessageQueueManager;
 import com.documentum.fc.common.*;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-@Log4j
+@Log4j2
 public class DctmSession implements AutoCloseable, IDfSession {
 	
 	private IDfSession session;

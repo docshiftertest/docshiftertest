@@ -4,22 +4,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.docshifter</groupId>
 	<artifactId>beans</artifactId>
 	<version>${revision}${sha1}${changelist}</version>
 
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.0.RELEASE</version>
+		<groupId>com.docshifter</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0</version>
 	</parent>
 
 	<properties>
 		<revision>6.4</revision>
 		<sha1 />
 		<hsqldb.version>2.3.4</hsqldb.version>
-		<java.version>1.8</java.version>
-		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 
 		<aspose.cad.version>20.10</aspose.cad.version>
 
@@ -57,18 +54,6 @@
 		<aspose.html.classifier>jdk16</aspose.html.classifier>
 	</properties>
 
-
-	<distributionManagement>
-		<repository>
-			<id>releases</id>
-			<url>https://mvn.docshifter.com/repository/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>snapshots</id>
-			<url>https://mvn.docshifter.com/repository/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<repositories>
 		<repository>
 			<id>internal</id>
@@ -82,20 +67,6 @@
 			</snapshots>
 		</repository>
 	</repositories>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>internal</id>
-			<name>Archiva Managed Internal Repository</name>
-			<url>https://mvn.docshifter.com/repository/plugins/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
 
 	<dependencies>
 		<dependency>
@@ -256,33 +227,12 @@
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.el</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<version>3.0.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-amqp</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-logging</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-classic</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>log4j-over-slf4j</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -297,11 +247,6 @@
 			<artifactId>spring-context</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-rest-core</artifactId>
 		</dependency>
@@ -313,34 +258,28 @@
 			<version>3.0.0</version>
 		</dependency>
 
-	<!-- SharePoint SDK -->
-	<dependency>
-		<groupId>com.microsoft.graph</groupId>
-		<artifactId>microsoft-graph</artifactId>
-		<version>2.2.0</version>
-	</dependency>
+		<!-- SharePoint SDK -->
+		<dependency>
+			<groupId>com.microsoft.graph</groupId>
+			<artifactId>microsoft-graph</artifactId>
+			<version>2.2.0</version>
+		</dependency>
 
-	<dependency>
-		<groupId>com.microsoft.graph</groupId>
-		<artifactId>microsoft-graph-auth</artifactId>
-		<version>0.2.0</version>
-	</dependency>
+		<dependency>
+			<groupId>com.microsoft.graph</groupId>
+			<artifactId>microsoft-graph-auth</artifactId>
+			<version>0.2.0</version>
+		</dependency>
 
-	<dependency>
-		<groupId>com.google.code.gson</groupId>
-		<artifactId>gson</artifactId>
-	</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
 			<version>1.6</version>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.4</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.emc.documentum.dfc</groupId>
@@ -359,25 +298,10 @@
 			<artifactId>commons-imaging</artifactId>
 			<version>1.0-alpha1</version>
 		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.13.1</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<forceJavacCompilerUse>true</forceJavacCompilerUse>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
@@ -392,7 +316,6 @@
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<forkMode>once</forkMode>
 					<!-- As of jdk11 we will need the extra illegal-access permit doohickey 
 						NOTA BENE!!! The illegal-access flag has to be preceded by 2 minus signs 
 						(without space between) but you can't put that in a comment in the pom! <argLine>-Djava.library.path=${project.build.directory}/classes/license/ 
@@ -418,51 +341,11 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>com.spotify</groupId>
-					<artifactId>dockerfile-maven-plugin</artifactId>
-					<version>1.4.13</version>
-					<executions>
-						<execution>
-							<id>default</id>
-							<goals>
-								<goal>build</goal>
-								<goal>push</goal>
-							</goals>
-						</execution>
-					</executions>
-					<configuration>
-						<repository>978459874896.dkr.ecr.eu-west-1.amazonaws.com/docshifter/docshifter-base</repository>
-						<tag>${project.version}</tag>
-						<buildArgs>
-							<DEPENDENCY>${project.artifactId}-${project.version}</DEPENDENCY>
-						</buildArgs>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 
 	<profiles>
 		<profile>
-			<id>development</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<changelist>-SNAPSHOT</changelist>
-			</properties>
-		</profile>
-		<profile>
 			<id>test</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<changelist>-SNAPSHOT</changelist>
-			</properties>
 			<build>
 				<plugins>
 					<plugin>
@@ -489,16 +372,6 @@
 		</profile>
 		<profile>
 			<id>release</id>
-			<activation>
-				<property>
-	                <name>env.PROFILE</name>
-	                <value>release</value>
-	            </property>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<properties>
-				<changelist />
-			</properties>
 			<build>
 				<plugins>
 					<plugin>

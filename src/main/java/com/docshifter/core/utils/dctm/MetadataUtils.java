@@ -6,12 +6,12 @@ import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfTime;
 import com.documentum.fc.common.IDfAttr;
 import com.documentum.fc.common.IDfValue;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.text.ParseException;
 import java.util.*;
 
-@Log4j
+@Log4j2
 public class MetadataUtils {
 	
 	private static final List<String> ignoreList = Arrays.asList("object_name", "acl_name", "acl_domain", "doc_id", "dossier_number", "dossier_type", "confidential");

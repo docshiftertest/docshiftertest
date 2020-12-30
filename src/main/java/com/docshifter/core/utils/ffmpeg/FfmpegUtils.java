@@ -1,6 +1,6 @@
 package com.docshifter.core.utils.ffmpeg;
 
-import com.docshifter.core.utils.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,12 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Log4j2
 public class FfmpegUtils {
 
 	//static public String ffmpegLocation = "C:/ffmpeg/bin/"; <-- really?
     static public Map<String,Object> executeInquiry( String filename, String ffmpegPath)
     {
-    	Logger.debug("attempting to get the duration of the video", null);
+    	log.debug("Attempting to get the duration of the video");
         Map<String, Object> fieldMap = new HashMap<String,Object>();
 
         try
@@ -36,7 +37,7 @@ public class FfmpegUtils {
             	fieldMap = getFieldMap(outLines);
             }
             else {
-            	Logger.warn("Did not get stderr as expected, trying stdout", null);
+            	log.warn("Did not get stderr as expected, trying stdout");
             	outLines = getOutputLines(proc.getInputStream());
             }
         	fieldMap = getFieldMap(outLines);
@@ -59,7 +60,7 @@ public class FfmpegUtils {
     public static List<String> getOutputLines(InputStream strm) throws IOException {
     	BufferedReader output = new BufferedReader( new InputStreamReader( strm ) );
     	List<String> outLines = new ArrayList<>();
-        Logger.debug("starting loop", null);
+        log.debug("Starting loop");
         String line = output.readLine();
         while( line != null) {
             // Handle the line
@@ -78,18 +79,18 @@ public class FfmpegUtils {
      */
     private static Map<String, Object> getFieldMap(List<String> outLines) {
     	Map<String, Object> fieldMap = new HashMap<>();
-        Logger.debug("starting loop", null);
+        log.debug("Starting loop");
         for( String line : outLines)
         {
             // Handle the line
-            if( line.startsWith( "FFmpeg version" ) )
+            if(line.startsWith( "FFmpeg version" ) )
             {
                 // Handle the version line:
                 //    FFmpeg version 0.6.2-4:0.6.2-1ubuntu1, Copyright (c) 2000-2010 the Libav developers
                 String version = line.substring( 15, line.indexOf( ", Copyright", 16  ) );
                 fieldMap.put( "version", version );
             }
-            else if( line.indexOf( "Duration:" ) != -1 )
+            else if(line.contains("Duration:"))
             {
                 // Handle Duration line:
                 //    Duration: 00:42:53.59, start: 0.000000, bitrate: 1136 kb/s
@@ -98,7 +99,7 @@ public class FfmpegUtils {
             
                 String bitrate = line.substring( line.indexOf( "bitrate: " ) + 9 );
                 fieldMap.put( "bitrate", bitrate );
-                Logger.debug("breaking loop, found duration: " + fieldMap.get("duration"), null);
+                log.debug("Breaking loop, found duration: {}", () -> fieldMap.get("duration"));
                 break;
             }
         }

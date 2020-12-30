@@ -1,7 +1,7 @@
 package com.docshifter.core.utils.veeva;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -15,8 +15,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+@Log4j2
 public class Requests{
-	private static final Logger logger = Logger.getLogger(Requests.class);
 	private final static char[] MULTIPART_CHARS =
 			"-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 					.toCharArray();
@@ -44,7 +44,7 @@ public class Requests{
 		byte[] postDataBytes = postData.toString().getBytes(StandardCharsets.UTF_8);
 
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		con.setRequestMethod("GET");
+		con.setRequestMethod("POST");
 		con.setRequestProperty("Authorization", sessionId);
 		con.setRequestProperty("accept", "*/*");
 		con.setDoOutput(true);
@@ -56,9 +56,9 @@ public class Requests{
 		osw.close();
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'GET' request to URL : " + url);
-		logger.debug("GET parameters : " + new String(postDataBytes));
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'POST' request to URL: {}", url);
+		log.debug("Post parameters: {}", new String(postDataBytes));
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -98,8 +98,8 @@ public class Requests{
 		con.setDoOutput(true);
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'GET' request to URL : " + url);
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'GET' request to URL: {}", url);
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -134,8 +134,8 @@ public class Requests{
 		con.setDoOutput(true);
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'GET' request to URL : " + url);
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'GET' request to URL: {}", url);
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -165,8 +165,8 @@ public class Requests{
 		con.setDoOutput(true);
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'GET' request to URL : " + url);
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'GET' request to URL: {}", url);
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -196,8 +196,8 @@ public class Requests{
 		con.setDoOutput(true);
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'GET' request to URL : " + url);
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'GET' request to URL: {}", url);
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -227,8 +227,8 @@ public class Requests{
 		con.setDoOutput(true);
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'GET' request to URL : " + url);
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'GET' request to URL: {}", url);
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -269,9 +269,9 @@ public class Requests{
 		osw.close();
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'POST' request to URL : " + url);
-		logger.debug("Post parameters : " + new String(postDataBytes));
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'POST' request to URL: {}", url);
+		log.debug("Post parameters: {}", new String(postDataBytes));
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -294,8 +294,8 @@ public class Requests{
 		con.setDoOutput(true);
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'GET' request to URL : " + url);
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'GET' request to URL: {}", url);
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -335,8 +335,8 @@ public class Requests{
 		addCloseDelimiter(body, boundary, crlf);
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'POST' request to URL : " + url);
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'POST' request to URL: {}", url);
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -377,9 +377,8 @@ public class Requests{
 		addCloseDelimiter(body, boundary, crlf);
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'POST' request to URL : " + url);
-		//logger.debug("Post parameters : " + new String(postDataBytes));
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'POST' request to URL: {}", url);
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -441,8 +440,8 @@ public class Requests{
 		osw.close();
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'POST' request to URL : " + url);
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'POST' request to URL: {}", url);
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -481,8 +480,8 @@ public class Requests{
 		con.setDoOutput(true);
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'GET' request to URL : " + url);
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'GET' request to URL: {}", url);
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -532,8 +531,8 @@ public class Requests{
 		osw.close();
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'PUT' request to URL : " + url);
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'PUT' request to URL: {}", url);
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -579,8 +578,8 @@ public class Requests{
 		osw.close();
 
 		int responseCode = con.getResponseCode();
-		logger.debug("\nSent 'PUT' request to URL : " + url);
-		logger.debug("Response Code : " + responseCode);
+		log.debug("Sent 'PUT' request to URL: {}", url);
+		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
@@ -664,7 +663,7 @@ public class Requests{
 			}
 		}
 
-		logger.debug("Latest version retrieved: "+majorVersion+"."+minorVersion);
+		log.debug("Latest version retrieved: {}.{}", majorVersion, minorVersion);
 		JSONObject jsonObject = (JSONObject) listIds.get(versions.indexOf(majorVersion+"."+minorVersion)); //get the highest version
 		return jsonObject.get("value").toString();
 	}

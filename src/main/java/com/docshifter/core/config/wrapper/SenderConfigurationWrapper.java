@@ -4,13 +4,13 @@ package com.docshifter.core.config.wrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+
+import lombok.extern.log4j.Log4j2;
 import com.docshifter.core.config.domain.ChainConfigurationRepository;
 import com.docshifter.core.config.domain.Node;
 
+@Log4j2
 public class SenderConfigurationWrapper extends NodeWrapper {
-
-	private static final Logger logger = Logger.getLogger(SenderConfigurationWrapper.class);
 
 	public SenderConfigurationWrapper(Node node, ChainConfigurationRepository chainConfigurationRepository) {
 		super(node, chainConfigurationRepository);
@@ -32,33 +32,33 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 	}
 	
 	public String getString(String name) {
-		logger.debug("Calling getString(" + name + ", null)");
+		log.debug("Calling getString({}, null)", name);
 		return getString(name, null);
 	}
 	
 	public String getString(String name, String defaultValue) {
 		//TODO: add general config params id necessary
 		Map<String, String> allParams = getModuleWrapper().params;
-		logger.debug("getString(" + name + ", " + defaultValue + ") called");
+		log.debug("getString({}, {}) called", name, defaultValue);
 		
 		if (allParams.containsKey(name)) {
-			logger.debug("containsKey so returning: " + allParams.get(name)); 
+			log.debug("containsKey so returning: {}", allParams.get(name));
 			return allParams.get(name);
 		} else {
-			logger.debug("returning (defaultValue): " + defaultValue);
+			log.debug("returning (defaultValue): {}", defaultValue);
 			return defaultValue;
 		}
 		
 	}
 	
 	public int getInt(String name) {
-		logger.debug("Calling getInt(" + name + ", 0)");
+		log.debug("Calling getInt({}, 0)", name);
 		return getInt(name, 0);
 	}
 
 	public int getInt(String name, int defaultValue){
 		Map<String, String> allParams = getModuleWrapper().params;
-		logger.debug("getInt(" + name + ", " + defaultValue + ") called");
+		log.debug("getInt({}, {}) called", name, defaultValue);
 		int result = defaultValue;
 		try {
 			if (allParams.containsKey(name)) {
@@ -67,8 +67,9 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 		}
 		catch (NumberFormatException niffy) {
 			// Just log it, we already set the default value
-			logger.warn("Used default value: " + defaultValue + " as we couldn't parse the provided value: [" + allParams.get(name) + "] for parameter: [" + name + "]");
-			logger.trace(niffy);
+			log.warn("Used default value: {} as we couldn't parse the provided value: [{}] for parameter: [{}]",
+					defaultValue, allParams.get(name), name);
+			log.trace(niffy);
 		}
 		return result;
 	}

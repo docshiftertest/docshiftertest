@@ -1,10 +1,10 @@
 package com.docshifter.core.utils.nalpeiron;
 
 import com.docshifter.core.exceptions.DocShifterLicenseException;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class NalpeironAnalyticsSender implements Runnable {
-
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NalpeironAnalyticsSender.class.getName());
 
     private final NalpeironHelper nalpeironHelper;
     private final String username;
@@ -17,10 +17,10 @@ public class NalpeironAnalyticsSender implements Runnable {
     @Override
     public void run() {
         try {
-            logger.info("Sending licensing analytics to remote server if connection available", null);
+            log.info("Sending licensing analytics to remote server if connection available");
             nalpeironHelper.sendAnalyticsCache(username);
         } catch (DocShifterLicenseException ex) {
-            logger.debug("Error during sending of analytics.", ex);
+            log.debug("Error during sending of analytics.", ex);
         }
     }
 }

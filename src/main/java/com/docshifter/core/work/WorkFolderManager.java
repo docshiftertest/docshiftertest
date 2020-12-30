@@ -4,8 +4,8 @@ import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.service.GeneralConfigService;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.naming.ConfigurationException;
@@ -20,9 +20,8 @@ import java.nio.file.Paths;
  * Created by michiel.vandriessche@docbyte.com on 6/11/15.
  */
 @Service
+@Log4j2
 public class WorkFolderManager {
-
-	private static final Logger logger = Logger.getLogger(WorkFolderManager.class);
 
 	private Path workfolder;
 	private Path errorfolder;
@@ -30,12 +29,12 @@ public class WorkFolderManager {
 	@Autowired
 	public WorkFolderManager(GeneralConfigService generalConfiguration) throws ConfigurationException {
 
-		logger.debug("Temp (Work) folder param name: " + Constants.TEMPFOLDER);
-		logger.debug("Error folder param name: " + Constants.ERRORFOLDER);
+		log.debug("Temp (Work) folder param name: {}", Constants.TEMPFOLDER);
+		log.debug("Error folder param name: {}", Constants.ERRORFOLDER);
 		String tempFolder = generalConfiguration.getString(Constants.TEMPFOLDER);
 		String errorFolder = generalConfiguration.getString(Constants.ERRORFOLDER);
-		logger.debug("Temp (Work) folder: " + tempFolder);
-		logger.debug("Error folder: " + errorFolder);
+		log.debug("Temp (Work) folder: {}", tempFolder);
+		log.debug("Error folder: {}", errorFolder);
 		
 		boolean workFolderResult = validateFolder("Work", tempFolder);
 		boolean errorFolderResult = validateFolder("Error", errorFolder);
@@ -61,13 +60,13 @@ public class WorkFolderManager {
 				+ "]! Please check and correct";
 
 		String applicationName = System.getProperty("program.name");
-		logger.debug("App name : " + applicationName);
+		log.debug("App name: {}", applicationName);
 		
 		if ((!StringUtils.isBlank(applicationName)) && applicationName.equalsIgnoreCase("DocShifterConsole")) {
-			logger.warn(errorMessage);
+			log.warn(errorMessage);
 		}
 		else {
-			logger.error(errorMessage);
+			log.error(errorMessage);
 			throw new ConfigurationException(errorMessage);
 		}
 	}
@@ -80,19 +79,18 @@ public class WorkFolderManager {
 		}
 		File folderFile = new File(folderPath);
 		if (!folderFile.exists()) {
-			logger.debug(workOrError + "folder: " + folderPath + " does not exist. Will try to create it.");
+			log.debug("{} folder: {} does not exist. Will try to create it.", workOrError, folderPath);
 			try {
 				Files.createDirectories(Paths.get(folderPath));
 			}
 			catch (IOException ioe) {
-				logger.error(workOrError + "folder: " + folderPath + " did not exist but then could not be created. " +
-						"IOException was: " + ioe);
+				log.error("{} folder: {} did not exist but then could not be created.", workOrError, folderPath, ioe);
 				result = false;
 			}
 		}
 		else {
 			if (Files.isRegularFile(Paths.get(folderPath))) {
-				logger.error(workOrError + "folder on [" + folderPath + "] is a regular file, not a directory!");
+				log.error("{} folder on [{}] is a regular file, not a directory!", workOrError, folderPath);
 				result = false;
 			}
 		}
@@ -102,10 +100,10 @@ public class WorkFolderManager {
 			File tst = new File(folderPath);
 			// Anyhoo, this should sort the wheat from the chaff... see if the folder is writable
 			if (tst.canWrite()) {
-				logger.debug(workOrError + "folder on [" + folderPath + "] is writable. We're good to go!");
+				log.debug("{} folder on [{}] is writable. We're good to go!", workOrError, folderPath);
 			}
 			else {
-				logger.error(workOrError + "folder on [" + folderPath + "] is not writable!");
+				log.error("{} folder on [{}] is not writable!", workOrError, folderPath);
 				result = false;
 			}
 		}
@@ -158,7 +156,7 @@ public class WorkFolderManager {
 		}
 
 		if (folder.getErrorFolder() == null){
-			logger.info("ERRORFOLDER IS NULL *****", null);
+			log.info("ERRORFOLDER IS NULL *****");
 		} else {
 			deletePath(folder.getErrorFolder(), force);
 		}
@@ -169,9 +167,9 @@ public class WorkFolderManager {
 	}
 
 	private boolean deletePath(Path dir, boolean force) {
-		logger.warn("Into deletePath(" + dir.toString() + ", " + force +")");
+		log.warn("Into deletePath({}, {})", dir.toString(), force);
 		if (Files.isDirectory(dir)) {
-			logger.debug("Is directory...");
+			log.debug("Is directory...");
 			try (DirectoryStream<Path> ds = Files.newDirectoryStream(dir)) {
 
 				for (Path child : ds)
@@ -180,22 +178,22 @@ public class WorkFolderManager {
 							return false;
 						}
 					} else {
-						logger.debug("Returning false because force is not set?");
+						log.debug("Returning false because force is not set?");
 						return false;
 					}
 			} catch (IOException ioe) {
-				logger.warn("deletePath(" + dir.toString() + ") in 'for Path', caught IOException: " + ioe);
+				log.warn("deletePath({}) in 'for Path', caught IOException.", dir.toString(), ioe);
 				return false;
 			}
 		}
-		logger.debug("Will delete [" + dir.toString() + "], if exists...");
+		log.debug("Will delete [{}], if exists...", dir.toString());
 		try {
 			Files.deleteIfExists(dir);
 		} catch (IOException ioe) {
-			logger.warn("deletePath(" + dir.toString() + ") after 'deleteIfExists', caught IOException: " + ioe);
+			log.warn("deletePath({}) after 'deleteIfExists', caught IOException.", dir.toString(), ioe);
 			return false;
 		}
-		logger.debug("Returning true!");
+		log.debug("Returning true!");
 		return true;
 	}
 

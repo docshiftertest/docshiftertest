@@ -9,14 +9,15 @@ import com.docshifter.core.utils.dctm.repositories.DctmRepository;
 import com.documentum.fc.client.IDfPersistentObject;
 import com.documentum.fc.client.IDfSysObject;
 import com.documentum.fc.common.DfId;
-import lombok.extern.log4j.Log4j;
 import java.util.Arrays;
 import java.util.HashSet;
+
+import lombok.extern.log4j.Log4j2;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-@Log4j
+@Log4j2
 public class DctmRepositoryTest {
 
 	@Ignore("There's no Dctm repo to talk to right now")

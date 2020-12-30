@@ -4,7 +4,7 @@ package com.docshifter.core.config.service;
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.domain.GlobalSettings;
 import com.docshifter.core.config.domain.GlobalSettingsRepository;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,14 +21,11 @@ import java.util.Optional;
  *
  */
 @Service
+@Log4j2
 public class GeneralConfigService {
-	
-	private static final Logger logger = Logger.getLogger(GeneralConfigService.class);
-	
+
 	protected Map<String, String> params;
 
-	private GlobalSettingsRepository globalSettingsRepository;
-	
 	/**
 	 *
 	 * Hardcoded filling in of the values, should actually get filled in with Hibernate info.
@@ -36,13 +33,11 @@ public class GeneralConfigService {
 	 * @param globalSettingsRepository
 	 */
 	@Autowired
-	public GeneralConfigService(GlobalSettingsRepository globalSettingsRepository){
-		this.globalSettingsRepository = globalSettingsRepository;
-		params = new HashMap<String, String>();
+	public GeneralConfigService(GlobalSettingsRepository globalSettingsRepository) {
+		params = new HashMap<>();
 
-		logger.info("GlobalSettingsRepository.count(): " + this.globalSettingsRepository.count());
-		
-		Optional<GlobalSettings> optionalConfig = this.globalSettingsRepository.findById(1l);
+		log.info("GlobalSettingsRepository.count(): {}", globalSettingsRepository.count());
+		Optional<GlobalSettings> optionalConfig = globalSettingsRepository.findById(1L);
 
 		if(optionalConfig.isPresent()){
 			GlobalSettings config = optionalConfig.get();

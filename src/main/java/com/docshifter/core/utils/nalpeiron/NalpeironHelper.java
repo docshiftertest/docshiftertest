@@ -8,6 +8,7 @@ import com.nalpeiron.nalplibrary.NALP;
 import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
 import com.nalpeiron.nalplibrary.NalpError;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.SystemUtils;
 
 import java.io.File;
@@ -22,10 +23,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Log4j2
 public class NalpeironHelper {
-
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NalpeironHelper.class.getName());
-
     private final int cachingDurationMinutes = 30;
     private final int licenseDurationMinutes = 58;
 
@@ -98,24 +97,24 @@ public class NalpeironHelper {
             nalpLibName += "nalpjava.dll";
         } else {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            logger.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application", null);
-            logger.debug("exited Spring app, doing system.exit()", null);
+            log.fatal("The operating system you are using is not recognized as a UNIX or WINDOWS operating system. This is not supported. Stopping Application");
+            log.debug("Exited Spring app, doing system.exit()");
 
             System.exit(errorCode);
         }
 
         String property = System.getProperty("java.library.path");
-        logger.debug("java.library.path: " + property, null);
+        log.debug("java.library.path: {}", property);
 
         StringTokenizer parser = new StringTokenizer(property, File.pathSeparator);
-        logger.debug("looking for nalpjava library in the following location", null);
+        log.debug("looking for nalpjava library in the following location");
 
         while (parser.hasMoreTokens()) {
             String libPath = parser.nextToken();
-            logger.debug(libPath, null);
+            log.debug(libPath);
 
             if (libPath.endsWith(nalpLibName)) {
-                logger.debug("found " + nalpLibName + " here: " + libPath);
+                log.debug("found {} here: {}", nalpLibName, libPath);
                 foundNalpLib = true;
             }
 
@@ -123,19 +122,20 @@ public class NalpeironHelper {
             if (pathFile.isDirectory()) {
                 File childPath = new File(libPath + "/" + nalpLibName);
                 if (childPath.exists()) {
-                    logger.debug("found " + nalpLibName + " here: " + childPath);
+                    log.debug("found {} here: {}", nalpLibName, childPath);
                     foundNalpLib = true;
                 }
             }
 
             if (foundNalpLib) {
-                logger.debug("nalpeiron core library found", null);
+                log.debug("nalpeiron core library found");
                 return;
             }
         }
 
         if (!foundNalpLib) {
-            logger.fatal("The " + nalpLibName + " file used for your operating system cannot be found in the included java library paths. Stopping Application", null);
+            log.fatal("The {} file used for your operating system cannot be found in the included java library paths." +
+                    " Stopping Application", nalpLibName);
             System.exit(0);
         }
     }
@@ -401,7 +401,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException("could not open nalp library" + nalp.callNalpGetErrorMsg(i), new NalpError(i, nalp.callNalpGetErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -415,7 +416,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException("could not open nalp library", new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
 
@@ -426,7 +428,8 @@ public class NalpeironHelper {
             String i = nalp.callNalpGetErrorMsg(nalpErrorNo);
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -436,7 +439,8 @@ public class NalpeironHelper {
             String i = nsl.callNSLGetVersion();
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -446,7 +450,8 @@ public class NalpeironHelper {
             String i = nsl.callNSLGetComputerID();
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -456,7 +461,8 @@ public class NalpeironHelper {
             String i = nsl.callNSLGetHostName();
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -470,7 +476,8 @@ public class NalpeironHelper {
             }
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -481,7 +488,8 @@ public class NalpeironHelper {
 
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -506,7 +514,8 @@ public class NalpeironHelper {
             }
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -516,7 +525,8 @@ public class NalpeironHelper {
             String i = nsl.callNSLGetSubExpDate();
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -529,7 +539,8 @@ public class NalpeironHelper {
             }
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -539,7 +550,8 @@ public class NalpeironHelper {
             String i = nsl.callNSLGetTrialExpDate();
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -549,7 +561,8 @@ public class NalpeironHelper {
             int i = nsl.callNSLGetLicense(licenseNo, xmlRegInfo);
             return LicenseStatus.getLicenseStatus(i);
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -562,7 +575,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLReturnLicense"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -577,7 +591,8 @@ public class NalpeironHelper {
 
             return LicenseStatus.getLicenseStatus(i);
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -587,7 +602,8 @@ public class NalpeironHelper {
             String i = nsl.callNSLGetActivationCertReq(licenseNo, xmlRegInfo);
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -597,7 +613,8 @@ public class NalpeironHelper {
             String i = nsl.callNSLGetDeactivationCertReq(licenseNo);
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -610,7 +627,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLValidateLibrary"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -620,7 +638,8 @@ public class NalpeironHelper {
             int i = nsl.callNSLGetLicenseStatus();
             return LicenseStatus.getLicenseStatus(i);
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -630,7 +649,8 @@ public class NalpeironHelper {
             String i = nsl.callNSLGetLicenseCode();
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -640,7 +660,8 @@ public class NalpeironHelper {
             int i = nsl.callNSLGetLicenseType();
             return LicenseType.getLicenseType(i);
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -651,7 +672,8 @@ public class NalpeironHelper {
             int i = nsl.callNSLGetActivationType();
             return ActivationType.getActivationType(i);
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -667,7 +689,8 @@ public class NalpeironHelper {
 
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -677,7 +700,8 @@ public class NalpeironHelper {
             int i = nsl.callNSLGetFeatureStatus(featureName);
             return FeatureStatus.getFeatureStatus(i);
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -687,7 +711,8 @@ public class NalpeironHelper {
             int i = nsl.callNSLCheckoutFeature(featureName, licCode);
             return FeatureStatus.getFeatureStatus(i);
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -699,7 +724,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLReturnFeature"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -709,7 +735,8 @@ public class NalpeironHelper {
             int i = nsl.callNSLGetPoolStatus(poolName);
             return PoolStatus.getPoolStatus(i);
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -722,7 +749,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLCheckoutPool"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -734,7 +762,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLReturnPool"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -744,7 +773,8 @@ public class NalpeironHelper {
             String i = nsl.callNSLGetUDFValue(UDFName);
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -757,7 +787,8 @@ public class NalpeironHelper {
             }
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -770,7 +801,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLRegister"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -782,7 +814,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLTestConnection"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -792,7 +825,8 @@ public class NalpeironHelper {
             String i = nsa.callNSAGetVersion();
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -805,7 +839,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSALogin"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -818,7 +853,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSALogout"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -828,7 +864,8 @@ public class NalpeironHelper {
             String i = nsa.callNSAGetHostName();
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -841,7 +878,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAFeatureStart"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -854,7 +892,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAFeatureStop"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         } catch (JsonProcessingException ex) {
             throw new DocShifterLicenseException(ex);
@@ -866,7 +905,8 @@ public class NalpeironHelper {
             int i = nsa.callNSAException(Username, ExceptionCode, clientData, Description);
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -879,7 +919,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSASysInfo"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -892,7 +933,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSASendCache"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -905,7 +947,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAApStart"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -918,7 +961,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAApStop"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -931,7 +975,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAGetLocation"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -941,7 +986,8 @@ public class NalpeironHelper {
             int i = nsa.callNSAGetPrivacy();
             return PrivacyValue.getPrivacyValue(i);
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -954,7 +1000,8 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSASetPrivacy"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
@@ -964,7 +1011,8 @@ public class NalpeironHelper {
             String i = nsa.callNSAGetStats();
             return i;
         } catch (NalpError error) {
-            logger.debug("NalpError was thrown in " + error.getStackTrace()[0].getMethodName() + " code=" + error.getErrorCode() + " message=" + error.getErrorMessage(), error);
+                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+                    error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
     }
