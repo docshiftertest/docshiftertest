@@ -4,19 +4,22 @@
         <Console name="STDOUT" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{DATE} %5p [%t] (%F:%L) - %m%n"/>
         </Console>
-        <RollingFile name="DOCSHIFTER_FILE_TRACE" fileName="logs/docshifter-beans.log">
+        <RollingFile name="DOCSHIFTER_FILE_TRACE" fileName="logs/docshifter-beans.log"
+                     filePattern="logs/$${date:yyyy-MM}/docshifter-beans-%d{MM-dd-yyyy}-%i.log.gz">
             <PatternLayout pattern="%d{DATE} %5p [%t] (%F:%L) - %m%n"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
         </RollingFile>
-        <RollingFile name="SPRING" fileName="logs/spring.log">
+        <RollingFile name="SPRING" fileName="logs/spring.log"
+                     filePattern="logs/$${date:yyyy-MM}/spring-%d{MM-dd-yyyy}-%i.log.gz">
             <PatternLayout pattern="%d{DATE} %5p [%t] (%F:%L) - %m%n"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
         </RollingFile>
-        <RollingFile name="LICENSING" fileName="logs/licensing.log">
+        <RollingFile name="LICENSING" fileName="logs/licensing.log"
+                     filePattern="logs/$${date:yyyy-MM}/licensing-%d{MM-dd-yyyy}-%i.log.gz">
             <PatternLayout pattern="%d{DATE} %5p [%t] (%F:%L) - %m%n"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
