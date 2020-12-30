@@ -36,7 +36,7 @@ public class GeneralConfigService {
 	public GeneralConfigService(GlobalSettingsRepository globalSettingsRepository) {
 		params = new HashMap<>();
 
-		log.info("GlobalSettingsRepository.count(): " + globalSettingsRepository.count());
+		log.info("GlobalSettingsRepository.count(): {}", globalSettingsRepository.count());
 		Optional<GlobalSettings> optionalConfig = globalSettingsRepository.findById(1L);
 
 		if(optionalConfig.isPresent()){

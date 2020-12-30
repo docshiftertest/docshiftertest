@@ -97,8 +97,8 @@ public class NalpeironHelper {
             nalpLibName += "nalpjava.dll";
         } else {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            log.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application");
-            log.debug("exited Spring app, doing system.exit()");
+            log.fatal("The operating system you are using is not recognized as a UNIX or WINDOWS operating system. This is not supported. Stopping Application");
+            log.debug("Exited Spring app, doing system.exit()");
 
             System.exit(errorCode);
         }

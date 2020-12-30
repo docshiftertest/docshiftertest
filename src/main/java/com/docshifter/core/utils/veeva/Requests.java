@@ -44,7 +44,7 @@ public class Requests{
 		byte[] postDataBytes = postData.toString().getBytes(StandardCharsets.UTF_8);
 
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		con.setRequestMethod("GET");
+		con.setRequestMethod("POST");
 		con.setRequestProperty("Authorization", sessionId);
 		con.setRequestProperty("accept", "*/*");
 		con.setDoOutput(true);
@@ -56,8 +56,8 @@ public class Requests{
 		osw.close();
 
 		int responseCode = con.getResponseCode();
-		log.debug("Sent 'GET' request to URL: {}", url);
-		log.debug("GET parameters: {}", new String(postDataBytes));
+		log.debug("Sent 'POST' request to URL: {}", url);
+		log.debug("Post parameters: {}", new String(postDataBytes));
 		log.debug("Response Code: {}", responseCode);
 
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
