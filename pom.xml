@@ -52,8 +52,6 @@
 
 		<aspose.html.version>20.12</aspose.html.version>
 		<aspose.html.classifier>jdk16</aspose.html.classifier>
-
-		<springdoc.version>1.5.2</springdoc.version>
 	</properties>
 
 	<repositories>
@@ -100,11 +98,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 			<version>2.4.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>${springdoc.version}</version>
 		</dependency>
 		<!-- test -->
 		<dependency>
@@ -281,7 +274,6 @@
 		<dependency>
 			<groupId>com.emc.documentum.dfc</groupId>
 			<artifactId>dfc</artifactId>
-			<version>7.1.0000.0118</version>
 			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
@@ -307,18 +299,6 @@
 					</excludes>
 					<finalName>docshifter-beans-${project.version}</finalName>
 					<outputDirectory>${project.build.directory}/jars/</outputDirectory>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<!-- As of jdk11 we will need the extra illegal-access permit doohickey 
-						NOTA BENE!!! The illegal-access flag has to be preceded by 2 minus signs 
-						(without space between) but you can't put that in a comment in the pom! <argLine>-Djava.library.path=${project.build.directory}/classes/license/ 
-						- -illegal-access=permit</argLine> -->
-					<!-- but for now, we don't need it and can't specify it -->
-					<argLine>-Djava.library.path=${project.build.directory}/classes/license/</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
