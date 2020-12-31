@@ -157,7 +157,7 @@ public abstract class Warning {
 	 * @param sourceFilePath The path pointing to the file to generate the notification for
 	 * @param notificationConfigId
 	 */
-	public static void sendWarningNotification(Task task, String warningInfo, Path sourceFilePath,
+	public static void sendWarningNotification(Task task, String warningInfo, String sourceFilePath,
 											   long notificationConfigId) {
 		sendNotification(task, warningInfo, sourceFilePath, notificationConfigId, NotificationLevels.WARN);
 	}
@@ -169,7 +169,7 @@ public abstract class Warning {
 	 * @param sourceFilePath The path pointing to the file to generate the notification for
 	 * @param notificationConfigId
 	 */
-	public static void sendErrorNotification(Task task, String warningInfo, Path sourceFilePath,
+	public static void sendErrorNotification(Task task, String warningInfo, String sourceFilePath,
 											 long notificationConfigId) {
 		sendNotification(task, warningInfo, sourceFilePath, notificationConfigId, NotificationLevels.ERROR);
 	}
@@ -182,7 +182,7 @@ public abstract class Warning {
 	 * @param notificationConfigId
 	 * @param level
 	 */
-	private static void sendNotification(Task task, String warningInfo, Path sourceFilePath,
+	private static void sendNotification(Task task, String warningInfo, String sourceFilePath,
 										 long notificationConfigId, NotificationLevels level) {
 		NotificationService notifier = (NotificationService) task.getData().get("notificationService");
 		NotificationDto notification = new NotificationDto();
