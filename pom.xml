@@ -101,16 +101,6 @@
 		</dependency>
 		<!-- test -->
 		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger2</artifactId>
-			<version>2.9.2</version>
-		</dependency>
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger-ui</artifactId>
-			<version>2.9.2</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-email</artifactId>
 			<version>1.5</version>
@@ -284,7 +274,6 @@
 		<dependency>
 			<groupId>com.emc.documentum.dfc</groupId>
 			<artifactId>dfc</artifactId>
-			<version>7.1.0000.0118</version>
 			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
@@ -310,18 +299,6 @@
 					</excludes>
 					<finalName>docshifter-beans-${project.version}</finalName>
 					<outputDirectory>${project.build.directory}/jars/</outputDirectory>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<!-- As of jdk11 we will need the extra illegal-access permit doohickey 
-						NOTA BENE!!! The illegal-access flag has to be preceded by 2 minus signs 
-						(without space between) but you can't put that in a comment in the pom! <argLine>-Djava.library.path=${project.build.directory}/classes/license/ 
-						- -illegal-access=permit</argLine> -->
-					<!-- but for now, we don't need it and can't specify it -->
-					<argLine>-Djava.library.path=${project.build.directory}/classes/license/</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
