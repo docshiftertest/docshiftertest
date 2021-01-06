@@ -75,6 +75,12 @@
 			<!-- This should be updated to 3.0.5 but appears to be missing the class
 				org.snmp4j.test.MultiThreadedTrapReceiver which is weird, and kind of scary! -->
 			<version>2.6.3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
