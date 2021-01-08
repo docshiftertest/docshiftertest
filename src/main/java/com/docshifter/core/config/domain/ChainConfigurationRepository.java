@@ -3,6 +3,7 @@ package com.docshifter.core.config.domain;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -27,4 +28,7 @@ public interface ChainConfigurationRepository extends CrudRepository<ChainConfig
     @Modifying(flushAutomatically = true)
     @Query("update ChainConfiguration cc set cc.enabled = ?1")
     void enableOrDisableAllWorkFlows(boolean enable);
+    
+    @Query("select cc.name FROM ChainConfiguration cc where cc.id = :id")
+    String findWorkflowNameById(@Param("id") Long configurationID);
 }
