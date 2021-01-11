@@ -76,6 +76,8 @@ public class DocShifterConfiguration {
 		// Set if the QOS values (deliveryMode, priority, timeToLive) should be used for sending a message
 	    template.setExplicitQosEnabled(true);
 	    template.setDeliveryPersistent(true);
+		 // JMS tuning  - http://activemq.apache.org/components/artemis/documentation/1.3.0/perf-tuning.html
+	    template.setMessageTimestampEnabled(false);
 		return template;
 	}
 
@@ -90,6 +92,7 @@ public class DocShifterConfiguration {
 		JmsTemplate template = new JmsTemplate(cachingConnectionFactory());
 		template.setPubSubDomain(true);
 		template.setPriority(AMQPSender.HIGHEST_PRIORITY);
+		template.setMessageTimestampEnabled(false);
 		return template;
 	}
 
