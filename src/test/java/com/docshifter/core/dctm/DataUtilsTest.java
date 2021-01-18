@@ -1,4 +1,4 @@
-package com.docbyte.utils.dctm;
+package com.docshifter.core.dctm;
 
 import com.docshifter.core.utils.dctm.*;
 import com.documentum.fc.client.IDfSysObject;

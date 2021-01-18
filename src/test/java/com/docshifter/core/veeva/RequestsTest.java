@@ -1,4 +1,4 @@
-package com.docbyte.utils.veeva;
+package com.docshifter.core.veeva;
 
 import com.docshifter.core.utils.veeva.VeevaResponse;
 import lombok.extern.log4j.Log4j2;

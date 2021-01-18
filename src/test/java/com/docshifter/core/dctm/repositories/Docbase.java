@@ -1,4 +1,4 @@
-package com.docbyte.utils.dctm.repositories;
+package com.docshifter.core.dctm.repositories;
 
 
 import com.docshifter.core.utils.dctm.annotations.DctmAttribute;

@@ -7,6 +7,8 @@ import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
 import com.nalpeiron.nalplibrary.NalpError;
 import org.apache.commons.lang.SystemUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Profile;
@@ -23,7 +25,7 @@ import java.util.Map;
 @Conditional(IsNotInDockerCondition.class)
 public class NalpeironService implements ILicensingService {
 
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ILicensingService.class.getName());
+    private static final Logger log = LogManager.getLogger(ILicensingService.class);
 
     //These private ints are unique to your product and must
     // be set here to the values corresponding to your product.
@@ -99,22 +101,22 @@ public class NalpeironService implements ILicensingService {
     //TODO: LOGGING
     @PostConstruct
     private void init() {
-        logger.info("|===========================| LICENSING SERVICE INIT START |===========================|", null);
+        log.info("|===========================| LICENSING SERVICE INIT START |===========================|");
 
         if (!(WorkDir.endsWith("/") || WorkDir.endsWith("\\"))) {
             WorkDir += "/";
         }
 
-        logger.debug("using nalpeiron workdir: " + WorkDir, null);
+        log.debug("Using nalpeiron workdir: {}", WorkDir);
 
         //Test if the DLL is present
         NalpeironHelper.dllTest();
 
-        logger.debug("Opening nalpeiron library", null);
+        log.debug("Opening nalpeiron library");
 
         openValidateNalpeironLibrary();
 
-        logger.info("|===========================| LICENSING SERVICE INIT FINISHED |===========================|", null);
+        log.info("|===========================| LICENSING SERVICE INIT FINISHED |===========================|");
 
     }
 
@@ -124,26 +126,26 @@ public class NalpeironService implements ILicensingService {
             int security = 1 + (int) (Math.random() * (501));
             int offset = AUTH_X + ((security * AUTH_Y) % AUTH_Z);
 
-            logger.debug("generated security params for nalpeiron", null);
+            log.debug("Generated security params for nalpeiron");
 
             //Library open, close and error handling
             NALP nalp = new NALP();
 
-            logger.debug("opened NALP()", null);
+            log.debug("opened NALP()");
 
             //Analytics functions
             NSA nsa = new NSA(nalp);
 
-            logger.debug("opened NSA()", null);
+            log.debug("opened NSA()");
 
             //Licensing functions
             NSL nsl = new NSL(nalp, offset);
 
-            logger.debug("opened NSL()", null);
+            log.debug("opened NSL()");
 
             helper = new NalpeironHelper(nalp, nsa, nsl, WorkDir, offlineActivation);
 
-            logger.debug("initialized NalpeironHelper", null);
+            log.debug("initialized NalpeironHelper");
 
             String dllPath = libDir + "/docShifterFileCheck.";
             if (SystemUtils.IS_OS_UNIX) {
@@ -152,12 +154,12 @@ public class NalpeironService implements ILicensingService {
                 dllPath += "dll";
             } else {
                 int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-                logger.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application", null);
+                log.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application");
 
                 System.exit(errorCode);
             }
 
-            logger.debug("using '" + dllPath + "' as the nalpeiron connection dll", null);
+            log.debug("using '{}' as the nalpeiron connection dll", dllPath);
 
             helper.openNalpLibrary(dllPath, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin,
                     NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort,
@@ -168,32 +170,32 @@ public class NalpeironService implements ILicensingService {
 
             helper.validateLibrary(customerID, productID);
 
-            logger.debug("validateLibrary finished, starting periodic license checking", null);
+            log.debug("validateLibrary finished, starting periodic license checking");
 
             helper.validateLicenseAndInitiatePeriodicChecking();
 
-            logger.debug("Periodic license checking thread started, staring analytics", null);
+            log.debug("Periodic license checking thread started, staring analytics");
 
             //At this point we have a license, so start analytics
             //Turn end user privacy off
             helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
 
-            logger.debug("privacy turned off, calling startAnalyticsApp", null);
+            log.debug("privacy turned off, calling startAnalyticsApp");
             helper.startAnalyticsApp(NALPEIRON_USERNAME, CLIENT_DATA, aid);
-            logger.debug("sending analytics SystemInfo", null);
+            log.debug("sending analytics SystemInfo");
 
             helper.sendAnalyticsSystemInfo(NALPEIRON_USERNAME, APP_LANGUAGE, VERSION, EDITION, BUILD, LICENSE_STAT, CLIENT_DATA);
 
             helper.sendAnalyticsAndInitiatePeriodicReporting();
-            logger.debug("sending analytics SystemInfo, starting periodic analytics sender", null);
+            log.debug("sending analytics SystemInfo, starting periodic analytics sender");
 
             //start periodic sending of analytics
             helper.sendAnalyticsAndInitiatePeriodicReporting();
 
-            logger.debug("Periodic analytics sending thread started", null);
+            log.debug("Periodic analytics sending thread started");
         } catch (DocShifterLicenseException | NalpError e) {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            logger.fatal("error in docshifter license processing. Could not complete opening and validating Nalpeiron Library.", e);
+            log.fatal("Error in docshifter license processing. Could not complete opening and validating Nalpeiron Library.", e);
 
             System.exit(errorCode);
         }
@@ -205,7 +207,7 @@ public class NalpeironService implements ILicensingService {
         if (!VALID_FEATURE_STATUS.contains(featureStatus)) {
             String errorMessage = "feature could not be activated. The feature status is: " + featureStatus.name() + ". Blocking acces to module: " + moduleId;
             DocShifterLicenseException ex = new DocShifterLicenseException(errorMessage);
-            logger.info(errorMessage, ex);
+            log.info(errorMessage, ex);
             throw ex;
         }
 
