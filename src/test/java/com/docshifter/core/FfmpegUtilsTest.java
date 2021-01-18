@@ -1,4 +1,4 @@
-package com.docbyte.utils;
+package com.docshifter.core;
 
 import java.util.Map;
 

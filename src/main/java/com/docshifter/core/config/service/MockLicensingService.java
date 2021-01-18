@@ -1,6 +1,8 @@
 package com.docshifter.core.config.service;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,7 @@ import java.util.Map;
 @Conditional(IsInDockerCondition.class)
 public class MockLicensingService implements ILicensingService {
 
-	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ILicensingService.class.getName());
+	private static final Logger log = LogManager.getLogger(ILicensingService.class);
 	private static final Map<String, Date> keys = new HashMap<>();
 	static {
 		keys.put("b6b1edf7-8e7c-4209-9911-8f630114be4d", null);
@@ -33,26 +35,26 @@ public class MockLicensingService implements ILicensingService {
 	}
 
 	public MockLicensingService() {
-		logger.info("Container environment detected.");
+		log.info("Container environment detected.");
 		String licenseCode = System.getenv("DS_LICENSE_CODE");
 
 		if (StringUtils.isBlank(licenseCode)) {
-			logger.fatal("No license code found. Make sure you have set the DS_LICENSE_CODE environment variable.");
+			log.fatal("No license code found. Make sure you have set the DS_LICENSE_CODE environment variable.");
 			System.exit(0);
 		}
 
 		if (!keys.containsKey(licenseCode)) {
-			logger.fatal(licenseCode + " is an invalid license code.");
+			log.fatal( "{} is an invalid license code.", licenseCode);
 			System.exit(0);
 		}
 
 		Date expiryDate = keys.get(licenseCode);
 		if (expiryDate != null && new Date().compareTo(expiryDate) > 0) {
-			logger.fatal("License code " + licenseCode + " has expired.");
+			log.fatal("License code {} has expired.", licenseCode);
 			System.exit(0);
 		}
 
-		logger.info("License validated.");
+		log.info("License validated.");
 	}
 
 	@Override

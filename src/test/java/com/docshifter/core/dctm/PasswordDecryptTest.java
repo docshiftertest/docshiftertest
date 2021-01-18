@@ -1,7 +1,6 @@
-package com.docbyte.utils.dctm;
+package com.docshifter.core.dctm;
 
 import com.docshifter.core.utils.dctm.DctmSessionUtils;
-import org.junit.Ignore;
 import org.junit.Ignore;
 import org.junit.Test;
 

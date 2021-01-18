@@ -1,4 +1,4 @@
-package com.docbyte.utils.dctm;
+package com.docshifter.core.dctm;
 
 import com.docshifter.core.utils.FileUtils;
 import org.apache.commons.lang.SystemUtils;
