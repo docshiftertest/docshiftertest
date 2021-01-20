@@ -21,10 +21,12 @@ public class IsInDockerCondition implements Condition {
 
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-		// https://stackoverflow.com/a/52581380
+		// The container platform can typically be detected from within a container by analyzing the cgroup file.
+		// https://stackoverflow.com/a/52581380 was used as a reference
 		try (Stream<String> stream = Files.lines(Paths.get("/proc/1/cgroup"))) {
 			return stream.anyMatch(line -> cGroups.stream().anyMatch(cGroup -> line.contains("/" + cGroup)));
 		} catch (IOException e) {
+			// We're probably just running on Windows here...
 			return false;
 		}
 	}
