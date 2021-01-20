@@ -25,9 +25,16 @@ public class ApplicationStateExporter {
 	public void onReadinessStateChange(AvailabilityChangeEvent<ReadinessState> event) throws IOException {
 		File file = new File(BASE_PATH + "ready");
 		switch (event.getState()) {
+			// Doesn't necessarily mean network traffic, just means it's analogous to the fact that the application
+			// has started up and is ready to start doing actual processing
+			// Also see https://docs.spring.io/spring-boot/docs/2.4.1/reference/html/spring-boot-features.html#boot-features-application-availability-readiness-state
 			case ACCEPTING_TRAFFIC:
 				file.createNewFile();
 				break;
+			// Ditto, doesn't necessarily mean network traffic, just means it's analogous to the fact that the
+			// application is not (or no longer) ready yet to do any processing (before application and command-line
+			// runners have been called).
+			// Also see https://docs.spring.io/spring-boot/docs/2.4.1/reference/html/spring-boot-features.html#boot-features-application-availability-readiness-state
 			case REFUSING_TRAFFIC:
 				file.delete();
 				break;
