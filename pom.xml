@@ -300,9 +300,6 @@
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
-					<excludes>
-						<exclude>**/application.properties</exclude>
-					</excludes>
 					<finalName>docshifter-beans-${project.version}</finalName>
 					<outputDirectory>${project.build.directory}/jars/</outputDirectory>
 				</configuration>

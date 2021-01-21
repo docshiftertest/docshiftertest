@@ -29,13 +29,6 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/src/main/resources/</directory>
-            <outputDirectory/>
-            <includes>
-                <include>application.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
             <directory>${project.basedir}/src/main/resources/license</directory>
             <outputDirectory>lib</outputDirectory>
             <includes>
