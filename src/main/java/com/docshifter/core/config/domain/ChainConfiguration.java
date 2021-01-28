@@ -1,5 +1,9 @@
 package com.docshifter.core.config.domain;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,7 +12,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+
+
+
+
+//Read-only: Use this strategy when you are sure that your data never changes. If you try to update the data with this strategy Hibernate will throw an exception.
+//Read-write: Use this strategy when you do lots of updates on your entity. It guarantees data consistency when multiple transactions try to access the same object. The transaction which accesses the object first acquires the lock and other transactions will not have access to the cache and will start fetching the data directly from the database.
+//Nonstrict-read-write:  It is similar to Read-write but there is no locking mechanism hence it does not guarantee data consistency between cache and database. Use this strategy when stale data for a small window is not a concern.
+//Transactional: It is suitable in a JTA environment. Any changes in the cached entity will be committed or rollback in the same transaction.
+//Using read-write strategy as we will can have a lot of changes during workflows configuration.
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cacheable
 public class ChainConfiguration {
 
 	@Id
@@ -26,6 +41,7 @@ public class ChainConfiguration {
 
 	private boolean enabled;
 
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne(cascade=CascadeType.ALL) // TODO: shouldn't this be OneToOne instead?
 	private Node rootNode;
 

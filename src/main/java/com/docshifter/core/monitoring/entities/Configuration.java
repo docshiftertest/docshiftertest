@@ -1,16 +1,21 @@
 package com.docshifter.core.monitoring.entities;
 
-import com.docshifter.core.monitoring.entities.AbstractConfigurationItem;
-
 import javax.persistence.*;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import java.util.List;
 
 @Entity(name = "MonitoringConfiguration")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cacheable
 public class Configuration {
     @Id
     private Long id;
     private String name;
 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy="configuration",
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)

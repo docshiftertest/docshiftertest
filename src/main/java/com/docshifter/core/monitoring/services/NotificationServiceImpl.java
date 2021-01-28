@@ -3,8 +3,6 @@ package com.docshifter.core.monitoring.services;
 import com.docshifter.core.monitoring.utils.EmailPlaceHolderConsts;
 import com.docshifter.core.monitoring.dtos.*;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
-import com.docshifter.core.monitoring.services.DbNotificationService;
-import com.docshifter.core.monitoring.services.EmailService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

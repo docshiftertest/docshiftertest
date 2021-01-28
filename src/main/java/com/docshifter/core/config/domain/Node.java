@@ -3,27 +3,34 @@ package com.docshifter.core.config.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cacheable
 public class Node {
 	@Id
 	@Column(name = "ID")
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private long id;
 
-	//@ManyToOne()
+
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne(cascade = CascadeType.REMOVE)
 	@JsonIgnore()
 	private Node parentNode;
 
-	//@OneToMany(mappedBy = "parentNode")
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "parentNode", cascade = CascadeType.ALL)
 	private Set<Node> childNodes=null;
 
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne
 	private ModuleConfiguration moduleConfiguration;
 	

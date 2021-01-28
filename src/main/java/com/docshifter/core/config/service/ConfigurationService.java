@@ -2,6 +2,7 @@ package com.docshifter.core.config.service;
 
 
 import com.docshifter.core.config.wrapper.SenderConfigurationWrapper;
+import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.domain.ChainConfiguration;
 import com.docshifter.core.config.domain.ChainConfigurationRepository;
 import com.docshifter.core.config.domain.Module;
@@ -13,6 +14,7 @@ import com.docshifter.core.config.domain.NodeRepository;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -91,18 +93,21 @@ public class ConfigurationService {
 	 * Method that returns the SenderConfigurationWrapper associated with the given
 	 * Configuration UID.
 	 * 
+	 * Cached by uid parameter to avoid unnecessary database calls and instances unnecessary creation.
+	 * 
 	 * @param uid a long representing the UID of the requested
 	 *        SenderConfiguration.
 	 */
+	@Cacheable(value = Constants.SENDER_CONFIGURATION_CACHE, key = "#uid")
 	public SenderConfigurationWrapper getSenderConfiguration(long uid) {
-		Optional<ChainConfiguration> cc=chainConfigurationRepository.findById(uid);
+		Optional<ChainConfiguration> cc = chainConfigurationRepository.findById(uid);
 		if (cc.isPresent()) {
 			Optional<Node> noddy = nodeRepository.findById(cc.get().getRootNode().getId());
 			if (noddy.isPresent()) {
 				return new SenderConfigurationWrapper(noddy.get(), chainConfigurationRepository);
 			}
 			else {
-				logger.error("Could not find Node in nodeRepository using ID: " + 
+				logger.error("Could not find Node in nodeRepository using ID: {} " +
 					cc.get().getRootNode().getId() +
 					" for ChainConfiguration ID: " + uid);
 			}

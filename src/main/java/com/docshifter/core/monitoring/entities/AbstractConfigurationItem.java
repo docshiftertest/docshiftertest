@@ -1,10 +1,28 @@
 package com.docshifter.core.monitoring.entities;
 
-import com.docshifter.core.monitoring.entities.Configuration;
-import com.docshifter.core.monitoring.enums.NotificationLevels;
-
-import javax.persistence.*;
 import java.util.Set;
+
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.docshifter.core.monitoring.enums.NotificationLevels;
 
 /**
  * Created by blazejm on 19.05.2017.
@@ -12,15 +30,19 @@ import java.util.Set;
 @Entity(name = "MonitoringConfigItem")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "type")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public abstract class AbstractConfigurationItem {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="configurationId", nullable = false)
     private Configuration configuration;
 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @ElementCollection(targetClass = NotificationLevels.class)
     @JoinTable(name = "MonitoringNotificationLevels", joinColumns = @JoinColumn(name = "configurationItemId"))
     @Column(name = "level", nullable = false)
