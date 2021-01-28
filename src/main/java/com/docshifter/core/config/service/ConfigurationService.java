@@ -2,6 +2,9 @@ package com.docshifter.core.config.service;
 
 
 import com.docshifter.core.config.wrapper.SenderConfigurationWrapper;
+
+import lombok.extern.log4j.Log4j2;
+
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.domain.ChainConfiguration;
 import com.docshifter.core.config.domain.ChainConfigurationRepository;
@@ -11,7 +14,6 @@ import com.docshifter.core.config.domain.ModuleConfigurationRepository;
 import com.docshifter.core.config.domain.ModuleRepository;
 import com.docshifter.core.config.domain.Node;
 import com.docshifter.core.config.domain.NodeRepository;
-import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,9 +34,8 @@ import java.util.Set;
  * 
  */
 @Service
+@Log4j2
 public class ConfigurationService {
-
-	private static final Logger logger = Logger.getLogger(new Object() { }.getClass().getEnclosingClass());
 
 	private NodeRepository nodeRepository;
 	private ChainConfigurationRepository chainConfigurationRepository;
@@ -107,15 +108,14 @@ public class ConfigurationService {
 				return new SenderConfigurationWrapper(noddy.get(), chainConfigurationRepository);
 			}
 			else {
-				logger.error("Could not find Node in nodeRepository using ID: {} " +
-					cc.get().getRootNode().getId() +
-					" for ChainConfiguration ID: " + uid);
+				log.error("Could not find Node in nodeRepository using ID: {} for ChainConfiguration ID: {}",
+						cc.get().getRootNode().getId(), uid);
 			}
 		}
 		else {
-			logger.error("Could not find ChainConfiguration (Workflow) using ID: " + uid +
-					". This may be because you have added/deleted Workflows and there " + 
-					" are still messages on the Q referring to the old Workflow!");
+			log.error(
+					"Could not find ChainConfiguration (Workflow) using ID:{} , This may be because you have added/deleted Workflows and there ",
+					" are still messages on the Q referring to the old Workflow!", uid);
 		}
 		return null;
 	}
@@ -149,8 +149,7 @@ public class ConfigurationService {
 			List<ModuleConfiguration> list = moduleConfigurationRepository.findByModule(module);
 			return list;
 		} catch (HibernateException e) {
-			logger.error("moduleconfiguration not found", e);
-			e.printStackTrace();
+			log.error("moduleconfiguration not found", e);
 			return null;
 		}
 	}
@@ -161,8 +160,7 @@ public class ConfigurationService {
 			Module module = moduleRepository.findOneByName(name);
 			return module;
 		} catch (HibernateException e) {
-			logger.error("module not found", e);
-			e.printStackTrace();
+			log.error("module not found", e);
 			return null;
 		}
 	}
