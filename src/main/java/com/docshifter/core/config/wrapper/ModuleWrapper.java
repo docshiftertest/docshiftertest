@@ -20,11 +20,7 @@ public class ModuleWrapper {
 
 		params = new HashMap<String, String>();
 
-		config.getParameterValues().entrySet().forEach(p -> {
-
-			params.put(p.getKey().getName(), p.getValue());
-
-		});
+		config.getParameterValues().forEach((key, value) -> params.put(key.getName(), value));
 	}
 
 	public String toString() {

@@ -4,22 +4,25 @@ import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.service.ConfigurationService;
 import com.docshifter.core.config.service.GeneralConfigService;
 import com.docshifter.core.messaging.sender.AMQPSender;
+
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import java.util.ArrayList;
-import java.util.List;
+import javax.jms.ConnectionFactory;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
@@ -95,19 +98,32 @@ public class DocShifterConfiguration {
 		template.setMessageTimestampEnabled(false);
 		return template;
 	}
+	
+	/**
+	 * Custom JMS listener container to work with topics , this is used in sender to reload configurations
+	 * and also in receiver to reload the configuration and clean the cache.
+	 * This operations happens when change / save an workflow and console send a notification.
+	 * @param connectionFactory auto injected  {@link #cachingConnectionFactory()}
+	 * @param configurer The {@link DefaultJmsListenerContainerFactoryConfigurer} to be customized. 
+	 */
+	@Bean
+	public JmsListenerContainerFactory<?> topicListener(ConnectionFactory connectionFactory,
+			DefaultJmsListenerContainerFactoryConfigurer configurer) {
+		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+		configurer.configure(factory, connectionFactory);		
+		// We need to explicit set to true so the listener will work in pub/sub mode.
+		factory.setPubSubDomain(true);
+		return factory;
+	}
 
 	@Bean
 	public ActiveMQQueue defaultQueue() {
 		return new ActiveMQQueue(generalConfigService.getString(Constants.MQ_QUEUE));
 	}
-
+	
 	@Bean
 	public ActiveMQTopic reloadExchange() {
 		return new ActiveMQTopic(Constants.RELOAD_QUEUE);
 	}
 
-	@Bean
-	public ActiveMQQueue syncQueue() {
-		return new ActiveMQQueue(Constants.SYNC_QUEUE);
-	}
 }

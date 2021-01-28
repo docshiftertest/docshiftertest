@@ -6,7 +6,6 @@ import com.docshifter.core.monitoring.dtos.ConfigurationItemDto;
 import com.docshifter.core.monitoring.entities.Configuration;
 import com.docshifter.core.monitoring.mappings.ConfigurationConverter;
 import com.docshifter.core.monitoring.repo.ConfigurationRepository;
-import com.docshifter.core.monitoring.services.ConfigurationService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

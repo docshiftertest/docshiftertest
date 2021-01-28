@@ -3,11 +3,16 @@ package com.docshifter.core.config.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.extern.log4j.Log4j2;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,6 +27,8 @@ import javax.persistence.Transient;
 
 @Entity
 @Log4j2
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cacheable
 public class Module {
 
 	@Id
@@ -37,6 +44,7 @@ public class Module {
 	private String inputFiletype;
 	private String outputFileType;
 
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinTable(name = "moduleparams",
 			joinColumns = {	@JoinColumn(name = "module") },
@@ -55,7 +63,6 @@ public class Module {
 		this.parameters = parameters;
 	}
 	public Module(String description, String name, String classname, String type, String condition, Set<Parameter> parameters) {
-//		this.id = id;
 		this.description = description;
 		this.name = name;
 		this.classname = classname;
