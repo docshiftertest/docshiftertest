@@ -15,6 +15,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/11/15.
@@ -78,34 +79,41 @@ public class WorkFolderManager {
 			folderPath = folderPath.substring(0, folderPath.length() - 1);
 		}
 		File folderFile = new File(folderPath);
-		if (!folderFile.exists()) {
-			log.debug("{} folder: {} does not exist. Will try to create it.", workOrError, folderPath);
-			try {
-				Files.createDirectories(Paths.get(folderPath));
-			}
-			catch (IOException ioe) {
-				log.error("{} folder: {} did not exist but then could not be created.", workOrError, folderPath, ioe);
+		if (folderFile.exists()) {
+			// Useless if it exists but is not a folder...
+			if (Files.isRegularFile(Paths.get(folderPath))) {
+				log.error("{} folder on {} is a regular file, not a directory so cannot be used!", workOrError, folderPath);
 				result = false;
 			}
 		}
 		else {
-			if (Files.isRegularFile(Paths.get(folderPath))) {
-				log.error("{} folder on [{}] is a regular file, not a directory!", workOrError, folderPath);
-				result = false;
+			// Java may incorrectly report that the folder does not exist if it's on a network, so allow for that
+			log.info("Java thinks {} folder: {} does not exist but it could be a network folder, so we'll first just try to create it.", workOrError, folderPath);
+			try {
+				Files.createDirectories(Paths.get(folderPath));
+			}
+			catch (IOException ioe) {
+				log.info("{} folder: {} did not exist but then could not be created. This may be OK if it's a network folder...", workOrError, folderPath, ioe);
 			}
 		}
-
-		
-		if (result) {
-			File tst = new File(folderPath);
-			// Anyhoo, this should sort the wheat from the chaff... see if the folder is writable
-			if (tst.canWrite()) {
-				log.debug("{} folder on [{}] is writable. We're good to go!", workOrError, folderPath);
-			}
-			else {
-				log.error("{} folder on [{}] is not writable!", workOrError, folderPath);
-				result = false;
-			}
+		// Either the folder didn't exist and we created it, or it did exist and java wrongly reported it didn't (network folder), or
+		// it didn't exist and our creation attempt failed (permissions, bad path?)
+		// Let's now see if we can create and then delete a test file in the folder...
+		String tempFileName = UUID.randomUUID() + ".tmp";
+		try {
+			Files.createFile(Paths.get(folderPath, tempFileName));
+		}
+		catch (IOException ioe) {
+			log.error("{} Folder: Could not create a test file {} on the folder: {} so the folder cannot be used.", workOrError, tempFileName, folderPath, ioe);
+			result = false;
+		}
+		// We also have to be able to delete from the Work and Error folders, otherwise it'll all go hideously wrong...
+		try {
+			Files.deleteIfExists(Paths.get(folderPath, tempFileName));
+		}
+		catch (IOException ioe) {
+			log.error("{} Folder: Could not delete the test file {} from the folder: {} so the folder cannot be used.", workOrError, tempFileName, folderPath, ioe);
+			result = false;
 		}
 		return result;
 	}
@@ -199,13 +207,11 @@ public class WorkFolderManager {
 
 	@Override
 	public String toString() {
-		StringBuilder sBuf = new StringBuilder();
-		sBuf.append("WorkFolderManager: ");
-		sBuf.append("Errorfolder=");
-		sBuf.append(this.errorfolder);
-		sBuf.append(", ");
-		sBuf.append("Workfolder=");
-		sBuf.append(this.workfolder);
-		return sBuf.toString();
+		return "WorkFolderManager: " +
+				"Errorfolder=" +
+				this.errorfolder +
+				", " +
+				"Workfolder=" +
+				this.workfolder;
 	}
 }
