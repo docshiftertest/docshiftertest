@@ -4,6 +4,7 @@ import com.aspose.pdf.PageSize;
 import com.aspose.pdf.Rectangle;
 import com.aspose.words.ImageSize;
 import com.aspose.words.PaperSize;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.common.bytesource.ByteSource;
@@ -11,8 +12,6 @@ import org.apache.commons.imaging.common.bytesource.ByteSourceFile;
 import org.apache.commons.imaging.formats.jpeg.JpegImageParser;
 import org.apache.commons.imaging.formats.jpeg.segments.UnknownSegment;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
@@ -28,12 +27,12 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.List;
 
+@Log4j2
 public class ImageUtils {
-	
-	private static final Logger logger = LoggerFactory.getLogger(ImageUtils.class);
 	
     public static final int COLOR_TYPE_RGB = 1;
     public static final int COLOR_TYPE_CMYK = 2;
@@ -129,18 +128,51 @@ public class ImageUtils {
 	}
 
 	/**
-	 * Try to get a Color, first by name and if that doesn't work, then we
-	 * presume it's a hex string 
+	 * Try to get a Color, first by name and if that doesn't work, then we presume it's a hex string. Returns BLACK in
+	 * case even the hex string is not parsable.
+	 * @param nm Name of a Color (yellow, black, blue...) or a hex string defining (alpha)rgb
+	 * @return The desired java awt Color object or else BLACK
+	 */
+	public static Color getColorOrBlack(String nm) {
+		return getColor(nm, Color.BLACK);
+	}
+
+	/**
+	 * Try to get a Color, first by name and if that doesn't work, then we presume it's a hex string. Has a final
+	 * fallback Color in case even the hex string is not parsable.
+	 * @param nm Name of a Color (yellow, black, blue...) or a hex string defining (alpha)rgb
+	 * @param fallback A fallback Color in case something goes wrong.
+	 * @return The desired java awt Color object or else the provided fallback Color
+	 */
+	public static Color getColor(String nm, Color fallback) {
+		try {
+			return getColor(nm);
+		} catch (Exception ex) {
+			log.warn("The color \"{}\" could not be parsed, so we will fallback to {}", nm, fallback);
+			return fallback;
+		}
+	}
+
+	/**
+	 * Try to get a Color, first by name and if that doesn't work, then we presume it's a hex string
 	 * @param nm Name of a Color (yellow, black, blue...) or a hex string defining (alpha)rgb
 	 * @return A java awt Color object
-	 * @throws NumberFormatException
+	 * @throws NumberFormatException The Color name is blank, is not known to Java AWT or is not a parsable hex string.
 	 */
 	public static Color getColor(String nm) throws NumberFormatException {
-		Color result = Color.getColor(nm);
-    	if (result == null) {
-    		result = decodeWithAlpha(nm);
-    	}
-    	return result;
+		if (StringUtils.isBlank(nm)) {
+			throw new NumberFormatException("A null or empty value is not a valid colour!");
+		}
+
+		nm = nm.trim().toUpperCase();
+		try {
+			Field field = Class.forName("java.awt.Color")
+					.getField(nm.replace(' ', '_').replace("GREY", "GRAY"));
+			return (Color)field.get(null);
+		} catch (Exception e) {
+			log.debug("Color {} was not found in AWT, so we'll try to decode it as a hex string.", nm);
+			return decodeWithAlpha(nm);
+		}
 	}
 
     /**
@@ -149,17 +181,22 @@ public class ImageUtils {
      * @return A java awt Color object
      * @throws NumberFormatException
      */
-	public static Color decodeWithAlpha(String nm) throws NumberFormatException {
-    	Integer intval = Integer.decode(nm);
-    	int i = intval.intValue();
-    	// Alpha channel is the most significant
-    	int alpha = (i >> 24) & 0xFF;
-    	// If no alpha bits, default to 255
-    	if (alpha == 0) {
+	private static Color decodeWithAlpha(String nm) throws NumberFormatException {
+		if (nm.length() > 9) {
+			throw new NumberFormatException("Hex string is too long.");
+		}
+
+		long l = Long.decode(nm);
+    	long alpha;
+    	if (nm.length() <= 7) {
+			// If no alpha bits, default to 255
     		alpha = 255;
-    	}
-    	logger.debug("Creating a new colour with alpha: " + alpha);
-        return new Color((i >> 16) & 0xFF, (i >> 8) & 0xFF, i & 0xFF, alpha);
+    	} else {
+			// Alpha channel is the most significant
+    		alpha = (l >> 24) & 0xFF;
+		}
+    	log.debug("Creating a new colour with alpha: {}", alpha);
+        return new Color((int)(l >> 16) & 0xFF, (int)(l >> 8) & 0xFF, (int)l & 0xFF, (int)alpha);
     }
 
     // Read jpegs with any colourspace you care to mention!
@@ -302,22 +339,18 @@ public class ImageUtils {
 		double ratioH = pageHeight / slideHeight;
 
 		// A smaller ratio will ensure that the image fits on the page
-		double ratio = ratioW < ratioH ? ratioW:ratioH;
-	    if ((slideWidth*ratio - pageWidth) > 1) {
-	    	logger.warn("Width (" +  slideWidth*ratio 
-	    			+ ") will be too large to fit on page (" 
-	    			+ pageWidth + ")");
+		double ratio = Math.min(ratioW, ratioH);
+	    if ((slideWidth * ratio - pageWidth) > 1) {
+	    	log.warn("Width ({}) will be too large to fit on page ({})", slideWidth * ratio, pageWidth);
 	    }
-	    if ((slideHeight*ratio - pageHeight) > 1) {
-	    	logger.warn("Height (" +  slideHeight*ratio 
-	    			+ ") will be too large to fit on page (" 
-	    			+ pageHeight + ")");
+	    if ((slideHeight * ratio - pageHeight) > 1) {
+	    	log.warn("Height ({}) will be too large to fit on page ({})", slideHeight * ratio, pageHeight);
 	    }
 	    // If we would be upscaling (ratio > 1) but upScale NOT requested, set ratio back to 1 (no resizing)
 	    if (ratio > 1 && !upScale) {
 	    	ratio = 1;
 	    }
-		return new double[] {slideWidth*ratio, slideHeight*ratio};
+		return new double[] {slideWidth * ratio, slideHeight * ratio};
 	}
 
 	/**
@@ -381,7 +414,7 @@ public class ImageUtils {
 			case "LETTER":
 				return PageSize.getPageLetter();
 			default:
-				logger.warn("Got a bad or empty page size: [" + pageSize + "]. Defaulting to A4...");
+				log.warn("Got a bad or empty page size: [{}]. Defaulting to A4...", pageSize);
 				return PageSize.getA4();
 		}
 	}
@@ -392,7 +425,7 @@ public class ImageUtils {
 	 */
 	public static int parsePaperSize(String paperSize) {
 		if (StringUtils.isBlank(paperSize)) {
-			logger.warn("Got a bad or empty paper size: [" + paperSize + "]. Defaulting to A4...");
+			log.warn("Got a bad or empty paper size: [{}]. Defaulting to A4...", paperSize);
 			return PaperSize.A4;
 		}
 		switch (paperSize.toUpperCase()) {
@@ -432,7 +465,7 @@ public class ImageUtils {
 			case "TABLOID":
 				return PaperSize.TABLOID;
 			default:
-				logger.warn("Got a bad or empty paper size: [" + paperSize + "]. Defaulting to A4...");
+				log.warn("Got a bad or empty paper size: [{}]. Defaulting to A4...", paperSize);
 				return PaperSize.A4;
 		}
 	}
