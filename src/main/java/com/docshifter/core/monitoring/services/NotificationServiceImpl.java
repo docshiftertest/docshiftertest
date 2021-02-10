@@ -51,7 +51,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void sendNotification(long configurationId, NotificationLevels level, String taskId, String message, File... attachments) {
     	log.debug("With attachments, sendNotification(configId=" + configurationId + ", level=" + level.toString() + ", taskId=" + taskId + ", message=" + message + ")");
-    	sendNotification(configurationId, level, taskId, message, null, new File[0]);
+    	sendNotification(configurationId, level, taskId, message, null, attachments);
     }
 
     @Override

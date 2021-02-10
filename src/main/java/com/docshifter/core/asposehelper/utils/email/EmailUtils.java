@@ -190,11 +190,7 @@ public class EmailUtils {
 			String opacity, String xPos, String yPos) {
 		Stamp stamp;
 		String[] lines = textOrPath.split("/n");
-		Color formatColor = ImageUtils.getColor(color);
-		if (formatColor == null) {
-			logger.warn("Color " + color + " not found. Using the default color BLACK");
-			formatColor = Color.BLACK;
-		}
+		Color formatColor = ImageUtils.getColorOrBlack(color);
 		FormattedText ft = new FormattedText(lines[0], formatColor, font, EncodingType.Winansi, false, Float.valueOf(fontSize));
 		for (int j = 1; j < lines.length; j++) {
 			ft.addNewLineText(lines[j]);
