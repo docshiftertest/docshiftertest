@@ -182,8 +182,15 @@ public class ImageUtils {
      * @throws NumberFormatException
      */
 	private static Color decodeWithAlpha(String nm) throws NumberFormatException {
-		if (nm.length() > 9) {
-			throw new NumberFormatException("Hex string is too long.");
+		if (nm.toLowerCase().startsWith("0x")) {
+			if (nm.length() > 10) {
+				throw new NumberFormatException("Hex string [" + nm + "] is too long.");
+			}
+		}
+		else if (nm.toLowerCase().startsWith("#")) {
+			if (nm.length() > 9) {
+				throw new NumberFormatException("Hash string " + nm + " is too long.");
+			}
 		}
 
 		long l = Long.decode(nm);

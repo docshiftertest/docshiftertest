@@ -290,7 +290,11 @@
 			<artifactId>commons-imaging</artifactId>
 			<version>1.0-alpha1</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.55</version>
+		</dependency>
 		
        <!--Caching Dependency-->
 		<dependency>
