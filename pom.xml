@@ -50,7 +50,7 @@
 		<aspose.tasks.version>20.12</aspose.tasks.version>
 		<aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
 
-		<aspose.words.version>21.1</aspose.words.version>
+		<aspose.words.version>21.2</aspose.words.version>
 		<aspose.words.classifier>jdk17</aspose.words.classifier>
 
 		<aspose.html.version>20.12</aspose.html.version>
@@ -290,7 +290,11 @@
 			<artifactId>commons-imaging</artifactId>
 			<version>1.0-alpha1</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.55</version>
+		</dependency>
 		
        <!--Caching Dependency-->
 		<dependency>

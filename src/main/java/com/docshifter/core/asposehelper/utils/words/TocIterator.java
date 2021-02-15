@@ -94,12 +94,7 @@ public class TocIterator implements Iterator<FieldStart> {
 		} else {
 			// For entries below the first entry, we can simply remove the parent paragraph and it'll get rid of the
 			// field and line.
-			try {
-				currentNode.getField().getStart().getParentParagraph().remove();
-			}
-			catch (Exception ex) {
-				logger.error("Could not remove Parent Paragraph.", ex);
-			}
+			currentNode.getField().getStart().getParentParagraph().remove();
 		}
 
 		currentNode = null;

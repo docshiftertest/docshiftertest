@@ -32,7 +32,7 @@ public final class DocumentBuilderUtils {
 	 * Inserts an empty line at the current position and stays on it.
 	 * @param docBuilder The {@link DocumentBuilder}.
 	 */
-	public static void writelnNoJump(DocumentBuilder docBuilder) throws Exception {
+	public static void writelnNoJump(DocumentBuilder docBuilder) {
 		docBuilder.writeln();
 		moveToPreviousParagraph(docBuilder);
 	}
@@ -42,7 +42,7 @@ public final class DocumentBuilderUtils {
 	 * @param docBuilder The {@link DocumentBuilder}.
 	 * @param text The text to insert.
 	 */
-	public static void writelnNoJump(DocumentBuilder docBuilder, String text) throws Exception {
+	public static void writelnNoJump(DocumentBuilder docBuilder, String text) {
 		docBuilder.writeln(text);
 		moveToPreviousParagraph(docBuilder);
 	}
