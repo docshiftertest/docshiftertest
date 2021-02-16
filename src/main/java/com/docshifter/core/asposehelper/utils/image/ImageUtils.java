@@ -157,7 +157,7 @@ public class ImageUtils {
 				// value was returned (we just assume no explicit value was provided)
 				log.info("The provided color is empty, so we will fallback to {}", fallback);
 			}
-			// We don't care logging a fallback event if both the provided String is blank/empty/null and the fallback
+			// We don't care logging a fallback event if both the provided String is empty/null and the fallback
 			// Color is null
 			return fallback;
 		}
