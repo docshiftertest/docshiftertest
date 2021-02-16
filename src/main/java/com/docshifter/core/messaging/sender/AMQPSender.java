@@ -4,12 +4,15 @@ import com.docshifter.core.config.domain.QueueMonitorRepository;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
+import com.docshifter.core.metric.MetricDto;
+import com.docshifter.core.metric.services.MetricService;
 import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.VeevaTask;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
@@ -31,6 +34,9 @@ public class AMQPSender implements IMessageSender {
 
 	public static final int DEFAULT_PRIORITY = 4;
 	public static final int HIGHEST_PRIORITY = 9;
+
+	@Autowired
+	private MetricService metricService;
 	
 	public AMQPSender(JmsTemplate jmsTemplate, JmsMessagingTemplate messagingTemplate, ActiveMQQueue docshifterQueue, QueueMonitorRepository queueMonitorRepository) {
 		this.jmsTemplate = jmsTemplate;
@@ -87,6 +93,8 @@ public class AMQPSender implements IMessageSender {
 		}
 		logger.debug("type=" + type.name());
 		logger.debug("chainConfigID=" + chainConfigurationID, null);
+
+		MetricDto metrics = metricService.createMetricDto(task.getSourceFilePath());
 
 		logger.info("Sending message: " + message.toString() + " for file: " + task.getSourceFilePath(), null);
 		String hostname = "localhost";
