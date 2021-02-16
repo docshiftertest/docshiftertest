@@ -46,15 +46,20 @@ public class ImageUtilsTest {
 				arguments("ReD", new Color(255, 0, 0)),
 				arguments("RED", new Color(255, 0, 0)),
 				arguments("orAngE", new Color(255, 200, 0)),
+				arguments("0000ff", new Color(0, 0, 255, 255)),
 				arguments("#00FF00", new Color(0, 255, 0)),
 				arguments("#EE00FF00", new Color(0, 255, 0, 238)),
 				arguments("#DeADbEEf", new Color(173, 190, 239,222)),
+				arguments("DEAdBe", new Color(222, 173, 190,255)),
+				arguments("DEADBEEF", new Color(173, 190, 239,222)),
+				arguments("0xCAFEBABE", new Color(254, 186, 190,202)),
 				arguments("#ffffFFFF", new Color(255, 255, 255, 255)),
 				arguments("#00000000", new Color(0, 0, 0, 0))
 		);
 	}
 
 	private static Stream<String> nonExistingColorParams() {
-		return Stream.of(null, "", "I do not exist", "R ed", "#DEADBEEZ", "#DEADBEEF1", "#", "DEADBEEF", "#000000001");
+		return Stream.of(null, "", "    ", "I do not exist", "R ed", "#DEADBEEZ", "#DEADBEEF1", "#", "0x", "#000000001",
+				"DEADBEEF1", "0xCAFEBABE1");
 	}
 }
