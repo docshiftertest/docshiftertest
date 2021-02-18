@@ -5,6 +5,8 @@ import com.docshifter.core.metric.MetricDto;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.zip.ZipFile;
 
@@ -12,7 +14,29 @@ import java.util.zip.ZipFile;
 public class MetricServiceImpl implements MetricService{
     private static final Logger logger = Logger.getLogger(new Object() { }.getClass().getEnclosingClass());
 
-    public void storeMetric() {}
+    public void storeMetric(int count) {
+        try {
+            File myObj = new File("E:/DocShifter/Repository/docshifter-core/docshifter-management/src/assets/metrics.txt");
+            if (myObj.createNewFile()) {
+                logger.info("File created: " + myObj.getName());
+            } else {
+                logger.info("File already exists.");
+            }
+        } catch (IOException e) {
+            logger.info("An error occurred.");
+            logger.error(e);
+        }
+
+        try {
+            FileWriter myWriter = new FileWriter("E:/DocShifter/Repository/docshifter-core/docshifter-management/src/assets/metrics.txt", true);
+            myWriter.write(count + ",");
+            myWriter.close();
+            logger.info("Successfully wrote to the file, yay 2!");
+        } catch (IOException e) {
+            logger.info("An error occurred.");
+            logger.error(e);
+        }
+    }
 
     public MetricDto createMetricDto(String filename){
         MetricDto metric = new MetricDto();
@@ -22,6 +46,8 @@ public class MetricServiceImpl implements MetricService{
 
         logger.info("Metric input filename: " + metric.getFilename());
         logger.info("Metric counts: " + metric.getCounts());
+
+        storeMetric(metric.getCounts());
 
         return metric;
     }
