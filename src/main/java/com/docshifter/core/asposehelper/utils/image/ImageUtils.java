@@ -148,7 +148,17 @@ public class ImageUtils {
 		try {
 			return getColor(nm);
 		} catch (Exception ex) {
-			log.warn("The color \"{}\" could not be parsed, so we will fallback to {}", nm, fallback);
+			if (StringUtils.isNotEmpty(nm)) {
+				// If an unparseable String was provided, WARN the user that the fallback value was returned (this
+				// fallback event might possibly be an attention point)
+				log.warn("The color \"{}\" could not be parsed, so we will fallback to {}", nm, fallback);
+			} else if (fallback != null) {
+				// If an empty String was provided and the fallback is not NULL, INFORM the user that the fallback
+				// value was returned (we just assume no explicit value was provided)
+				log.info("The provided color is empty, so we will fallback to {}", fallback);
+			}
+			// We don't care logging a fallback event if both the provided String is empty/null and the fallback
+			// Color is null
 			return fallback;
 		}
 	}
@@ -161,7 +171,7 @@ public class ImageUtils {
 	 */
 	public static Color getColor(String nm) throws NumberFormatException {
 		if (StringUtils.isBlank(nm)) {
-			throw new NumberFormatException("A null or empty value is not a valid colour!");
+			throw new NumberFormatException("A null, empty or blank value is not a valid colour!");
 		}
 
 		nm = nm.trim().toUpperCase();
@@ -182,15 +192,17 @@ public class ImageUtils {
      * @throws NumberFormatException
      */
 	private static Color decodeWithAlpha(String nm) throws NumberFormatException {
-		if (nm.toLowerCase().startsWith("0x")) {
-			if (nm.length() > 10) {
-				throw new NumberFormatException("Hex string [" + nm + "] is too long.");
+		final int maxLength;
+		if (nm.startsWith("0X")) {
+			maxLength = 10;
+		} else {
+			maxLength = 9;
+			if (!nm.startsWith("#")) {
+				nm = "#" + nm;
 			}
 		}
-		else if (nm.toLowerCase().startsWith("#")) {
-			if (nm.length() > 9) {
-				throw new NumberFormatException("Hash string " + nm + " is too long.");
-			}
+		if (nm.length() > maxLength) {
+			throw new NumberFormatException("Hex string [" + nm + "] is too long.");
 		}
 
 		long l = Long.decode(nm);
