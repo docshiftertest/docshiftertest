@@ -10,6 +10,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.zip.ZipFile;
 
+/**
+ * Handles operations related to metrics.
+ *
+ * For now handles counting the incoming files and storing the counts.
+ */
 @Service
 public class MetricServiceImpl implements MetricService{
     private static final Logger logger = Logger.getLogger(new Object() { }.getClass().getEnclosingClass());

@@ -1,5 +1,10 @@
 package com.docshifter.core.metric;
 
+/**
+Data transfer object to store metrics
+ Currently stores filename and counts, will be expanded with other metrics
+ Metrics other than the basic counter should be implemented as a licensable module
+ */
 public class MetricDto {
     private String filename;
     private int counts;
