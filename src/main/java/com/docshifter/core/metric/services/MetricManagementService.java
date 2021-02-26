@@ -7,4 +7,10 @@ public interface MetricManagementService {
     Connection connect();
 
     int successfulWfs();
+
+    int successfulFiles();
+
+    int allFiles();
+
+    int allWfs();
 }

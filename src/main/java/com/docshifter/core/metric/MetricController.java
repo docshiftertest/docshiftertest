@@ -25,5 +25,20 @@ public class MetricController {
     public int successfulWfs() {
         return this.metricManagementService.successfulWfs();
     }
+//
+    @GetMapping("successfulFiles")
+    public int successfulFiles() {
+        return this.metricManagementService.successfulFiles();
+    }
+
+    @GetMapping("allWorkflows")
+    public int allWfs(){
+        return this.metricManagementService.allWfs();
+    }
+
+    @GetMapping("allFiles")
+    public int allFiles(){
+        return this.metricManagementService.allFiles();
+    }
 }
 
