@@ -6,12 +6,14 @@ import com.docshifter.core.monitoring.enums.ConfigurationTypes;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * Created by blazejm on 29.09.2017.
  */
 @Entity(name = "MonitoringDbConfigItem")
 @DiscriminatorValue(ConfigurationTypes.DB)
+@Table(schema = "DOCSHIFTER")
 public class DbConfigurationItem extends AbstractConfigurationItem {
     private String driver;
     private String connection;

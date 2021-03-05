@@ -23,10 +23,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyClass;
+import javax.persistence.Table;
 import javax.persistence.Transient;
+
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
+@Table(schema = "DOCSHIFTER")
 public class ModuleConfiguration {
 
 	@Id

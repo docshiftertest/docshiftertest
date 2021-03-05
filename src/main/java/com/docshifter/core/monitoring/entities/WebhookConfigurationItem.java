@@ -12,6 +12,7 @@ import java.util.List;
  */
 @Entity(name = "MonitoringWebhookConfigItem")
 @DiscriminatorValue(ConfigurationTypes.WEBHOOK)
+@Table(schema = "DOCSHIFTER")
 public class WebhookConfigurationItem extends AbstractConfigurationItem {
     private String url;
 

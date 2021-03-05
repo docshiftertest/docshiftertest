@@ -5,12 +5,14 @@ import com.docshifter.core.monitoring.enums.ConfigurationTypes;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * Created by blazejm on 18.05.2017.
  */
 @Entity(name = "MonitoringSnmpConfigItem")
 @DiscriminatorValue(ConfigurationTypes.SNMP)
+@Table(schema = "DOCSHIFTER")
 public class SnmpConfigurationItem extends AbstractConfigurationItem {
     private String community = "public";
     private String trapOid = ".1.3.6.1.2.1.1.6";

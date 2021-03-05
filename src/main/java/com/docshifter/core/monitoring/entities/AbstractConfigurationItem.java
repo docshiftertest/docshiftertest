@@ -2,22 +2,7 @@ package com.docshifter.core.monitoring.entities;
 
 import java.util.Set;
 
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -32,6 +17,7 @@ import com.docshifter.core.monitoring.enums.NotificationLevels;
 @DiscriminatorColumn(name = "type")
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Table(schema = "DOCSHIFTER")
 public abstract class AbstractConfigurationItem {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

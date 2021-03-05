@@ -29,10 +29,10 @@ import javax.jms.ConnectionFactory;
  */
 @Configuration
 @ComponentScan(basePackages = {"com.docshifter.core", "com.docshifter.core.monitoring"})
-@EnableJpaRepositories(basePackages = {
-        "com.docshifter.core.config.domain",
-        "com.docshifter.core.monitoring.repo"})
-@EntityScan({"com.docshifter.core.config", "com.docshifter.core.monitoring.entities"})
+//@EnableJpaRepositories(basePackages = {
+//        "com.docshifter.core.config.domain",
+//        "com.docshifter.core.monitoring.repo"})
+//@EntityScan({"com.docshifter.core.config", "com.docshifter.core.monitoring.entities"})
 public class DocShifterConfiguration {
 
 	@Value("${queue.replytimeout:300}")
