@@ -8,7 +8,7 @@ import javax.persistence.*;
  * Created by blazejm on 17.05.2017.
  */
 @Entity(name = "MonitoringMailTemplate")
-@Table(schema = "DOCSHIFTER")
+@Table(schema = "DOCSHIFTER", name="MONITORING_MAIL_TEMPLATE")
 public class MailTemplate {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

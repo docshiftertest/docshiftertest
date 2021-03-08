@@ -30,7 +30,7 @@ import javax.persistence.Transient;
 @Log4j2
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
-@Table(schema = "DOCSHIFTER")
+@Table(schema = "DOCSHIFTER", name="MODULE")
 public class Module {
 
 	@Id

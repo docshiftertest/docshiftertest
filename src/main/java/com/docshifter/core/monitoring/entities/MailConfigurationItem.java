@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Entity(name = "MonitoringMailConfigItem")
 @DiscriminatorValue(ConfigurationTypes.MAIL)
-@Table(schema = "DOCSHIFTER")
+@Table(schema = "DOCSHIFTER", name="MONITORING_MAIL_CONFIG_ITEM")
 public class MailConfigurationItem extends AbstractConfigurationItem {
     @OneToOne(cascade = CascadeType.ALL,
             fetch = FetchType.EAGER)

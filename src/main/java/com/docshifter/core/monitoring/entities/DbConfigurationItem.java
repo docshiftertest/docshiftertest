@@ -13,7 +13,7 @@ import javax.persistence.Table;
  */
 @Entity(name = "MonitoringDbConfigItem")
 @DiscriminatorValue(ConfigurationTypes.DB)
-@Table(schema = "DOCSHIFTER")
+@Table(schema = "DOCSHIFTER", name="MONITORING_DB_CONFIG_ITEM")
 public class DbConfigurationItem extends AbstractConfigurationItem {
     private String driver;
     private String connection;

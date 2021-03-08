@@ -10,7 +10,7 @@ import java.util.List;
 @Entity(name = "MonitoringConfiguration")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
-@Table(schema = "DOCSHIFTER")
+@Table(schema = "DOCSHIFTER", name="Monitoring_Configuration")
 public class Configuration {
     @Id
     private Long id;

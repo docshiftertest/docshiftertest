@@ -9,7 +9,7 @@ import javax.persistence.Table;
 import com.docshifter.core.security.Encrypted;
 
 @Entity
-@Table(schema = "DOCSHIFTER")
+@Table(schema = "DOCSHIFTER", name="GLOBAL_SETTINGS")
 public class GlobalSettings
 {
 	@Id

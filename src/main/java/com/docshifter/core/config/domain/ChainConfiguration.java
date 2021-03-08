@@ -22,7 +22,7 @@ import javax.persistence.Table;
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
-@Table(schema = "DOCSHIFTER")
+@Table(schema = "DOCSHIFTER", name="CHAIN_CONFIGURATION")
 public class ChainConfiguration {
 
 	@Id

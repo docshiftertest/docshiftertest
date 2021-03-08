@@ -17,7 +17,7 @@ import com.docshifter.core.monitoring.enums.NotificationLevels;
 @DiscriminatorColumn(name = "type")
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@Table(schema = "DOCSHIFTER")
+@Table(schema = "DOCSHIFTER", name="MONITORING_CONFIG_ITEM")
 public abstract class AbstractConfigurationItem {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
