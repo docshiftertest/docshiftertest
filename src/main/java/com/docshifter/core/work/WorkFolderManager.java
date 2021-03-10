@@ -2,7 +2,7 @@ package com.docshifter.core.work;
 
 import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.config.Constants;
-import com.docshifter.core.config.service.GeneralConfigService;
+import com.docshifter.core.config.services.GeneralConfigService;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;

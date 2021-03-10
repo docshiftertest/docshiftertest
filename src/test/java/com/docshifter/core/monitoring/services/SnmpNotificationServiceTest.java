@@ -1,10 +1,8 @@
 package com.docshifter.core.monitoring.services;
 
-import com.docshifter.core.monitoring.AbstractSpringTest;
 import com.docshifter.core.monitoring.dtos.NotificationDto;
 import com.docshifter.core.monitoring.dtos.SnmpConfigurationItemDto;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
-import com.docshifter.core.monitoring.services.SnmpNotificationService;
 import com.docshifter.core.monitoring.snmp.SnmpTrapReceiver;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Created by blazejm on 29.05.2017.
  */
-public class SnmpNotificationServiceTest extends AbstractSpringTest {
+public class SnmpNotificationServiceTest extends AbstractServiceTest {
+
     @Autowired
     private SnmpNotificationService snmpNotificationService;
 

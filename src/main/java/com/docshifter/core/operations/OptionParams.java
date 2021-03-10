@@ -1,6 +1,6 @@
 package com.docshifter.core.operations;
 
-import com.docshifter.core.config.domain.Node;
+import com.docshifter.core.config.entities.Node;
 import java.nio.file.Path;
 import java.util.Set;
 

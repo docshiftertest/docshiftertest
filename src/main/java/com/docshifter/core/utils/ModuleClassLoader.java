@@ -1,6 +1,6 @@
 package com.docshifter.core.utils;
 
-import com.docshifter.core.config.service.ApplicationContextProvider;
+import com.docshifter.core.config.services.ApplicationContextProvider;
 import com.docshifter.core.operations.AbstractOperation;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;

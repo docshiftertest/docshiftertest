@@ -9,7 +9,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
-import com.docshifter.core.config.domain.Parameter;
+import com.docshifter.core.config.entities.Parameter;
 import com.docshifter.core.security.utils.EncryptionUtils;
 import com.docshifter.core.security.utils.SecurityProperties;
 import com.docshifter.core.security.utils.SecurityUtils;

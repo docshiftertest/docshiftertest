@@ -15,8 +15,8 @@ import org.hibernate.event.spi.PreUpdateEvent;
 import org.hibernate.event.spi.PreUpdateEventListener;
 import org.springframework.stereotype.Component;
 
-import com.docshifter.core.config.domain.ModuleConfiguration;
-import com.docshifter.core.config.domain.Parameter;
+import com.docshifter.core.config.entities.ModuleConfiguration;
+import com.docshifter.core.config.entities.Parameter;
 import com.docshifter.core.security.utils.SecurityProperties;
 import com.docshifter.core.security.utils.SecurityUtils;
 

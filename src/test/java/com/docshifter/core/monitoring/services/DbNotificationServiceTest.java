@@ -1,12 +1,9 @@
 package com.docshifter.core.monitoring.services;
 
-import com.docshifter.core.monitoring.AbstractSpringTest;
+import com.docshifter.core.AbstractSpringTest;
 import com.docshifter.core.monitoring.dtos.DbConfigurationItemDto;
 import com.docshifter.core.monitoring.dtos.NotificationDto;
-import com.docshifter.core.monitoring.entities.TestDbNotification;
-import com.docshifter.core.monitoring.entities.TestDbNotificationRepository;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
-import com.docshifter.core.monitoring.services.DbNotificationService;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,16 +20,13 @@ public class DbNotificationServiceTest extends AbstractSpringTest {
     @Autowired
     private DbNotificationService dbNotificationService;
 
-    @Autowired
-    private TestDbNotificationRepository testDbNotificationRepository;
-
     private DbConfigurationItemDto configurationItem;
 
-    @Before
+   @Before
     public void setUp() {
         configurationItem = new DbConfigurationItemDto();
-        configurationItem.setDriver("org.hsqldb.jdbc.JDBCDriver");
-        configurationItem.setConnection("jdbc:hsqldb:mem:docshifter");
+        configurationItem.setDriver("org.h2.Driver");
+        configurationItem.setConnection("jdbc:h2:mem:testdb;INIT=RUNSCRIPT FROM 'classpath:init.sql';DB_CLOSE_DELAY=-1;");
         configurationItem.setUser("sa");
         configurationItem.setTableName("test_db_notification");
         configurationItem.setPassword("sa");
@@ -39,7 +35,6 @@ public class DbNotificationServiceTest extends AbstractSpringTest {
     @Test
     public void shouldInject() {
         assertThat(dbNotificationService).isNotNull();
-        assertThat(testDbNotificationRepository).isNotNull();
     }
 
     @Test
@@ -51,17 +46,16 @@ public class DbNotificationServiceTest extends AbstractSpringTest {
         notificationDto.setAttachments(new File[] {new File("test.doc")});
 
         dbNotificationService.sendNotification(configurationItem, notificationDto);
-
-        Iterable<TestDbNotification> dbNotifications = testDbNotificationRepository.findAll();
+        List<NotificationDto> dbNotifications = dbNotificationService.getNotifications(configurationItem);
         Assertions.assertThat(dbNotifications).isNotNull();
         Assertions.assertThat(dbNotifications).size().isEqualTo(1);
 
-        TestDbNotification dbNotification = dbNotifications.iterator().next();
+        NotificationDto dbNotification = dbNotifications.get(0);
         assertThat(dbNotification).isNotNull();
-        assertThat(dbNotification.getLevel()).isEqualTo("ERROR");
+        assertThat(dbNotification.getLevel().toString()).isEqualTo("ERROR");
         assertThat(dbNotification.getTaskId()).isEqualTo("test task");
         assertThat(dbNotification.getMessage()).isEqualTo("test message");
-        assertThat(dbNotification.getAttachments()).isEqualTo("test.doc");
+        assertThat(Arrays.stream(dbNotification.getAttachments()).findFirst().get().getName()).isEqualTo("test.doc");
     }
 
 }

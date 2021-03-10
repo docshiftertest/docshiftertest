@@ -1,6 +1,6 @@
 package com.docshifter.core.utils.nalpeiron;
 
-import com.docshifter.core.config.service.NalpeironService;
+import com.docshifter.core.config.services.NalpeironService;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

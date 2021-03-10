@@ -5,8 +5,7 @@ import com.docshifter.core.monitoring.entities.WebhookConfigurationItem;
 import com.docshifter.core.monitoring.entities.WebhookTemplate;
 import com.docshifter.core.monitoring.mappings.ConfigurationItemConverter;
 import com.docshifter.core.monitoring.mappings.WebhookConfigurationItemConverter;
-import com.docshifter.core.monitoring.repo.WebhookConfigurationItemRepository;
-import com.docshifter.core.monitoring.services.AbstractConfigurationItemService;
+import com.docshifter.core.monitoring.repositories.WebhookConfigurationItemRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-@Transactional
+@Transactional("dsTransactionManager")
 public class WebhookConfigurationItemService extends AbstractConfigurationItemService<WebhookConfigurationItem, WebhookConfigurationItemDto>
 {
 	private static final Logger log = Logger.getLogger(com.docshifter.core.monitoring.services.WebhookConfigurationItemService.class.getName());

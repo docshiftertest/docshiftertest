@@ -1,10 +1,9 @@
 package com.docshifter.core.monitoring.services;
 
-import com.docshifter.core.monitoring.AbstractSpringTest;
+import com.docshifter.core.AbstractSpringTest;
 import com.docshifter.core.monitoring.dtos.DbConfigurationItemDto;
 import com.docshifter.core.monitoring.entities.DbConfigurationItem;
 import com.docshifter.core.monitoring.mappings.DbConfigurationItemConverter;
-import com.docshifter.core.monitoring.services.DbConfigurationItemService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

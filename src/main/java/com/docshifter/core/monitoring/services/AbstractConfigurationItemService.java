@@ -4,16 +4,17 @@ import com.docshifter.core.monitoring.dtos.AbstractConfigurationItemDto;
 import com.docshifter.core.monitoring.entities.AbstractConfigurationItem;
 import com.docshifter.core.monitoring.entities.Configuration;
 import com.docshifter.core.monitoring.mappings.ConfigurationItemConverter;
-import com.docshifter.core.monitoring.repo.ConfigurationRepository;
+import com.docshifter.core.monitoring.repositories.ConfigurationRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Optional;
 
-@Transactional
+@Transactional("dsTransactionManager")
 public abstract class AbstractConfigurationItemService
         <TEntity extends AbstractConfigurationItem, TDto extends AbstractConfigurationItemDto> {
     private static final Logger log = Logger.getLogger(com.docshifter.core.monitoring.services.AbstractConfigurationItemService.class.getName());
@@ -21,7 +22,7 @@ public abstract class AbstractConfigurationItemService
     @Autowired
     private ConfigurationRepository configurationRepository;
 
-    @Autowired
+    @PersistenceContext(unitName = "DocShifterEM")
     protected EntityManager entityManager;
 
     protected abstract ConfigurationItemConverter<TEntity,TDto> getConverter();

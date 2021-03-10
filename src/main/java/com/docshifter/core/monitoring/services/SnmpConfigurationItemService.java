@@ -4,8 +4,7 @@ import com.docshifter.core.monitoring.dtos.SnmpConfigurationItemDto;
 import com.docshifter.core.monitoring.entities.SnmpConfigurationItem;
 import com.docshifter.core.monitoring.mappings.ConfigurationItemConverter;
 import com.docshifter.core.monitoring.mappings.SnmpConfigurationItemConverter;
-import com.docshifter.core.monitoring.repo.SnmpConfigurationItemRepository;
-import com.docshifter.core.monitoring.services.AbstractConfigurationItemService;
+import com.docshifter.core.monitoring.repositories.SnmpConfigurationItemRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-@Transactional
+@Transactional("dsTransactionManager")
 public class SnmpConfigurationItemService extends AbstractConfigurationItemService<SnmpConfigurationItem, SnmpConfigurationItemDto>
 {
 	private static final Logger log = Logger.getLogger(com.docshifter.core.monitoring.services.SnmpConfigurationItemService.class.getName());

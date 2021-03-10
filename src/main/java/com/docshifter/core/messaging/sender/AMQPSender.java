@@ -1,11 +1,11 @@
 package com.docshifter.core.messaging.sender;
 
-import com.docshifter.core.config.domain.QueueMonitorRepository;
+import com.docshifter.core.config.repositories.QueueMonitorRepository;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
-import com.docshifter.core.metric.MetricDto;
-import com.docshifter.core.metric.services.MetricService;
+import com.docshifter.core.metrics.dtos.DocumentCounterDTO;
+import com.docshifter.core.metrics.services.MetricService;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
 import com.docshifter.core.monitoring.services.NotificationService;
 import com.docshifter.core.task.DctmTask;
@@ -104,7 +104,7 @@ public class AMQPSender implements IMessageSender {
 			* Calls metricService to handle the basic counts TODO: Handling other metrics as well
 			* Sends a notification (best used with database notifications) with the taskID and number of counts
 			*  */
-			MetricDto metrics = metricService.createMetricDto(task.getSourceFilePath());
+			DocumentCounterDTO metrics = metricService.createMetricDto(task.getSourceFilePath());
 			String notification = "Notification from sender: Processing " + metrics.getCounts() + " files.";
 			notificationService.sendNotification(chainConfigurationID, NotificationLevels.INFO, task.getId(), notification, task.getSourceFilePath(), new File[]{});
 
