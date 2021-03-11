@@ -175,7 +175,7 @@ public class WorkFolderManager {
 	}
 
 	private boolean deletePath(Path dir, boolean force) {
-		log.warn("Into deletePath({}, {})", dir.toString(), force);
+		log.warn("Into deletePath({}, {})", dir, force);
 		if (Files.isDirectory(dir)) {
 			log.debug("Is directory...");
 			try (DirectoryStream<Path> ds = Files.newDirectoryStream(dir)) {
@@ -190,15 +190,18 @@ public class WorkFolderManager {
 						return false;
 					}
 			} catch (IOException ioe) {
-				log.warn("deletePath({}) in 'for Path', caught IOException.", dir.toString(), ioe);
+				log.warn("deletePath({}) in 'for Path', caught IOException.", dir, ioe);
 				return false;
 			}
 		}
-		log.debug("Will delete [{}], if exists...", dir.toString());
+		log.debug("Will delete [{}], if exists...", dir);
 		try {
-			Files.deleteIfExists(dir);
+			File bunny = new File(dir.toString());
+			if (bunny.exists()) {
+				org.apache.commons.io.FileUtils.forceDelete(bunny);
+			}
 		} catch (IOException ioe) {
-			log.warn("deletePath({}) after 'deleteIfExists', caught IOException.", dir.toString(), ioe);
+			log.warn("deletePath({}) after 'forceDelete', caught IOException.", dir, ioe);
 			return false;
 		}
 		log.debug("Returning true!");
