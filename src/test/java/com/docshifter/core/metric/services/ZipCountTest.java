@@ -1,7 +1,7 @@
 package com.docshifter.core.metric.services;
 
 import com.docshifter.core.metrics.dtos.DocumentCounterDTO;
-import com.docshifter.core.metrics.services.MetricServiceImpl;
+import com.docshifter.core.metrics.services.DocumentCounterServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class ZipCountTest {
     @Autowired
-    private MetricServiceImpl metricService;
+    private DocumentCounterServiceImpl counterService;
 
     private byte[] bytesOfPoem;
     private byte[] bytesOfText;
@@ -68,10 +68,10 @@ public class ZipCountTest {
     }
 
     @Test
-    @Ignore
     public void shouldCountAllFilesInzip(){
         String filename = zipFile.toString();
-        DocumentCounterDTO metric = metricService.createMetricDto(filename);
+        int counts = counterService.countFiles(filename);
+        DocumentCounterDTO metric = counterService.createDocumentCounterDto("sometask", counts);
 
         assertThat(metric.getCounts()).isEqualTo(2);
     }

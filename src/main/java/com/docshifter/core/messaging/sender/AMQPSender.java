@@ -4,21 +4,15 @@ import com.docshifter.core.config.repositories.QueueMonitorRepository;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
-import com.docshifter.core.metrics.dtos.DocumentCounterDTO;
-import com.docshifter.core.metrics.services.MetricService;
-import com.docshifter.core.monitoring.enums.NotificationLevels;
-import com.docshifter.core.monitoring.services.NotificationService;
 import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.VeevaTask;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -37,12 +31,6 @@ public class AMQPSender implements IMessageSender {
 
 	public static final int DEFAULT_PRIORITY = 4;
 	public static final int HIGHEST_PRIORITY = 9;
-
-	@Autowired
-	private MetricService metricService;
-
-	@Autowired // This is necessary for the notificationService to work; but now it does!
-	private NotificationService notificationService;
 	
 	public AMQPSender(JmsTemplate jmsTemplate, JmsMessagingTemplate messagingTemplate, ActiveMQQueue docshifterQueue, QueueMonitorRepository queueMonitorRepository) {
 		this.jmsTemplate = jmsTemplate;
@@ -99,14 +87,6 @@ public class AMQPSender implements IMessageSender {
 		}
 		logger.debug("type=" + type.name());
 		logger.debug("chainConfigID=" + chainConfigurationID, null);
-
-			/*
-			* Calls metricService to handle the basic counts TODO: Handling other metrics as well
-			* Sends a notification (best used with database notifications) with the taskID and number of counts
-			*  */
-			DocumentCounterDTO metrics = metricService.createMetricDto(task.getSourceFilePath());
-			String notification = "Notification from sender: Processing " + metrics.getCounts() + " files.";
-			notificationService.sendNotification(chainConfigurationID, NotificationLevels.INFO, task.getId(), notification, task.getSourceFilePath(), new File[]{});
 
 		logger.info("Sending message: " + message.toString() + " for file: " + task.getSourceFilePath(), null);
 		String hostname = "localhost";

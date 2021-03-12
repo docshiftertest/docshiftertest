@@ -1,0 +1,12 @@
+package com.docshifter.core.metrics.services;
+
+import com.docshifter.core.metrics.dtos.DocumentCounterDTO;
+import com.docshifter.core.metrics.entities.DocumentCounter;
+
+public interface DocumentCounterService {
+    DocumentCounter saveDocumentCounter(DocumentCounterDTO dto);
+
+    DocumentCounterDTO createDocumentCounterDto(String task, int counts);
+
+    int countFiles(String filename);
+}

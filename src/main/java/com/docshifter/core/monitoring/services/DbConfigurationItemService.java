@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-@Transactional
+@Transactional("dsTransactionManager")
 public class DbConfigurationItemService extends AbstractConfigurationItemService<DbConfigurationItem, DbConfigurationItemDto>
 {
 	private static final Logger log = Logger.getLogger(com.docshifter.core.monitoring.services.DbConfigurationItemService.class.getName());

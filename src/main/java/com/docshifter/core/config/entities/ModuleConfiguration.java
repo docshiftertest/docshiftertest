@@ -91,7 +91,7 @@ public class ModuleConfiguration {
 			cascade = CascadeType.PERSIST,
 			fetch = FetchType.EAGER
 	)
-	@JoinColumn(name = "MODULEID")
+	@JoinColumn(name = "MODULE_ID")
 	public Module getModule()
 	{
 		return module;

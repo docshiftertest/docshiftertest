@@ -3,6 +3,8 @@ package com.docshifter.core.config.db;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
+import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -32,6 +34,8 @@ public class ConfigurationDocshifterDB {
     private String password;
     @Value("${spring.jpa.database-platform}")
     private String dialect;
+    @Value("${spring.jpa.properties.hibernate.default_schema}")
+    private String defaultSchema;
 
     @Bean
     @Primary
@@ -43,17 +47,23 @@ public class ConfigurationDocshifterDB {
     }
 
     @Bean
+    @Primary
     public PlatformTransactionManager dsTransactionManager() {
         return new JpaTransactionManager(dsEntityManagerFactory(docshifterDataSource()).getObject());
     }
 
     @Bean(name = "dsEM")
+    @Primary
     public LocalContainerEntityManagerFactoryBean dsEntityManagerFactory(@Qualifier("docshifterDataSource") DataSource ds) {
 
         HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
         jpaVendorAdapter.setGenerateDdl(false);
         Properties properties = new Properties();
         properties.setProperty("hibernate.dialect", dialect);
+        properties.setProperty("hibernate.default_schema", defaultSchema);
+        properties.put("hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
+        properties.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
+//        properties.setProperty("hibernate.hbm2ddl.auto", "update");
 
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 

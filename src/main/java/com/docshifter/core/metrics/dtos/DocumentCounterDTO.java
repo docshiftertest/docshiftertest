@@ -1,6 +1,9 @@
 package com.docshifter.core.metrics.dtos;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -10,9 +13,12 @@ Data transfer object to store metrics
  */
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DocumentCounterDTO {
 
-    private String filename;
+    private String task_id;
     private int counts;
 
 }

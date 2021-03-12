@@ -4,7 +4,8 @@ import com.aspose.email.Attachment;
 import com.aspose.email.MailMessage;
 import com.aspose.email.SaveOptions;
 import com.docshifter.core.metrics.dtos.DocumentCounterDTO;
-import com.docshifter.core.metrics.services.MetricServiceImpl;
+import com.docshifter.core.metrics.services.DocumentCounterService;
+import com.docshifter.core.metrics.services.DocumentCounterServiceImpl;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class EmailCountTest {
     @Autowired
-    private MetricServiceImpl metricService;
+    private DocumentCounterServiceImpl counterService;
 
     MailMessage message;
 
@@ -31,18 +32,20 @@ public class EmailCountTest {
     }
 
     @Test
-    @Ignore
+//    @Ignore
     public void shouldCountEmail(){
         message.save("/TestMessage.eml", SaveOptions.getDefaultEml());
         String filename = "/TestMessage.eml";
-        DocumentCounterDTO metric = metricService.createMetricDto(filename);
+        String task_id = "sometask";
+        int counts = counterService.countFiles(filename);
+        DocumentCounterDTO metric = counterService.createDocumentCounterDto(task_id, counts);
 
         assertThat(metric.getCounts()).isEqualTo(1);
 
     }
 
     @Test
-    @Ignore
+//    @Ignore
     public void shouldCountAttachments() {
         Attachment attachment = new Attachment("target/test-classes/attachment.txt");
         message.addAttachment(attachment);
@@ -50,7 +53,9 @@ public class EmailCountTest {
         System.out.println(message.getAttachments().size());
 
         String filename = "/TestMessage.eml";
-        DocumentCounterDTO metric = metricService.createMetricDto(filename);
+        String task_id = "sometask";
+        int counts = counterService.countFiles(filename);
+        DocumentCounterDTO metric = counterService.createDocumentCounterDto(task_id, counts);
 
         assertThat(metric.getCounts()).isEqualTo(2);
     }
