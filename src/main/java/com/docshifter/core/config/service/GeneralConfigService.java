@@ -5,7 +5,9 @@ import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.domain.GlobalSettings;
 import com.docshifter.core.config.domain.GlobalSettingsRepository;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -33,7 +35,10 @@ public class GeneralConfigService {
 	 * @param globalSettingsRepository
 	 */
 	@Autowired
-	public GeneralConfigService(GlobalSettingsRepository globalSettingsRepository) {
+	public GeneralConfigService(GlobalSettingsRepository globalSettingsRepository,
+								@Value("${work.folder.override:}") String workFolderOverride,
+								@Value("${error.folder.override:}") String errorFolderOverride,
+								@Value("${mq.url.override:}") String mqUrlOverride) {
 		params = new HashMap<>();
 
 		log.info("GlobalSettingsRepository.count(): {}", globalSettingsRepository.count());
@@ -42,12 +47,25 @@ public class GeneralConfigService {
 		if(optionalConfig.isPresent()){
 			GlobalSettings config = optionalConfig.get();
 			params.put(Constants.MQ_SYSTEM, config.getMqSystem());
-			params.put(Constants.MQ_URL, config.getMqURL());
+			if (StringUtils.isBlank(mqUrlOverride)) {
+				params.put(Constants.MQ_URL, config.getMqURL());
+			} else {
+				params.put(Constants.MQ_URL, mqUrlOverride);
+			}
 			params.put(Constants.MQ_QUEUE, config.getMqQueue());
 			params.put(Constants.MQ_USER, config.getMqUser());
 			params.put(Constants.MQ_PASSWORD, config.getMqUserPassword());
-			params.put(Constants.TEMPFOLDER, config.getDefaultTempFolder());
-			params.put(Constants.ERRORFOLDER, config.getDefaultErrorFolder());
+			if (StringUtils.isBlank(workFolderOverride)) {
+				params.put(Constants.TEMPFOLDER, config.getDefaultTempFolder());
+			} else {
+				params.put(Constants.TEMPFOLDER, workFolderOverride);
+			}
+
+			if (StringUtils.isBlank(errorFolderOverride)) {
+				params.put(Constants.ERRORFOLDER, config.getDefaultErrorFolder());
+			} else {
+				params.put(Constants.ERRORFOLDER, errorFolderOverride);
+			}
 		}
 	}
 
