@@ -50,7 +50,7 @@ public class ConfigurationMetricsDB {
 
         Properties properties = new Properties();
         properties.setProperty("hibernate.dialect", dialect);
-        properties.setProperty("hibernate.hbm2ddl.auto", "update");
+//        properties.setProperty("hibernate.hbm2ddl.auto", "update");
         properties.put("hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
         properties.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
 
