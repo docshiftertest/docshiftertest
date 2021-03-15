@@ -1,10 +1,8 @@
-package com.docshifter.core.metric.services;
+package com.docshifter.core.metrics.services;
 
 import com.docshifter.core.metrics.dtos.DocumentCounterDTO;
-import com.docshifter.core.metrics.services.DocumentCounterServiceImpl;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

@@ -1,13 +1,10 @@
-package com.docshifter.core.metric.services;
+package com.docshifter.core.metrics.services;
 
 import com.aspose.email.Attachment;
 import com.aspose.email.MailMessage;
 import com.aspose.email.SaveOptions;
 import com.docshifter.core.metrics.dtos.DocumentCounterDTO;
-import com.docshifter.core.metrics.services.DocumentCounterService;
-import com.docshifter.core.metrics.services.DocumentCounterServiceImpl;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
