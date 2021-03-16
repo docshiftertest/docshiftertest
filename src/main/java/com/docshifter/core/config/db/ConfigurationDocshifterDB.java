@@ -36,6 +36,14 @@ public class ConfigurationDocshifterDB {
     private String dialect;
     @Value("${spring.jpa.properties.hibernate.default_schema}")
     private String defaultSchema;
+    @Value("${spring.jpa.properties.hibernate.cache.use_second_level_cache}")
+    private String secondLevelCache;
+    @Value("${spring.jpa.properties.hibernate.cache.region.factory_class}")
+    private String cacheRegionFactory;
+    @Value("${spring.jpa.properties.javax.persistence.sharedCache.mode}")
+    private String sharedCacheMode;
+    @Value("${spring.jpa.properties.hibernate.cache.ehcache.missing_cache_strategy}")
+    private String missingCacheStrat;
 
     @Bean
     @Primary
@@ -59,11 +67,15 @@ public class ConfigurationDocshifterDB {
         HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
         jpaVendorAdapter.setGenerateDdl(false);
         Properties properties = new Properties();
+
         properties.setProperty("hibernate.dialect", dialect);
         properties.setProperty("hibernate.default_schema", defaultSchema);
         properties.put("hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
         properties.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
-//        properties.setProperty("hibernate.hbm2ddl.auto", "update");
+        properties.put("hibernate.cache.use_second_level_cache", secondLevelCache);
+        properties.put("hibernate.cache.region.factory_class", cacheRegionFactory);
+        properties.put("javax.persistence.sharedCache.mode", sharedCacheMode);
+        properties.put("hibernate.cache.ehcache.missing_cache_strategy", missingCacheStrat);
 
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 
