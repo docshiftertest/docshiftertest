@@ -3,7 +3,7 @@ package com.docshifter.core.work;
 import com.docshifter.core.utils.FileUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.extern.log4j.Log4j2;
-
+import org.apache.commons.lang.StringUtils;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/11/15.
@@ -81,12 +82,21 @@ public class WorkFolder implements Serializable {
 
 	public Path getNewFilePath(String filename, String extension, boolean shortenFileName) {
 
+		if (StringUtils.isBlank(filename)) {
+			filename = UUID.randomUUID().toString();
+		}
 		if (shortenFileName) {
 			filename = FileUtils.shortenFileName(filename);
 		}
 		filename = FileUtils.removeIllegalFilesystemCharacters(filename);
 
-		Path newPath = Paths.get(folder.toString(), filename + "." + extension);
+		Path newPath;
+		if (StringUtils.isNotBlank(extension)) {
+			newPath = Paths.get(folder.toString(), filename + "." + extension);
+		}
+		else {
+			newPath = Paths.get(folder.toString(), filename);
+		}
 		String now;
 		while (Files.exists(newPath)) {
 			now = Objects.toString(System.currentTimeMillis());
@@ -97,14 +107,21 @@ public class WorkFolder implements Serializable {
 				log.error("Could not create directory: {}", newPath);
 				return null;
 			}
-			newPath = Paths.get(newPath.toString(), filename + "." + extension);
+			if (StringUtils.isNotBlank(extension)) {
+				newPath = Paths.get(newPath.toString(), filename + "." + extension);
+			}
+			else {
+				newPath = Paths.get(newPath.toString(), filename);
+			}
 		}
-
 		return newPath;
 	}
 
 	public Path getNewFolderPath(String folderName) {
 
+		if (StringUtils.isBlank(folderName)) {
+			folderName = UUID.randomUUID().toString();
+		}
 		folderName = FileUtils.shortenFileName(folderName);
 		folderName = FileUtils.removeIllegalFilesystemCharacters(folderName);
 

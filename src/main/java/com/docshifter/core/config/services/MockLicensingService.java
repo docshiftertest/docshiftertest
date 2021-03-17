@@ -22,8 +22,6 @@ public class MockLicensingService implements ILicensingService {
 	private static final Map<String, Date> keys = new HashMap<>();
 	static {
 		keys.put("b6b1edf7-8e7c-4209-9911-8f630114be4d", null);
-		keys.put("a14b8870-2266-11ea-874c-98fa9b42e1ca", new GregorianCalendar(2020, Calendar.OCTOBER, 31, 23, 59, 59).getTime());
-		keys.put("8f59e896-2266-11ea-8f74-98fa9b42e1ca", new GregorianCalendar(2020, Calendar.DECEMBER, 31, 23, 59, 59).getTime());
 		keys.put("f5c1668c-f587-475c-b6d1-b7ee2b5cbacd", new GregorianCalendar(2021, Calendar.MARCH, 31, 23, 59, 59).getTime());
 		keys.put("5f4f7686-e502-4a89-aa64-834f0220107e", new GregorianCalendar(2021, Calendar.JUNE, 30, 23, 59, 59).getTime());
 		keys.put("2beb15ee-8292-42b2-85f1-dab53d9f5255", new GregorianCalendar(2021, Calendar.SEPTEMBER, 30, 23, 59, 59).getTime());
@@ -34,9 +32,12 @@ public class MockLicensingService implements ILicensingService {
 		keys.put("b0b6d35c-fe3f-45fb-b795-24bc3453263d", new GregorianCalendar(2022, Calendar.DECEMBER, 31, 23, 59, 59).getTime());
 	}
 
+	private final String licenseCode;
+	private final Date expiryDate;
+
 	public MockLicensingService() {
 		log.info("Container environment detected.");
-		String licenseCode = System.getenv("DS_LICENSE_CODE");
+		licenseCode = System.getenv("DS_LICENSE_CODE");
 
 		if (StringUtils.isBlank(licenseCode)) {
 			log.fatal("No license code found. Make sure you have set the DS_LICENSE_CODE environment variable.");
@@ -48,18 +49,23 @@ public class MockLicensingService implements ILicensingService {
 			System.exit(0);
 		}
 
-		Date expiryDate = keys.get(licenseCode);
-		if (expiryDate != null && new Date().compareTo(expiryDate) > 0) {
-			log.fatal("License code {} has expired.", licenseCode);
-			System.exit(0);
-		}
+		expiryDate = keys.get(licenseCode);
+		checkLicense();
 
 		log.info("License validated.");
 	}
 
 	@Override
 	public long[] validateAndStartModule(String moduleId, long[] fid) {
+		checkLicense();
 		return fid;
+	}
+
+	private void checkLicense() {
+		if (expiryDate != null && new Date().compareTo(expiryDate) > 0) {
+			log.fatal("License code {} has expired.", licenseCode);
+			System.exit(0);
+		}
 	}
 
 	@Override
