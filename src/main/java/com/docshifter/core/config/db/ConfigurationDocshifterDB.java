@@ -44,6 +44,8 @@ public class ConfigurationDocshifterDB {
     private String sharedCacheMode;
     @Value("${spring.jpa.properties.hibernate.cache.ehcache.missing_cache_strategy}")
     private String missingCacheStrat;
+    @Value("${spring.jpa.hibernate.ddl-auto}")
+    private String schemaCreation;
 
     @Bean
     @Primary
@@ -76,6 +78,7 @@ public class ConfigurationDocshifterDB {
         properties.put("hibernate.cache.region.factory_class", cacheRegionFactory);
         properties.put("javax.persistence.sharedCache.mode", sharedCacheMode);
         properties.put("hibernate.cache.ehcache.missing_cache_strategy", missingCacheStrat);
+        properties.setProperty("hibernate.hbm2ddl.auto", schemaCreation);
 
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 

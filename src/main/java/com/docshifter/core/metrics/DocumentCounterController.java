@@ -17,9 +17,10 @@ public class DocumentCounterController {
     @Autowired
     DocumentCounterRepository counterRepository;
 
-    @Autowired
-    public DocumentCounterController() {
-    }
+    //why?
+//    @Autowired
+//    public DocumentCounterController(counterRepository) {
+//    }
     @GetMapping("successfulFiles")
     public int successfulFiles() {
         return this.counterRepository.selectTotalCounts();
