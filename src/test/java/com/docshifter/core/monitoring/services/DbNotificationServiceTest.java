@@ -25,12 +25,12 @@ public class DbNotificationServiceTest extends AbstractSpringTest {
    @Before
     public void setUp() {
        //TODO: Update when the metrics user and pass are finalized
-        configurationItem = new DbConfigurationItemDto();
-        configurationItem.setDriver("org.h2.Driver");
-        configurationItem.setConnection("jdbc:h2:mem:testdb;INIT=RUNSCRIPT FROM 'classpath:init.sql';DB_CLOSE_DELAY=-1;");
-        configurationItem.setUser("METRICS_SYSTEM");
-        configurationItem.setTableName("test_db_notification");
-        configurationItem.setPassword("docshifterpassword");
+       configurationItem = new DbConfigurationItemDto();
+       configurationItem.setDriver("org.hsqldb.jdbc.JDBCDriver");
+       configurationItem.setConnection("jdbc:hsqldb:mem:docshifter");
+       configurationItem.setUser("METRICS_SYSTEM");
+       configurationItem.setTableName("test_db_notification");
+       configurationItem.setPassword("docshifterpassword");
     }
 
     @Test

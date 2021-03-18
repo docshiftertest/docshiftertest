@@ -1,5 +1,6 @@
 package com.docshifter.core.metrics.services;
 
+import com.docshifter.core.AbstractSpringTest;
 import com.docshifter.core.metrics.dtos.DocumentCounterDTO;
 import org.junit.After;
 import org.junit.Before;
@@ -20,9 +21,7 @@ import java.util.zip.ZipOutputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class ZipCountTest {
+public class ZipCountTest extends AbstractSpringTest {
     @Autowired
     private DocumentCounterServiceImpl counterService;
 

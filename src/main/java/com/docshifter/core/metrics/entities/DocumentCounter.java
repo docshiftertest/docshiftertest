@@ -11,7 +11,6 @@ import java.math.BigInteger;
 
 
 @Entity(name="DocumentCounter")
-@Table(schema="METRICS", name="DOCUMENT_COUNTER")
 @Getter
 @Setter // these do Gets and Sets automatically
 @NoArgsConstructor

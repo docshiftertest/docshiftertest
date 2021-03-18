@@ -16,7 +16,7 @@ public class WebhookController {
     private WebhookConfigurationItemService webhookService;
 
     @RequestMapping(path = "/configurations/{configurationId}/webhooks/{id}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.GET)
     public WebhookConfigurationItemDto getById(
             @PathVariable("configurationId") long configurationId,
@@ -26,8 +26,8 @@ public class WebhookController {
     }
 
     @RequestMapping(path = "/configurations/{configurationId}/webhooks",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.POST)
     public WebhookConfigurationItemDto addWebhook(
             @PathVariable("configurationId") long configurationId,
@@ -37,8 +37,8 @@ public class WebhookController {
     }
 
     @RequestMapping(path = "/configurations/{configurationId}/webhooks/{id}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.PUT)
     public WebhookConfigurationItemDto updateWebhook(
             @PathVariable("configurationId") long configurationId,
@@ -49,7 +49,7 @@ public class WebhookController {
     }
 
     @RequestMapping(path = "/configurations/{configurationId}/webhooks/{id}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.DELETE)
     public void deleteWebhook(
             @PathVariable("configurationId") long configurationId,

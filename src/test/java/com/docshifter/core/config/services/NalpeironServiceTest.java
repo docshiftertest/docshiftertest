@@ -15,7 +15,6 @@ import java.util.Map;
 
 import static org.junit.Assert.fail;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("licensing")
 public class NalpeironServiceTest extends AbstractServiceTest {
 

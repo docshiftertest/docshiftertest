@@ -1,5 +1,6 @@
 package com.docshifter.core.monitoring.services;
 
+import com.docshifter.core.AbstractSpringTest;
 import com.docshifter.core.dctm.DctmMetaDataConsts;
 import com.docshifter.core.events.NotificationEvent;
 import com.docshifter.core.messaging.message.DocshifterMessage;
@@ -40,10 +41,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-public class NotificationEventTest {
+public class NotificationEventTest extends AbstractSpringTest {
 
 	private static final Logger logger = Logger.getLogger(NotificationEventTest.class);
 

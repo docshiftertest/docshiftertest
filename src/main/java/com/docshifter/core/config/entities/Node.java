@@ -14,7 +14,6 @@ import java.util.function.Consumer;
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
-@Table(schema = "DOCSHIFTER", name="NODE")
 public class Node {
 	@Id
 	@Column(name = "ID")

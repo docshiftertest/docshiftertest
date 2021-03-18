@@ -3,6 +3,7 @@ package com.docshifter.core.metrics.services;
 import com.aspose.email.Attachment;
 import com.aspose.email.MailMessage;
 import com.aspose.email.SaveOptions;
+import com.docshifter.core.AbstractSpringTest;
 import com.docshifter.core.metrics.dtos.DocumentCounterDTO;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,9 +14,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class EmailCountTest {
+public class EmailCountTest extends AbstractSpringTest {
+
     @Autowired
     private DocumentCounterServiceImpl counterService;
 
@@ -31,8 +31,8 @@ public class EmailCountTest {
     @Test
 //    @Ignore
     public void shouldCountEmail(){
-        message.save("/TestMessage.eml", SaveOptions.getDefaultEml());
-        String filename = "/TestMessage.eml";
+        message.save("target/test-classes/TestMessage.eml", SaveOptions.getDefaultEml());
+        String filename = "target/test-classes/TestMessage.eml";
         String task_id = "sometask";
         int counts = counterService.countFiles(filename);
         DocumentCounterDTO metric = counterService.createDocumentCounterDto(task_id, counts);
@@ -46,10 +46,10 @@ public class EmailCountTest {
     public void shouldCountAttachments() {
         Attachment attachment = new Attachment("target/test-classes/attachment.txt");
         message.addAttachment(attachment);
-        message.save("/TestMessage.eml", SaveOptions.getDefaultEml());
+        message.save("target/test-classes/TestMessage.eml", SaveOptions.getDefaultEml());
         System.out.println(message.getAttachments().size());
 
-        String filename = "/TestMessage.eml";
+        String filename = "target/test-classes/TestMessage.eml";
         String task_id = "sometask";
         int counts = counterService.countFiles(filename);
         DocumentCounterDTO metric = counterService.createDocumentCounterDto(task_id, counts);

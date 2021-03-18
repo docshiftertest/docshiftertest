@@ -1,5 +1,6 @@
 package com.docshifter.core.messaging;
 
+import com.docshifter.core.AbstractSpringTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,9 +14,7 @@ import java.util.Date;
 import static org.junit.Assert.*;
 import static org.springframework.util.Assert.isInstanceOf;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class DateDeserializerTest {
+public class DateDeserializerTest extends AbstractSpringTest {
 	
 	
 	@Test

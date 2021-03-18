@@ -1,5 +1,6 @@
-package com.docshifter.core.config.db;
+package com.docshifter.datasource.config.docshifter;
 
+import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -70,15 +71,16 @@ public class ConfigurationDocshifterDB {
         jpaVendorAdapter.setGenerateDdl(false);
         Properties properties = new Properties();
 
-        properties.setProperty("hibernate.dialect", dialect);
-        properties.setProperty("hibernate.default_schema", defaultSchema);
-        properties.put("hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
-        properties.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
-        properties.put("hibernate.cache.use_second_level_cache", secondLevelCache);
-        properties.put("hibernate.cache.region.factory_class", cacheRegionFactory);
-        properties.put("javax.persistence.sharedCache.mode", sharedCacheMode);
+        properties.setProperty(Environment.DIALECT, dialect);
+        properties.setProperty(Environment.DEFAULT_SCHEMA, defaultSchema);
+        properties.put(Environment.PHYSICAL_NAMING_STRATEGY, SpringPhysicalNamingStrategy.class.getName());
+        properties.put(Environment.IMPLICIT_NAMING_STRATEGY, SpringImplicitNamingStrategy.class.getName());
+        properties.put( Environment.USE_SECOND_LEVEL_CACHE, secondLevelCache);
+
+        properties.put(Environment.CACHE_REGION_FACTORY, cacheRegionFactory);
+        properties.put(Environment.JPA_SHARED_CACHE_MODE, sharedCacheMode);
         properties.put("hibernate.cache.ehcache.missing_cache_strategy", missingCacheStrat);
-        properties.setProperty("hibernate.hbm2ddl.auto", schemaCreation);
+        properties.setProperty(Environment.HBM2DDL_AUTO, schemaCreation);
 
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 

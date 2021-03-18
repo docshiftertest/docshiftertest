@@ -14,7 +14,6 @@ import javax.persistence.Table;
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
-@Table(schema = "DOCSHIFTER", name="PARAMETER")
 public class Parameter implements Comparable<Parameter>
 {
 

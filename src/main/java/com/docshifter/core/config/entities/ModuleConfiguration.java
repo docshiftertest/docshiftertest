@@ -29,7 +29,6 @@ import javax.persistence.Transient;
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
-@Table(schema = "DOCSHIFTER", name="MODULE_CONFIGURATION")
 public class ModuleConfiguration {
 
 	@Id

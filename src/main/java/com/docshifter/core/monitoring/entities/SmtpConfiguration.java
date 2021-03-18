@@ -8,7 +8,6 @@ import javax.persistence.*;
  * Created by blazejm on 12.05.2017.
  */
 @Entity(name = "MonitoringSmtpConfig")
-@Table(schema = "DOCSHIFTER", name="MONITORING_SMTP_CONFIG")
 public class SmtpConfiguration {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

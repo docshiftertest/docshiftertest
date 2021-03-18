@@ -1,5 +1,6 @@
-package com.docshifter.core.config.db;
+package com.docshifter.datasource.config.metrics;
 
+import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
@@ -27,6 +28,8 @@ public class ConfigurationMetricsDB {
     private String url;
     @Value("${spring.jpa.database-platform}")
     private String dialect;
+    @Value("${spring.jpa.hibernate.ddl-auto}")
+    private String schemaCreation;
 
     @Bean
     public DataSource metricsDataSource(){
@@ -49,10 +52,11 @@ public class ConfigurationMetricsDB {
         jpaVendorAdapter.setGenerateDdl(false);
 
         Properties properties = new Properties();
-        properties.setProperty("hibernate.dialect", dialect);
-//        properties.setProperty("hibernate.hbm2ddl.auto", "update");
-        properties.put("hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
-        properties.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
+        properties.setProperty(Environment.DIALECT, dialect);
+        properties.setProperty(Environment.DEFAULT_SCHEMA, "metrics");
+        properties.put(Environment.PHYSICAL_NAMING_STRATEGY, SpringPhysicalNamingStrategy.class.getName());
+        properties.put(Environment.IMPLICIT_NAMING_STRATEGY, SpringImplicitNamingStrategy.class.getName());
+        properties.setProperty(Environment.HBM2DDL_AUTO, schemaCreation);
 
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 

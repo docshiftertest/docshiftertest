@@ -9,7 +9,6 @@ import java.util.Map;
  * Created by blazejm on 17.05.2017.
  */
 @Entity(name = "MonitoringWebhookTemplate")
-@Table(schema = "DOCSHIFTER", name="MONITORING_WEBHOOK_TEMPLATE")
 public class WebhookTemplate {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

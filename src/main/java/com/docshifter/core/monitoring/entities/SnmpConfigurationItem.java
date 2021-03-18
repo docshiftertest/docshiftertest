@@ -12,7 +12,6 @@ import javax.persistence.Table;
  */
 @Entity(name = "MonitoringSnmpConfigItem")
 @DiscriminatorValue(ConfigurationTypes.SNMP)
-@Table(schema = "DOCSHIFTER", name="MONITORING_SNMP_CONFIG_ITEM")
 public class SnmpConfigurationItem extends AbstractConfigurationItem {
     private String community = "public";
     private String trapOid = ".1.3.6.1.2.1.1.6";

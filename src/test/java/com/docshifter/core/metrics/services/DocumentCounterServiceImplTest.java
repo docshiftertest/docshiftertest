@@ -1,5 +1,6 @@
 package com.docshifter.core.metrics.services;
 
+import com.docshifter.core.AbstractSpringTest;
 import com.docshifter.core.metrics.dtos.DocumentCounterDTO;
 import com.docshifter.core.metrics.entities.DocumentCounter;
 import com.docshifter.core.metrics.repositories.DocumentCounterRepository;
@@ -9,12 +10,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class DocumentCounterServiceImplTest {
+public class DocumentCounterServiceImplTest extends AbstractSpringTest {
     @Autowired
     private DocumentCounterServiceImpl counterService;
 
@@ -30,7 +30,6 @@ public class DocumentCounterServiceImplTest {
         assertThat(metric.getCounts()).isEqualTo(1);
     }
 
-//    @Transactional("metricsTransactionManager")
     @Test
     public void shouldSaveEntity() {
         DocumentCounterDTO counter = new DocumentCounterDTO().builder().task_id("sometask").counts(1).build();
