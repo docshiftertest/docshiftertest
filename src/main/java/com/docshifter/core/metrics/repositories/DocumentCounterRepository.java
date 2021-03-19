@@ -15,4 +15,7 @@ public interface DocumentCounterRepository extends JpaRepository<DocumentCounter
     @Query("SELECT SUM(c.counts) FROM DocumentCounter c")
     int selectTotalCounts();
 
+    @Query("SELECT COUNT(c.task_id) FROM DocumentCounter c")
+    int selectSuccessfulWorkflows();
+
 }
