@@ -56,4 +56,30 @@ public class EmailCountTest extends AbstractSpringTest {
 
         assertThat(metric.getCounts()).isEqualTo(2);
     }
+
+    @Test
+    public void shouldCountMSG() {
+        message.save("target/test-classes/TestMessage.msg", SaveOptions.getDefaultMsg());
+        String filename = "target/test-classes/TestMessage.msg";
+        String task_id = "sometask";
+        int counts = counterService.countFiles(filename);
+        DocumentCounterDTO metric = counterService.createDocumentCounterDto(task_id, counts);
+
+        assertThat(metric.getCounts()).isEqualTo(1);}
+
+    @Test
+    public void shouldCountMSGAttachments() {
+        Attachment attachment = new Attachment("target/test-classes/attachment.txt");
+        message.addAttachment(attachment);
+        message.addAttachment(attachment);
+        message.save("target/test-classes/TestMessage.msg", SaveOptions.getDefaultMsg());
+        System.out.println(message.getAttachments().size());
+
+        String filename = "target/test-classes/TestMessage.msg";
+        String task_id = "sometask";
+        int counts = counterService.countFiles(filename);
+        DocumentCounterDTO metric = counterService.createDocumentCounterDto(task_id, counts);
+
+        assertThat(metric.getCounts()).isEqualTo(3);
+    }
 }
