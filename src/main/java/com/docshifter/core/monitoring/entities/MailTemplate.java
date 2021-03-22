@@ -1,8 +1,14 @@
 package com.docshifter.core.monitoring.entities;
 
-import com.docshifter.core.monitoring.entities.MailConfigurationItem;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 /**
  * Created by blazejm on 17.05.2017.

@@ -3,13 +3,11 @@ package com.docshifter.core.config.services;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import com.docshifter.core.monitoring.services.AbstractServiceTest;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.HashMap;
 import java.util.Map;
 

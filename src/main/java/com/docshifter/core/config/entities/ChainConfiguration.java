@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 
 //Read-only: Use this strategy when you are sure that your data never changes. If you try to update the data with this strategy Hibernate will throw an exception.

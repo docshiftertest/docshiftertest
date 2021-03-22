@@ -3,18 +3,19 @@ package com.docshifter.core.monitoring.services;
 import com.docshifter.core.monitoring.dtos.DbConfigurationItemDto;
 import com.docshifter.core.monitoring.dtos.NotificationDto;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
-import com.docshifter.core.monitoring.services.DbNotificationService;
 import com.docshifter.core.monitoring.utils.TemplateUtils;
 import lombok.extern.log4j.Log4j2;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.nio.file.Paths;
-import java.sql.*;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2

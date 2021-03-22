@@ -23,7 +23,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyClass;
-import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
@@ -90,7 +89,7 @@ public class ModuleConfiguration {
 			cascade = CascadeType.PERSIST,
 			fetch = FetchType.EAGER
 	)
-	@JoinColumn(name = "MODULE_ID")
+	@JoinColumn(name = "MODULEID")
 	public Module getModule()
 	{
 		return module;

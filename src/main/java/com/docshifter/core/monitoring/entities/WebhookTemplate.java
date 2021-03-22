@@ -1,8 +1,16 @@
 package com.docshifter.core.monitoring.entities;
 
-import com.docshifter.core.monitoring.entities.WebhookConfigurationItem;
-
-import javax.persistence.*;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
 import java.util.Map;
 
 /**

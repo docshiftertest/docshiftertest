@@ -1,12 +1,10 @@
 package com.docshifter.core.monitoring.entities;
 
 import com.docshifter.core.security.Encrypted;
-import com.docshifter.core.monitoring.entities.AbstractConfigurationItem;
 import com.docshifter.core.monitoring.enums.ConfigurationTypes;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 /**
  * Created by blazejm on 29.09.2017.
