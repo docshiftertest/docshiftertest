@@ -21,7 +21,7 @@ public class DocumentCounterServiceImplTest extends AbstractSpringTest {
         String id = "sometask";
         DocumentCounterDTO metric = counterService.createDocumentCounterDto(id, 1);
 
-        assertThat(metric.getTask_id()).isEqualTo(id);
+        assertThat(metric.getTaskId()).isEqualTo(id);
         assertThat(metric.getCounts()).isEqualTo(1);
     }
 
@@ -29,7 +29,6 @@ public class DocumentCounterServiceImplTest extends AbstractSpringTest {
     public void shouldSaveEntity() {
         DocumentCounterDTO counter = new DocumentCounterDTO().builder().task_id("sometask").counts(1).build();
         DocumentCounter entity = counterService.saveDocumentCounter(counter);
-//        System.out.println("Written)");
 
         assertThat(counterRepository.findById("sometask")).isNotNull();
     }

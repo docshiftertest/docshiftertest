@@ -28,7 +28,7 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
     public DocumentCounter saveDocumentCounter(DocumentCounterDTO dto) {
         // convert from Dto to Entity and save
         DocumentCounter entity = new DocumentCounter();
-        entity.setTask_id(dto.getTask_id());
+        entity.setTaskId(dto.getTaskId());
         entity.setCounts(dto.getCounts());
 
         return documentCounterRepository.save(entity);

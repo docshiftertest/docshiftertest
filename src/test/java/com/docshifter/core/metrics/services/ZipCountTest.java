@@ -44,21 +44,20 @@ public class ZipCountTest extends AbstractSpringTest {
         // create a zip file zipFile.zip
         zipFile = folder.newFile("zipFile.zip");
         // open streams for writing to zip file
-        OutputStream out = new FileOutputStream(zipFile);
-        ZipOutputStream zipOutputStream = new ZipOutputStream(out);
-        // create entry for poem
-        ZipEntry poemEntry = new ZipEntry("/poem.docx");
-        // set size for poem entry
-        poemEntry.setSize(bytesOfPoem.length);
-        // stream entry declaration
-        zipOutputStream.putNextEntry(poemEntry);
-        // and content within
-        zipOutputStream.write(bytesOfPoem);
-        ZipEntry messageEntry = new ZipEntry("/text.docx");
-        messageEntry.setSize(bytesOfText.length);
-        zipOutputStream.putNextEntry(messageEntry);
-        zipOutputStream.write(bytesOfText);
-        zipOutputStream.close();
+        try (OutputStream out = new FileOutputStream(zipFile);
+             ZipOutputStream zipOutputStream = new ZipOutputStream(out)) {
+            ZipEntry poemEntry = new ZipEntry("/poem.docx");
+            // set size for poem entry
+            poemEntry.setSize(bytesOfPoem.length);
+            // stream entry declaration
+            zipOutputStream.putNextEntry(poemEntry);
+            // and content within
+            zipOutputStream.write(bytesOfPoem);
+            ZipEntry messageEntry = new ZipEntry("/text.docx");
+            messageEntry.setSize(bytesOfText.length);
+            zipOutputStream.putNextEntry(messageEntry);
+            zipOutputStream.write(bytesOfText);
+        }
     }
 
     @Test

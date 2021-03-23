@@ -47,9 +47,9 @@ public class DbNotificationServiceImpl implements DbNotificationService {
 
     @Override
     public List<NotificationDto> getNotifications(DbConfigurationItemDto dbConfigurationItem) {
+    //Method is only used in the test class
 
-        String selectTableSQL = "SELECT * FROM " + dbConfigurationItem.getTableName();
-
+        String selectTableSQL = "SELECT * FROM test_db_notification";
         List<NotificationDto> result = new ArrayList<>();
 
         try (Connection dbConnection = getDBConnection(dbConfigurationItem);
