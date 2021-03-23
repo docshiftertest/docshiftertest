@@ -6,6 +6,7 @@ import com.docshifter.core.config.repositories.ModuleConfigurationRepository;
 import com.docshifter.core.config.repositories.ModuleRepository;
 import com.docshifter.core.config.repositories.NodeRepository;
 import com.docshifter.core.config.repositories.ParameterRepository;
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,8 @@ public class ChainConfigurationRepositoryTest extends AbstractSpringTest {
 	NodeRepository nodeRepository;
 	@Autowired
 	ChainConfigurationRepository chainConfigurationRepository;
+
+	private static final Logger logger = Logger.getLogger(ChainConfigurationRepositoryTest.class);
 
 	Module m1;
 	Module m2;
@@ -203,8 +206,7 @@ public class ChainConfigurationRepositoryTest extends AbstractSpringTest {
 
 	@Test
 	public void findRootNodesByEnabled() throws Exception {
-
-		System.out.println(chainConfigurationRepository.findByEnabled(true));
+		logger.info(chainConfigurationRepository.findByEnabled(true));
 	}
 
 	@Test

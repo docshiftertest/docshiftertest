@@ -29,7 +29,8 @@ public class DbNotificationServiceImpl implements DbNotificationService {
                 + "(?,?,?,?,?)",
                 dbConfigurationItem.getTableName());
 
-        try (Connection dbConnection = getDBConnection(dbConfigurationItem); PreparedStatement preparedStatement = dbConnection.prepareStatement(insertTableSQL)) {
+        try (Connection dbConnection = getDBConnection(dbConfigurationItem);
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(insertTableSQL)) {
 
             preparedStatement.setTimestamp(1, getCurrentTimeStamp());
             preparedStatement.setString(2, notification.getLevel().toString());
@@ -51,7 +52,8 @@ public class DbNotificationServiceImpl implements DbNotificationService {
 
         List<NotificationDto> result = new ArrayList<>();
 
-        try (Connection dbConnection = getDBConnection(dbConfigurationItem); PreparedStatement preparedStatement = dbConnection.prepareStatement(selectTableSQL)) {
+        try (Connection dbConnection = getDBConnection(dbConfigurationItem);
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(selectTableSQL)) {
 
             ResultSet rs = preparedStatement.executeQuery();
 
