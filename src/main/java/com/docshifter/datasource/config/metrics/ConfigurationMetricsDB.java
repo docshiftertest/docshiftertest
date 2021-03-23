@@ -36,7 +36,9 @@ public class ConfigurationMetricsDB {
        return DataSourceBuilder.create()
         .url(url)
         .username("METRICS_SYSTEM")
-        .password("docshifterpassword")
+        .password("mb282wu7nvDkbQRkfXvA") // make it at least slightly less obvious that this is the password
+               //make a new string from a byte array
+               //.password(somestring);
         .build();
     }
 

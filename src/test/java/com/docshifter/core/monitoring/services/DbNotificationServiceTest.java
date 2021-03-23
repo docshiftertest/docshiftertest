@@ -30,7 +30,7 @@ public class DbNotificationServiceTest extends AbstractSpringTest {
        configurationItem.setConnection("jdbc:hsqldb:mem:docshifter");
        configurationItem.setUser("METRICS_SYSTEM");
        configurationItem.setTableName("test_db_notification");
-       configurationItem.setPassword("docshifterpassword");
+       configurationItem.setPassword("mb282wu7nvDkbQRkfXvA");
     }
 
     @Test
