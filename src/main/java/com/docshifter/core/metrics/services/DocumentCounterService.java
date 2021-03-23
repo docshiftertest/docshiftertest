@@ -6,7 +6,7 @@ import com.docshifter.core.metrics.entities.DocumentCounter;
 public interface DocumentCounterService {
     DocumentCounter saveDocumentCounter(DocumentCounterDTO dto);
 
-    DocumentCounterDTO createDocumentCounterDto(String task, int counts);
+    DocumentCounterDTO createDocumentCounterDto(String task, long counts);
 
-    int countFiles(String filename);
+    long countFiles(String filename);
 }

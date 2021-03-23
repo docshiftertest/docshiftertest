@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.zip.ZipFile;
 
 /**
@@ -29,13 +28,13 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
         // convert from Dto to Entity and save
         DocumentCounter entity = new DocumentCounter();
         entity.setTask_id(dto.getTask_id());
-        entity.setCounts(BigInteger.valueOf(dto.getCounts()));
+        entity.setCounts(dto.getCounts());
 
         return documentCounterRepository.save(entity);
     }
 
     //Uses the @Builder annotation to create the DTO
-    public DocumentCounterDTO createDocumentCounterDto(String task, int counts){
+    public DocumentCounterDTO createDocumentCounterDto(String task, long counts){
         return DocumentCounterDTO.builder().task_id(task).counts(counts).build();
 
     }
@@ -45,10 +44,9 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
      * @param filename The source filename from the Task object
      * @return int count The number of counted files
      */
-    public int countFiles(String filename) {
-        int counts=1;
-        //toLowerCase uses 'default locale', potential problems related to the culture/locale problem encountered before?
-        String extension = FileUtils.getExtension(filename).toLowerCase();
+    public long countFiles(String filename) {
+        long counts=1;
+        String extension = FileUtils.getExtension(filename);
         logger.debug("The file extension is:" + extension);
 
         //TODO: Handle other archive file formats (rar, 7z, tar, etc.)

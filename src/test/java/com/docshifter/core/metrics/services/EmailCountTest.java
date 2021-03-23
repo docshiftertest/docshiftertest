@@ -31,7 +31,7 @@ public class EmailCountTest extends AbstractSpringTest {
         message.save("target/test-classes/TestMessage.eml", SaveOptions.getDefaultEml());
         String filename = "target/test-classes/TestMessage.eml";
         String task_id = "sometask";
-        int counts = counterService.countFiles(filename);
+        long counts = counterService.countFiles(filename);
         DocumentCounterDTO metric = counterService.createDocumentCounterDto(task_id, counts);
 
         assertThat(metric.getCounts()).isEqualTo(1);
@@ -48,7 +48,7 @@ public class EmailCountTest extends AbstractSpringTest {
 
         String filename = "target/test-classes/TestMessage.eml";
         String task_id = "sometask";
-        int counts = counterService.countFiles(filename);
+        long counts = counterService.countFiles(filename);
         DocumentCounterDTO metric = counterService.createDocumentCounterDto(task_id, counts);
 
         assertThat(metric.getCounts()).isEqualTo(2);
@@ -59,7 +59,7 @@ public class EmailCountTest extends AbstractSpringTest {
         message.save("target/test-classes/TestMessage.msg", SaveOptions.getDefaultMsg());
         String filename = "target/test-classes/TestMessage.msg";
         String task_id = "sometask";
-        int counts = counterService.countFiles(filename);
+        long counts = counterService.countFiles(filename);
         DocumentCounterDTO metric = counterService.createDocumentCounterDto(task_id, counts);
 
         assertThat(metric.getCounts()).isEqualTo(1);}
@@ -74,7 +74,7 @@ public class EmailCountTest extends AbstractSpringTest {
 
         String filename = "target/test-classes/TestMessage.msg";
         String task_id = "sometask";
-        int counts = counterService.countFiles(filename);
+        long counts = counterService.countFiles(filename);
         DocumentCounterDTO metric = counterService.createDocumentCounterDto(task_id, counts);
 
         assertThat(metric.getCounts()).isEqualTo(3);

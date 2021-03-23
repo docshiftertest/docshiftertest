@@ -64,7 +64,7 @@ public class ZipCountTest extends AbstractSpringTest {
     @Test
     public void shouldCountAllFilesInzip(){
         String filename = zipFile.toString();
-        int counts = counterService.countFiles(filename);
+        long counts = counterService.countFiles(filename);
         DocumentCounterDTO metric = counterService.createDocumentCounterDto("sometask", counts);
 
         assertThat(metric.getCounts()).isEqualTo(2);

@@ -19,6 +19,6 @@ Data transfer object to store metrics
 public class DocumentCounterDTO {
 
     private String task_id;
-    private int counts;
+    private long counts;
 
 }
