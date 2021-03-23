@@ -5,6 +5,7 @@ import com.docshifter.core.metrics.dtos.DocumentCounterDTO;
 import com.docshifter.core.metrics.entities.DocumentCounter;
 import com.docshifter.core.metrics.repositories.DocumentCounterRepository;
 import com.docshifter.core.utils.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,9 +50,14 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
         String extension = FileUtils.getExtension(filename);
         logger.debug("The file extension is:" + extension);
 
+        if(StringUtils.isBlank(extension)) {
+            logger.warn("Extension is blank, failure might occur; file will otherwise be counted as 1");
+        }
+
         //TODO: Handle other archive file formats (rar, 7z, tar, etc.)
         //counts all files in an archive
-        if (extension.equals("zip")) {
+        //Yoda fix - compared string first avoids NullPointerExceptions from extension
+        if ("zip".equalsIgnoreCase(extension)) { //
             try (ZipFile zf = new ZipFile(filename)) {
                 counts = zf.size();
                 return counts;
@@ -62,15 +68,13 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
             }
         }
         //counts all attachments and main body in an email
-        else if (extension.equals("eml") || extension.equals("msg")) {
+        else if ("eml".equalsIgnoreCase(extension) || "msg".equalsIgnoreCase(extension)) {
             MailMessage eml = MailMessage.load(filename);
             counts = eml.getAttachments().size() + 1; // counts is set to all attachments plus the e-mail body
             return counts;
         }
 
-        //TODO: Some kind of error handling for unexpected extension types?
-        // or would unexpected types crash the process anyway?
-            return counts; //default case
+        return counts; //default case
 
     }
 }
