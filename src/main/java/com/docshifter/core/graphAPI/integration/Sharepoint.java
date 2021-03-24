@@ -1,5 +1,6 @@
 package com.docshifter.core.graphAPI.integration;
 
+import com.microsoft.graph.models.ColumnDefinition;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.models.DriveItem;
 import com.microsoft.graph.models.DriveItemSearchParameterSet;
@@ -7,6 +8,8 @@ import com.microsoft.graph.models.FieldValueSet;
 import com.microsoft.graph.models.ListItem;
 import com.microsoft.graph.models.Site;
 import com.microsoft.graph.options.QueryOption;
+import com.microsoft.graph.requests.ColumnDefinitionCollectionPage;
+import com.microsoft.graph.requests.ColumnDefinitionCollectionRequestBuilder;
 import com.microsoft.graph.requests.DriveCollectionPage;
 import com.microsoft.graph.requests.DriveCollectionRequestBuilder;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
@@ -190,6 +193,46 @@ public class Sharepoint {
     }
 
     /**
+     * Get all columns from given siteId and ListId
+     * @param siteId      the sharepoint site id
+     * @param listId      the sharepoint list id
+     * @return List of of columns definition
+     */
+    public List<ColumnDefinition> getColumnDefinition(String siteId, String listId) {
+
+        List<ColumnDefinition> columnDefinitionList = new ArrayList<>();
+
+        ColumnDefinitionCollectionPage collectionPage =  graphClient
+                .sites(siteId)
+                .lists(listId)
+                .columns().buildRequest().get();
+
+        getAllPagesFromColumnCollection(columnDefinitionList,collectionPage);
+
+        return columnDefinitionList;
+    }
+
+    /**
+     * Iterate all IListCollectionPage pages and add to list.
+     *
+     * @param columnDefinitionList          the list to aggregate the DriveItems
+     * @param columnDefinitionCollectionPage the given page collection from the request.
+     */
+    public void getAllPagesFromColumnCollection(List<ColumnDefinition> columnDefinitionList,
+                                                ColumnDefinitionCollectionPage columnDefinitionCollectionPage) {
+
+        columnDefinitionList.addAll(columnDefinitionCollectionPage.getCurrentPage());
+
+        ColumnDefinitionCollectionRequestBuilder nextPage = columnDefinitionCollectionPage.getNextPage();
+        if (nextPage != null) {
+            getAllPagesFromColumnCollection(columnDefinitionList, nextPage.buildRequest().get());
+        }
+    }
+
+
+
+
+    /**
      * Iterate all lstICollectionPage pages and add to list.
      *
      * @param allItems            the list to aggregate the DriveItems
@@ -234,11 +277,10 @@ public class Sharepoint {
 			  //If the folder name contains "/" then we encode the given folder and compare against webURL.
 			} else if (folderName.contains("/")) {
 				if (item.webUrl.contains(encodeFolderPath(folderName))) {
-					
-					if(log.isDebugEnabled()) {
+
 						log.debug("Item name: {} ", item.name);
-						log.debug("Item weburl: {} ", item.webUrl);
-					}
+						log.debug("Item webUrl: {} ", item.webUrl);
+
 					allItems.add(item);
 				}
 			}
