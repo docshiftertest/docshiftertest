@@ -1,8 +1,8 @@
 package com.docshifter.core.config.wrapper;
 
-import com.docshifter.core.config.domain.ChainConfiguration;
-import com.docshifter.core.config.domain.ChainConfigurationRepository;
-import com.docshifter.core.config.domain.Node;
+import com.docshifter.core.config.entities.ChainConfiguration;
+import com.docshifter.core.config.repositories.ChainConfigurationRepository;
+import com.docshifter.core.config.entities.Node;
 
 public abstract class NodeWrapper {
 

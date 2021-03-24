@@ -3,7 +3,7 @@ package com.docshifter.core.config.wrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.docshifter.core.config.domain.ModuleConfiguration;
+import com.docshifter.core.config.entities.ModuleConfiguration;
 
 public class ModuleWrapper {
 

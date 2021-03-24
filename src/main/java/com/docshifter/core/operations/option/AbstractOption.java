@@ -1,6 +1,6 @@
 package com.docshifter.core.operations.option;
 
-import com.docshifter.core.config.domain.Node;
+import com.docshifter.core.config.entities.Node;
 import com.docshifter.core.config.wrapper.ModuleWrapper;
 import com.docshifter.core.exceptions.EmptyOperationException;
 import com.docshifter.core.operations.ModuleOperation;

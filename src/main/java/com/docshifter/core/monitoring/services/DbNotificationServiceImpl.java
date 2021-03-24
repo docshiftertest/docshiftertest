@@ -2,31 +2,35 @@ package com.docshifter.core.monitoring.services;
 
 import com.docshifter.core.monitoring.dtos.DbConfigurationItemDto;
 import com.docshifter.core.monitoring.dtos.NotificationDto;
-import com.docshifter.core.monitoring.services.DbNotificationService;
+import com.docshifter.core.monitoring.enums.NotificationLevels;
 import com.docshifter.core.monitoring.utils.TemplateUtils;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.sql.*;
-import java.util.stream.Collectors;
+import java.io.File;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
+@Log4j2
 public class DbNotificationServiceImpl implements DbNotificationService {
-    private static final Logger log = Logger.getLogger(com.docshifter.core.monitoring.services.DbNotificationServiceImpl.class.getName());
 
     @Override
     public void sendNotification(DbConfigurationItemDto dbConfigurationItem, NotificationDto notification) throws SQLException {
-        Connection dbConnection = null;
-        PreparedStatement preparedStatement = null;
 
         String insertTableSQL = String.format("INSERT INTO %s"
                 + "(timestamp, level, task_id, message, attachments) VALUES"
                 + "(?,?,?,?,?)",
                 dbConfigurationItem.getTableName());
 
-        try {
-            dbConnection = getDBConnection(dbConfigurationItem);
-            preparedStatement = dbConnection.prepareStatement(insertTableSQL);
+        try (Connection dbConnection = getDBConnection(dbConfigurationItem);
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(insertTableSQL)) {
 
             preparedStatement.setTimestamp(1, getCurrentTimeStamp());
             preparedStatement.setString(2, notification.getLevel().toString());
@@ -35,16 +39,39 @@ public class DbNotificationServiceImpl implements DbNotificationService {
             preparedStatement.setString(5, getAttachmentsString(notification));
 
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             log.error("SQL insert error", e);
-        } finally {
-            if (preparedStatement != null) {
-                preparedStatement.close();
-            }
-            if (dbConnection != null) {
-                dbConnection.close();
+        }
+    }
+
+    @Override
+    public List<NotificationDto> getNotifications(DbConfigurationItemDto dbConfigurationItem) {
+    //Method is only used in the test class
+
+        String selectTableSQL = "SELECT * FROM test_db_notification";
+        List<NotificationDto> result = new ArrayList<>();
+
+        try (Connection dbConnection = getDBConnection(dbConfigurationItem);
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(selectTableSQL)) {
+
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while (rs.next()) {
+                NotificationDto notificationDto = new NotificationDto();
+                notificationDto.setLevel(NotificationLevels.valueOf(rs.getString("level")));
+                notificationDto.setTaskId(rs.getString("task_id"));
+                notificationDto.setMessage(rs.getString("message"));
+                notificationDto.setAttachments(new File[] {new File(rs.getString("attachments"))});
+
+                result.add(notificationDto);
             }
         }
+        catch (SQLException e) {
+            log.error("SQL Select error", e);
+        }
+
+        return result;
     }
 
     private Connection getDBConnection(DbConfigurationItemDto dbConfigurationItem) {
@@ -76,9 +103,7 @@ public class DbNotificationServiceImpl implements DbNotificationService {
         if (notification.getAttachments() == null) {
             return null;
         }
-        return TemplateUtils.getAttachmentNames(notification)
-                .stream()
-                .collect(Collectors.joining(", "));
+        return String.join(", ", TemplateUtils.getAttachmentNames(notification));
     }
 
 }

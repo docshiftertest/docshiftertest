@@ -1,6 +1,5 @@
 package com.docshifter.core.monitoring.entities;
 
-import com.docshifter.core.monitoring.entities.AbstractConfigurationItem;
 import com.docshifter.core.monitoring.enums.ConfigurationTypes;
 
 import javax.persistence.DiscriminatorValue;

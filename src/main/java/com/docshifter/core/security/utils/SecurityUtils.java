@@ -1,6 +1,5 @@
 package com.docshifter.core.security.utils;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -8,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 import org.jasypt.salt.RandomSaltGenerator;
 
-import com.docshifter.core.config.domain.Parameter;
+import com.docshifter.core.config.entities.Parameter;
 import com.ulisesbocchio.jasyptspringboot.encryptor.SimplePBEByteEncryptor;
 import com.ulisesbocchio.jasyptspringboot.encryptor.SimplePBEStringEncryptor;
 

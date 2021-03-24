@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class MailConfigurationItemServiceTest extends AbstractServiceTest {
+
     @Autowired
     MailConfigurationItemService configurationItemService;
 

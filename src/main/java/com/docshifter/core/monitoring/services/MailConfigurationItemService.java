@@ -5,8 +5,7 @@ import com.docshifter.core.monitoring.entities.MailConfigurationItem;
 import com.docshifter.core.monitoring.entities.MailTemplate;
 import com.docshifter.core.monitoring.mappings.ConfigurationItemConverter;
 import com.docshifter.core.monitoring.mappings.MailConfigurationItemConverter;
-import com.docshifter.core.monitoring.repo.MailConfigurationItemRepository;
-import com.docshifter.core.monitoring.services.AbstractConfigurationItemService;
+import com.docshifter.core.monitoring.repositories.MailConfigurationItemRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-@Transactional
+@Transactional("dsTransactionManager")
 public class MailConfigurationItemService extends AbstractConfigurationItemService<MailConfigurationItem, MailConfigurationItemDto>
 {
 	private static final Logger log = Logger.getLogger(com.docshifter.core.monitoring.services.MailConfigurationItemService.class.getName());

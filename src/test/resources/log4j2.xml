@@ -37,7 +37,7 @@
         <Logger name="com.docshifter.core.utils.nalpeiron" level="info" additivity="false">
             <AppenderRef ref="LICENSING"/>
         </Logger>
-        <Logger name="com.docshifter.core.config.service.ILicensingService" level="info" additivity="false">
+        <Logger name="com.docshifter.core.config.services.ILicensingService" level="info" additivity="false">
             <AppenderRef ref="LICENSING"/>
         </Logger>
         <Root level="info">

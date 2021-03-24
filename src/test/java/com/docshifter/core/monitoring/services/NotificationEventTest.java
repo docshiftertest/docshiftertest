@@ -1,5 +1,6 @@
 package com.docshifter.core.monitoring.services;
 
+import com.docshifter.core.AbstractSpringTest;
 import com.docshifter.core.dctm.DctmMetaDataConsts;
 import com.docshifter.core.events.NotificationEvent;
 import com.docshifter.core.messaging.message.DocshifterMessage;
@@ -19,13 +20,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.mail.Address;
 import javax.mail.Session;
@@ -40,10 +38,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-public class NotificationEventTest {
+public class NotificationEventTest extends AbstractSpringTest {
 
 	private static final Logger logger = Logger.getLogger(NotificationEventTest.class);
 

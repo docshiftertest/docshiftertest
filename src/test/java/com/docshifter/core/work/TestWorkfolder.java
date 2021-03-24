@@ -6,19 +6,14 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
-import com.docshifter.core.TestController;
-import org.junit.After;
-import org.junit.Test;
-import com.docshifter.core.work.WorkFolder;
-import com.docshifter.core.work.WorkFolderManager;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = TestController.class)
-public class TestWorkfolder {
+import com.docshifter.core.monitoring.services.AbstractServiceTest;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+
+public class TestWorkfolder extends AbstractServiceTest {
+
 	@Autowired
 	WorkFolderManager manager;
 	WorkFolder workfolder;
@@ -47,13 +42,4 @@ public class TestWorkfolder {
 		manager.deleteWorkfolder(workfolder);
 		assertFalse(folder.exists());
 	}
-	
-	@After
-	public void after() {
-		File folder = new File(workfolder.toString());
-		if (folder.exists()) {
-			manager.deleteWorkfolder(workfolder);
-		}
-	}
-
 }

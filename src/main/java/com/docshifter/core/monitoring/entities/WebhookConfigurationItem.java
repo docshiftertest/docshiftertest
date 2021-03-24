@@ -1,10 +1,12 @@
 package com.docshifter.core.monitoring.entities;
 
-import com.docshifter.core.monitoring.entities.AbstractConfigurationItem;
-import com.docshifter.core.monitoring.entities.WebhookTemplate;
 import com.docshifter.core.monitoring.enums.ConfigurationTypes;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import java.util.List;
 
 /**

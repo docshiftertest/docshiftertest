@@ -1,10 +1,9 @@
 package com.docshifter.core.monitoring.services;
 
-import com.docshifter.core.monitoring.AbstractSpringTest;
+import com.docshifter.core.AbstractSpringTest;
 import com.docshifter.core.monitoring.dtos.NotificationDto;
 import com.docshifter.core.monitoring.dtos.WebhookConfigurationItemDto;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
-import com.docshifter.core.monitoring.services.WebhookNotificationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

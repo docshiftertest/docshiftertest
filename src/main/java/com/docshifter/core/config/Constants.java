@@ -19,13 +19,13 @@ public class Constants {
 	public final static String DEFAULT_QUEUE = "docshifter";
 	
 	/**
-	 * Used to cache {@link com.docshifter.core.config.service.ConfigurationService#getSenderConfiguration(long)}
+	 * Used to cache {@link com.docshifter.core.config.services.ConfigurationService#getSenderConfiguration(long)}
 	 */
 	public final static String SENDER_CONFIGURATION_CACHE = "senderConfiguration";
 	
 	/**
 	 * This constant should reflect 
-	 * {@link com.docshifter.core.DocShifterConfiguration#topicListener(javax.jms.ConnectionFactory, org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer)} method name.
+	 * {@link DocShifterConfiguration#topicListener(javax.jms.ConnectionFactory, org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer)} method name.
 	 */
 	public final static String TOPIC_LISTENER = "topicListener";
 }

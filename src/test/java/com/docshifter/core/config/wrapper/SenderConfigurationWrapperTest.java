@@ -11,13 +11,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import com.docshifter.core.config.domain.ChainConfiguration;
-import com.docshifter.core.config.domain.ChainConfigurationRepository;
-import com.docshifter.core.config.domain.Module;
-import com.docshifter.core.config.domain.ModuleConfiguration;
-import com.docshifter.core.config.domain.Node;
-import com.docshifter.core.config.domain.Parameter;
-import com.docshifter.core.config.domain.ParameterTypes;
+import com.docshifter.core.config.entities.ChainConfiguration;
+import com.docshifter.core.config.repositories.ChainConfigurationRepository;
+import com.docshifter.core.config.entities.Module;
+import com.docshifter.core.config.entities.ModuleConfiguration;
+import com.docshifter.core.config.entities.Node;
+import com.docshifter.core.config.entities.Parameter;
+import com.docshifter.core.config.entities.ParameterTypes;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SenderConfigurationWrapperTest {

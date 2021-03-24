@@ -4,8 +4,7 @@ import com.docshifter.core.monitoring.dtos.DbConfigurationItemDto;
 import com.docshifter.core.monitoring.entities.DbConfigurationItem;
 import com.docshifter.core.monitoring.mappings.ConfigurationItemConverter;
 import com.docshifter.core.monitoring.mappings.DbConfigurationItemConverter;
-import com.docshifter.core.monitoring.repo.DbConfigurationItemRepository;
-import com.docshifter.core.monitoring.services.AbstractConfigurationItemService;
+import com.docshifter.core.monitoring.repositories.DbConfigurationItemRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-@Transactional
+@Transactional("dsTransactionManager")
 public class DbConfigurationItemService extends AbstractConfigurationItemService<DbConfigurationItem, DbConfigurationItemDto>
 {
 	private static final Logger log = Logger.getLogger(com.docshifter.core.monitoring.services.DbConfigurationItemService.class.getName());

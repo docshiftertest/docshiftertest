@@ -1,10 +1,9 @@
 package com.docshifter.core.monitoring.services;
 
-import com.docshifter.core.monitoring.AbstractSpringTest;
+import com.docshifter.core.AbstractSpringTest;
 import com.docshifter.core.monitoring.dtos.DbConfigurationItemDto;
 import com.docshifter.core.monitoring.entities.DbConfigurationItem;
 import com.docshifter.core.monitoring.mappings.DbConfigurationItemConverter;
-import com.docshifter.core.monitoring.services.DbConfigurationItemService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +24,10 @@ public class DbConfigItemServiceTest extends AbstractSpringTest {
     public void setUp() {
         configurationItem = new DbConfigurationItemDto();
         configurationItem.setDriver("org.hsqldb.jdbc.JDBCDriver");
-        configurationItem.setConnection("jdbc:hsqldb:mem:unittests");
-        configurationItem.setUser("sa");
+        configurationItem.setConnection("jdbc:hsqldb:mem:docshifter");
+        configurationItem.setUser("METRICS_SYSTEM");
         configurationItem.setTableName("test_db_notification");
-        configurationItem.setPassword("randomly");
+        configurationItem.setPassword("mb282wu7nvDkbQRkfXvA");
     }
 
     @Test

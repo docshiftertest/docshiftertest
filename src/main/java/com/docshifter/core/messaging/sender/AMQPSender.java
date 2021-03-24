@@ -1,6 +1,6 @@
 package com.docshifter.core.messaging.sender;
 
-import com.docshifter.core.config.domain.QueueMonitorRepository;
+import com.docshifter.core.config.repositories.QueueMonitorRepository;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;

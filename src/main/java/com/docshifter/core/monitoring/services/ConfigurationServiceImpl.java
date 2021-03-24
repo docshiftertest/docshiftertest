@@ -5,7 +5,7 @@ import com.docshifter.core.monitoring.dtos.ConfigurationDto;
 import com.docshifter.core.monitoring.dtos.ConfigurationItemDto;
 import com.docshifter.core.monitoring.entities.Configuration;
 import com.docshifter.core.monitoring.mappings.ConfigurationConverter;
-import com.docshifter.core.monitoring.repo.ConfigurationRepository;
+import com.docshifter.core.monitoring.repositories.ConfigurationRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.Optional;
  * Created by blazejm on 11.05.2017.
  */
 @Service
-@Transactional
+@Transactional("dsTransactionManager")
 public class ConfigurationServiceImpl implements ConfigurationService {
     private static final Logger log = Logger.getLogger(com.docshifter.core.monitoring.services.ConfigurationServiceImpl.class.getName());
 
