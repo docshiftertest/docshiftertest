@@ -3,10 +3,10 @@ package com.docshifter.core.graphAPI;
 import java.util.Collections;
 import java.util.List;
 
-import com.microsoft.graph.auth.confidentialClient.ClientCredentialProvider;
-import com.microsoft.graph.auth.enums.NationalCloud;
-import com.microsoft.graph.models.extensions.IGraphServiceClient;
-import com.microsoft.graph.requests.extensions.GraphServiceClient;
+import com.azure.identity.ClientSecretCredential;
+import com.azure.identity.ClientSecretCredentialBuilder;
+import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
+import com.microsoft.graph.requests.GraphServiceClient;
 
 /**
  * Class responsible to retrieve microsoft graph session.
@@ -16,21 +16,22 @@ import com.microsoft.graph.requests.extensions.GraphServiceClient;
  */
 public class MSGraphAuthenticationBuilder {
 
-	private static final List<String> SCOPES = Collections
-			.unmodifiableList(Collections.singletonList("https://graph.microsoft.com/.default"));
+	private static final List<String> SCOPES = Collections.singletonList("https://graph.microsoft.com/.default");
 
-	public static IGraphServiceClient createGraphClient(String clientId, String clientSecret, String tenant,
-			NationalCloud nationalCloud) {
-		return buildClientCredentials(clientId, clientSecret, tenant, nationalCloud);
+	public static GraphServiceClient<?> createGraphClient(String clientId, String clientSecret, String tenant) {
+		return buildClientCredentials(clientId, clientSecret, tenant);
 	}
 
-	private static IGraphServiceClient buildClientCredentials(String clientId, String clientSecret, String tenant,
-			NationalCloud nationalCloud) {
+	private static GraphServiceClient<?> buildClientCredentials(String clientId, String clientSecret, String tenant) {
 
-		ClientCredentialProvider cliCredential = new ClientCredentialProvider(clientId, SCOPES, clientSecret, tenant,
-				nationalCloud);
+		ClientSecretCredential clientSecretCredential = new ClientSecretCredentialBuilder()
+				.clientId(clientId)
+				.clientSecret(clientSecret)
+				.tenantId(tenant)
+				.build();
 
-		return GraphServiceClient.builder().authenticationProvider(cliCredential).buildClient();
+		final TokenCredentialAuthProvider authProvider = new TokenCredentialAuthProvider(SCOPES, clientSecretCredential);
 
+		return GraphServiceClient.builder().authenticationProvider(authProvider).buildClient();
 	}
 }

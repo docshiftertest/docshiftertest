@@ -1,7 +1,7 @@
 package com.docshifter.core.graphAPI;
 
 import com.docshifter.core.graphAPI.integration.Sharepoint;
-import com.microsoft.graph.models.extensions.IGraphServiceClient;
+import com.microsoft.graph.requests.GraphServiceClient;
 
 /**
  *
@@ -11,9 +11,9 @@ import com.microsoft.graph.models.extensions.IGraphServiceClient;
  */
 public class GraphClient {
 
-	private Sharepoint sharepoint;
+	private final Sharepoint sharepoint;
 
-	public GraphClient(IGraphServiceClient graphClient) {
+	public GraphClient(GraphServiceClient<?> graphClient) {
 		this.sharepoint = new Sharepoint(graphClient);
 	}
 
