@@ -209,7 +209,7 @@ public class Sharepoint {
     }
 
     /**
-     * Iterate all IListCollectionPage pages and add to list.
+     * Iterate all ColumnDefinition Collection pages and add to list.
      *
      * @param columnDefinitionList          the list to aggregate the DriveItems
      * @param columnDefinitionCollectionPage the given page collection from the request.
