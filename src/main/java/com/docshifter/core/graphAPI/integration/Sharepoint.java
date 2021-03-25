@@ -7,7 +7,6 @@ import com.microsoft.graph.models.DriveItemSearchParameterSet;
 import com.microsoft.graph.models.FieldValueSet;
 import com.microsoft.graph.models.ListItem;
 import com.microsoft.graph.models.Site;
-import com.microsoft.graph.options.QueryOption;
 import com.microsoft.graph.requests.ColumnDefinitionCollectionPage;
 import com.microsoft.graph.requests.ColumnDefinitionCollectionRequestBuilder;
 import com.microsoft.graph.requests.DriveCollectionPage;
@@ -27,7 +26,6 @@ import org.springframework.web.util.UriUtils;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,10 +53,8 @@ public class Sharepoint {
      * results.
      */
     public ListCollectionPage getLibrary(String siteId) {
-    	
-    	if(log.isDebugEnabled()) {
-        	log.debug("Getting library from :" + siteId);
-    	}
+
+        log.debug("Getting library from {} " , siteId);
 
         return this.graphClient
                 .sites(siteId)
@@ -76,7 +72,7 @@ public class Sharepoint {
      */
     public String retrieveSiteId(String siteName) {
 
-        log.debug("Getting site id from{} :",siteName);
+        log.debug("Getting site id from {} ",siteName);
 
         if (!StringUtils.isBlank(siteName) && !siteName.equalsIgnoreCase(DEFAULT_SITE)) {
 
@@ -292,7 +288,7 @@ public class Sharepoint {
     }
     
     /**
-     * We encode the given folder from workflow to compare against weburl.
+     * We encode the given folder from workflow to compare against webUrl.
      * @param folderPath the folder path from workflow E.G. eCTD Sample Content/Module 2/27 Clinical Summary
      * @return the encoded folder path E.G eCTD%20Sample%20Content/Module%202/27%20Clinical%20Summary
      */
@@ -473,17 +469,5 @@ public class Sharepoint {
                 .children()
                 .buildRequest()
                 .post(driveItem);
-    }
-
-    /**
-     * Used to build queries to send within the build request.
-     *
-     * @param name  the param that you want to filter
-     * @param value the value to be filtered
-     * @return a list with the requested QueryOption
-     */
-    public List <QueryOption> buildQueryOptions(String name, String value) {
-        return Collections.unmodifiableList(Collections.singletonList(new QueryOption(name, value)));
-
     }
 }
