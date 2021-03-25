@@ -9,4 +9,6 @@ public interface DocumentCounterService {
     DocumentCounterDTO createDocumentCounterDto(String task, long counts);
 
     long countFiles(String filename);
+
+    void exportCounts(String path, String keyPath);
 }
