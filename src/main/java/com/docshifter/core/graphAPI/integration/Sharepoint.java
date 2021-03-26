@@ -125,7 +125,9 @@ public class Sharepoint {
 				.lists(listID)
 				.drive()
 				.root()
-				.search(new DriveItemSearchParameterSet())
+                .search(DriveItemSearchParameterSet
+                        .newBuilder()
+                        .withQ(listID).build())
 				.buildRequest()
 				.get();
 	}
