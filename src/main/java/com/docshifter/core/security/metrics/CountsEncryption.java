@@ -1,11 +1,16 @@
 package com.docshifter.core.security.metrics;
 
+import org.apache.commons.codec.binary.Base64;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -44,13 +49,14 @@ public class CountsEncryption {
         writeToFile(output, this.cipher.doFinal(input));
     }
 
-    //Helper function to write to encrypted file TODO: This isn't needed
-    private void writeToFile(File output, byte[] toWrite)
+    //Helper function to write to encrypted file
+    public void writeToFile(File output, byte[] toWrite)
             throws IllegalBlockSizeException, BadPaddingException, IOException {
-        FileOutputStream fos = new FileOutputStream(output);
-        fos.write(toWrite);
-        fos.flush();
-        fos.close();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(128);
+                FileOutputStream fos = new FileOutputStream(output)){
+            baos.write(toWrite);
+            fos.write(baos.toByteArray());
+        }
     }
 
     //Returns file as bytes

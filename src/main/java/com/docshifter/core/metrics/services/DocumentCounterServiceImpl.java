@@ -86,73 +86,76 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
     }
 
     // Creates the encrypted file containing the counts that should be sent to DocShifter
-    public void exportCounts(String path, String keyPath) {
+
+    /**
+     *
+     * @param tempPath The console.temp.dir value from the application.properties file; retrieved in the Controller
+     * @param exportPath Similar to above, the export.dir value
+     */
+    public void exportCounts(String tempPath, String exportPath) {
         logger.info("Creating counts export file");
 
         //Retrieving counts from the database
         long counts = documentCounterRepository.selectTotalCounts();
-        logger.info("Total counts: " + counts);
+        logger.info("Total counts to date: " + counts);
+        long tasks = documentCounterRepository.selectSuccessfulWorkflows();
+        logger.info("Total tasks to date: " + tasks);
 
         //Searches through the DocShifter install directory to find the public key
         //which should be hidden under a non-indicative name
         //Apparently overwrites the 'accept' method in FilenameFilter to find the file we want
         //TODO: Find a more straightforward and understandable solution
-        File exportDir = new File(keyPath);
+        File exportDir = new File(exportPath);
         File[] match = exportDir.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.startsWith("publicKey");
             }
         });
-        logger.info(keyPath);
-        logger.info(match);
 
         //Prepares the name of the export file, including timestamp
-        path = path + "/";
-        String name = "counts_";
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         Date date = new Date();
         String timestamp = dateFormat.format(date); //timestamp as a variable to be included in file name and content
-        name = name + timestamp;
+        String name = tempPath + "/" + "counts_" + timestamp;
 
         //Creates the unencrypted file
-        File countsFile = new File(path + name);
+        File countsFile = new File(tempPath + name);
         try (FileWriter writer = new FileWriter(countsFile)) {
-            File dir = new File(path);
+            File dir = new File(tempPath);
             if (!dir.exists()) {
                 dir.mkdirs();
             }
 
             // TODO: Never have an unencrypted version of the file stored on the disk
             //  A way to do that would be to encrypt the string and only then write it to a file, but that was running into issues (not actually getting written to the file)
-//            writer.write("Total files       " + "\n     " + counts + "   " + "processed     \n by" +
-//                    "+" + "DocShifter: " + counts + "   " + " and some more   \n padding" +
-//                    " \n and some + " + "more" + "timestamp: " + timestamp);
-//            String padding = "";
 
-            // Writes the weird wibbly-wobbly file contents that can't be replicated without decompiling (and even then should prove a struggle)
-            // TODO: Put a regex for this exact pattern in the decrypter to verify the contents
-            writer.write("Total flies + " + counts + " \n     " + "  processed by" + counts + "   " +
-                    " and some more +   \n   padding" + "timestamp: " + timestamp);
-
+            // Writes the file contents; some padding provided at the end of the lines to make the contents slightly less obvious
+            writer.write("Files: " + counts +
+                        "   \n" + "Tasks:" + tasks + "     \n"
+                        + "At: " + timestamp);
+//            writer.write("Total files:         ")
+            //TODO: When the metric system is expanded, add other metrics we are interested in
         } catch (IOException e) {
             countsFile.delete(); //Remove plaintext file in case of errors!
             logger.warn(e);
             logger.error("Counts file not created");
         }
 
-
+        //Encrypts the counts file created above
         try {
             CountsEncryption encryptor = new CountsEncryption();
             // Gets the public key from the file retrieved above
             PublicKey publicKey = encryptor.getPublic(match[0].toString());
 
             //Replaces the plaintext counts file with the encrypted version
-            encryptor.encryptFile(encryptor.getFileInBytes(new File(path+name)),
-                    new File(path+name), publicKey);
+            encryptor.encryptFile(encryptor.getFileInBytes(new File(tempPath+name)),
+                    new File(tempPath+name), publicKey);
         } catch  (Exception exception) {
             countsFile.delete(); //Remove plaintext file in case of errors!
             logger.error("Failed to encrypt file");
             exception.printStackTrace();
         }
+        // TODO: First send e-mail, then open e-mail client, then point them to encrypted file
+        // mailTo link, encrypt the body of the email; include license number? -> DSLicenseCode
     }
 }
