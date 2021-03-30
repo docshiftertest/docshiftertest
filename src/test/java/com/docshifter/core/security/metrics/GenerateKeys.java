@@ -46,13 +46,15 @@ public class GenerateKeys {
         fos.close();
     }
 
-    public void createTestKeys() {
+    public static void main(String[] args) {
+        // Run to generate a public and private key to be used by the DocShifter processes;
+        // command-line arguments determine the location where they will be saved
         GenerateKeys gk;
         try {
-            gk = new GenerateKeys(1024);
+            gk = new GenerateKeys(2048);
             gk.createKeys();
-            gk.writeToFile("target/test-classes/publicKey", gk.getPublicKey().getEncoded());
-            gk.writeToFile("target/test-classes/privateKey", gk.getPrivateKey().getEncoded());
+            gk.writeToFile(args[0], gk.getPublicKey().getEncoded()); //first CL argument is the path and file name for the public key
+            gk.writeToFile(args[1], gk.getPrivateKey().getEncoded()); //second CL argument is the path and file name for the private key
         } catch (NoSuchAlgorithmException | NoSuchProviderException | IOException e) {
             System.err.println(e.getMessage());
         }

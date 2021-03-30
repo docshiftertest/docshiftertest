@@ -125,6 +125,9 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
             }
 
             // Writes the string that will be encrypted
+            // limited to (key length in bits)/8 -11) bytes
+            // so for a 2048-bit RSA key, maximum size of the string is 245 bytes/characters
+            // Current size is 60-70 even with maximum values for the longs, so we're good
             String padding = "Files: " + counts +
                     "   \n" + "Tasks:" + tasks + "     \n"
                     + "At: " + timestamp;
