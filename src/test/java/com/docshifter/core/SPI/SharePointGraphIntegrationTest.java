@@ -1,21 +1,16 @@
 package com.docshifter.core.SPI;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
+import com.docshifter.core.graphAPI.GraphClient;
+import com.docshifter.core.graphAPI.MSGraphAuthenticationBuilder;
+import com.docshifter.core.utils.FileUtils;
+import com.google.gson.JsonPrimitive;
+import com.microsoft.graph.core.ClientException;
+import com.microsoft.graph.models.DriveItem;
+import com.microsoft.graph.models.FieldValueSet;
+import com.microsoft.graph.models.Folder;
+import com.microsoft.graph.models.ListItem;
+import com.microsoft.graph.requests.ListCollectionPage;
+import com.microsoft.graph.serializer.AdditionalDataManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -25,21 +20,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import com.docshifter.core.utils.FileUtils;
-import com.docshifter.core.graphAPI.GraphClient;
-import com.docshifter.core.graphAPI.MSGraphAuthenticationBuilder;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.reflect.TypeToken;
-import com.microsoft.graph.auth.enums.NationalCloud;
-import com.microsoft.graph.core.ClientException;
-import com.microsoft.graph.models.extensions.DriveItem;
-import com.microsoft.graph.models.extensions.FieldValueSet;
-import com.microsoft.graph.models.extensions.Folder;
-import com.microsoft.graph.models.extensions.ListItem;
-import com.microsoft.graph.requests.extensions.IListCollectionPage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Juan Marques created on 07/08/2020
@@ -58,7 +51,7 @@ public class SharePointGraphIntegrationTest {
 
 		graphClient = new GraphClient(MSGraphAuthenticationBuilder.createGraphClient(
 				"c01820bd-f5ab-4a94-8fcc-1c47d6b264f5", "Cf12Tr0~7P7D.Kof0_Rb6k81_bZ9J8Cl6k",
-				"fdfaf67a-261f-4fc8-bc26-fa14aa7691e1", NationalCloud.Global));
+				"fdfaf67a-261f-4fc8-bc26-fa14aa7691e1"));
 
 		if (site.equalsIgnoreCase("demo"))
 			site = graphClient.getSharepoint().retrieveSiteId(site);
@@ -68,9 +61,9 @@ public class SharePointGraphIntegrationTest {
 	public void badCredentialsTest() {
 
 		graphClient = new GraphClient(MSGraphAuthenticationBuilder.createGraphClient("b081-42d7-a8e1-4c93452d9a3c",
-				"3O1p8_T2XatR-PCRd18ywH~DU_tEx.m433", "a545304d-99b4-4706-8c12-f626a2d2a3cb", NationalCloud.Global));
+				"3O1p8_T2XatR-PCRd18ywH~DU_tEx.m433", "a545304d-99b4-4706-8c12-f626a2d2a3cb"));
 
-		IListCollectionPage collectionPage = null;
+		ListCollectionPage collectionPage = null;
 
 		try {
 			collectionPage = graphClient.getSharepoint().getLibrary(site);
@@ -84,8 +77,8 @@ public class SharePointGraphIntegrationTest {
 	@Test
 	public void getAllContentFromSpecificFolderTest() {
 
-		String folderName = "Test";
-		String listId = "48aa2e0d-0599-4be3-976d-4296f601ac34";
+		String folderName = "Input";
+		String listId = "f8cadb07-3edb-4a23-ba0a-4b159206c4d2";
 
 		List<DriveItem> items = new ArrayList<>();
 		graphClient.getSharepoint().getAllItemDriveCollectionPage(items, graphClient.getSharepoint().getAllDriveItems(listId, site), folderName);
@@ -103,21 +96,25 @@ public class SharePointGraphIntegrationTest {
 
 		for (DriveItem childFolderItems : lstChildItems) {
 			if (childFolderItems.file != null) {
-				JsonObject listItem = childFolderItems.getRawObject().getAsJsonObject("listItem");
-				JsonElement fieldsElement = listItem.get("fields");
-				Map<String, String> fields = jsonToMap(fieldsElement);
-				boolean processedByDS = Boolean.parseBoolean(fields.getOrDefault("ProcessedByDS", "false"));
+
+
+				ListItem listItem = childFolderItems.listItem;
+				// Getting fields from file
+				FieldValueSet itemFieldValueSet = listItem.fields;
+				AdditionalDataManager itemFields = itemFieldValueSet.additionalDataManager();
+				boolean processedByDS =	itemFields.get("ProcessedByDS").getAsBoolean();
+
 				if (!processedByDS) {
 
 					// Updating field
-					updateFields(listId, fields.get("id"), graphClient,true);
+					updateFields(listId, childFolderItems.listItem.id, graphClient,true);
 					
 					InputStream fileInputStream = graphClient.getSharepoint().getFileByDriveId(childFolderItems.id, site,listId);
 
 					downloadFile(fileInputStream, childFolderItems.name);
 					
          			//Updating field to false to get the file again
-					updateFields(listId, fields.get("id"), graphClient,false);
+					updateFields(listId, childFolderItems.listItem.id, graphClient,false);
 				}
 			}
 
@@ -130,11 +127,6 @@ public class SharePointGraphIntegrationTest {
 	
 	/**
 	 * Update column
-	 * 
-	 * @param listId
-	 * @param itemId
-	 * @param graphClient
-	 * @param processed
 	 */
 	public void updateFields(String listId, String itemId, GraphClient graphClient,boolean processed) {
 		FieldValueSet fieldValueSet = new FieldValueSet();
@@ -162,7 +154,7 @@ public class SharePointGraphIntegrationTest {
 
 		graphClient.getSharepoint().getLibrary(site).getCurrentPage().forEach(c -> {
 
-			if (c.name.equalsIgnoreCase("InputDev")) {
+			if (c.name.equalsIgnoreCase("OutputDev")) {
 				log.info(c.id);
 				log.info(c.name);
 				log.info("    \n");
@@ -220,8 +212,7 @@ public class SharePointGraphIntegrationTest {
 
 		DriveItem driveItem = new DriveItem();
 		driveItem.name = "NewChildrenlv3";
-		Folder folder = new Folder();
-		driveItem.folder = folder;
+		driveItem.folder = new Folder();
 		driveItem.additionalDataManager().put("@microsoft.graph.conflictBehavior", new JsonPrimitive("rename"));
 
 		DriveItem driveItemParentCallBack = null;
@@ -239,14 +230,6 @@ public class SharePointGraphIntegrationTest {
 		assertNotNull(driveItemParentCallBack);
 		assertNotNull(driveItemChildCallBack);
 
-	}
-
-	public Map<String, String> jsonToMap(JsonElement jsonElement) {
-		Gson gson = new Gson();
-
-		Type type = new TypeToken<Map<String, String>>() {
-		}.getType();
-		return gson.fromJson(jsonElement, type);
 	}
 
 }

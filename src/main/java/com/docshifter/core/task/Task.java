@@ -58,8 +58,9 @@ public class Task implements Serializable {
 	public ArrayList<String> getMessages() {
 		return messages;
 	}
-	public void addMessage(String message) {
+	public String addMessage(String message) {
 		messages.add(message);
+		return message;
 	}
 
 	public String getName() {
