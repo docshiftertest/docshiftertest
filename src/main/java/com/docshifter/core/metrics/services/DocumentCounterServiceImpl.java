@@ -205,22 +205,22 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
         //Add logo to PDF
         //Commented code is the one that actually adds the logo to the file, which we probably want
         BufferedImage logo = ImageUtils.getLogo(values);
-//        Page page = doc.getPages().get_Item(1);
-//        page.getResources().getImages().add(logo);
-//        // Create Rectangle and Matrix objects
-//        Rectangle rectangle = new Rectangle(300, 300, 430, 430);
-//        Matrix matrix = new Matrix(new double[] { rectangle.getURX() - rectangle.getLLX(), 0, 0, rectangle.getURY() - rectangle.getLLY(), rectangle.getLLX(), rectangle.getLLY() });
-//
-//        // Using ConcatenateMatrix (concatenate matrix) operator: defines how image must be placed
-//        page.getContents().add(new ConcatenateMatrix(matrix));
-//        XImage ximage = page.getResources().getImages().get_Item(page.getResources().getImages().size());
-//
-//        // Using Do operator: this operator draws image
-//        page.getContents().add(new Do(ximage.getName()));
-//
-//        // Using GRestore operator: this operator restores graphics state
-//        page.getContents().add(new GRestore());
-//
+        Page page = doc.getPages().get_Item(1);
+        page.getResources().getImages().add(logo);
+        // Create Rectangle and Matrix objects
+        Rectangle rectangle = new Rectangle(200, 500, 400, 650);
+        Matrix matrix = new Matrix(new double[] { rectangle.getURX() - rectangle.getLLX(), 0, 0, rectangle.getURY() - rectangle.getLLY(), rectangle.getLLX(), rectangle.getLLY() });
+
+        // Using ConcatenateMatrix (concatenate matrix) operator: defines how image must be placed
+        page.getContents().add(new ConcatenateMatrix(matrix));
+        XImage ximage = page.getResources().getImages().get_Item(page.getResources().getImages().size());
+
+        // Using Do operator: this operator draws image
+        page.getContents().add(new Do(ximage.getName()));
+
+        // Using GRestore operator: this operator restores graphics state
+        page.getContents().add(new GRestore());
+
 //        // Save the new PDF
 //        doc.save("Updated_document.pdf");
 
