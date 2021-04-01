@@ -63,7 +63,7 @@ public class ChainConfiguration {
 	}
 
 	public String getDescription() {
-		return description;
+		return description == null ? "" : description;
 	}
 
 
@@ -106,7 +106,7 @@ public class ChainConfiguration {
 	}
 
 	public String getPrinterName() {
-		return printerName;
+		return printerName == null ? "" : printerName;
 	}
 
 	public void setPrinterName(String printerName) {
@@ -114,7 +114,7 @@ public class ChainConfiguration {
 	}
 
 	public String getQueueName() {
-		return queueName;
+		return queueName == null ? "" : queueName;
 	}
 
 	public void setQueueName(String queueName) {
