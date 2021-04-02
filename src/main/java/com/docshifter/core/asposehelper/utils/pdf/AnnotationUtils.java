@@ -16,7 +16,7 @@ public final class AnnotationUtils {
 	private AnnotationUtils() {}
 
 	/**
-	 * Unwraps an {@link IAppointment} from a {@link LinkAnnotation} entirely and tries to cast the result as an
+	 * Extracts an {@link IAppointment} from a {@link LinkAnnotation} entirely and tries to cast the result as an
 	 * {@link ExplicitDestination}. Will return null if it is not an {@link ExplicitDestination}.
 	 * @param doc The document containing the {@link LinkAnnotation} and {@link NamedDestination}s.
 	 * @param annotation The object to extract the destination from.
@@ -39,10 +39,11 @@ public final class AnnotationUtils {
 	}
 
 	/**
-	 * Unwraps a {@link LinkAnnotation} from an {@link IAppointment} (specifically {@link GoToAction}s) entirely and
-	 * tries to cast the result as an {@link ExplicitDestination}. Will return null if it is not an
-	 * {@link ExplicitDestination}. ONLY use this if you don't care about following {@link NamedDestination}s! For
-	 * more robust checking see {@link #extractExplicitDestinationSoft(IDocument, LinkAnnotation)}.
+	 * Extracts an {@link IAppointment} from a {@link LinkAnnotation} (following specifically through
+	 * {@link GoToAction}s) entirely and tries to cast the result as an {@link ExplicitDestination}. Will return null
+	 * if it is not an {@link ExplicitDestination}. ONLY use this if you don't care about following
+	 * {@link NamedDestination}s! For more robust checking see
+	 * {@link #extractExplicitDestinationSoft(IDocument, LinkAnnotation)}.
 	 * @param annotation The object to extract the destination from.
 	 * @return The retrieved {@link ExplicitDestination} or null if it couldn't be casted or retrieved.
 	 */
@@ -62,16 +63,39 @@ public final class AnnotationUtils {
 		return dest;
 	}
 
+	/**
+	 * Do NOT use this, has been replaced by {@link #extractExplicitDestinationHard(LinkAnnotation)} in order to make
+	 * intentions clearer, but {@link #extractExplicitDestinationSoft(IDocument, LinkAnnotation)} should be used in
+	 * most scenarios for more robust checking.
+	 * @param annotation The object to extract the destination from.
+	 * @return The retrieved {@link ExplicitDestination} or null if it couldn't be casted or retrieved.
+	 */
 	@Deprecated
 	public static ExplicitDestination extractExplicitDestination(LinkAnnotation annotation) {
 		return extractExplicitDestinationHard(annotation);
 	}
 
+	/**
+	 * Do NOT use this, has been replaced by {@link #setDestinationOrActionHard(LinkAnnotation, ExplicitDestination)}
+	 * in order to make intentions clearer. Also see
+	 * {@link #setDestinationOrActionSoft(Document, LinkAnnotation, ExplicitDestination)} and the overloaded methods
+	 * that accept a {@link NamedDestination}.
+	 * @param annotation The annotation to change.
+	 * @param dest The destination to change to.
+	 */
 	@Deprecated
 	public static void setDestinationOrAction(LinkAnnotation annotation, ExplicitDestination dest) {
 		setDestinationOrActionHard(annotation, dest);
 	}
 
+	/**
+	 * Changes the underlying destination of a {@link LinkAnnotation} to an {@link ExplicitDestination}. Does NOT
+	 * follow through wrapped {@link IAppointment}s if there are any, so this is useful if you want to change the
+	 * destination of a single link instead of the destination backed by a {@link NamedDestination} for example
+	 * (which would then update the destinations of everything pointing to that specific name).
+	 * @param annotation The annotation to change.
+	 * @param dest The destination to change to.
+	 */
 	public static void setDestinationOrActionHard(LinkAnnotation annotation, ExplicitDestination dest) {
 		if (annotation.getDestination() != null || annotation.getAction() == null) {
 			annotation.setDestination(dest);
@@ -80,6 +104,15 @@ public final class AnnotationUtils {
 		}
 	}
 
+	/**
+	 * Changes the underlying destination of a {@link LinkAnnotation} to a {@link NamedDestination}. Does NOT follow
+	 * through wrapped {@link IAppointment}s if there are any, so this is useful if you want to change the
+	 * destination of a single link instead of the destination backed by a {@link NamedDestination} for example
+	 * (which would then update the destinations of everything pointing to that specific name).
+	 * @param annotation The annotation to change.
+	 * @param doc The document that contains the annotation.
+	 * @param dest The destination to change to.
+	 */
 	public static void setDestinationOrActionHard(LinkAnnotation annotation, Document doc, NamedDestination dest) {
 		if (annotation.getDestination() != null || annotation.getAction() == null) {
 			annotation.setDestination(dest);
@@ -88,6 +121,14 @@ public final class AnnotationUtils {
 		}
 	}
 
+	/**
+	 * Changes the underlying destination of a {@link LinkAnnotation} to an {@link ExplicitDestination}. DOES follow
+	 * through wrapped {@link IAppointment}s if there are any, so this is useful if you want to or don't care about
+	 * changing the destination of everything pointing to a {@link NamedDestination}.
+	 * @param annotation The annotation to change.
+	 * @param doc The document that contains the annotation.
+	 * @param dest The destination to change to.
+	 */
 	public static void setDestinationOrActionSoft(Document doc, LinkAnnotation annotation,
 												  ExplicitDestination dest) {
 		if (annotation.getDestination() != null) {
@@ -103,6 +144,14 @@ public final class AnnotationUtils {
 		}
 	}
 
+	/**
+	 * Changes the underlying destination of a {@link LinkAnnotation} to a {@link NamedDestination}. DOES follow
+	 * through wrapped {@link IAppointment}s if there are any, so this is useful if you want to or don't care about
+	 * changing the destination of everything pointing to a {@link NamedDestination}.
+	 * @param annotation The annotation to change.
+	 * @param doc The document that contains the annotation.
+	 * @param dest The destination to change to.
+	 */
 	public static void setDestinationOrActionSoft(Document doc, LinkAnnotation annotation,
 												  NamedDestination dest) {
 		if (annotation.getDestination() != null) {
@@ -118,6 +167,14 @@ public final class AnnotationUtils {
 		}
 	}
 
+	/**
+	 * Changes the underlying destination of a {@link LinkAnnotation} to an {@link ExplicitDestination} pointing to
+	 * the top left of a page. DOES follow through wrapped {@link IAppointment}s if there are any, so this is useful
+	 * if you want to or don't care about changing the destination of everything pointing to a {@link NamedDestination}.
+	 * @param annotation The annotation to change.
+	 * @param doc The document that contains the annotation.
+	 * @param target The target page to point to.
+	 */
 	public static XYZExplicitDestination setDestinationToUpperLeftCornerSoft(Document doc,
 																			 LinkAnnotation annotation, Page target) {
 		XYZExplicitDestination dest = XYZExplicitDestination.createDestinationToUpperLeftCorner(target);
@@ -125,12 +182,27 @@ public final class AnnotationUtils {
 		return dest;
 	}
 
+	/**
+	 * Changes the underlying destination of a {@link LinkAnnotation} to an {@link ExplicitDestination} pointing to the
+	 * top left of a page. Does NOT follow through wrapped {@link IAppointment}s if there are any, so this is useful
+	 * if you want to change the destination of a single link instead of the destination backed by a
+	 * {@link NamedDestination} for example (which would then update the destinations of everything pointing to that
+	 * specific name).
+	 * @param annotation The annotation to change.
+	 * @param target The target page to point to.
+	 */
 	public static XYZExplicitDestination setDestinationToUpperLeftCornerHard(LinkAnnotation annotation, Page target) {
 		XYZExplicitDestination dest = XYZExplicitDestination.createDestinationToUpperLeftCorner(target);
 		setDestinationOrActionHard(annotation, dest);
 		return dest;
 	}
 
+	/**
+	 * Do NOT use this, has been replaced by {@link #setDestinationToUpperLeftCornerHard(LinkAnnotation, Page)}
+	 * in order to make intentions clearer.
+	 * @param annotation The annotation to change.
+	 * @param target The target page to point to.
+	 */
 	@Deprecated
 	public static XYZExplicitDestination setDestinationToUpperLeftCorner(LinkAnnotation annotation, Page target) {
 		return setDestinationToUpperLeftCornerHard(annotation, target);
