@@ -23,8 +23,8 @@ import com.docshifter.core.metrics.dtos.DocumentCounterDTO;
 import com.docshifter.core.metrics.entities.DocumentCounter;
 import com.docshifter.core.metrics.repositories.DocumentCounterRepository;
 import com.docshifter.core.utils.FileUtils;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,9 +45,8 @@ import java.util.zip.ZipFile;
  * For now handles counting the incoming files and storing the counts.
  */
 @Service
+@Log4j2
 public class DocumentCounterServiceImpl implements DocumentCounterService {
-    private static final Logger logger = Logger.getLogger(new Object() {
-    }.getClass().getEnclosingClass());
 
     @Autowired
     DocumentCounterRepository documentCounterRepository;
@@ -74,10 +73,10 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
     public long countFiles(String filename) {
         long counts = 1;
         String extension = FileUtils.getExtension(filename);
-        logger.debug("The file extension is:" + extension);
+        log.debug("The file extension is: {}", extension);
 
         if (StringUtils.isBlank(extension)) {
-            logger.warn("Extension is blank, failure might occur; file will otherwise be counted as 1");
+            log.warn("Extension is blank, failure might occur; file will otherwise be counted as 1");
         }
 
         //TODO: Handle other archive file formats (rar, 7z, tar, etc.)
@@ -88,8 +87,8 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
                 counts = zf.size();
                 return counts;
             } catch (IOException e) {
-                logger.error("Error with .zip file");
-                logger.error(e);
+                log.error("Error with .zip file");
+                e.printStackTrace();
             }
         }
         //counts all attachments and main body in an email
@@ -107,13 +106,13 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
 
     public void exportCounts(String tempPath, String exportPath) {
         LicenseHelper.getLicenseHelper(); //aspose license helper
-        logger.info("Creating export PDF");
+        log.info("Creating export PDF");
 
         //Retrieve the counts from the metrics database
-        long counts = documentCounterRepository.selectTotalCounts();
-        logger.info("Total counts to date: " + counts);
+        long count = documentCounterRepository.selectTotalCounts();
+        log.info("Total counts to date: {}", count);
         long tasks = documentCounterRepository.selectSuccessfulWorkflows();
-        logger.info("Total tasks to date: " + tasks);
+        log.info("Total tasks to date: {}", tasks);
 
         // Instantiate Document object from preset PDF
         Document doc = new Document(DocumentCounterServiceImpl.class.getResourceAsStream("/export/Counts-report-template.pdf"));
@@ -126,13 +125,13 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
 
         //Long data for the logo
         long[] data = new long[2];
-        data[0] = counts;
+        data[0] = count;
         data[1] = tasks;
 
         //Data to fill the placeholders
         String[] values = new String[3];
-        values[0] = counts + "";
-        values[1] = tasks + "";
+        values[0] = String.valueOf(count);
+        values[1] = String.valueOf(tasks);
         values[2] = timestamp;
 
         // Locate placeholders on page
@@ -142,7 +141,7 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
 
         if (tfc.size() != values.length) {
             //TODO: Should we fail the process or keep it as a warning?
-            logger.warn("Number of placeholders does not match number of values to be written");
+            log.warn("Number of placeholders does not match number of values to be written");
         }
 
         // Loops through placeholders and replaces them with values
@@ -156,55 +155,64 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
 
         // First creates the logo and saves it as an image on the disk
         BufferedImage logo = ImageUtils.getLogo(data);
+        if (logo == null) {
+            log.error("Failed to create export file"); //Could not retrieve logo for some reason
+        }
         File logoFile = new File(tempPath + "/logo.png");
         try {
             ImageIO.write(logo, "png", logoFile);
         }
         catch (Exception e) {
             logoFile.delete();
-            logger.error("Failed to create export file"); //actually failed to create secrety logo
+            log.error("Failed to create export file"); //actually failed to create secrety logo
             e.printStackTrace();
         }
 
-        //Add logo to PDF:
-        // Add logo to page resources
-        Page page = doc.getPages().get_Item(1);
-        page.getResources().getImages().add(logo);
-        // Create Rectangle and Matrix objects
-        Rectangle rectangle = new Rectangle(100, 700, 500, 850); //lower left and upper right corner coordinates for the logo
-        Matrix matrix = new Matrix(new double[] { rectangle.getURX() - rectangle.getLLX(), 0, 0, rectangle.getURY() - rectangle.getLLY(), rectangle.getLLX(), rectangle.getLLY() });
+        try {
+            //Add logo to PDF:
+            // Add logo to page resources
+            Page page = doc.getPages().get_Item(1);
+            page.getResources().getImages().add(logo);
+            // Create Rectangle and Matrix objects
+            Rectangle rectangle = new Rectangle(100, 700, 500, 850); //lower left and upper right corner coordinates for the logo
+            Matrix matrix = new Matrix(new double[]{rectangle.getURX() - rectangle.getLLX(), 0, 0, rectangle.getURY() - rectangle.getLLY(), rectangle.getLLX(), rectangle.getLLY()});
 
-        // Using ConcatenateMatrix (concatenate matrix) operator: defines how image must be placed
-        page.getContents().add(new ConcatenateMatrix(matrix));
-        XImage ximage = page.getResources().getImages().get_Item(page.getResources().getImages().size());
-        // Using Do operator: this operator draws image
-        page.getContents().add(new Do(ximage.getName()));
-        // Using GRestore operator: this operator restores graphics state
-        page.getContents().add(new GRestore());
+            // Using ConcatenateMatrix (concatenate matrix) operator: defines how image must be placed
+            page.getContents().add(new ConcatenateMatrix(matrix));
+            XImage ximage = page.getResources().getImages().get_Item(page.getResources().getImages().size());
+            // Using Do operator: this operator draws image
+            page.getContents().add(new Do(ximage.getName()));
+            // Using GRestore operator: this operator restores graphics state
+            page.getContents().add(new GRestore());
 
-        // Retrieve created logo and add as attachment
-        // to the document's attachment collection
-        FileSpecification fileSpecification = new FileSpecification(tempPath + "/logo.png", "Logo");
-        doc.getEmbeddedFiles().add(fileSpecification);
+            // Retrieve created logo and add as attachment
+            // to the document's attachment collection
+            FileSpecification fileSpecification = new FileSpecification(tempPath + "/logo.png", "Logo");
+            doc.getEmbeddedFiles().add(fileSpecification);
 
-        // Save document to Stream object for signing
-        ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
-        doc.save(out);
+            // Save document to Stream object for signing
+            ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            doc.save(out);
 
-        // Create PdfFileSignature instance
-        PdfFileSignature pdfSignSingle = new PdfFileSignature();
-        // Bind the source PDF by reading contents of Stream
-        pdfSignSingle.bindPdf(new ByteArrayInputStream((out).toByteArray()));
-        // Sign the PDF file using PKCS1 object
-        Signature signature =  new PKCS1(DocumentCounterServiceImpl.class.getResourceAsStream("/export/docshifter.pfx"), "Gre@tD@y4Thund3rB@y");
-        signature.setShowProperties(false);
-        pdfSignSingle.sign(1, true, new java.awt.Rectangle(100, 100, 150, 50), signature);
-        // Set image for signature appearance TODO: Probably something other than the DS logo
-        pdfSignSingle.setSignatureAppearance(tempPath + "/logo.png");
-        // Save final output
-        pdfSignSingle.save(name + ".pdf");
-
-        logoFile.delete();
-
+            // Create PdfFileSignature instance
+            PdfFileSignature pdfSignSingle = new PdfFileSignature();
+            // Bind the source PDF by reading contents of Stream
+            pdfSignSingle.bindPdf(new ByteArrayInputStream((out).toByteArray()));
+            // Sign the PDF file using PKCS1 object
+            Signature signature = new PKCS1(DocumentCounterServiceImpl.class.getResourceAsStream("/export/docshifter.pfx"), "Gre@tD@y4Thund3rB@y");
+            signature.setShowProperties(false);
+            pdfSignSingle.sign(1, true, new java.awt.Rectangle(100, 100, 150, 50), signature);
+            // Set image for signature appearance TODO: Probably something other than the DS logo
+            pdfSignSingle.setSignatureAppearance(tempPath + "/logo.png");
+            // Save final output
+            pdfSignSingle.save(name + ".pdf");
         }
+        catch (Exception e) {
+            log.error("Failed to create export file");
+            e.printStackTrace();
+        }
+        finally {
+            logoFile.delete();
+        }
+    }
 }
