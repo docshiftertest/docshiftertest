@@ -115,7 +115,9 @@ public final class OutlineUtils {
 		// instead of the action as a sane default.
 		if (outline.getDestination() != null || outline.getAction() == null) {
 			outline.setDestination(dest);
-		} else {
+		}
+
+		if (outline.getAction() != null) {
 			outline.setAction(new GoToAction(dest));
 		}
 	}
@@ -134,7 +136,9 @@ public final class OutlineUtils {
 		// instead of the action as a sane default.
 		if (outline.getDestination() != null || outline.getAction() == null) {
 			outline.setDestination(dest);
-		} else {
+		}
+
+		if (outline.getAction() != null) {
 			outline.setAction(new GoToAction(doc, dest.getName()));
 		}
 	}
@@ -149,15 +153,22 @@ public final class OutlineUtils {
 	 */
 	public static void setDestinationOrActionSoft(Document doc, OutlineItemCollection outline,
 												  ExplicitDestination dest) {
+		boolean updated = false;
 		if (outline.getDestination() != null) {
 			AppointmentUtils.replaceIfWrapped(doc, outline.getDestination(), dest);
-		} else if (outline.getAction() != null) {
+			updated = true;
+		}
+
+		if (outline.getAction() != null) {
 			if (outline.getAction() instanceof GoToAction) {
 				AppointmentUtils.replaceIfWrapped(doc, outline.getAction(), dest);
 			} else {
 				outline.setAction(new GoToAction(dest));
 			}
-		} else {
+			updated = true;
+		}
+
+		if (!updated) {
 			outline.setDestination(dest);
 		}
 	}
@@ -172,15 +183,22 @@ public final class OutlineUtils {
 	 */
 	public static void setDestinationOrActionSoft(Document doc, OutlineItemCollection outline,
 												  NamedDestination dest) {
+		boolean updated = false;
 		if (outline.getDestination() != null) {
 			AppointmentUtils.replaceIfWrapped(doc, outline.getDestination(), dest);
-		} else if (outline.getAction() != null) {
+			updated = true;
+		}
+
+		if (outline.getAction() != null) {
 			if (outline.getAction() instanceof GoToAction) {
 				AppointmentUtils.replaceIfWrapped(doc, outline.getAction(), dest);
 			} else {
 				outline.setAction(new GoToAction(doc, dest.getName()));
 			}
-		} else {
+			updated = true;
+		}
+
+		if (!updated) {
 			outline.setDestination(dest);
 		}
 	}

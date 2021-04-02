@@ -101,7 +101,9 @@ public final class AnnotationUtils {
 		// instead of the action as a sane default.
 		if (annotation.getDestination() != null || annotation.getAction() == null) {
 			annotation.setDestination(dest);
-		} else {
+		}
+
+		if (annotation.getAction() != null) {
 			annotation.setAction(new GoToAction(dest));
 		}
 	}
@@ -120,7 +122,9 @@ public final class AnnotationUtils {
 		// instead of the action as a sane default.
 		if (annotation.getDestination() != null || annotation.getAction() == null) {
 			annotation.setDestination(dest);
-		} else {
+		}
+
+		if (annotation.getAction() != null) {
 			annotation.setAction(new GoToAction(doc, dest.getName()));
 		}
 	}
@@ -135,15 +139,22 @@ public final class AnnotationUtils {
 	 */
 	public static void setDestinationOrActionSoft(Document doc, LinkAnnotation annotation,
 												  ExplicitDestination dest) {
+		boolean updated = false;
 		if (annotation.getDestination() != null) {
 			AppointmentUtils.replaceIfWrapped(doc, annotation.getDestination(), dest);
-		} else if (annotation.getAction() != null) {
+			updated = true;
+		}
+
+		if (annotation.getAction() != null) {
 			if (annotation.getAction() instanceof GoToAction) {
 				AppointmentUtils.replaceIfWrapped(doc, annotation.getAction(), dest);
 			} else {
 				annotation.setAction(new GoToAction(dest));
 			}
-		} else {
+			updated = true;
+		}
+
+		if (!updated) {
 			annotation.setDestination(dest);
 		}
 	}
@@ -158,15 +169,22 @@ public final class AnnotationUtils {
 	 */
 	public static void setDestinationOrActionSoft(Document doc, LinkAnnotation annotation,
 												  NamedDestination dest) {
+		boolean updated = false;
 		if (annotation.getDestination() != null) {
 			AppointmentUtils.replaceIfWrapped(doc, annotation.getDestination(), dest);
-		} else if (annotation.getAction() != null) {
+			updated = true;
+		}
+
+		if (annotation.getAction() != null) {
 			if (annotation.getAction() instanceof GoToAction) {
 				AppointmentUtils.replaceIfWrapped(doc, annotation.getAction(), dest);
 			} else {
 				annotation.setAction(new GoToAction(doc, dest.getName()));
 			}
-		} else {
+			updated = true;
+		}
+
+		if (!updated) {
 			annotation.setDestination(dest);
 		}
 	}
