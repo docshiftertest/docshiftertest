@@ -174,7 +174,7 @@ public class Sharepoint {
         ColumnDefinitionCollectionPage collectionPage =  graphClient
                 .sites(siteId)
                 .lists(listId)
-                .columns().buildRequest().get();
+                .columns().buildRequest().getAsync().get();
 
         getAllPagesFromColumnCollection(columnDefinitionList,collectionPage);
 
