@@ -7,15 +7,13 @@ import com.google.gson.JsonPrimitive;
 import com.microsoft.graph.core.ClientException;
 import com.microsoft.graph.models.DriveItem;
 import com.microsoft.graph.models.FieldValueSet;
-import com.microsoft.graph.models.Folder;
 import com.microsoft.graph.models.ListItem;
-import com.microsoft.graph.requests.ListCollectionPage;
+import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.serializer.AdditionalDataManager;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -26,113 +24,188 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 /**
  * @author Juan Marques created on 07/08/2020
  */
 @RunWith(JUnit4.class)
+@Log4j2
 public class SharePointGraphIntegrationTest {
 
-	private final Logger log = Logger.getLogger(SharePointGraphIntegrationTest.class);
-
-	private GraphClient graphClient;
+	private static GraphClient graphClient;
 	
-	private static String site = "demo";
+	private static final String site = "demo";
 
-	@Before
-	public void before() {
+	@BeforeClass
+	public static void before() throws ExecutionException, InterruptedException {
 
 		graphClient = new GraphClient(MSGraphAuthenticationBuilder.createGraphClient(
 				"c01820bd-f5ab-4a94-8fcc-1c47d6b264f5", "Cf12Tr0~7P7D.Kof0_Rb6k81_bZ9J8Cl6k",
 				"fdfaf67a-261f-4fc8-bc26-fa14aa7691e1"));
+	}
 
-		if (site.equalsIgnoreCase("demo"))
-			site = graphClient.getSharepoint().retrieveSiteId(site);
+	@Test
+	public void processFullList() throws ExecutionException, InterruptedException {
+
+		String siteId = graphClient.getSharepoint().getSiteId(site);
+
+		String listName = "Test Input";
+		List<DriveItem> driveItemList = new ArrayList<>();
+
+		String driveListId = graphClient.getSharepoint().getDriveListIdByListName(siteId,listName);
+
+		String listId = graphClient.getSharepoint().getListIdByDriveId(siteId,driveListId);
+
+		DriveItemCollectionPage driveItemSearchCollectionPage = graphClient.getSharepoint().getAllDriveItems(listId,siteId);
+
+		graphClient.getSharepoint().getAllItemDriveCollectionPage(driveItemList,driveItemSearchCollectionPage,StringUtils.EMPTY);
+
+		// true = folder / false = files
+		Map<Boolean, List<DriveItem>> folderOrFiles = driveItemList.parallelStream().collect(Collectors.partitioningBy(driveItem -> driveItem.folder != null));
+
+		for (DriveItem driveItem : folderOrFiles.get(false)) {
+			getAllFiles(listId, driveItem, driveItem.parentReference.name , siteId);
+		}
+
+		for (DriveItem driveItem : folderOrFiles.get(true)) {
+			getAllFiles(listId, driveItem, driveItem.name , siteId);
+		}
+	}
+
+	@Test
+	public void getSiteId() throws ExecutionException, InterruptedException {
+		String siteId = graphClient.getSharepoint().getSiteId(site);
+		log.info(siteId);
+		assertEquals(siteId,"docshifter.sharepoint.com,8eb0793b-bd2c-4c55-9f89-c50344d812a6,074d4c88-f1e2-4815-9664-f250b3660685");
 	}
 
 	@Test
 	public void badCredentialsTest() {
 
-		graphClient = new GraphClient(MSGraphAuthenticationBuilder.createGraphClient("b081-42d7-a8e1-4c93452d9a3c",
+		GraphClient badGraphClient = new GraphClient(MSGraphAuthenticationBuilder.createGraphClient("b081-42d7-a8e1-4c93452d9a3c",
 				"3O1p8_T2XatR-PCRd18ywH~DU_tEx.m433", "a545304d-99b4-4706-8c12-f626a2d2a3cb"));
 
-		ListCollectionPage collectionPage = null;
+		String siteId = null;
 
 		try {
-			collectionPage = graphClient.getSharepoint().getLibrary(site);
+			siteId = badGraphClient.getSharepoint().getSiteId(site);
 		} catch (ClientException e) {
 			log.error("ohh noo" + e.getMessage());
 		}
-		assertNull(collectionPage);
+		catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+		assertNull(siteId);
 	}
-
 
 	@Test
-	public void getAllContentFromSpecificFolderTest() {
+	public void processesSpecificFolder() throws ExecutionException, InterruptedException {
 
-		String folderName = "Input";
-		String listId = "f8cadb07-3edb-4a23-ba0a-4b159206c4d2";
+		String folderName = "Input/2ndLevel";
+		String listName = "Test Input";
 
-		List<DriveItem> items = new ArrayList<>();
-		graphClient.getSharepoint().getAllItemDriveCollectionPage(items, graphClient.getSharepoint().getAllDriveItems(listId, site), folderName);
+		String siteId = graphClient.getSharepoint().getSiteId(site);
 
-		DriveItem item = items.stream().findFirst().orElseThrow(NoSuchElementException::new);
+		String driveListId = graphClient.getSharepoint().getDriveListIdByListName(siteId,listName);
 
-		getAllFiles(listId, item.id);
+		String listId = graphClient.getSharepoint().getListIdByDriveId(siteId,driveListId);
+
+		DriveItem folder = graphClient.getSharepoint()
+				.getDriveItemByPath(listId, siteId,folderName);
+
+		// Getting Item by parent drive id
+		DriveItemCollectionPage itemCollection = graphClient.getSharepoint().listAllItemsFromListById(listId,siteId,folder.id);
+
+		List<DriveItem> lsItems = new ArrayList<>();
+
+		graphClient.getSharepoint().getAllItemDriveCollectionPage(lsItems,itemCollection,StringUtils.EMPTY);
+
+		// true = folder / false = files
+		Map<Boolean, List<DriveItem>> folderOrFiles = lsItems.parallelStream().collect(Collectors.partitioningBy(driveItem -> driveItem.folder != null));
+
+		// Process files from main given folder
+		for (DriveItem driveItemFolder : folderOrFiles.get(false)) {
+			getAllFiles(listId, driveItemFolder, folderName , siteId);
+		}
+
+		// Process folders from main given folder
+		for (DriveItem driveItemFolder : folderOrFiles.get(true)) {
+			getAllFiles(listId, driveItemFolder, folderName , siteId);
+		}
 	}
 
-	public void getAllFiles(String listId, String driveItemId) {
+	public void getAllFiles(String listId, DriveItem driveItem , String folderName , String siteId) throws ExecutionException, InterruptedException {
 
-		List<DriveItem> lstChildItems = new ArrayList<>();
-		graphClient.getSharepoint().getAllItemDriveCollectionPage(lstChildItems,
-				graphClient.getSharepoint().getAllContentFromSpecificFolder(listId, driveItemId, site), StringUtils.EMPTY);
+		log.info("Filename {} " , driveItem.name);
 
-		for (DriveItem childFolderItems : lstChildItems) {
-			if (childFolderItems.file != null) {
+			if (driveItem.file != null) {
 
-
-				ListItem listItem = childFolderItems.listItem;
-				// Getting fields from file
+				ListItem listItem = driveItem.listItem;
 				FieldValueSet itemFieldValueSet = listItem.fields;
 				AdditionalDataManager itemFields = itemFieldValueSet.additionalDataManager();
 				boolean processedByDS =	itemFields.get("ProcessedByDS").getAsBoolean();
 
+				updateFields(listId, driveItem.listItem.id, graphClient,false,siteId);
+
 				if (!processedByDS) {
 
-					// Updating field
-					updateFields(listId, childFolderItems.listItem.id, graphClient,true);
-					
-					InputStream fileInputStream = graphClient.getSharepoint().getFileByDriveId(childFolderItems.id, site,listId);
+					log.info("DOWNLOADING FILE {}", driveItem.name);
 
-					downloadFile(fileInputStream, childFolderItems.name);
-					
-         			//Updating field to false to get the file again
-					updateFields(listId, childFolderItems.listItem.id, graphClient,false);
+					InputStream fileInputStream = graphClient.getSharepoint().downloadFile(driveItem.parentReference.driveId,driveItem.id,siteId);
+
+					log.info("SAVING FILE PROPERTY {}", processedByDS);
+					downloadFile(fileInputStream, driveItem.name);
+
+					log.info("UPDATING FILE PROPERTY {} TO TRUE", processedByDS);
+					updateFields(listId, driveItem.listItem.id, graphClient,true,siteId);
+
+					log.info("UPDATING FILE PROPERTY {} TO FALSE", processedByDS);
+					updateFields(listId, driveItem.listItem.id, graphClient,false,siteId);
 				}
 			}
 
-			else if (childFolderItems.folder.childCount > 0) {
-				getAllFiles(listId, childFolderItems.id);
+			else if (driveItem.folder.childCount > 0) {
+
+				String childFolderName = folderName;
+
+				if(!StringUtils.equals(folderName,driveItem.name)){
+					childFolderName = Paths.get(folderName,driveItem.name).toString();
+				}
+
+				DriveItem folder = graphClient.getSharepoint()
+						.getDriveItemByPath(listId, siteId,childFolderName);
+
+
+				// Getting Item by parent drive id
+				DriveItemCollectionPage itemCollection = graphClient.getSharepoint().listAllItemsFromListById(listId,siteId,folder.id);
+
+				List<DriveItem> lsItems = new ArrayList<>();
+
+				graphClient.getSharepoint().getAllItemDriveCollectionPage(lsItems,itemCollection,StringUtils.EMPTY);
+
+				for (DriveItem driveItem1 : lsItems) {
+					getAllFiles(listId, driveItem1, childFolderName , siteId );
+				}
+
 			}
 		}
 
-	}
-	
-	/**
-	 * Update column
-	 */
-	public void updateFields(String listId, String itemId, GraphClient graphClient,boolean processed) {
+
+	public void updateFields(String listId, String itemId, GraphClient graphClient,boolean processed , String siteId) throws ExecutionException, InterruptedException {
 		FieldValueSet fieldValueSet = new FieldValueSet();
 		fieldValueSet.additionalDataManager().put("ProcessedByDS", new JsonPrimitive(processed));
 
-		graphClient.getSharepoint().updateFields(listId, itemId, fieldValueSet, site);
+		graphClient.getSharepoint().updateFields(listId, itemId, fieldValueSet, siteId);
 
 	}
 
@@ -148,45 +221,14 @@ public class SharePointGraphIntegrationTest {
 	}
 
 	@Test
-	public void getAllLists() {
-
-		List<ListItem> allItems = new ArrayList<>();
-
-		graphClient.getSharepoint().getLibrary(site).getCurrentPage().forEach(c -> {
-
-			if (c.name.equalsIgnoreCase("OutputDev")) {
-				log.info(c.id);
-				log.info(c.name);
-				log.info("    \n");
-				graphClient.getSharepoint().getLibraryItems(c.id, allItems, "Document", site);
-			}
-		});
-
-		allItems.forEach(r -> {
-
-			log.info(r.webUrl);
-			log.info(r.id);
-			log.info("parentReference.driveId: " + r.parentReference.driveId);
-			log.info("parentReference.id: " + r.parentReference.id);
-			log.info("parentReference.name : " + r.parentReference.name);
-			log.info("name : " + r.name);
-
-			String weburl = r.webUrl;
-			log.info("Actual url..." + weburl);
-			weburl = getFolderPath(weburl);
-			log.info("Folder Path..." + weburl);
-		});
-	}
-
-	@Test
 	public void getCurrentPathTest() {
-		String weburl = "https://docshifterdev.sharepoint.com/Shared%20Documents/Output/watermark/26_Nonclinical_Summary.pdf";
+		String webUrl = "https://docshifterdev.sharepoint.com/Shared%20Documents/Output/watermark/26_Nonclinical_Summary.pdf";
 
-		log.info("Actual url..." + weburl);
-		weburl = getFolderPath(weburl);
-		log.info("Folder Path..." + weburl);
+		log.info("Actual url..." + webUrl);
+		webUrl = getFolderPath(webUrl);
+		log.info("Folder Path..." + webUrl);
 
-		assertNotEquals(StringUtils.EMPTY, weburl);
+		assertNotEquals(StringUtils.EMPTY, webUrl);
 	}
 
 	public String getFolderPath(String webURL) {
@@ -204,32 +246,6 @@ public class SharePointGraphIntegrationTest {
 		}
 
 		return StringUtils.EMPTY;
-	}
-
-	@Test
-	@Ignore
-	public void createFolderTest() {
-
-		DriveItem driveItem = new DriveItem();
-		driveItem.name = "NewChildrenlv3";
-		driveItem.folder = new Folder();
-		driveItem.additionalDataManager().put("@microsoft.graph.conflictBehavior", new JsonPrimitive("rename"));
-
-		DriveItem driveItemParentCallBack = null;
-		DriveItem driveItemChildCallBack = null;
-
-		try {
-			driveItemParentCallBack = graphClient.getSharepoint().createRootFolder("fd4b0a4f-4ab3-4ca3-9bdb-7addbc3e5ee0", driveItem, site);
-
-			driveItemChildCallBack = graphClient.getSharepoint().createChildrenFolder("fd4b0a4f-4ab3-4ca3-9bdb-7addbc3e5ee0",
-					driveItemParentCallBack.name, driveItem, site);
-		} catch (ClientException ex) {
-			log.info(ex);
-		}
-
-		assertNotNull(driveItemParentCallBack);
-		assertNotNull(driveItemChildCallBack);
-
 	}
 
 }
