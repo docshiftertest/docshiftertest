@@ -111,6 +111,8 @@ public final class OutlineUtils {
 	 * @param dest The destination to change to.
 	 */
 	public static void setDestinationOrActionHard(OutlineItemCollection outline, ExplicitDestination dest) {
+		// If there is already a destination set it. If there is no destination or action at all, set the destination
+		// instead of the action as a sane default.
 		if (outline.getDestination() != null || outline.getAction() == null) {
 			outline.setDestination(dest);
 		} else {
@@ -128,6 +130,8 @@ public final class OutlineUtils {
 	 * @param dest The destination to change to.
 	 */
 	public static void setDestinationOrActionHard(OutlineItemCollection outline, Document doc, NamedDestination dest) {
+		// If there is already a destination set it. If there is no destination or action at all, set the destination
+		// instead of the action as a sane default.
 		if (outline.getDestination() != null || outline.getAction() == null) {
 			outline.setDestination(dest);
 		} else {

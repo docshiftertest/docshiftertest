@@ -97,6 +97,8 @@ public final class AnnotationUtils {
 	 * @param dest The destination to change to.
 	 */
 	public static void setDestinationOrActionHard(LinkAnnotation annotation, ExplicitDestination dest) {
+		// If there is already a destination set it. If there is no destination or action at all, set the destination
+		// instead of the action as a sane default.
 		if (annotation.getDestination() != null || annotation.getAction() == null) {
 			annotation.setDestination(dest);
 		} else {
@@ -114,6 +116,8 @@ public final class AnnotationUtils {
 	 * @param dest The destination to change to.
 	 */
 	public static void setDestinationOrActionHard(LinkAnnotation annotation, Document doc, NamedDestination dest) {
+		// If there is already a destination set it. If there is no destination or action at all, set the destination
+		// instead of the action as a sane default.
 		if (annotation.getDestination() != null || annotation.getAction() == null) {
 			annotation.setDestination(dest);
 		} else {
