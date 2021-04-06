@@ -87,8 +87,7 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
                 counts = zf.size();
                 return counts;
             } catch (IOException e) {
-                log.error("Error with .zip file");
-                e.printStackTrace();
+                log.error("Error with .zip file", e);
             }
         }
         //counts all attachments and main body in an email
