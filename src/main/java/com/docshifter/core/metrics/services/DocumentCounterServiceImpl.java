@@ -242,9 +242,4 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
             logoFile.delete();
         }
     }
-
-//    @Scheduled
-    private void timedExport() {
-
-    }
 }
