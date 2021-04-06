@@ -109,18 +109,27 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
         log.info("Creating export PDF");
 
         //Retrieve the counts from the metrics database
-        long count = documentCounterRepository.selectTotalCounts();
-        log.info("Total counts to date: {}", count);
-        long tasks = documentCounterRepository.selectSuccessfulWorkflows();
-        log.info("Total tasks to date: {}", tasks);
+        long count = 0L;
+        long tasks = 0L;
+        try {
+            count = documentCounterRepository.selectTotalCounts();
+            log.info("Total counts to date: {}", count);
+            tasks = documentCounterRepository.selectSuccessfulWorkflows();
+            log.info("Total tasks to date: {}", tasks);
+        }
+        catch (NullPointerException npe) {
+            log.error("Could not retrieve counts; table might be empty");
+        }
 
         // Instantiate Document object from preset PDF
         Document doc = new Document(DocumentCounterServiceImpl.class.getResourceAsStream("/export/Counts-report-template.pdf"));
 
         //Prepares the name of the export file, including timestamp
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm");
+            DateFormat dateFormatReadable = new SimpleDateFormat("MMM dd, yyyy 'at' HH:mma z");
             Date date = new Date();
             String timestamp = dateFormat.format(date); //timestamp as a variable to be included in file name and content
+            String readableTimestamp = dateFormatReadable.format(date);
             String name = tempPath + "/" + "counts_" + timestamp;
 
         //Long data for the logo
@@ -132,7 +141,7 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
         String[] values = new String[3];
         values[0] = String.valueOf(count);
         values[1] = String.valueOf(tasks);
-        values[2] = timestamp;
+        values[2] = readableTimestamp;
 
         // Locate placeholders on page
         TextFragmentAbsorber tfa = new TextFragmentAbsorber("$PH");
@@ -154,41 +163,57 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
         }
 
         // First creates the logo and saves it as an image on the disk
-        BufferedImage logo = ImageUtils.getLogo(data);
-        if (logo == null) {
-            log.error("Failed to create export file"); //Could not retrieve logo for some reason
-        }
-        File logoFile = new File(tempPath + "/logo.png");
+        BufferedImage logo = null;
         try {
-            ImageIO.write(logo, "png", logoFile);
+            logo = ImageUtils.getLogo(data);
         }
-        catch (Exception e) {
-            logoFile.delete();
-            log.error("Failed to create export file"); //actually failed to create secrety logo
-            e.printStackTrace();
+        catch (NullPointerException npe) {
+            log.warn("Could not retrieve logo");
+        }
+
+        //Creates the temp dir to store the logo
+        File tempDir = new File(tempPath + "/");
+        if (!tempDir.exists()) {
+            tempDir.mkdirs();
+        }
+
+        File logoFile = new File(tempPath + "/logo.png");
+        if (logo != null) {
+            try {
+                ImageIO.write(logo, "png", logoFile);
+            }
+            catch (Exception e) {
+                logoFile.delete();
+                log.error("Failed to create export file", e); //actually failed to create secrety logo
+                e.printStackTrace();
+            }
         }
 
         try {
             //Add logo to PDF:
             // Add logo to page resources
             Page page = doc.getPages().get_Item(1);
-            page.getResources().getImages().add(logo);
-            // Create Rectangle and Matrix objects
-            Rectangle rectangle = new Rectangle(100, 700, 500, 850); //lower left and upper right corner coordinates for the logo
-            Matrix matrix = new Matrix(new double[]{rectangle.getURX() - rectangle.getLLX(), 0, 0, rectangle.getURY() - rectangle.getLLY(), rectangle.getLLX(), rectangle.getLLY()});
+            if (logo != null) {
+                page.getResources().getImages().add(logo);
 
-            // Using ConcatenateMatrix (concatenate matrix) operator: defines how image must be placed
-            page.getContents().add(new ConcatenateMatrix(matrix));
-            XImage ximage = page.getResources().getImages().get_Item(page.getResources().getImages().size());
-            // Using Do operator: this operator draws image
-            page.getContents().add(new Do(ximage.getName()));
-            // Using GRestore operator: this operator restores graphics state
-            page.getContents().add(new GRestore());
+                // Create Rectangle and Matrix objects
+                Rectangle rectangle = new Rectangle(100, 700, 500, 850); //lower left and upper right corner coordinates for the logo
+                Matrix matrix = new Matrix(new double[]{rectangle.getURX() - rectangle.getLLX(), 0, 0, rectangle.getURY() - rectangle.getLLY(), rectangle.getLLX(), rectangle.getLLY()});
 
+                // Using ConcatenateMatrix (concatenate matrix) operator: defines how image must be placed
+                page.getContents().add(new ConcatenateMatrix(matrix));
+                XImage ximage = page.getResources().getImages().get_Item(page.getResources().getImages().size());
+                // Using Do operator: this operator draws image
+                page.getContents().add(new Do(ximage.getName()));
+                // Using GRestore operator: this operator restores graphics state
+                page.getContents().add(new GRestore());
+            }
             // Retrieve created logo and add as attachment
             // to the document's attachment collection
-            FileSpecification fileSpecification = new FileSpecification(tempPath + "/logo.png", "Logo");
-            doc.getEmbeddedFiles().add(fileSpecification);
+            if (logo != null) {
+                FileSpecification fileSpecification = new FileSpecification(tempPath + "/logo.png", "Logo");
+                doc.getEmbeddedFiles().add(fileSpecification);
+            }
 
             // Save document to Stream object for signing
             ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
@@ -203,16 +228,23 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
             signature.setShowProperties(false);
             pdfSignSingle.sign(1, true, new java.awt.Rectangle(100, 100, 150, 50), signature);
             // Set image for signature appearance TODO: Probably something other than the DS logo
-            pdfSignSingle.setSignatureAppearance(tempPath + "/logo.png");
+            if (logo != null) {
+                pdfSignSingle.setSignatureAppearance(tempPath + "/logo.png");
+            }
             // Save final output
             pdfSignSingle.save(name + ".pdf");
+            log.info("Export file created successfully!");
         }
         catch (Exception e) {
-            log.error("Failed to create export file");
-            e.printStackTrace();
+            log.error("Failed to create export file", e);
         }
         finally {
             logoFile.delete();
         }
+    }
+
+//    @Scheduled
+    private void timedExport() {
+
     }
 }
