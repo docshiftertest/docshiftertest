@@ -104,7 +104,7 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
 
     // Creates the encrypted file containing the counts that should be sent to DocShifter
 
-    public void exportCounts(String tempPath, String exportPath) {
+    public void exportCounts(String tempPath) {
         LicenseHelper.getLicenseHelper(); //aspose license helper
         log.info("Creating export PDF");
 

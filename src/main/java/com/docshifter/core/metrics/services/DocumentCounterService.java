@@ -10,5 +10,5 @@ public interface DocumentCounterService {
 
     long countFiles(String filename);
 
-    void exportCounts(String path, String keyPath);
+    void exportCounts(String path);
 }
