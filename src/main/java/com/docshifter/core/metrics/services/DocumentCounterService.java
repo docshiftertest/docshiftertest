@@ -2,6 +2,7 @@ package com.docshifter.core.metrics.services;
 
 import com.docshifter.core.metrics.dtos.DocumentCounterDTO;
 import com.docshifter.core.metrics.entities.DocumentCounter;
+import org.springframework.core.io.Resource;
 
 public interface DocumentCounterService {
     DocumentCounter saveDocumentCounter(DocumentCounterDTO dto);
@@ -10,5 +11,5 @@ public interface DocumentCounterService {
 
     long countFiles(String filename);
 
-    void exportCounts(String path);
+    Resource exportCounts(String path);
 }

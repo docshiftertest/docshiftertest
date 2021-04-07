@@ -26,6 +26,8 @@ import com.docshifter.core.utils.FileUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -34,6 +36,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -103,7 +107,7 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
 
     // Creates the encrypted file containing the counts that should be sent to DocShifter
 
-    public void exportCounts(String tempPath) {
+    public Resource exportCounts(String tempPath) {
         LicenseHelper.getLicenseHelper(); //aspose license helper
         log.info("Creating export PDF");
 
@@ -129,7 +133,10 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
             Date date = new Date();
             String timestamp = dateFormat.format(date); //timestamp as a variable to be included in file name and content
             String readableTimestamp = dateFormatReadable.format(date);
-            String name = tempPath + "/" + "counts_" + timestamp;
+
+            String filename = "counts_" + timestamp;
+            filename = FileUtils.addExtensionToFilename(filename,"pdf");
+            Path outputPath = Paths.get(tempPath,filename);
 
         //Long data for the logo
         long[] data = new long[2];
@@ -184,9 +191,10 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
             catch (Exception e) {
                 logoFile.delete();
                 log.error("Failed to create export file", e); //actually failed to create secrety logo
-                e.printStackTrace();
             }
         }
+
+        Resource outPdfSignSingle = null;
 
         try {
             //Add logo to PDF:
@@ -231,7 +239,8 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
                 pdfSignSingle.setSignatureAppearance(tempPath + "/logo.png");
             }
             // Save final output
-            pdfSignSingle.save(name + ".pdf");
+            pdfSignSingle.save(outputPath.toString());
+            outPdfSignSingle = new UrlResource(outputPath.toUri());
             log.info("Export file created successfully!");
         }
         catch (Exception e) {
@@ -240,5 +249,7 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
         finally {
             logoFile.delete();
         }
+
+        return outPdfSignSingle;
     }
 }
