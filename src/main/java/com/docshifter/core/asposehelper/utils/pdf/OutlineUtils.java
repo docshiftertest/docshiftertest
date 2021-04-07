@@ -155,7 +155,7 @@ public final class OutlineUtils {
 												  ExplicitDestination dest) {
 		boolean updated = false;
 		if (outline.getDestination() != null) {
-			AppointmentUtils.replaceIfWrapped(doc, outline.getDestination(), dest);
+			outline.setDestination(AppointmentUtils.replaceIfWrapped(doc, outline.getDestination(), dest));
 			updated = true;
 		}
 
@@ -185,7 +185,7 @@ public final class OutlineUtils {
 												  NamedDestination dest) {
 		boolean updated = false;
 		if (outline.getDestination() != null) {
-			AppointmentUtils.replaceIfWrapped(doc, outline.getDestination(), dest);
+			outline.setDestination(AppointmentUtils.replaceIfWrapped(doc, outline.getDestination(), dest));
 			updated = true;
 		}
 

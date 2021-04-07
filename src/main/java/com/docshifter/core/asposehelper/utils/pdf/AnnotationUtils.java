@@ -141,7 +141,7 @@ public final class AnnotationUtils {
 												  ExplicitDestination dest) {
 		boolean updated = false;
 		if (annotation.getDestination() != null) {
-			AppointmentUtils.replaceIfWrapped(doc, annotation.getDestination(), dest);
+			annotation.setDestination(AppointmentUtils.replaceIfWrapped(doc, annotation.getDestination(), dest));
 			updated = true;
 		}
 
@@ -171,7 +171,7 @@ public final class AnnotationUtils {
 												  NamedDestination dest) {
 		boolean updated = false;
 		if (annotation.getDestination() != null) {
-			AppointmentUtils.replaceIfWrapped(doc, annotation.getDestination(), dest);
+			annotation.setDestination(AppointmentUtils.replaceIfWrapped(doc, annotation.getDestination(), dest));
 			updated = true;
 		}
 
