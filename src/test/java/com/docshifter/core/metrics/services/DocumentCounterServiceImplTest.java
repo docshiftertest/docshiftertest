@@ -27,7 +27,7 @@ public class DocumentCounterServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void shouldSaveEntity() {
-        DocumentCounterDTO counter = new DocumentCounterDTO().builder().task_id("sometask").counts(1).build();
+        DocumentCounterDTO counter = DocumentCounterDTO.builder().taskId("sometask").counts(1).build();
         DocumentCounter entity = counterService.saveDocumentCounter(counter);
 
         assertThat(counterRepository.findById("sometask")).isNotNull();

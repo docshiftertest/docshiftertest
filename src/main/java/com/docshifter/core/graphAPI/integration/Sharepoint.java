@@ -76,7 +76,7 @@ public class Sharepoint {
     	
         if (!StringUtils.isBlank(siteName) && !siteName.equalsIgnoreCase(DEFAULT_SITE)) {
 
-            String site = Paths.get(DEFAULT_SITE, ":/sites", siteName).toString();
+            String site = DEFAULT_SITE + ":/sites/" + siteName;
 
             return this.graphClient.sites(site)
                     .buildRequest().getAsync().get().id;
