@@ -153,7 +153,7 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
         values[2] = readableTimestamp;
 
         // Locate placeholders on page
-        TextFragmentAbsorber tfa = new TextFragmentAbsorber("blah");
+        TextFragmentAbsorber tfa = new TextFragmentAbsorber("$PH");
         doc.getPages().accept(tfa);
         TextFragmentCollection tfc = tfa.getTextFragments();
 
