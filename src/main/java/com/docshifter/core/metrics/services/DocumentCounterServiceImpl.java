@@ -79,7 +79,7 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
      * @return int count The number of counted files
      */
     public long countFiles(String filename) {
-        long counts = 1;
+        long count = 1;
         String extension = FileUtils.getExtension(filename);
         log.debug("The file extension is: {}", extension);
 
@@ -92,20 +92,27 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
         //Yoda fix - compared string first avoids NullPointerExceptions from extension
         if ("zip".equalsIgnoreCase(extension)) { //
             try (ZipFile zf = new ZipFile(filename)) {
-                counts = zf.size();
-                return counts;
+                count = zf.size();
+                return count;
             } catch (IOException e) {
                 log.error("Error with .zip file", e);
+                count = 1;
             }
         }
         //counts all attachments and main body in an email
         else if ("eml".equalsIgnoreCase(extension) || "msg".equalsIgnoreCase(extension)) {
-            MailMessage eml = MailMessage.load(filename);
-            counts = eml.getAttachments().size() + 1; // counts is set to all attachments plus the e-mail body
-            return counts;
+            try {
+                MailMessage eml = MailMessage.load(filename);
+                count = eml.getAttachments().size() + 1; // counts is set to all attachments plus the e-mail body
+                return count;
+            }
+            catch (Exception e) {
+                log.error("Error when reading e-mail");
+                count = 1;
+            }
         }
 
-        return counts; //default case
+        return count; //default case
 
     }
 
@@ -147,7 +154,7 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
         values[2] = readableTimestamp;
 
         // Locate placeholders on page
-        TextFragmentAbsorber tfa = new TextFragmentAbsorber("$PH");
+        TextFragmentAbsorber tfa = new TextFragmentAbsorber("blah");
         doc.getPages().accept(tfa);
         TextFragmentCollection tfc = tfa.getTextFragments();
 
