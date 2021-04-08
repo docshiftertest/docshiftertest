@@ -52,8 +52,12 @@ import java.util.zip.ZipFile;
 @Log4j2
 public class DocumentCounterServiceImpl implements DocumentCounterService {
 
+    private final DocumentCounterRepository documentCounterRepository;
+
     @Autowired
-    DocumentCounterRepository documentCounterRepository;
+    public DocumentCounterServiceImpl (DocumentCounterRepository documentCounterRepository) {
+        this.documentCounterRepository = documentCounterRepository;
+    }
 
     public DocumentCounter saveDocumentCounter(DocumentCounterDTO dto) {
         // convert from Dto to Entity and save
@@ -66,7 +70,7 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
 
     //Uses the @Builder annotation to create the DTO
     public DocumentCounterDTO createDocumentCounterDto(String task, long counts) {
-        return DocumentCounterDTO.builder().task_id(task).counts(counts).build();
+        return DocumentCounterDTO.builder().taskId(task).counts(counts).build();
 
     }
 
@@ -112,17 +116,10 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
         log.info("Creating export PDF");
 
         //Retrieve the counts from the metrics database
-        long count = 0L;
-        long tasks = 0L;
-        try {
-            count = documentCounterRepository.selectTotalCounts();
+        long count  = documentCounterRepository.selectTotalCounts().orElse(0L);
             log.info("Total counts to date: {}", count);
-            tasks = documentCounterRepository.selectSuccessfulWorkflows();
+        long tasks = documentCounterRepository.selectSuccessfulWorkflows().orElse(0L);
             log.info("Total tasks to date: {}", tasks);
-        }
-        catch (NullPointerException npe) {
-            log.error("Could not retrieve counts; table might be empty");
-        }
 
         // Instantiate Document object from preset PDF
         Document doc = new Document(DocumentCounterServiceImpl.class.getResourceAsStream("/export/Counts-report-template.pdf"));
@@ -161,7 +158,7 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
 
         // Loops through placeholders and replaces them with values
         int index = 0; // tracker for looping through the values[] array
-        for (TextFragment textFragment : (Iterable<TextFragment>) tfc) {
+        for (TextFragment textFragment : tfc) {
             textFragment.setText(values[index] + "");
             textFragment.getTextState().setFont(FontRepository.findFont("Calibri"));
             textFragment.getTextState().setFontSize(10.5f);
@@ -251,5 +248,20 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
         }
 
         return outPdfSignSingle;
+    }
+
+    @Override
+    public DocumentCounterDTO getTotals() {
+
+        //Retrieve the counts from the metrics database
+        long count  = documentCounterRepository.selectTotalCounts().orElse(0L);
+        log.info("Total counts to date: {}", count);
+        long tasks = documentCounterRepository.selectSuccessfulWorkflows().orElse(0L);
+        log.info("Total tasks to date: {}", tasks);
+
+        return DocumentCounterDTO.builder()
+                .successTasks(tasks)
+                .successFiles(count)
+                .build();
     }
 }

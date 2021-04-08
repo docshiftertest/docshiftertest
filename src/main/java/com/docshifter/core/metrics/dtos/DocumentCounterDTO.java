@@ -18,12 +18,9 @@ Data transfer object to store metrics
 @AllArgsConstructor
 public class DocumentCounterDTO {
 
-    private String task_id;
+    private String taskId;
     private long counts;
-
-   //non-fugly Camel_Case_Underscore methods; @Getter and @Setter create these automatically otherwise
-    public void setTaskId(String taskId){ this.task_id = taskId;}
-
-    public String getTaskId() { return this.task_id;}
+    private long successTasks;
+    private long successFiles;
 
 }
