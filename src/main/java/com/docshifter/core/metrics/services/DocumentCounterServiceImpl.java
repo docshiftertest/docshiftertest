@@ -111,8 +111,6 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
                 count = 1;
             }
         }
-
-        log.debug("Files processed during the task: " + count);
         return count; //default case
 
     }
