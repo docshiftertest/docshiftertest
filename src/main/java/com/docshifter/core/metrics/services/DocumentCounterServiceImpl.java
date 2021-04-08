@@ -95,7 +95,7 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
                 count = zf.size();
                 return count;
             } catch (IOException e) {
-                log.error("Error with .zip file", e);
+                log.error("Error reading .zip file, defaulting count to 1", e);
                 count = 1;
             }
         }
@@ -107,11 +107,12 @@ public class DocumentCounterServiceImpl implements DocumentCounterService {
                 return count;
             }
             catch (Exception e) {
-                log.error("Error when reading e-mail");
+                log.error("Error reading e-mail, defaulting count to 1", e);
                 count = 1;
             }
         }
 
+        log.debug("Files processed during the task: " + count);
         return count; //default case
 
     }
