@@ -163,7 +163,7 @@ public class MockLicensingService implements ILicensingService {
 			// application anyway.
 			BACKGROUND_RUNNER.execute(() -> {
 				String currPod = System.getenv("HOSTNAME");
-				String currRs = currPod.substring(0, currPod.lastIndexOf("-"));
+				String currRs = currPod.substring(0, currPod.lastIndexOf('-'));
 				String currDeploy = currRs.substring(0, currRs.lastIndexOf('-'));
 				String currNs = k8sClient.getConfiguration().getNamespace();
 				Integer replicas = null;
