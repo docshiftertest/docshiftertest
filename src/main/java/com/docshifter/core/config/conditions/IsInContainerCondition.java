@@ -1,5 +1,6 @@
-package com.docshifter.core.config.services;
+package com.docshifter.core.config.conditions;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
@@ -7,20 +8,18 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
 import java.util.stream.Stream;
 
-public class IsInDockerCondition implements Condition {
-	private static final Set<String> cGroups = new HashSet<>();
-	static {
-		cGroups.add("docker"); // Docker
-		cGroups.add("kubepods"); // Kubernetes
-		cGroups.add("ecs"); // Amazon Elastic Container Service (ECS)
+public abstract class IsInContainerCondition implements Condition {
+	private final Collection<String> cGroups;
+
+	public IsInContainerCondition(Collection<String> cGroups) {
+		this.cGroups = cGroups;
 	}
 
 	@Override
-	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+	public boolean matches(@NotNull ConditionContext context, @NotNull AnnotatedTypeMetadata metadata) {
 		// The container platform can typically be detected from within a container by analyzing the cgroup file.
 		// https://stackoverflow.com/a/52581380 was used as a reference
 		try (Stream<String> stream = Files.lines(Paths.get("/proc/1/cgroup"))) {

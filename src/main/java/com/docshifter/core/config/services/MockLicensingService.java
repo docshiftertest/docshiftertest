@@ -1,5 +1,8 @@
 package com.docshifter.core.config.services;
 
+import com.docshifter.core.config.conditions.IsInAnyContainerCondition;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,30 +15,100 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Profile("licensing")
-@Conditional(IsInDockerCondition.class)
+@Conditional(IsInAnyContainerCondition.class)
 public class MockLicensingService implements ILicensingService {
 
+	private static final ExecutorService BACKGROUND_RUNNER = Executors.newSingleThreadExecutor();
+	private final KubernetesClient k8sClient;
+	private Date lastCheck = new Date(0);
+
 	private static final Logger log = LogManager.getLogger(ILicensingService.class);
-	private static final Map<String, Date> keys = new HashMap<>();
+	private static final Map<String, License> keys = new HashMap<>();
 	static {
-		keys.put("b6b1edf7-8e7c-4209-9911-8f630114be4d", null);
-		keys.put("f5c1668c-f587-475c-b6d1-b7ee2b5cbacd", new GregorianCalendar(2021, Calendar.MARCH, 31, 23, 59, 59).getTime());
-		keys.put("5f4f7686-e502-4a89-aa64-834f0220107e", new GregorianCalendar(2021, Calendar.JUNE, 30, 23, 59, 59).getTime());
-		keys.put("2beb15ee-8292-42b2-85f1-dab53d9f5255", new GregorianCalendar(2021, Calendar.SEPTEMBER, 30, 23, 59, 59).getTime());
-		keys.put("11206e6e-694b-43c7-906c-209134d3fadc", new GregorianCalendar(2021, Calendar.DECEMBER, 31, 23, 59, 59).getTime());
-		keys.put("22f37141-f6b1-4478-ae53-43ae15aae19a", new GregorianCalendar(2022, Calendar.MARCH, 31, 23, 59, 59).getTime());
-		keys.put("edd36cc0-9bf5-4c21-bf00-91e48f2e521d", new GregorianCalendar(2022, Calendar.JUNE, 30, 23, 59, 59).getTime());
-		keys.put("006208ca-2054-4175-a6bd-c406ebb0d8df", new GregorianCalendar(2022, Calendar.SEPTEMBER, 30, 23, 59, 59).getTime());
-		keys.put("b0b6d35c-fe3f-45fb-b795-24bc3453263d", new GregorianCalendar(2022, Calendar.DECEMBER, 31, 23, 59, 59).getTime());
+		// Also see https://docshifter.atlassian.net/wiki/spaces/TEC/pages/1714716673/Environment+Overview
+		// Make sure to keep this up to date!
+
+		// === THE ROOTEST OF ROOT CODE, NEVER SEND THIS TO ANYONE, KEEP IT FOR INTERNAL DEVELOPMENT! ===
+		keys.put("66de59a9-2de1-4621-b5a3-6778ad7c4eb8", new License(
+				null,
+				null));
+
+		// === PostFinance ===
+		// Non-production usage
+		keys.put("006208ca-2054-4175-a6bd-c406ebb0d8df", new License(
+				new GregorianCalendar(2023, Calendar.MARCH, 31, 23, 59, 59).getTime(),
+				5));
+		// Production usage
+		keys.put("b0b6d35c-fe3f-45fb-b795-24bc3453263d", new License(
+				new GregorianCalendar(2023, Calendar.MARCH, 31, 23, 59, 59).getTime(),
+				2));
+
+		// === Novartis ===
+		// Non-production usage
+		keys.put("bcccbf81-0a79-4da8-bd44-4abbc0ea85d9", new License(
+				null,
+				10));
+		// Production usage
+		keys.put("855408d7-cd0d-4cbf-96e7-64efa6f6fefa", new License(
+				null,
+				4));
+
+		// === Preyer ===
+		keys.put("b1656ce3-6c9b-4382-895c-429378c37632", new License(
+				new GregorianCalendar(2023, Calendar.MARCH, 31, 23, 59, 59).getTime(),
+				null));
+
+		// === Bayer ===
+		keys.put("2ad776f1-d715-4f39-a74b-c007f62228f1", new License(
+				null,
+				null));
+
+		// === SPARE CODES (PoCs, new customers,...) ===
+		keys.put("5f4f7686-e502-4a89-aa64-834f0220107e", new License(
+				new GregorianCalendar(2021, Calendar.JUNE, 30, 23, 59, 59).getTime(),
+				null));
+		keys.put("2beb15ee-8292-42b2-85f1-dab53d9f5255", new License(
+				new GregorianCalendar(2021, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
+				null));
+		keys.put("11206e6e-694b-43c7-906c-209134d3fadc", new License(
+				new GregorianCalendar(2021, Calendar.DECEMBER, 31, 23,	59,	59).getTime(),
+				null));
+		keys.put("22f37141-f6b1-4478-ae53-43ae15aae19a", new License(
+				new GregorianCalendar(2022, Calendar.MARCH, 31, 23, 59, 59).getTime(),
+				null));
+		keys.put("edd36cc0-9bf5-4c21-bf00-91e48f2e521d", new License(
+				new GregorianCalendar(2022, Calendar.JUNE, 30, 23, 59, 59).getTime(),
+				null));
+		keys.put("e3dbd68b-96b3-4b21-8a27-1bc28d3f4ed2", new License(
+				new GregorianCalendar(2022, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
+				null));
+		keys.put("fe08d717-f8e8-4aa0-b641-9ed734f8cde7", new License(
+				new GregorianCalendar(2022, Calendar.DECEMBER, 31, 23,	59,	59).getTime(),
+				null));
+		keys.put("dfa4d4e4-39c1-424c-b717-305b99f1eb71", new License(
+				new GregorianCalendar(2023, Calendar.MARCH, 31, 23, 59, 59).getTime(),
+				null));
+		keys.put("5e995acd-77ca-4fea-a487-b060eceb096a", new License(
+				new GregorianCalendar(2023, Calendar.JUNE, 30, 23, 59, 59).getTime(),
+				null));
+		keys.put("c76f6d84-7e35-46e2-a608-978d08bf6d72", new License(
+				new GregorianCalendar(2023, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
+				null));
+		keys.put("a0136286-5f01-49c4-9441-96d5c0e159bc", new License(
+				new GregorianCalendar(2023, Calendar.DECEMBER, 31, 23,	59,	59).getTime(),
+				null));
 	}
 
 	private final String licenseCode;
-	private final Date expiryDate;
+	private final License licenseInfo;
 
-	public MockLicensingService() {
+	public MockLicensingService(KubernetesClient k8sClient) {
 		log.info("Container environment detected.");
 		licenseCode = System.getenv("DS_LICENSE_CODE");
 
@@ -49,10 +122,15 @@ public class MockLicensingService implements ILicensingService {
 			System.exit(0);
 		}
 
-		expiryDate = keys.get(licenseCode);
+		licenseInfo = keys.get(licenseCode);
+		this.k8sClient = k8sClient;
 		checkLicense();
 
 		log.info("License validated.");
+	}
+
+	public MockLicensingService() {
+		this(null);
 	}
 
 	@Override
@@ -62,13 +140,66 @@ public class MockLicensingService implements ILicensingService {
 	}
 
 	private void checkLicense() {
-		if (expiryDate != null && new Date().compareTo(expiryDate) > 0) {
+		if (licenseInfo == null) {
+			return;
+		}
+
+		Date currDate = new Date();
+		if (licenseInfo.expiry != null && currDate.compareTo(licenseInfo.expiry) > 0) {
 			log.fatal("License code {} has expired.", licenseCode);
 			System.exit(0);
+		}
+
+		if (k8sClient == null || licenseInfo.maxReplicas == null) {
+			return;
+		}
+
+		long diff = currDate.getTime() - lastCheck.getTime();
+		if (TimeUnit.MILLISECONDS.toMinutes(diff) >= 30) {
+			lastCheck = new Date();
+			// It's hard to predict how long the Kubernetes API call will hold up DocShifter, so give the customer
+			// the benefit of the doubt that they're playing nice and offload this work to a background thread in the
+			// interest of minimizing processing delays. If we notice any abnormalities, crash and burn the
+			// application anyway.
+			BACKGROUND_RUNNER.execute(() -> {
+				String currPod = System.getenv("HOSTNAME");
+				String currRs = currPod.substring(0, currPod.lastIndexOf('-'));
+				String currDeploy = currRs.substring(0, currRs.lastIndexOf('-'));
+				String currNs = k8sClient.getConfiguration().getNamespace();
+				Integer replicas = null;
+				try {
+					replicas = k8sClient.apps()
+							.deployments()
+							.inNamespace(currNs)
+							.withName(currDeploy)
+							.get()
+							.getSpec()
+							.getReplicas();
+					if (replicas == null) {
+						throw new NullPointerException("Kubernetes API request returned a NULL value!");
+					}
+				} catch (Exception ex) {
+					log.fatal("Unable to query the Kubernetes API correctly. Did you provide the service account with the" +
+							" appropriate credentials to GET a Deployment?", ex);
+					System.exit(0);
+				}
+				if (replicas > licenseInfo.maxReplicas) {
+					log.fatal("You have {} receivers running. This is more than allotted for your current license ({}). " +
+									"Please downscale the number of pods or upgrade your license to continue.", replicas,
+							licenseInfo.maxReplicas);
+					System.exit(0);
+				}
+			});
 		}
 	}
 
 	@Override
 	public void endModule(String moduleId, Map<String, Object> clientData, long[] fid) {
+	}
+
+	@AllArgsConstructor
+	private static class License {
+		private final Date expiry;
+		private final Integer maxReplicas;
 	}
 }

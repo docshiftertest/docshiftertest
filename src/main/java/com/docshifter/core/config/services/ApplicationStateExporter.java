@@ -1,5 +1,6 @@
 package com.docshifter.core.config.services;
 
+import com.docshifter.core.config.conditions.IsInAnyContainerCondition;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.availability.AvailabilityChangeEvent;
 import org.springframework.boot.availability.LivenessState;
@@ -17,7 +18,7 @@ import java.io.IOException;
  * @see <a href="https://docs.spring.io/spring-boot/docs/2.4.1/reference/html/spring-boot-features.html#boot-features-application-availability-managing">https://docs.spring.io/spring-boot/docs/2.4.1/reference/html/spring-boot-features.html#boot-features-application-availability-managing</a>
  */
 @Component
-@Conditional(IsInDockerCondition.class)
+@Conditional(IsInAnyContainerCondition.class)
 @Log4j2
 public class ApplicationStateExporter {
 

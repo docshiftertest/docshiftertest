@@ -1,8 +1,11 @@
 package com.docshifter.core.config;
 
+import com.docshifter.core.config.conditions.IsInKubernetesCondition;
 import com.docshifter.core.config.services.ConfigurationService;
 import com.docshifter.core.config.services.GeneralConfigService;
 import com.docshifter.core.messaging.sender.AMQPSender;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
@@ -11,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
@@ -119,4 +123,9 @@ public class DocShifterConfiguration {
 		return new ActiveMQTopic(Constants.RELOAD_QUEUE);
 	}
 
+	@Bean
+	@Conditional(IsInKubernetesCondition.class)
+	public KubernetesClient k8sClient() {
+		return new DefaultKubernetesClient();
+	}
 }
