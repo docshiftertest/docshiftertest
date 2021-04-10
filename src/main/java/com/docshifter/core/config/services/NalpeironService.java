@@ -1,5 +1,6 @@
 package com.docshifter.core.config.services;
 
+import com.docshifter.core.config.conditions.IsNotInAnyContainerCondition;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import com.nalpeiron.nalplibrary.NALP;
@@ -22,7 +23,7 @@ import java.util.Map;
 
 @Service
 @Profile("licensing")
-@Conditional(IsNotInDockerCondition.class)
+@Conditional(IsNotInAnyContainerCondition.class)
 public class NalpeironService implements ILicensingService {
 
     private static final Logger log = LogManager.getLogger(ILicensingService.class);
