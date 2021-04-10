@@ -31,6 +31,9 @@ public class MockLicensingService implements ILicensingService {
 	private static final Logger log = LogManager.getLogger(ILicensingService.class);
 	private static final Map<String, License> keys = new HashMap<>();
 	static {
+		// Also see https://docshifter.atlassian.net/wiki/spaces/TEC/pages/1714716673/Environment+Overview
+		// Make sure to keep this up to date!
+
 		// === THE ROOTEST OF ROOT CODE, NEVER SEND THIS TO ANYONE, KEEP IT FOR INTERNAL DEVELOPMENT! ===
 		keys.put("66de59a9-2de1-4621-b5a3-6778ad7c4eb8", new License(
 				null,
