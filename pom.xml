@@ -14,7 +14,7 @@
 	</parent>
 
 	<properties>
-		<revision>6.4.3-RC</revision>
+		<revision>6.4.3</revision>
 		<sha1 />
 		<hsqldb.version>2.3.4</hsqldb.version>
 
