@@ -11,6 +11,6 @@ public class IsInAnyContainerCondition extends AnyNestedCondition {
 	@Conditional(IsInKubernetesCondition.class)
 	static class KubernetesCondition {}
 
-	@Conditional(IsInAnyContainerCondition.class)
+	@Conditional(IsInGenericContainerCondition.class)
 	static class GenericCondition {}
 }
