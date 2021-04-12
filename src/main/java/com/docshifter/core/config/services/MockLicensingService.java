@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -108,6 +109,7 @@ public class MockLicensingService implements ILicensingService {
 	private final String licenseCode;
 	private final License licenseInfo;
 
+	@Autowired(required = false)
 	public MockLicensingService(KubernetesClient k8sClient) {
 		log.info("Container environment detected.");
 		licenseCode = System.getenv("DS_LICENSE_CODE");
@@ -124,7 +126,9 @@ public class MockLicensingService implements ILicensingService {
 
 		licenseInfo = keys.get(licenseCode);
 		this.k8sClient = k8sClient;
-		checkLicense();
+		// On application startup, make sure the customer is already playing nice... (e.g. not overscaling the number
+		// of receivers based on what their license allows)
+		checkLicense(false);
 
 		log.info("License validated.");
 	}
@@ -135,11 +139,15 @@ public class MockLicensingService implements ILicensingService {
 
 	@Override
 	public long[] validateAndStartModule(String moduleId, long[] fid) {
-		checkLicense();
+		// It's hard to predict how long the Kubernetes API call will hold up DocShifter, so give the customer
+		// the benefit of the doubt that they're playing nice and offload this work to a background thread in the
+		// interest of minimizing processing delays. If we notice any abnormalities, crash and burn the
+		// application anyway.
+		checkLicense(true);
 		return fid;
 	}
 
-	private void checkLicense() {
+	private void checkLicense(boolean checkPodsInBackground) {
 		if (licenseInfo == null) {
 			return;
 		}
@@ -157,39 +165,41 @@ public class MockLicensingService implements ILicensingService {
 		long diff = currDate.getTime() - lastCheck.getTime();
 		if (TimeUnit.MILLISECONDS.toMinutes(diff) >= 30) {
 			lastCheck = new Date();
-			// It's hard to predict how long the Kubernetes API call will hold up DocShifter, so give the customer
-			// the benefit of the doubt that they're playing nice and offload this work to a background thread in the
-			// interest of minimizing processing delays. If we notice any abnormalities, crash and burn the
-			// application anyway.
-			BACKGROUND_RUNNER.execute(() -> {
-				String currPod = System.getenv("HOSTNAME");
-				String currRs = currPod.substring(0, currPod.lastIndexOf('-'));
-				String currDeploy = currRs.substring(0, currRs.lastIndexOf('-'));
-				String currNs = k8sClient.getConfiguration().getNamespace();
-				Integer replicas = null;
-				try {
-					replicas = k8sClient.apps()
-							.deployments()
-							.inNamespace(currNs)
-							.withName(currDeploy)
-							.get()
-							.getSpec()
-							.getReplicas();
-					if (replicas == null) {
-						throw new NullPointerException("Kubernetes API request returned a NULL value!");
-					}
-				} catch (Exception ex) {
-					log.fatal("Unable to query the Kubernetes API correctly. Did you provide the service account with the" +
-							" appropriate credentials to GET a Deployment?", ex);
-					System.exit(0);
-				}
-				if (replicas > licenseInfo.maxReplicas) {
-					log.fatal("You have {} receivers running. This is more than allotted for your current license ({}). " +
-									"Please downscale the number of pods or upgrade your license to continue.", replicas,
-							licenseInfo.maxReplicas);
-					System.exit(0);
-				}
-			});
+			if (checkPodsInBackground) {
+				BACKGROUND_RUNNER.execute(this::checkPods);
+			} else {
+				checkPods();
+			}
+		}
+	}
+
+	private void checkPods() {
+		String currPod = System.getenv("HOSTNAME");
+		String currRs = currPod.substring(0, currPod.lastIndexOf('-'));
+		String currDeploy = currRs.substring(0, currRs.lastIndexOf('-'));
+		String currNs = k8sClient.getConfiguration().getNamespace();
+		Integer replicas = null;
+		try {
+			replicas = k8sClient.apps()
+					.deployments()
+					.inNamespace(currNs)
+					.withName(currDeploy)
+					.get()
+					.getSpec()
+					.getReplicas();
+			if (replicas == null) {
+				throw new NullPointerException("Kubernetes API request returned a NULL value!");
+			}
+		} catch (Exception ex) {
+			log.fatal("Unable to query the Kubernetes API correctly. Did you provide the service account with the" +
+					" appropriate credentials to GET a Deployment?", ex);
+			System.exit(0);
+		}
+		if (replicas > licenseInfo.maxReplicas) {
+			log.fatal("You have {} receivers running. This is more than allotted for your current license ({}). " +
+							"Please downscale the number of pods or upgrade your license to continue.", replicas,
+					licenseInfo.maxReplicas);
+			System.exit(0);
 		}
 	}
 
