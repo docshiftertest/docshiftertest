@@ -8,12 +8,32 @@ import com.aspose.pdf.IDocument;
 import com.aspose.pdf.LinkAnnotation;
 import com.aspose.pdf.NamedDestination;
 import com.aspose.pdf.Page;
+import com.aspose.pdf.PdfAction;
 import com.aspose.pdf.XYZExplicitDestination;
 import lombok.extern.log4j.Log4j2;
+
+import java.util.Optional;
 
 @Log4j2
 public final class AnnotationUtils {
 	private AnnotationUtils() {}
+
+	/**
+	 * Extracts an {@link IAppointment} from a {@link LinkAnnotation} by visiting its destination or action.
+	 * @param annotation The object to extract the destination from.
+	 * @return The retrieved {@link IAppointment}, which can be null.
+	 */
+	public static IAppointment extractAppointment(LinkAnnotation annotation) {
+		IAppointment annotationDest = annotation.getDestination();
+
+		// If destination on the annotation itself is null,
+		// we might have to deal with a GoToAction wrapping a ExplicitDestination here
+		if (annotationDest == null) {
+			annotationDest = annotation.getAction();
+		}
+
+		return annotationDest;
+	}
 
 	/**
 	 * Extracts an {@link IAppointment} from a {@link LinkAnnotation} entirely and tries to cast the result as an
@@ -23,14 +43,7 @@ public final class AnnotationUtils {
 	 * @return The retrieved {@link ExplicitDestination} or null if it couldn't be casted or retrieved.
 	 */
 	public static ExplicitDestination extractExplicitDestinationSoft(IDocument doc, LinkAnnotation annotation) {
-		IAppointment annotationDest = annotation.getDestination();
-
-		// If destination on the annotation itself is null,
-		// we might have to deal with a GoToAction wrapping a ExplicitDestination here
-		if (annotationDest == null) {
-			annotationDest = annotation.getAction();
-		}
-
+		IAppointment annotationDest = extractAppointment(annotation);
 		ExplicitDestination dest = AppointmentUtils.asExplicitDestinationSoft(doc, annotationDest);
 		if (dest != null) {
 			log.debug("Appropriate link found referring to page {}", dest.getPageNumber());
@@ -48,14 +61,7 @@ public final class AnnotationUtils {
 	 * @return The retrieved {@link ExplicitDestination} or null if it couldn't be casted or retrieved.
 	 */
 	public static ExplicitDestination extractExplicitDestinationHard(LinkAnnotation annotation) {
-		IAppointment annotationDest = annotation.getDestination();
-
-		// If destination on the annotation itself is null,
-		// we might have to deal with a GoToAction wrapping a ExplicitDestination here
-		if (annotationDest == null) {
-			annotationDest = annotation.getAction();
-		}
-
+		IAppointment annotationDest = extractAppointment(annotation);
 		ExplicitDestination dest = AppointmentUtils.asExplicitDestinationHard(annotationDest);
 		if (dest != null) {
 			log.debug("Appropriate link found referring to page {}", dest.getPageNumber());
@@ -86,6 +92,35 @@ public final class AnnotationUtils {
 	@Deprecated
 	public static void setDestinationOrAction(LinkAnnotation annotation, ExplicitDestination dest) {
 		setDestinationOrActionHard(annotation, dest);
+	}
+
+	/**
+	 * Changes the underlying destination of a {@link LinkAnnotation} to an {@link IAppointment}. Does NOT
+	 * follow through wrapped {@link IAppointment}s if there are any in the annotation, so this is useful if you want
+	 * to change the destination of a single link instead of the destination backed by a {@link NamedDestination} for
+	 * example (which would then update the destinations of everything pointing to that specific name).
+	 * @param annotation The annotation to change.
+	 * @param dest The destination to change to.
+	 * @param actionHandling What to do if dest is an action and there is already an action present on the annotation.
+	 */
+	public static void setDestinationOrActionHard(LinkAnnotation annotation, IAppointment dest,
+												  ActionHandling actionHandling) {
+		// If the replacement is a PdfAction, set or add the action to the annotation.
+		if (dest instanceof PdfAction) {
+			Optional<IAppointment> unwrapped = AppointmentUtils.unwrapIfGoToAction(dest);
+			if (!unwrapped.isPresent()) {
+				if (annotation.getAction() == null || actionHandling == ActionHandling.OVERWRITE) {
+					annotation.setAction((PdfAction) dest);
+				} else {
+					annotation.getAction().getNext().add((PdfAction) dest);
+				}
+				return;
+			}
+			dest = unwrapped.get();
+		}
+
+		// In other cases we just replace the destination with the replacement.
+		annotation.setDestination(dest);
 	}
 
 	/**

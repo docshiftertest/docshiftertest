@@ -9,12 +9,32 @@ import com.aspose.pdf.NamedDestination;
 import com.aspose.pdf.OutlineItemCollection;
 import com.aspose.pdf.Outlines;
 import com.aspose.pdf.Page;
+import com.aspose.pdf.PdfAction;
 import com.aspose.pdf.XYZExplicitDestination;
 import lombok.extern.log4j.Log4j2;
+
+import java.util.Optional;
 
 @Log4j2
 public final class OutlineUtils {
 	private OutlineUtils() {}
+
+	/**
+	 * Extracts an {@link IAppointment} from a {@link OutlineItemCollection} by visiting its destination or action.
+	 * @param outline The object to extract the destination from.
+	 * @return The retrieved {@link IAppointment}, which can be null.
+	 */
+	public static IAppointment extractAppointment(OutlineItemCollection outline) {
+		IAppointment annotationDest = outline.getDestination();
+
+		// If destination on the outline itself is null,
+		// we might have to deal with a GoToAction wrapping a ExplicitDestination here
+		if (annotationDest == null) {
+			annotationDest = outline.getAction();
+		}
+
+		return annotationDest;
+	}
 
 	/**
 	 * Extracts an {@link IAppointment} from an {@link OutlineItemCollection} entirely and tries to cast the result
@@ -24,14 +44,7 @@ public final class OutlineUtils {
 	 * @return The retrieved {@link ExplicitDestination} or null if it couldn't be casted or retrieved.
 	 */
 	public static ExplicitDestination extractExplicitDestinationSoft(IDocument doc, OutlineItemCollection outline) {
-		IAppointment outlineDest = outline.getDestination();
-
-		// If destination on the outline itself is null,
-		// we might have to deal with a GoToAction wrapping a ExplicitDestination here
-		if (outlineDest == null) {
-			outlineDest = outline.getAction();
-		}
-
+		IAppointment outlineDest = extractAppointment(outline);
 		ExplicitDestination bookmark = AppointmentUtils.asExplicitDestinationSoft(doc, outlineDest);
 		if (bookmark != null) {
 			log.debug("Appropriate level {} bookmark found referring to page {}", outline.getLevel(),
@@ -50,14 +63,7 @@ public final class OutlineUtils {
 	 * @return The retrieved {@link ExplicitDestination} or null if it couldn't be casted or retrieved.
 	 */
 	public static ExplicitDestination extractExplicitDestinationHard(OutlineItemCollection outline) {
-		IAppointment outlineDest = outline.getDestination();
-
-		// If destination on the outline itself is null,
-		// we might have to deal with a GoToAction wrapping a ExplicitDestination here
-		if (outlineDest == null) {
-			outlineDest = outline.getAction();
-		}
-
+		IAppointment outlineDest = extractAppointment(outline);
 		ExplicitDestination bookmark = AppointmentUtils.asExplicitDestinationHard(outlineDest);
 		if (bookmark != null) {
 			log.debug("Appropriate level {} bookmark found referring to page {}", outline.getLevel(),
@@ -100,6 +106,35 @@ public final class OutlineUtils {
 	@Deprecated
 	public static void setDestinationOrAction(OutlineItemCollection outline, ExplicitDestination dest) {
 		setDestinationOrActionHard(outline, dest);
+	}
+
+	/**
+	 * Changes the underlying destination of an {@link OutlineItemCollection} to an {@link IAppointment}. Does NOT
+	 * follow through wrapped {@link IAppointment}s if there are any in the outline, so this is useful if you want
+	 * to change the destination of a single outline instead of the destination backed by a {@link NamedDestination} for
+	 * example (which would then update the destinations of everything pointing to that specific name).
+	 * @param outline The outline to change.
+	 * @param dest The destination to change to.
+	 * @param actionHandling What to do if dest is an action and there is already an action present on the outline.
+	 */
+	public static void setDestinationOrActionHard(OutlineItemCollection outline, IAppointment dest,
+												  ActionHandling actionHandling) {
+		// If the replacement is a PdfAction, set or add the action to the outline.
+		if (dest instanceof PdfAction) {
+			Optional<IAppointment> unwrapped = AppointmentUtils.unwrapIfGoToAction(dest);
+			if (!unwrapped.isPresent()) {
+				if (outline.getAction() == null || actionHandling == ActionHandling.OVERWRITE) {
+					outline.setAction((PdfAction) dest);
+				} else {
+					outline.getAction().getNext().add((PdfAction) dest);
+				}
+				return;
+			}
+			dest = unwrapped.get();
+		}
+
+		// In other cases we just replace the destination with the replacement.
+		outline.setDestination(dest);
 	}
 
 	/**
