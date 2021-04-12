@@ -25,15 +25,15 @@ public final class OutlineUtils {
 	 * @return The retrieved {@link IAppointment}, which can be null.
 	 */
 	public static IAppointment extractAppointment(OutlineItemCollection outline) {
-		IAppointment annotationDest = outline.getDestination();
+		IAppointment outlineDest = outline.getDestination();
 
 		// If destination on the outline itself is null,
 		// we might have to deal with a GoToAction wrapping a ExplicitDestination here
-		if (annotationDest == null) {
-			annotationDest = outline.getAction();
+		if (outlineDest == null) {
+			outlineDest = outline.getAction();
 		}
 
-		return annotationDest;
+		return outlineDest;
 	}
 
 	/**

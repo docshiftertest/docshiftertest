@@ -49,7 +49,7 @@ public final class AppointmentUtils {
 	 */
 	public static ExplicitDestination asExplicitDestinationHard(IAppointment appointment) {
 		// It might be a GoToAction wrapping an ExplicitDestination...
-		appointment = unwrapIfGoToAction(appointment).orElse(null);
+		appointment = unwrapGoToAction(appointment);
 
 		// Check if destination is of right type
 		if (!(appointment instanceof ExplicitDestination)) {
@@ -78,6 +78,18 @@ public final class AppointmentUtils {
 		Optional<GoToAction> goToAction = getIfGoToAction(appointment);
 		if (goToAction.isPresent()) {
 			return unwrap(doc, goToAction.get().getDestination());
+		}
+
+		return appointment;
+	}
+
+	// TODO: was meant to be replaced by getIfGoToAction but ran into regressions in HiFi, so investigate why!
+	private static IAppointment unwrapGoToAction(IAppointment appointment) {
+		if (appointment instanceof GoToAction) {
+			IAppointment dest = ((GoToAction) appointment).getDestination();
+			if (dest != null) {
+				return unwrapGoToAction(((GoToAction) appointment).getDestination());
+			}
 		}
 
 		return appointment;
