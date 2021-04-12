@@ -47,13 +47,6 @@
                 <include>DSLicenseCode.txt</include>
             </includes>
         </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/src/main/resources/logos</directory>
-            <outputDirectory>logos</outputDirectory>
-            <includes>
-                <include>logo-white-background.png</include>
-            </includes>
-        </fileSet>
     </fileSets>
     <dependencySets>
         <dependencySet>
