@@ -42,6 +42,6 @@ public interface IMessageSender {
 
 	int getMessageCount() throws JMSException;
 
-	SyncTask sendSyncTask(long ChainConfigurationID, Task task);
+	SyncTask sendSyncTask(long ChainConfigurationID, long timeout, Task task);
 
 }
