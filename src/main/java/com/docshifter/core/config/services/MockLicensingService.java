@@ -16,18 +16,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @Profile("licensing")
 @Conditional(IsInAnyContainerCondition.class)
 public class MockLicensingService implements ILicensingService {
-
-	private static final ExecutorService BACKGROUND_RUNNER = Executors.newSingleThreadExecutor();
-	private final KubernetesClient k8sClient;
-	private Date lastCheck = new Date(0);
 
 	private static final Logger log = LogManager.getLogger(ILicensingService.class);
 	private static final Map<String, License> keys = new HashMap<>();
@@ -106,6 +99,7 @@ public class MockLicensingService implements ILicensingService {
 				null));
 	}
 
+	private final KubernetesClient k8sClient;
 	private final String licenseCode;
 	private final License licenseInfo;
 
@@ -126,9 +120,10 @@ public class MockLicensingService implements ILicensingService {
 
 		licenseInfo = keys.get(licenseCode);
 		this.k8sClient = k8sClient;
-		// On application startup, make sure the customer is already playing nice... (e.g. not overscaling the number
-		// of receivers based on what their license allows)
-		checkLicense(false);
+		// On application startup, also make sure the customer is playing nice... (i.e. not overscaling the number of
+		// receivers based on what their license allows)
+		checkLicense();
+		checkPods();
 
 		log.info("License validated.");
 	}
@@ -139,41 +134,22 @@ public class MockLicensingService implements ILicensingService {
 
 	@Override
 	public long[] validateAndStartModule(String moduleId, long[] fid) {
-		// It's hard to predict how long the Kubernetes API call will hold up DocShifter, so give the customer
-		// the benefit of the doubt that they're playing nice and offload this work to a background thread in the
-		// interest of minimizing processing delays. If we notice any abnormalities, crash and burn the
-		// application anyway.
-		checkLicense(true);
+		checkLicense();
 		return fid;
 	}
 
-	private void checkLicense(boolean checkPodsInBackground) {
-		if (licenseInfo == null) {
-			return;
-		}
-
-		Date currDate = new Date();
-		if (licenseInfo.expiry != null && currDate.compareTo(licenseInfo.expiry) > 0) {
+	private void checkLicense() {
+		if (licenseInfo.expiry != null && new Date().compareTo(licenseInfo.expiry) > 0) {
 			log.fatal("License code {} has expired.", licenseCode);
 			System.exit(0);
-		}
-
-		if (k8sClient == null || licenseInfo.maxReplicas == null) {
-			return;
-		}
-
-		long diff = currDate.getTime() - lastCheck.getTime();
-		if (TimeUnit.MILLISECONDS.toMinutes(diff) >= 30) {
-			lastCheck = new Date();
-			if (checkPodsInBackground) {
-				BACKGROUND_RUNNER.execute(this::checkPods);
-			} else {
-				checkPods();
-			}
 		}
 	}
 
 	private void checkPods() {
+		if (k8sClient == null || licenseInfo.maxReplicas == null) {
+			return;
+		}
+
 		String currPod = System.getenv("HOSTNAME");
 		String currRs = currPod.substring(0, currPod.lastIndexOf('-'));
 		String currDeploy = currRs.substring(0, currRs.lastIndexOf('-'));
