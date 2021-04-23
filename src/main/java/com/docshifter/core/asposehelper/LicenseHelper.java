@@ -56,6 +56,7 @@ public class LicenseHelper {
 	//private final com.aspose.ocr.License ocrLicense;
 	private final com.aspose.diagram.License diagramLicense;
 	private final com.aspose.cad.License cadLicense;
+	private final com.aspose.html.License htmlLicense;
 
 	private static final LicenseHelper licenseHelper = new LicenseHelper();
 
@@ -99,6 +100,7 @@ public class LicenseHelper {
 		//ocrLicense = new com.aspose.ocr.License();
 		diagramLicense = new com.aspose.diagram.License();
 		cadLicense = new com.aspose.cad.License();
+		htmlLicense = new com.aspose.html.License();
 		try {
 			log.debug("Setting the licences");
 			emailLicense.setLicense(tmpFileFullPathStr);
@@ -113,6 +115,7 @@ public class LicenseHelper {
 			//log.debug("OCR licence valid is: " + ocrLicense.isValid());
 			cadLicense.setLicense(tmpFileFullPathStr);
 			diagramLicense.setLicense(tmpFileFullPathStr);
+			htmlLicense.setLicense(tmpFileFullPathStr);
 			Files.deleteIfExists(tmpFileFullPath);
 		}
 		catch (Exception ex) {

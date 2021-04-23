@@ -55,7 +55,7 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 		} catch (IOException e) {
 			logger.error("Could not open JSON file", e);
 		} catch (Exception e) {
-			logger.error("An unexplainable exception occured",e);
+			logger.error("An unexplainable exception occurred",e);
 		}
 
 		return conditions;

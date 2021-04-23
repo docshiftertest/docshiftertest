@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @Component
 public class DocshifterMessage implements Serializable {
 
+	private static final long serialVersionUID = 42L;
 	private DocshifterMessageType type;
 	private Task task;
 	private Long configId;
