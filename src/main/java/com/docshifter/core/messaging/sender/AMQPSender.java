@@ -24,18 +24,18 @@ import java.util.concurrent.TimeUnit;
 public class AMQPSender implements IMessageSender {
 
 	private final ActiveMQQueue docshifterQueue;
-	private final QueueMonitorRepository queueMonitorRepository;
+	//private final QueueMonitorRepository queueMonitorRepository;
 	private final JmsTemplate jmsTemplate;
 	private final JmsMessagingTemplate messagingTemplate;
 
 	public static final int DEFAULT_PRIORITY = 4;
 	public static final int HIGHEST_PRIORITY = 9;
 	
-	public AMQPSender(JmsTemplate jmsTemplate, JmsMessagingTemplate messagingTemplate, ActiveMQQueue docshifterQueue, QueueMonitorRepository queueMonitorRepository) {
+	public AMQPSender(JmsTemplate jmsTemplate, JmsMessagingTemplate messagingTemplate, ActiveMQQueue docshifterQueue) {
 		this.jmsTemplate = jmsTemplate;
 		this.messagingTemplate = messagingTemplate;
 		this.docshifterQueue = docshifterQueue;
-		this.queueMonitorRepository = queueMonitorRepository;
+		//this.queueMonitorRepository = queueMonitorRepository;
 	}
 
 
@@ -101,8 +101,6 @@ public class AMQPSender implements IMessageSender {
 
 		if (DocshifterMessageType.SYNC.equals(type)) {
 			Object obj = messagingTemplate.convertSendAndReceive(queue,message,DocshifterMessage.class, messagePostProcessor -> {
-				// create new JmsTemplate on the fly (probably)? or get priority and receive timeout and set back to
-				// original value?
 				messagingTemplate.getJmsTemplate().setPriority(HIGHEST_PRIORITY);
 				long timeoutInMs = timeout > 0 ? TimeUnit.SECONDS.toMillis(timeout) : JmsDestinationAccessor.RECEIVE_TIMEOUT_INDEFINITE_WAIT;
 				log.debug("Message receive timeout was {}, setting it to {}",
