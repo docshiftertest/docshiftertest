@@ -28,11 +28,11 @@
 	<distributionManagement>
 		<repository>
 			<id>releases</id>
-			<url>https://mvn.docbyte.com/artifactory/releases</url>
+			<url>https://mvn.docshifter.com/repository/docshifter-modules</url>
 		</repository>
 		<snapshotRepository>
 			<id>snapshots</id>
-			<url>https://mvn.docbyte.com/artifactory/snapshots</url>
+			<url>https://mvn.docshifter.com/repository/docshifter-modules-snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 
