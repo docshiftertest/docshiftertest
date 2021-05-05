@@ -19,8 +19,8 @@
 		<hsqldb.version>2.3.4</hsqldb.version>
 		<java.version>1.8</java.version>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-
-        <monitoring.version>6.2.3.1${changelist}</monitoring.version>
+<!-- quick hack to force picking up snapshot monitoring -->
+        <monitoring.version>6.2.3.1-SNAPSHOT</monitoring.version>
 		<docbyteutils.version>1.14${changelist}</docbyteutils.version>
 	</properties>
 
