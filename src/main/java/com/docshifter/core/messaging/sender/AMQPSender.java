@@ -1,5 +1,6 @@
 package com.docshifter.core.messaging.sender;
 
+import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.repositories.QueueMonitorRepository;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
@@ -8,21 +9,19 @@ import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.VeevaTask;
+import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
-import org.apache.log4j.Logger;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 5/20/16.
  */
 
+@Log4j2
 public class AMQPSender implements IMessageSender {
-
-	private static final Logger logger = Logger.getLogger(new Object() { }.getClass().getEnclosingClass());
 
 	private final ActiveMQQueue docshifterQueue;
 	private final QueueMonitorRepository queueMonitorRepository;
@@ -39,10 +38,9 @@ public class AMQPSender implements IMessageSender {
 		this.queueMonitorRepository = queueMonitorRepository;
 	}
 
+	private SyncTask sendSyncTask(String queue, ChainConfiguration chainConfiguration, Task task) {
 
-	private SyncTask sendSyncTask(String queue, long chainConfigurationID, Task task) {
-
-		Object response = sendTask(DocshifterMessageType.SYNC, queue, chainConfigurationID, task, HIGHEST_PRIORITY);
+		Object response = sendTask(DocshifterMessageType.SYNC, queue, chainConfiguration, task);
 
 		if (response == null) {
 			//TODO: update to good exception message
@@ -71,50 +69,56 @@ public class AMQPSender implements IMessageSender {
 		}
 	}
 	
-	private Object sendTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task, int priority) {
+	private Object sendTask(DocshifterMessageType type, String queue, ChainConfiguration chainConfiguration, Task task) {
 		DocshifterMessage message = new DocshifterMessage(
 				type,
 				task,
-				chainConfigurationID);
+				chainConfiguration.getId());
 		
 		if (task == null) {
-			logger.debug("task=NULL ERROR", null);
+			log.debug("task=NULL ERROR");
 		}
-		else {
-			logger.debug("task.Id=" + task.getId());
-			logger.debug("task.class=" + task.getClass().getSimpleName());
-			logger.debug("message.task.class=" + message.getTask().getClass().getSimpleName());
-		}
-		logger.debug("type=" + type.name());
-		logger.debug("chainConfigID=" + chainConfigurationID, null);
 
-		logger.info("Sending message: " + message.toString() + " for file: " + task.getSourceFilePath(), null);
-		String hostname = "localhost";
-		try {
-			hostname = InetAddress.getLocalHost().getHostName();
+		else {
+			log.debug("task.Id={}", task.getId());
+			log.debug("task.class={}", task.getClass().getSimpleName());
+			log.debug("message.task.class={}", message.getTask().getClass().getSimpleName());
 		}
-		catch (UnknownHostException uncle) {
-			logger.warn("Couldn't get hostname of the DocShifter machine, so will default to localhost (for queue_monitor)");
-		}
-		//QueueMonitor qMon = new QueueMonitor(type.name(), queue, chainConfigurationID, task.getId(), task.getSourceFilePath(), priority, hostname);
-		//queueMonitorRepository.save(qMon);
+		log.debug("type={}", type.name());
+		log.debug("chainConfigID={}", chainConfiguration.getId());
+
+		// Try to get the priority from webservice request otherwise uses workflow priority
+		int taskPriority = (int) task.getData().getOrDefault("priority", chainConfiguration.getPriority());
+
+		// Gets the sync webservices workflow timeout from webservice request
+		long taskTimeoutInSeconds = ((Integer) task.getData().getOrDefault("timeout", chainConfiguration.getTimeout())).longValue();
+
+		long taskTimeoutInMillis = TimeUnit.SECONDS.toMillis(taskTimeoutInSeconds);
+
+		log.info("taskTimeoutInMillis {}",taskTimeoutInMillis);
+		log.info("taskTimeoutInSeconds {}",taskTimeoutInSeconds);
+
+		log.info("Sending message: {} for file: {} using workflow {} ", message, task.getSourceFilePath(), chainConfiguration.getName());
 
 		if (DocshifterMessageType.SYNC.equals(type)) {
-			Object obj = messagingTemplate.convertSendAndReceive(queue,message,DocshifterMessage.class, messagePostProcessor -> {
-				messagingTemplate.getJmsTemplate().setPriority(HIGHEST_PRIORITY);
-				logger.debug("'messagingTemplate.convertSendAndReceive': message.task type=" + message.getTask().getClass().getSimpleName());
+			Object obj = messagingTemplate.convertSendAndReceive(queue, message, DocshifterMessage.class, messagePostProcessor -> {
+				messagingTemplate.getJmsTemplate().setPriority(taskPriority);
+				messagingTemplate.getJmsTemplate().setReceiveTimeout(taskTimeoutInMillis);
+				log.debug("'messagingTemplate.convertSendAndReceive': message.task type=" + message.getTask().getClass().getSimpleName());
 				return messagePostProcessor;
 			});
 			if (obj != null) {
-				logger.debug("return on jms 'convertSendAndReceive': obj type" + obj.getClass().getSimpleName());
-			} else {
-				logger.debug("return on jms 'convertSendAndReceive': obj is null");
+				log.debug("return on jms 'convertSendAndReceive': obj type {}", obj.getClass().getSimpleName());
+			}
+			else {
+				log.debug("return on jms 'convertSendAndReceive': obj is null");
 			}
 			return obj;
-		} else {
+		}
+		else {
 			jmsTemplate.convertAndSend(queue, message, messagePostProcessor -> {
-				jmsTemplate.setPriority(priority);
-				logger.debug("'jmsTemplate.convertAndSend': message.task type=" + message.getTask().getClass().getSimpleName());
+				jmsTemplate.setPriority(taskPriority);
+				log.debug("'jmsTemplate.convertAndSend': message.task type={}", message.getTask().getClass().getSimpleName());
 				return messagePostProcessor;
 			});
 			return null;
@@ -134,27 +138,27 @@ public class AMQPSender implements IMessageSender {
 	}
 
 	@Override
-	public void sendTask(long chainConfigurationID, Task task, int priority)  {
-		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfigurationID, task, priority);
+	public void sendTask(ChainConfiguration chainConfiguration, Task task)  {
+		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfiguration, task);
 	}
 
 	@Override
-	public void sendDocumentumTask(long chainConfigurationID, DctmTask task, int priority)  {
-		sendTask(DocshifterMessageType.DCTM, docshifterQueue.getName(), chainConfigurationID, task, priority);
+	public void sendDocumentumTask(ChainConfiguration chainConfiguration, DctmTask task)  {
+		sendTask(DocshifterMessageType.DCTM, docshifterQueue.getName(), chainConfiguration, task);
 	}
 
 	@Override
-	public void sendVeevaTask(long chainConfigurationID,VeevaTask task, int priority) {
-		sendTask(DocshifterMessageType.VEEVA, docshifterQueue.getName(), chainConfigurationID, task, priority);
+	public void sendVeevaTask(ChainConfiguration chainConfiguration,VeevaTask task) {
+		sendTask(DocshifterMessageType.VEEVA, docshifterQueue.getName(), chainConfiguration, task);
 	}
 
 	@Override
-	public void sendPrintTask(Task task, int priority)  {
-		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), 0, task, priority);
+	public void sendPrintTask(ChainConfiguration chainConfiguration,Task task)  {
+		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfiguration, task);
 	}
 	
 	@Override
-	public SyncTask sendSyncTask(long chainConfigurationID, Task task) {
-		return sendSyncTask(docshifterQueue.getName(), chainConfigurationID, task);
+	public SyncTask sendSyncTask(ChainConfiguration chainConfiguration, Task task) {
+		return sendSyncTask(docshifterQueue.getName(), chainConfiguration, task);
 	}
 }
