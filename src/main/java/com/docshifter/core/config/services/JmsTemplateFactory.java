@@ -5,8 +5,6 @@ import org.springframework.jms.core.JmsTemplate;
 import javax.jms.ConnectionFactory;
 
 public class JmsTemplateFactory implements IJmsTemplateFactory {
-	public static final int DEFAULT_PRIORITY = 4;
-	public static final int HIGHEST_PRIORITY = 9;
 	private final ConnectionFactory connectionFactory;
 
 	public JmsTemplateFactory(ConnectionFactory connectionFactory) {

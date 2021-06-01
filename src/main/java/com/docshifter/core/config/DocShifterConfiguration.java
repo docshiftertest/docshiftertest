@@ -3,6 +3,7 @@ package com.docshifter.core.config;
 import com.docshifter.core.config.conditions.IsInKubernetesCondition;
 import com.docshifter.core.config.services.ConfigurationService;
 import com.docshifter.core.config.services.GeneralConfigService;
+import com.docshifter.core.config.services.IJmsTemplateFactory;
 import com.docshifter.core.config.services.JmsTemplateFactory;
 import com.docshifter.core.messaging.sender.AMQPSender;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -77,7 +78,7 @@ public class DocShifterConfiguration {
 
 	@Bean
 	public JmsTemplate defaultJmsTemplate() {
-		return jmsTemplateFactory().create(JmsTemplateFactory.DEFAULT_PRIORITY, queueReplyTimeout);
+		return jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY, queueReplyTimeout);
 	}
 
 	@Bean
@@ -90,7 +91,7 @@ public class DocShifterConfiguration {
 	public JmsTemplate jmsTemplateMulticast() {
 		JmsTemplate template = new JmsTemplate(cachingConnectionFactory());
 		template.setPubSubDomain(true);
-		template.setPriority(JmsTemplateFactory.HIGHEST_PRIORITY);
+		template.setPriority(IJmsTemplateFactory.HIGHEST_PRIORITY);
 		template.setMessageTimestampEnabled(false);
 		return template;
 	}

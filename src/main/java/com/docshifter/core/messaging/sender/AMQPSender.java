@@ -114,9 +114,6 @@ public class AMQPSender implements IMessageSender {
 		}
 		else {
 			jmsTemplate.convertAndSend(queue, message, messagePostProcessor -> {
-				// Async task, so makes no sense to set this to the timeout of the workflow. Just use the globally
-				// configured queue timeout (or 300ms by default).
-				jmsTemplate.setReceiveTimeout(defaultJmsTemplate.getReceiveTimeout());
 				log.debug("'jmsTemplate.convertAndSend': message.task type={}", message.getTask().getClass().getSimpleName());
 				return messagePostProcessor;
 			});
