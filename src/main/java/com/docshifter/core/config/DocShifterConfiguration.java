@@ -111,8 +111,17 @@ public class DocShifterConfiguration {
 		SimpleJmsListenerContainerFactory factory = new SimpleJmsListenerContainerFactory();
 		factory.setConnectionFactory(connectionFactory);
 		factory.setErrorHandler(t -> {
-			log.error("Caught an error related to the message queue, so setting the application state to broken!", t);
-			AvailabilityChangeEvent.publish(appContext, LivenessState.BROKEN);
+			// Make sure we only freak out if we encounter confirmed unrecoverable errors, as some/most errors with
+			// the JMS connection might be perfectly recoverable
+
+			// This one arose sporadically in a NVS PROD environment (DPS-447)
+			if (t instanceof javax.jms.IllegalStateException && "Session is closed".equals(t.getMessage())) {
+				log.error("Caught an unrecoverable error related to the message queue, so setting the application " +
+						"state to broken!", t);
+				AvailabilityChangeEvent.publish(appContext, LivenessState.BROKEN);
+			} else {
+				log.debug("Not handling the following message queue error:", t);
+			}
 		});
 		return factory;
 	}
