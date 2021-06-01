@@ -95,9 +95,6 @@ public class AMQPSender implements IMessageSender {
 
 		long taskTimeoutInMillis = TimeUnit.SECONDS.toMillis(taskTimeoutInSeconds);
 
-		log.info("taskTimeoutInMillis {}",taskTimeoutInMillis);
-		log.info("taskTimeoutInSeconds {}",taskTimeoutInSeconds);
-
 		log.info("Sending message: {} for file: {} using workflow {} ", message, task.getSourceFilePath(), chainConfiguration.getName());
 
 		if (DocshifterMessageType.SYNC.equals(type)) {
