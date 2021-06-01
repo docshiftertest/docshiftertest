@@ -3,6 +3,7 @@ package com.docshifter.core.config;
 import com.docshifter.core.config.conditions.IsInKubernetesCondition;
 import com.docshifter.core.config.services.ConfigurationService;
 import com.docshifter.core.config.services.GeneralConfigService;
+import com.docshifter.core.config.services.JmsTemplateFactory;
 import com.docshifter.core.messaging.sender.AMQPSender;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -70,28 +71,26 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
-	public JmsTemplate jmsTemplate() {
-		JmsTemplate template = new JmsTemplate(cachingConnectionFactory());
-		template.setReceiveTimeout(queueReplyTimeout);
-		// Set if the QOS values (deliveryMode, priority, timeToLive) should be used for sending a message
-	    template.setExplicitQosEnabled(true);
-	    template.setDeliveryPersistent(true);
-		 // JMS tuning  - http://activemq.apache.org/components/artemis/documentation/1.3.0/perf-tuning.html
-	    template.setMessageTimestampEnabled(false);
-		return template;
+	public JmsTemplateFactory jmsTemplateFactory() {
+		return new JmsTemplateFactory(cachingConnectionFactory());
 	}
 
 	@Bean
-	@DependsOn("jmsTemplate")
-	public JmsMessagingTemplate messagingTemplate () {
-		return new JmsMessagingTemplate(jmsTemplate());
+	public JmsTemplate defaultJmsTemplate() {
+		return jmsTemplateFactory().create(JmsTemplateFactory.DEFAULT_PRIORITY, queueReplyTimeout);
+	}
+
+	@Bean
+	@DependsOn("defaultJmsTemplate")
+	public JmsMessagingTemplate defaultMessagingTemplate () {
+		return new JmsMessagingTemplate(defaultJmsTemplate());
 	}
 
 	@Bean
 	public JmsTemplate jmsTemplateMulticast() {
 		JmsTemplate template = new JmsTemplate(cachingConnectionFactory());
 		template.setPubSubDomain(true);
-		template.setPriority(AMQPSender.HIGHEST_PRIORITY);
+		template.setPriority(JmsTemplateFactory.HIGHEST_PRIORITY);
 		template.setMessageTimestampEnabled(false);
 		return template;
 	}

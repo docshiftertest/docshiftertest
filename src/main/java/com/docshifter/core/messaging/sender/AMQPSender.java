@@ -2,6 +2,7 @@ package com.docshifter.core.messaging.sender;
 
 import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.repositories.QueueMonitorRepository;
+import com.docshifter.core.config.services.IJmsTemplateFactory;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
@@ -25,15 +26,14 @@ public class AMQPSender implements IMessageSender {
 
 	private final ActiveMQQueue docshifterQueue;
 	private final QueueMonitorRepository queueMonitorRepository;
-	private final JmsTemplate jmsTemplate;
-	private final JmsMessagingTemplate messagingTemplate;
-
-	public static final int DEFAULT_PRIORITY = 4;
-	public static final int HIGHEST_PRIORITY = 9;
+	private final JmsTemplate defaultJmsTemplate;
+	private final IJmsTemplateFactory jmsTemplateFactory;
 	
-	public AMQPSender(JmsTemplate jmsTemplate, JmsMessagingTemplate messagingTemplate, ActiveMQQueue docshifterQueue, QueueMonitorRepository queueMonitorRepository) {
-		this.jmsTemplate = jmsTemplate;
-		this.messagingTemplate = messagingTemplate;
+	public AMQPSender(JmsTemplate defaultJmsTemplate, IJmsTemplateFactory jmsTemplateFactory,
+					  ActiveMQQueue docshifterQueue,
+					  QueueMonitorRepository queueMonitorRepository) {
+		this.defaultJmsTemplate = defaultJmsTemplate;
+		this.jmsTemplateFactory = jmsTemplateFactory;
 		this.docshifterQueue = docshifterQueue;
 		this.queueMonitorRepository = queueMonitorRepository;
 	}
@@ -97,10 +97,10 @@ public class AMQPSender implements IMessageSender {
 
 		log.info("Sending message: {} for file: {} using workflow {} ", message, task.getSourceFilePath(), chainConfiguration.getName());
 
+		JmsTemplate jmsTemplate = jmsTemplateFactory.create(taskPriority, taskTimeoutInMillis);
 		if (DocshifterMessageType.SYNC.equals(type)) {
+			JmsMessagingTemplate messagingTemplate = new JmsMessagingTemplate(jmsTemplate);
 			Object obj = messagingTemplate.convertSendAndReceive(queue, message, DocshifterMessage.class, messagePostProcessor -> {
-				messagingTemplate.getJmsTemplate().setPriority(taskPriority);
-				messagingTemplate.getJmsTemplate().setReceiveTimeout(taskTimeoutInMillis);
 				log.debug("'messagingTemplate.convertSendAndReceive': message.task type=" + message.getTask().getClass().getSimpleName());
 				return messagePostProcessor;
 			});
@@ -114,7 +114,9 @@ public class AMQPSender implements IMessageSender {
 		}
 		else {
 			jmsTemplate.convertAndSend(queue, message, messagePostProcessor -> {
-				jmsTemplate.setPriority(taskPriority);
+				// Async task, so makes no sense to set this to the timeout of the workflow. Just use the globally
+				// configured queue timeout (or 300ms by default).
+				jmsTemplate.setReceiveTimeout(defaultJmsTemplate.getReceiveTimeout());
 				log.debug("'jmsTemplate.convertAndSend': message.task type={}", message.getTask().getClass().getSimpleName());
 				return messagePostProcessor;
 			});
@@ -125,7 +127,7 @@ public class AMQPSender implements IMessageSender {
   @Override
   public int getMessageCount() {
 	  
-	  return this.jmsTemplate.browse(docshifterQueue.getName(), (session, browser) -> {
+	  return this.defaultJmsTemplate.browse(docshifterQueue.getName(), (session, browser) -> {
 		  int counter = 0;
 		  while (browser.getEnumeration().hasMoreElements()) {
 			  counter += 1;
