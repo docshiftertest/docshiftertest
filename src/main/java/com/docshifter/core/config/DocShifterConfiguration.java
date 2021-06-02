@@ -74,7 +74,7 @@ public class DocShifterConfiguration {
 		return connectionFactory;
 	}
 
-	@Bean(name = "cachingConnectionFactory")
+	@Bean
 	public CachingConnectionFactory cachingConnectionFactory() {
 		return new CachingConnectionFactory(activeMQConnectionFactory());
 	}
@@ -134,7 +134,7 @@ public class DocShifterConfiguration {
 	 * @param configurer The {@link DefaultJmsListenerContainerFactoryConfigurer} to be customized. 
 	 */
 	@Bean
-	public JmsListenerContainerFactory<?> topicListener(ConnectionFactory connectionFactory,
+	public JmsListenerContainerFactory<?> topicListener(@Qualifier("cachingConnectionFactory") ConnectionFactory connectionFactory,
 			DefaultJmsListenerContainerFactoryConfigurer configurer) {
 		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
 		configurer.configure(factory, connectionFactory);		
