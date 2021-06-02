@@ -6,12 +6,17 @@ import com.docshifter.core.config.services.GeneralConfigService;
 import com.docshifter.core.messaging.sender.AMQPSender;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
+import org.springframework.boot.availability.AvailabilityChangeEvent;
+import org.springframework.boot.availability.LivenessState;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
@@ -19,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
+import org.springframework.jms.config.SimpleJmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
@@ -30,6 +36,7 @@ import javax.jms.ConnectionFactory;
  */
 @Configuration
 @ComponentScan(basePackages = {"com.docshifter.core", "com.docshifter.core.monitoring"})
+@Log4j2
 public class DocShifterConfiguration {
 
 	@Value("${queue.replytimeout:300}")
@@ -39,12 +46,15 @@ public class DocShifterConfiguration {
 	
 	public ConfigurationService configurationService;
 
-	
+	private ApplicationContext appContext;
+
 	@Autowired
 	public DocShifterConfiguration(GeneralConfigService generalConfigService,
-			ConfigurationService configurationService) {
+								   ConfigurationService configurationService,
+								   ApplicationContext appContext) {
 		this.generalConfigService = generalConfigService;
 		this.configurationService = configurationService;
+		this.appContext = appContext;
 	}
 	
 	public DocShifterConfiguration () {
@@ -64,7 +74,7 @@ public class DocShifterConfiguration {
 		return connectionFactory;
 	}
 
-	@Bean
+	@Bean(name = "cachingConnectionFactory")
 	public CachingConnectionFactory cachingConnectionFactory() {
 		return new CachingConnectionFactory(activeMQConnectionFactory());
 	}
@@ -94,6 +104,26 @@ public class DocShifterConfiguration {
 		template.setPriority(AMQPSender.HIGHEST_PRIORITY);
 		template.setMessageTimestampEnabled(false);
 		return template;
+	}
+
+	@Bean
+	public JmsListenerContainerFactory<?> jmsListenerContainerFactory(@Qualifier("cachingConnectionFactory") ConnectionFactory connectionFactory) {
+		SimpleJmsListenerContainerFactory factory = new SimpleJmsListenerContainerFactory();
+		factory.setConnectionFactory(connectionFactory);
+		factory.setErrorHandler(t -> {
+			// Make sure we only freak out if we encounter confirmed unrecoverable errors, as some/most errors with
+			// the JMS connection might be perfectly recoverable
+
+			// This one arose sporadically in a NVS PROD environment (DPS-447)
+			if (t instanceof javax.jms.IllegalStateException && "Session is closed".equals(t.getMessage())) {
+				log.error("Caught an unrecoverable error related to the message queue, so setting the application " +
+						"state to broken!", t);
+				AvailabilityChangeEvent.publish(appContext, LivenessState.BROKEN);
+			} else {
+				log.warn("Not handling the following message queue error:", t);
+			}
+		});
+		return factory;
 	}
 	
 	/**
