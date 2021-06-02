@@ -120,7 +120,7 @@ public class DocShifterConfiguration {
 						"state to broken!", t);
 				AvailabilityChangeEvent.publish(appContext, LivenessState.BROKEN);
 			} else {
-				log.debug("Not handling the following message queue error:", t);
+				log.warn("Not handling the following message queue error:", t);
 			}
 		});
 		return factory;
