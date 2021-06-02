@@ -1,5 +1,6 @@
 package com.docshifter.core.messaging.queue.sender;
 
+import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
@@ -11,37 +12,32 @@ public interface IMessageSender {
 
 	/**
 	 * 
-	 * @param ChainConfigurationID the workflow configurationID
+	 * @param ChainConfiguration the workflow configuration
 	 * @param task                 The task that will be converted and sent to be
 	 *                             processed.
-	 * @param priority             Default (JMSPriority == 4) High (JMSPriority > 4
-	 *                             && <= 9) Low (JMSPriority > 0 && < 4)
 	 */
-	void sendTask(long ChainConfigurationID, Task task, int priority);
+	void sendTask(ChainConfiguration ChainConfiguration, Task task);
 
 	/**
-	 * 
-	 * @param ChainConfigurationID the workflow configurationID
-	 * @param task                 Documentum Task
-	 * @param priority             Default (JMSPriority == 4) High (JMSPriority > 4
-	 *                             && <= 9) Low (JMSPriority > 0 && < 4)
+	 *
+	 * @param ChainConfiguration the workflow configuration
+	 * @param task                 The task that will be converted and sent to be
+	 *                             processed.
 	 */
-	void sendDocumentumTask(long ChainConfigurationID, DctmTask task, int priority);
+	void sendDocumentumTask(ChainConfiguration ChainConfiguration, DctmTask task);
 
 	/**
-	 * 
-	 * @param ChainConfigurationID the workflow configurationID
-	 * @param task                 The Veeva task that will be converted and sent to
-	 *                             be processed.
-	 * @param priority             Default (JMSPriority == 4) High (JMSPriority > 4
-	 *                             && <= 9) Low (JMSPriority > 0 && < 4)
+	 *
+	 * @param ChainConfiguration the workflow configuration
+	 * @param task                 The VeevaTask that will be converted and sent to be
+	 *                             processed.
 	 */
-	void sendVeevaTask(long ChainConfigurationID, VeevaTask task, int priority);
+	void sendVeevaTask(ChainConfiguration ChainConfiguration, VeevaTask task);
 
-	void sendPrintTask(Task task, int priority);
+	void sendPrintTask(ChainConfiguration ChainConfiguration,Task task);
 
 	int getMessageCount() throws JMSException;
 
-	SyncTask sendSyncTask(long ChainConfigurationID, Task task);
+	SyncTask sendSyncTask(ChainConfiguration ChainConfiguration, Task task);
 
 }
