@@ -23,12 +23,21 @@ public class SecurityUtilsTest {
     public void isAlreadyEncrypted() {
         log.info("Running isAlreadyEncrypted...");
 
-        String message = "WzBZMDgGCSqGSIb3DQEFDDArBBTgb0i0adEOKHa4aaz8tGBajfRDBAICEAACASAwDAYIKoZIhvcNAgoFADAdBglghkgBZQMEASoEEADU+dk1C+rh6E+Sl9GJajKYCZc6s4OxW82hX56kjfX3dkJpb7SnfXdPhhPKk8oKlXN8LwrjrsXh2cBpyBTCib4=";
+        String message = "stoopidEncryptor";
 
+        log.info("Message to be encrypted {} ", message);
+        // I can't pass the message already encrypted due different JVM and that will make encryptor to fail if we build in CB
         String encryptedMessage = SecurityUtils.encryptMessage(message, SecurityProperties.DEFAULT_ALGORITHM.getValue(),
                 SecurityProperties.SECRET.getValue(), this);
 
-        Assert.assertEquals(message, encryptedMessage);
+        log.info("Encrypted message {} ", encryptedMessage);
+
+        String doubleEncryptedMessage = SecurityUtils.encryptMessage(encryptedMessage, SecurityProperties.DEFAULT_ALGORITHM.getValue(),
+                SecurityProperties.SECRET.getValue(), this);
+
+        log.info("Message after going through encryptMessage again....{}", doubleEncryptedMessage);
+
+        Assert.assertEquals(encryptedMessage, doubleEncryptedMessage);
     }
 
     /**
