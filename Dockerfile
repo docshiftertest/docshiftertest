@@ -9,7 +9,7 @@ LABEL maintainer="DocShifter, support@docshifter.com"
 
 ARG DEPENDENCY
 
-RUN groupadd -r -g 999 docshifter && useradd -r -m -u 999 -g docshifter docshifter
+RUN groupadd -r -g 999 docshifter && useradd -r -u 999 -g docshifter docshifter
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libtcnative-1 \
