@@ -3,12 +3,10 @@ package com.docshifter.core.task;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
 import com.docshifter.core.work.WorkFolder;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "className")
 public class Task implements Serializable {
 
 	private static final long serialVersionUID = 4087826709318179760L;
@@ -17,21 +15,16 @@ public class Task implements Serializable {
 	protected String sourceFilePath;
 	protected String name;
 	protected String folderStructure;
-	protected ArrayList<String> messages = new ArrayList<>();
+	protected List<String> messages = new ArrayList<>();
 	protected Map<String, Object> data = new HashMap<>();
 
-	
 	public Task() {
 	}
-
 
 	public Task(String filePath, WorkFolder wf) {
 		this.sourceFilePath = filePath;
 		this.workFolder = wf;
 	}
-
-
-
 
 	public WorkFolder getWorkFolder() {
 		return workFolder;
@@ -55,7 +48,7 @@ public class Task implements Serializable {
 		this.folderStructure = folderStructure;
 	}
 
-	public ArrayList<String> getMessages() {
+	public List<String> getMessages() {
 		return messages;
 	}
 	public String addMessage(String message) {
