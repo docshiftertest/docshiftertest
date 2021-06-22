@@ -316,7 +316,7 @@
 			<version>${kubernetes-client.version}</version>
 		</dependency>
 
-		<!-- Needed for hacking the Producer/Creator metadata -->
+		<!-- Not sure where else pdfbox is brought in, but we do use it here and there -->
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox</artifactId>
