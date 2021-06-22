@@ -6,15 +6,14 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 
 public class DateDeserializer extends UntypedObjectDeserializer {
 	
-	private final DateFormat formatter = new ISO8601DateFormat();
+	private final DateFormat formatter = new StdDateFormat();
 	private final String dateRegex = "(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})([+-](\\d{2}):(\\d{2})|Z)";
 	
 	@Override
