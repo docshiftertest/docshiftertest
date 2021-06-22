@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.docshifter.core.security;
 
 import java.util.Map;
@@ -11,6 +8,8 @@ import org.hibernate.event.spi.PreCollectionUpdateEvent;
 import org.hibernate.event.spi.PreCollectionUpdateEventListener;
 import org.hibernate.event.spi.PreInsertEvent;
 import org.hibernate.event.spi.PreInsertEventListener;
+import org.hibernate.event.spi.PreLoadEvent;
+import org.hibernate.event.spi.PreLoadEventListener;
 import org.hibernate.event.spi.PreUpdateEvent;
 import org.hibernate.event.spi.PreUpdateEventListener;
 import org.springframework.stereotype.Component;
@@ -27,13 +26,11 @@ import com.docshifter.core.security.utils.SecurityUtils;
  */
 @Component
 public class EncryptionListener implements PreInsertEventListener, PostLoadEventListener, PreUpdateEventListener,
-		PreCollectionUpdateEventListener {
+		PreCollectionUpdateEventListener , PreLoadEventListener {
 
-	private static final long serialVersionUID = 4591477573110020801L;
+	private final FieldEncrypter fieldEncrypter;
 
-	private FieldEncrypter fieldEncrypter;
-
-	private FieldDecrypter fieldDecrypter;
+	private final FieldDecrypter fieldDecrypter;
 
 	public EncryptionListener(FieldEncrypter fieldEncrypter, FieldDecrypter fieldDecrypter) {
 		this.fieldEncrypter = fieldEncrypter;
@@ -42,6 +39,11 @@ public class EncryptionListener implements PreInsertEventListener, PostLoadEvent
 
 	@Override
 	public void onPostLoad(PostLoadEvent event) {
+		fieldDecrypter.decrypt(event.getEntity());
+	}
+
+	@Override
+	public void onPreLoad(PreLoadEvent event) {
 		fieldDecrypter.decrypt(event.getEntity());
 	}
 
