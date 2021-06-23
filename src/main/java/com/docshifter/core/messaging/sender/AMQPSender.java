@@ -91,7 +91,9 @@ public class AMQPSender implements IMessageSender {
 		int taskPriority = (int) task.getData().getOrDefault("priority", chainConfiguration.getPriority());
 
 		// Gets the sync webservices workflow timeout from webservice request
-		long taskTimeoutInSeconds = ((Integer) task.getData().getOrDefault("timeout", chainConfiguration.getTimeout())).longValue();
+		Integer wsTimeout = (Integer) task.getData().get("timeout");
+
+		long taskTimeoutInSeconds = wsTimeout != null ? (long) wsTimeout : chainConfiguration.getTimeout();
 
 		long taskTimeoutInMillis = TimeUnit.SECONDS.toMillis(taskTimeoutInSeconds);
 
