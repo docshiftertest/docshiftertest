@@ -3,106 +3,31 @@ package com.docshifter.core.config.wrapper;
 import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.repositories.ChainConfigurationRepository;
 import com.docshifter.core.config.entities.Node;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public abstract class NodeWrapper {
 
-	private Node node;
-	private ChainConfiguration chainConfiguration;
-	
-	private long configurationId;
-	private String queueName;
-	private String printerName;
-	private boolean configurationEnabled;
+    private Node node;
+    private ChainConfiguration chainConfiguration;
+    private ModuleWrapper moduleWrapper;
 
-	
-	private long timeout = 0;
-	private int priority=2;
-	
-	private ModuleWrapper moduleWrapper;
+    protected ChainConfigurationRepository chainConfigurationRepository;
 
-	protected ChainConfigurationRepository chainConfigurationRepository;
-	
-	public NodeWrapper(Node n, ChainConfigurationRepository chainConfigurationRepository){
-		this.node = n;
-		this.chainConfigurationRepository = chainConfigurationRepository;
+    public NodeWrapper(Node n, ChainConfigurationRepository chainConfigurationRepository) {
+        this.node = n;
+        this.chainConfigurationRepository = chainConfigurationRepository;
 
-		Node rootNode = n;
-		if(n!=null)
-		{
-			while(rootNode.getParentNode() != null)
-				rootNode = rootNode.getParentNode();
-		}
-		chainConfiguration = chainConfigurationRepository.findByRootNode(rootNode);
-		
-		this.configurationId = chainConfiguration.getId();
-		this.queueName = chainConfiguration.getQueueName();
-		this.printerName = chainConfiguration.getPrinterName();
-		this.configurationEnabled = chainConfiguration.isEnabled();
-		this.timeout = chainConfiguration.getTimeout();
-		this.priority = chainConfiguration.getPriority();
-
-		this.moduleWrapper = new ModuleWrapper(n.getModuleConfiguration());
-	}
-	
-	public NodeWrapper() {}
-
-	public Node getNode(){
-		return node;
-	}
-	
-	protected ChainConfiguration getChainConfiguration(){
-		return chainConfiguration;
-	}
-	
-	public long getID() {
-		return configurationId;
-	}
-
-	public void setId(long id) {
-		this.configurationId = id;
-	}
-
-	public String getQueueName() {
-		return queueName;
-	}
-
-	public void setQueueName(String queueName) {
-		this.queueName = queueName;
-	}
-
-	public String getPrinterName() {
-		return printerName;
-	}
-
-	public void setPrinterName(String printerName) {
-		this.printerName = printerName;
-	}
-
-	public boolean isEnabled() {
-		return configurationEnabled;
-	}
-
-	public void setEnabled(boolean enabled) {
-		this.configurationEnabled = enabled;
-	}
-	
-	public ModuleWrapper getModuleWrapper(){
-		return this.moduleWrapper;
-	}
-	
-	public long getTimeout() {
-		return timeout;
-	}
-	
-	public void setTimeout(long timeout) {
-		this.timeout = timeout;
-	}
-
-	public int getPriority() {
-		return priority;
-	}
-
-	public void setPriority(int priority) {
-		this.priority = priority;
-	}
+        Node rootNode = n;
+        if (n != null) {
+            while (rootNode.getParentNode() != null)
+                rootNode = rootNode.getParentNode();
+        }
+        chainConfiguration = chainConfigurationRepository.findByRootNode(rootNode);
+        this.moduleWrapper = new ModuleWrapper(n.getModuleConfiguration());
+    }
 }

@@ -161,8 +161,8 @@ public final class FileUtils {
 
     public static String shortenFileName(String filename){
         String newfilename = filename;
-        if (filename.length() > 40) {
-            newfilename = filename.substring(0, 40);
+        if (filename.length() > 256) {
+            newfilename = filename.substring(0, 256);
         }
         return newfilename;
     }
@@ -186,7 +186,6 @@ public final class FileUtils {
 		output = output.replace('<', '_');
 		output = output.replace('>', '_');
 		output = output.replace('|', '_');
-		output = output.replace(' ', '_');
 		output = output.replace("\t", "_");
 		output = output.replaceAll("(\\.{2,})","_");
 

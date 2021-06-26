@@ -1,5 +1,7 @@
 package com.docshifter.core.messaging.sender;
 
+import com.docshifter.core.config.entities.ChainConfiguration;
+import com.docshifter.core.config.services.IJmsTemplateFactory;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
@@ -23,25 +25,19 @@ import java.util.concurrent.TimeUnit;
 public class AMQPSender implements IMessageSender {
 
 	private final ActiveMQQueue docshifterQueue;
-	//private final QueueMonitorRepository queueMonitorRepository;
-	private final JmsTemplate jmsTemplate;
-	private final JmsMessagingTemplate messagingTemplate;
+	private final JmsTemplate defaultJmsTemplate;
+	private final IJmsTemplateFactory jmsTemplateFactory;
 
-	public static final int DEFAULT_PRIORITY = 4;
-	public static final int HIGHEST_PRIORITY = 9;
-	
-	public AMQPSender(JmsTemplate jmsTemplate, JmsMessagingTemplate messagingTemplate, ActiveMQQueue docshifterQueue) {
-		this.jmsTemplate = jmsTemplate;
-		this.messagingTemplate = messagingTemplate;
+	public AMQPSender(JmsTemplate defaultJmsTemplate, IJmsTemplateFactory jmsTemplateFactory,
+					  ActiveMQQueue docshifterQueue) {
+		this.defaultJmsTemplate = defaultJmsTemplate;
+		this.jmsTemplateFactory = jmsTemplateFactory;
 		this.docshifterQueue = docshifterQueue;
-		//this.queueMonitorRepository = queueMonitorRepository;
 	}
 
+	private SyncTask sendSyncTask(String queue, ChainConfiguration chainConfiguration, Task task) {
 
-	private SyncTask sendSyncTask(String queue, long chainConfigurationID, long timeout, Task task) {
-
-		Object response = sendTask(DocshifterMessageType.SYNC, queue, chainConfigurationID, task, HIGHEST_PRIORITY,
-				timeout);
+		Object response = sendTask(DocshifterMessageType.SYNC, queue, chainConfiguration, task);
 
 		if (response == null) {
 			//TODO: update to good exception message
@@ -70,8 +66,7 @@ public class AMQPSender implements IMessageSender {
 		}
 	}
 	
-	private Object sendTask(DocshifterMessageType type, String queue, long chainConfigurationID, Task task,
-							int priority, long timeout) {
+	private Object sendTask(DocshifterMessageType type, String queue, ChainConfiguration chainConfiguration, Task task) {
 		if (task == null) {
 			throw new NullPointerException("The task to send cannot be NULL!");
 		}
@@ -79,32 +74,30 @@ public class AMQPSender implements IMessageSender {
 		DocshifterMessage message = new DocshifterMessage(
 				type,
 				task,
-				chainConfigurationID);
+				chainConfiguration.getId());
 
 		log.debug("task.Id={}", task.getId());
 		log.debug("task.class={}", () -> task.getClass().getSimpleName());
 		log.debug("message.task.class={}", () -> message.getTask().getClass().getSimpleName());
 		log.debug("type={}", type.name());
-		log.debug("chainConfigID={}", chainConfigurationID);
+		log.debug("chainConfigID={}", chainConfiguration.getId());
 
-		log.info("Sending message: {} for file: {}", message, task.getSourceFilePath());
-		// String hostname = "localhost";
-		// try {
-		// 	hostname = InetAddress.getLocalHost().getHostName();
-		// }
-		// catch (UnknownHostException uncle) {
-		// 	logger.warn("Couldn't get hostname of the DocShifter machine, so will default to localhost (for queue_monitor)");
-		// }
-		//QueueMonitor qMon = new QueueMonitor(type.name(), queue, chainConfigurationID, task.getId(), task.getSourceFilePath(), priority, hostname);
-		//queueMonitorRepository.save(qMon);
+		// Try to get the priority from webservice request otherwise uses workflow priority
+		int taskPriority = (int) task.getData().getOrDefault("priority", chainConfiguration.getPriority());
 
+		// Gets the sync webservices workflow timeout from webservice request
+		Integer wsTimeout = (Integer) task.getData().get("timeout");
+
+		long taskTimeoutInSeconds = wsTimeout != null ? (long) wsTimeout : chainConfiguration.getTimeout();
+
+		long taskTimeoutInMillis = TimeUnit.SECONDS.toMillis(taskTimeoutInSeconds);
+
+		log.info("Sending message: {} for file: {} using workflow {} ", message, task.getSourceFilePath(), chainConfiguration.getName());
+
+		JmsTemplate jmsTemplate = jmsTemplateFactory.create(taskPriority, taskTimeoutInMillis);
 		if (DocshifterMessageType.SYNC.equals(type)) {
-			Object obj = messagingTemplate.convertSendAndReceive(queue,message,DocshifterMessage.class, messagePostProcessor -> {
-				messagingTemplate.getJmsTemplate().setPriority(HIGHEST_PRIORITY);
-				long timeoutInMs = timeout > 0 ? TimeUnit.SECONDS.toMillis(timeout) : JmsDestinationAccessor.RECEIVE_TIMEOUT_INDEFINITE_WAIT;
-				log.debug("Message receive timeout was {}, setting it to {}",
-						messagingTemplate.getJmsTemplate().getReceiveTimeout(), timeoutInMs);
-				messagingTemplate.getJmsTemplate().setReceiveTimeout(timeoutInMs);
+			JmsMessagingTemplate messagingTemplate = new JmsMessagingTemplate(jmsTemplate);
+			Object obj = messagingTemplate.convertSendAndReceive(queue, message, DocshifterMessage.class, messagePostProcessor -> {
 				log.debug("'messagingTemplate.convertSendAndReceive': message.task type={}",
 						() -> message.getTask().getClass().getSimpleName());
 				return messagePostProcessor;
@@ -115,9 +108,9 @@ public class AMQPSender implements IMessageSender {
 				log.debug("return on jms 'convertSendAndReceive': obj is NULL!");
 			}
 			return obj;
-		} else {
+		}
+		else {
 			jmsTemplate.convertAndSend(queue, message, messagePostProcessor -> {
-				jmsTemplate.setPriority(priority);
 				log.debug("'jmsTemplate.convertAndSend': message.task type={}",
 						() -> message.getTask().getClass().getSimpleName());
 				return messagePostProcessor;
@@ -129,7 +122,7 @@ public class AMQPSender implements IMessageSender {
   @Override
   public int getMessageCount() {
 	  
-	  return this.jmsTemplate.browse(docshifterQueue.getName(), (session, browser) -> {
+	  return this.defaultJmsTemplate.browse(docshifterQueue.getName(), (session, browser) -> {
 		  int counter = 0;
 		  while (browser.getEnumeration().hasMoreElements()) {
 			  counter += 1;
@@ -139,27 +132,27 @@ public class AMQPSender implements IMessageSender {
 	}
 
 	@Override
-	public void sendTask(long chainConfigurationID, Task task, int priority)  {
-		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfigurationID, task, priority, 0);
+	public void sendTask(ChainConfiguration chainConfiguration, Task task)  {
+		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfiguration, task);
 	}
 
 	@Override
-	public void sendDocumentumTask(long chainConfigurationID, DctmTask task, int priority)  {
-		sendTask(DocshifterMessageType.DCTM, docshifterQueue.getName(), chainConfigurationID, task, priority, 0);
+	public void sendDocumentumTask(ChainConfiguration chainConfiguration, DctmTask task)  {
+		sendTask(DocshifterMessageType.DCTM, docshifterQueue.getName(), chainConfiguration, task);
 	}
 
 	@Override
-	public void sendVeevaTask(long chainConfigurationID,VeevaTask task, int priority) {
-		sendTask(DocshifterMessageType.VEEVA, docshifterQueue.getName(), chainConfigurationID, task, priority, 0);
+	public void sendVeevaTask(ChainConfiguration chainConfiguration,VeevaTask task) {
+		sendTask(DocshifterMessageType.VEEVA, docshifterQueue.getName(), chainConfiguration, task);
 	}
 
 	@Override
-	public void sendPrintTask(Task task, int priority)  {
-		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), 0, task, priority, 0);
+	public void sendPrintTask(ChainConfiguration chainConfiguration,Task task)  {
+		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfiguration, task);
 	}
 	
 	@Override
-	public SyncTask sendSyncTask(long chainConfigurationID, long timeout, Task task) {
-		return sendSyncTask(docshifterQueue.getName(), chainConfigurationID, timeout, task);
+	public SyncTask sendSyncTask(ChainConfiguration chainConfiguration, Task task) {
+		return sendSyncTask(docshifterQueue.getName(), chainConfiguration, task);
 	}
 }

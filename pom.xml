@@ -14,49 +14,49 @@
 	</parent>
 
 	<properties>
-		<revision>6.4.3</revision>
+		<revision>6.4.4</revision>
 		<sha1 />
 		<hsqldb.version>2.3.4</hsqldb.version>
 
-		<aspose.cad.version>20.12</aspose.cad.version>
+		<aspose.cad.version>21.2</aspose.cad.version>
 		<!-- Despite the fact Aspose show a classifier, it's apparently not needed -->
 		<!-- SIGHS -->
 		<!-- aspose.cad.classifier>jdk16</aspose.cad.classifier -->
 
-		<aspose.cells.version>21.3</aspose.cells.version>
+		<aspose.cells.version>21.6</aspose.cells.version>
 
-		<aspose.diagram.version>21.1</aspose.diagram.version>
+		<aspose.diagram.version>21.6</aspose.diagram.version>
 		<aspose.diagram.classifier>jdk16</aspose.diagram.classifier>
 
-		<aspose.email.version>21.2</aspose.email.version>
+		<aspose.email.version>21.5</aspose.email.version>
 		<aspose.email.classifier>jdk16</aspose.email.classifier>
 
-		<aspose.imaging.version>21.3</aspose.imaging.version>
+		<aspose.imaging.version>21.6</aspose.imaging.version>
 		<aspose.imaging.classifier>jdk16</aspose.imaging.classifier>
 
 		<!-- This is not used at the moment but we try to keep it up-to-date
-        <aspose.note.version>20.11</aspose.note.version>
+        <aspose.note.version>21.5</aspose.note.version>
         <aspose.note.classifier>jdk17</aspose.note.classifier>
         -->
 
-<!--		<aspose.ocr.version>20.11</aspose.ocr.version>-->
+<!--		<aspose.ocr.version>21.5</aspose.ocr.version>-->
 
-		<aspose.pdf.version>21.3</aspose.pdf.version>
+		<aspose.pdf.version>21.6</aspose.pdf.version>
 		<aspose.pdf.classifier>jdk17</aspose.pdf.classifier>
 
-		<aspose.slides.version>21.3</aspose.slides.version>
+		<aspose.slides.version>21.6</aspose.slides.version>
 		<aspose.slides.classifier>jdk16</aspose.slides.classifier>
 
-		<aspose.tasks.version>20.12</aspose.tasks.version>
+		<aspose.tasks.version>21.6</aspose.tasks.version>
 		<aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
 
-		<aspose.words.version>21.3</aspose.words.version>
+		<aspose.words.version>21.6</aspose.words.version>
 		<aspose.words.classifier>jdk17</aspose.words.classifier>
 
-		<aspose.html.version>20.12</aspose.html.version>
+		<aspose.html.version>21.5</aspose.html.version>
 		<!-- Despite fact Aspose claim a classifier is not needed, apparently it is -->
 		<!-- SIGHS again -->
-		<aspose.html.classifier>jdk16</aspose.html.classifier>
+		<aspose.html.classifier>jdk1.8</aspose.html.classifier>
 
 		<kubernetes-client.version>5.3.0</kubernetes-client.version>
 
@@ -258,9 +258,14 @@
 		<dependency>
 			<groupId>com.microsoft.graph</groupId>
 			<artifactId>microsoft-graph</artifactId>
-			<version>3.1.0</version>
+			<version>3.9.0</version>
 		</dependency>
-
+		<!-- This dependency is only needed if you are using the TokenCrendentialAuthProvider -->
+		<dependency>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-identity</artifactId>
+			<version>1.2.3</version>
+		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
@@ -309,6 +314,18 @@
 			<groupId>io.fabric8</groupId>
 			<artifactId>kubernetes-client</artifactId>
 			<version>${kubernetes-client.version}</version>
+		</dependency>
+
+		<!-- Not sure where else pdfbox is brought in, but we do use it here and there -->
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>2.0.24</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>fontbox</artifactId>
+			<version>2.0.24</version>
 		</dependency>
 
 	</dependencies>

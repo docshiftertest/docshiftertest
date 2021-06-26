@@ -1,11 +1,8 @@
 package com.docshifter.core.task;
 
 import com.docshifter.core.work.WorkFolder;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.io.Serializable;
 
-/***/
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "className")
 public class VeevaTask extends Task implements Serializable {
 
 	private static final long serialVersionUID = -2850556403171817586L;
@@ -16,7 +13,6 @@ public class VeevaTask extends Task implements Serializable {
 
 	public VeevaTask() {
 	}
-
 
 	public VeevaTask(String binder_id, String item_id, WorkFolder wf) {
 		this.task_id = binder_id;

@@ -1,24 +1,22 @@
 package com.docshifter.core.security.utils;
 
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
-import org.jasypt.salt.RandomSaltGenerator;
-
 import com.docshifter.core.config.entities.Parameter;
 import com.ulisesbocchio.jasyptspringboot.encryptor.SimplePBEByteEncryptor;
 import com.ulisesbocchio.jasyptspringboot.encryptor.SimplePBEStringEncryptor;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang.StringUtils;
+import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
+import org.jasypt.salt.RandomSaltGenerator;
+
+import java.util.Map;
 
 /**
  * Utility to encrypt / decrypt messages.
  * 
  * @author Created by juan.marques on 04/12/2019.
  */
+@Log4j2
 public class SecurityUtils {
-
-	private static final Logger logger = Logger.getLogger(SecurityUtils.class);
 
 	/**
 	 * Utility to decrypt message. If no algorithm is provided will be applied the
@@ -39,12 +37,12 @@ public class SecurityUtils {
 
 		SimplePBEStringEncryptor decrypt = new SimplePBEStringEncryptor(delegate);
 
-		String decryptedMessage = null;
+		String decryptedMessage;
 
 		if (StringUtils.isNotEmpty(algorithm)) {
 			delegate.setAlgorithm(algorithm);
 		} else {
-			logger.debug("Using the default algorithm...");
+			log.debug("Using the default algorithm...");
 			delegate.setAlgorithm(SecurityProperties.DEFAULT_ALGORITHM.getValue());
 		}
 
@@ -52,24 +50,24 @@ public class SecurityUtils {
 			delegate.setPassword(secret);
 		} else {
 			// Get the vm given secret
-			logger.debug("Getting vm argument to start the decryption...");
+			log.debug("Getting vm argument to start the decryption...");
 			delegate.setPassword(System.getProperty(SecurityProperties.JASYPT_VM_ARGUMENT.getValue()));
 		}
 
 		try {
-			logger.debug("Starting decryption for " + logClass);
+			log.debug("Starting decryption for {} " ,logClass);
 			decryptedMessage = decrypt.decrypt(encryptedMessage);
 
 		} catch (Exception e) {
 			if (e instanceof EncryptionOperationNotPossibleException || e instanceof IllegalArgumentException || e instanceof NegativeArraySizeException) {
-				logger.debug("The password is in plain text...: " + e);
+				log.debug("The password is in plain text...: ", e);
 				decryptedMessage = encryptedMessage;
 			} else {
-				logger.info(e);
+				log.error(e);
 				throw new EncryptionOperationNotPossibleException("Occurred an error trying to decrypt " + logClass);
 			}
 		}
-		logger.debug("Decryption completed for " + logClass);
+		log.debug("Decryption completed for {} " , logClass);
 		return decryptedMessage;
 	}
 
@@ -93,12 +91,14 @@ public class SecurityUtils {
 		delegate.setSaltGenerator(new RandomSaltGenerator());
 		delegate.setIterations(1000);
 
-		String encryptedMessage = null;
+		boolean isAlreadyEncrypted = !decryptMessage(message, algorithm, secret, logClass).equals(message);
+
+		String encryptedMessage;
 
 		if (StringUtils.isNotEmpty(algorithm)) {
 			delegate.setAlgorithm(algorithm);
 		} else {
-			logger.debug("Using the default algorithm...");
+			log.debug("Using the default algorithm...");
 			delegate.setAlgorithm(SecurityProperties.DEFAULT_ALGORITHM.getValue());
 		}
 
@@ -106,19 +106,25 @@ public class SecurityUtils {
 			delegate.setPassword(secret);
 		} else {
 			// Get the vm given secret
-			logger.debug("Getting vm argument to start the decryption...");
+			log.debug("Getting vm argument to start the decryption...");
 			delegate.setPassword(System.getProperty(SecurityProperties.JASYPT_VM_ARGUMENT.getValue()));
 		}
 
 		try {
-			logger.debug("Starting encryption for " + logClass);
-			encryptedMessage = encrypt.encrypt(message);
+			log.debug("Starting encryption for {} ",logClass);
+			if (!isAlreadyEncrypted) {
+				encryptedMessage = encrypt.encrypt(message);
+			}
+			else {
+				log.debug("Message is already encrypted...");
+				encryptedMessage = message;
+			}
 		} catch (Exception e) {
-			logger.info(e);
+			log.error(e);
 			throw new EncryptionOperationNotPossibleException("Occurred an error trying to encrypt " + logClass);
 		}
 
-		logger.debug("Encryption completed for " + logClass);
+		log.debug("Encryption completed for {} ", logClass);
 
 		return encryptedMessage;
 
@@ -136,10 +142,8 @@ public class SecurityUtils {
 	public static <T> void readParametersThenEncrypt(Map<Parameter, String> param, String type, T logClass) {
 
 		if (param != null) {
-			param.entrySet().stream().filter(p -> p.getKey().getType().equalsIgnoreCase(type)).forEach((entry) -> {
-				entry.setValue(encryptMessage(entry.getValue(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
-						SecurityProperties.SECRET.getValue(), logClass));
-			});
+			param.entrySet().stream().filter(p -> p.getKey().getType().equalsIgnoreCase(type)).forEach(entry -> entry.setValue(encryptMessage(entry.getValue(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
+					SecurityProperties.SECRET.getValue(), logClass)));
 		}
 	}
 
@@ -153,13 +157,11 @@ public class SecurityUtils {
 	 * @param logClass the class to be logged.
 	 */
 	public static <T> void readParametersThenDecrypt(Map<Parameter, String> param, String type,
-			Class<? extends Object> logClass) {
+			Class<?> logClass) {
 
 		if (param != null) {
-			param.entrySet().stream().filter(p -> p.getKey().getType().equalsIgnoreCase(type)).forEach((entry) -> {
-				entry.setValue(decryptMessage(entry.getValue(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
-						SecurityProperties.SECRET.getValue(), logClass));
-			});
+			param.entrySet().stream().filter(p -> p.getKey().getType().equalsIgnoreCase(type)).forEach(entry -> entry.setValue(decryptMessage(entry.getValue(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
+					SecurityProperties.SECRET.getValue(), logClass)));
 		}
 	}
 }
