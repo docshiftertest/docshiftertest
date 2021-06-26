@@ -1,32 +1,35 @@
 package com.docshifter.core.config.services;
 
-import com.docshifter.core.config.conditions.IsInAnyContainerCondition;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.availability.AvailabilityChangeEvent;
 import org.springframework.boot.availability.LivenessState;
 import org.springframework.boot.availability.ReadinessState;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
  * Exports application availability events (liveness and readiness) as files. It is then very useful to monitor
- * the existence of these files within a container environment.
+ * the existence of these files.
  * @see <a href="https://docs.spring.io/spring-boot/docs/2.4.1/reference/html/spring-boot-features.html#boot-features-application-availability-managing">https://docs.spring.io/spring-boot/docs/2.4.1/reference/html/spring-boot-features.html#boot-features-application-availability-managing</a>
  */
 @Component
-@Conditional(IsInAnyContainerCondition.class)
+@ConditionalOnProperty(prefix = "applicationState", name = "exportPath")
 @Log4j2
 public class ApplicationStateExporter {
 
-	// TODO: allow this to be configurable through @Value instead of a hardcoded path so it can be enabled for a
-	//  classical installation of DocShifter as well?
-	private static final String BASE_PATH = "/opt/DocShifter/";
-	private static final File readyFile = new File(BASE_PATH + "ready");
-	private static final File healthyFile = new File(BASE_PATH + "healthy");
+	private final File readyFile;
+	private final File healthyFile;
+
+	public ApplicationStateExporter(@Value("${applicationState.exportPath}") String exportPath) {
+		readyFile = Paths.get(exportPath, "ready").toFile();
+		healthyFile = Paths.get(exportPath, "healthy").toFile();
+	}
 
 	@EventListener
 	public void onReadinessStateChange(AvailabilityChangeEvent<ReadinessState> event) throws IOException {

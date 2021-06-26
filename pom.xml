@@ -335,7 +335,7 @@
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
-					<finalName>docshifter-beans-${project.version}</finalName>
+					<finalName>docshifter-beans</finalName>
 					<outputDirectory>${project.build.directory}/jars/</outputDirectory>
 				</configuration>
 			</plugin>

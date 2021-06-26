@@ -1,7 +1,6 @@
 package com.docshifter.core.messaging.sender;
 
 import com.docshifter.core.config.entities.ChainConfiguration;
-import com.docshifter.core.config.repositories.QueueMonitorRepository;
 import com.docshifter.core.config.services.IJmsTemplateFactory;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
@@ -25,17 +24,16 @@ import java.util.concurrent.TimeUnit;
 public class AMQPSender implements IMessageSender {
 
 	private final ActiveMQQueue docshifterQueue;
-	private final QueueMonitorRepository queueMonitorRepository;
 	private final JmsTemplate defaultJmsTemplate;
 	private final IJmsTemplateFactory jmsTemplateFactory;
-	
+	private final int queueReplyTimeout;
+
 	public AMQPSender(JmsTemplate defaultJmsTemplate, IJmsTemplateFactory jmsTemplateFactory,
-					  ActiveMQQueue docshifterQueue,
-					  QueueMonitorRepository queueMonitorRepository) {
+					  ActiveMQQueue docshifterQueue, int queueReplyTimeout) {
 		this.defaultJmsTemplate = defaultJmsTemplate;
 		this.jmsTemplateFactory = jmsTemplateFactory;
 		this.docshifterQueue = docshifterQueue;
-		this.queueMonitorRepository = queueMonitorRepository;
+		this.queueReplyTimeout = queueReplyTimeout;
 	}
 
 	private SyncTask sendSyncTask(String queue, ChainConfiguration chainConfiguration, Task task) {
@@ -70,53 +68,62 @@ public class AMQPSender implements IMessageSender {
 	}
 	
 	private Object sendTask(DocshifterMessageType type, String queue, ChainConfiguration chainConfiguration, Task task) {
+		if (task == null) {
+			throw new IllegalArgumentException("The task to send cannot be NULL!");
+		}
+
 		DocshifterMessage message = new DocshifterMessage(
 				type,
 				task,
 				chainConfiguration.getId());
-		
-		if (task == null) {
-			log.debug("task=NULL ERROR");
-		}
 
-		else {
-			log.debug("task.Id={}", task.getId());
-			log.debug("task.class={}", task.getClass().getSimpleName());
-			log.debug("message.task.class={}", message.getTask().getClass().getSimpleName());
-		}
+		log.debug("task.Id={}", task.getId());
+		log.debug("task.class={}", () -> task.getClass().getSimpleName());
+		log.debug("message.task.class={}", () -> message.getTask().getClass().getSimpleName());
 		log.debug("type={}", type.name());
 		log.debug("chainConfigID={}", chainConfiguration.getId());
 
 		// Try to get the priority from webservice request otherwise uses workflow priority
 		int taskPriority = (int) task.getData().getOrDefault("priority", chainConfiguration.getPriority());
 
-		// Gets the sync webservices workflow timeout from webservice request
+		// Use the provided timeout value if explicitly specified on the task data, otherwise use the configured
+		// queue reply timeout
 		Integer wsTimeout = (Integer) task.getData().get("timeout");
 
-		long taskTimeoutInSeconds = wsTimeout != null ? (long) wsTimeout : chainConfiguration.getTimeout();
+		long taskTimeoutInMillis;
+		if (wsTimeout != null) {
+			taskTimeoutInMillis = wsTimeout;
+		} else {
+			taskTimeoutInMillis = queueReplyTimeout;
+			if (DocshifterMessageType.SYNC.equals(type)) {
+				// On a sync task we only get a reply after task completion, so increase the timeout by the value set
+				// on the workflow
+				taskTimeoutInMillis += TimeUnit.SECONDS.toMillis(chainConfiguration.getTimeout());
+			}
+		}
 
-		long taskTimeoutInMillis = TimeUnit.SECONDS.toMillis(taskTimeoutInSeconds);
-
-		log.info("Sending message: {} for file: {} using workflow {} ", message, task.getSourceFilePath(), chainConfiguration.getName());
+		log.info("Sending message: {} (priority = {}, timeout = {} ms) for file: {} using workflow {}", message,
+				taskPriority, taskTimeoutInMillis, task.getSourceFilePath(), chainConfiguration.getName());
 
 		JmsTemplate jmsTemplate = jmsTemplateFactory.create(taskPriority, taskTimeoutInMillis);
 		if (DocshifterMessageType.SYNC.equals(type)) {
 			JmsMessagingTemplate messagingTemplate = new JmsMessagingTemplate(jmsTemplate);
 			Object obj = messagingTemplate.convertSendAndReceive(queue, message, DocshifterMessage.class, messagePostProcessor -> {
-				log.debug("'messagingTemplate.convertSendAndReceive': message.task type=" + message.getTask().getClass().getSimpleName());
+				log.debug("'messagingTemplate.convertSendAndReceive': message.task type={}",
+						() -> message.getTask().getClass().getSimpleName());
 				return messagePostProcessor;
 			});
 			if (obj != null) {
-				log.debug("return on jms 'convertSendAndReceive': obj type {}", obj.getClass().getSimpleName());
-			}
-			else {
-				log.debug("return on jms 'convertSendAndReceive': obj is null");
+				log.debug("return on jms 'convertSendAndReceive': obj type={}", () -> obj.getClass().getSimpleName());
+			} else {
+				log.debug("return on jms 'convertSendAndReceive': obj is NULL!");
 			}
 			return obj;
 		}
 		else {
 			jmsTemplate.convertAndSend(queue, message, messagePostProcessor -> {
-				log.debug("'jmsTemplate.convertAndSend': message.task type={}", message.getTask().getClass().getSimpleName());
+				log.debug("'jmsTemplate.convertAndSend': message.task type={}",
+						() -> message.getTask().getClass().getSimpleName());
 				return messagePostProcessor;
 			});
 			return null;
