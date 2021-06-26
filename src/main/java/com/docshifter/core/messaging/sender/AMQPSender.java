@@ -69,7 +69,7 @@ public class AMQPSender implements IMessageSender {
 	
 	private Object sendTask(DocshifterMessageType type, String queue, ChainConfiguration chainConfiguration, Task task) {
 		if (task == null) {
-			throw new NullPointerException("The task to send cannot be NULL!");
+			throw new IllegalArgumentException("The task to send cannot be NULL!");
 		}
 
 		DocshifterMessage message = new DocshifterMessage(
