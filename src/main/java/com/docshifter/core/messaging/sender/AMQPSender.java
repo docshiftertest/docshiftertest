@@ -13,7 +13,6 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.support.destination.JmsDestinationAccessor;
 
 import java.util.concurrent.TimeUnit;
 
@@ -27,12 +26,14 @@ public class AMQPSender implements IMessageSender {
 	private final ActiveMQQueue docshifterQueue;
 	private final JmsTemplate defaultJmsTemplate;
 	private final IJmsTemplateFactory jmsTemplateFactory;
+	private final int queueReplyTimeout;
 
 	public AMQPSender(JmsTemplate defaultJmsTemplate, IJmsTemplateFactory jmsTemplateFactory,
-					  ActiveMQQueue docshifterQueue) {
+					  ActiveMQQueue docshifterQueue, int queueReplyTimeout) {
 		this.defaultJmsTemplate = defaultJmsTemplate;
 		this.jmsTemplateFactory = jmsTemplateFactory;
 		this.docshifterQueue = docshifterQueue;
+		this.queueReplyTimeout = queueReplyTimeout;
 	}
 
 	private SyncTask sendSyncTask(String queue, ChainConfiguration chainConfiguration, Task task) {
@@ -85,14 +86,24 @@ public class AMQPSender implements IMessageSender {
 		// Try to get the priority from webservice request otherwise uses workflow priority
 		int taskPriority = (int) task.getData().getOrDefault("priority", chainConfiguration.getPriority());
 
-		// Gets the sync webservices workflow timeout from webservice request
+		// Use the provided timeout value if explicitly specified on the task data, otherwise use the configured
+		// queue reply timeout
 		Integer wsTimeout = (Integer) task.getData().get("timeout");
 
-		long taskTimeoutInSeconds = wsTimeout != null ? (long) wsTimeout : chainConfiguration.getTimeout();
+		long taskTimeoutInMillis;
+		if (wsTimeout != null) {
+			taskTimeoutInMillis = wsTimeout;
+		} else {
+			taskTimeoutInMillis = queueReplyTimeout;
+			if (DocshifterMessageType.SYNC.equals(type)) {
+				// On a sync task we only get a reply after task completion, so increase the timeout by the value set
+				// on the workflow
+				taskTimeoutInMillis += TimeUnit.SECONDS.toMillis(chainConfiguration.getTimeout());
+			}
+		}
 
-		long taskTimeoutInMillis = TimeUnit.SECONDS.toMillis(taskTimeoutInSeconds);
-
-		log.info("Sending message: {} for file: {} using workflow {} ", message, task.getSourceFilePath(), chainConfiguration.getName());
+		log.info("Sending message: {} (priority = {}, timeout = {} ms) for file: {} using workflow {}", message,
+				taskPriority, taskTimeoutInMillis, task.getSourceFilePath(), chainConfiguration.getName());
 
 		JmsTemplate jmsTemplate = jmsTemplateFactory.create(taskPriority, taskTimeoutInMillis);
 		if (DocshifterMessageType.SYNC.equals(type)) {
