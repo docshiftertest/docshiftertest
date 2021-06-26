@@ -39,7 +39,7 @@ public class HealthMonitorService {
 				break;
 			case BROKEN:
 				if (runningFuture != null) {
-					runningFuture.cancel(false);
+					return;
 				}
 				log.warn("Application is BROKEN! It will terminate after {} seconds.", exitSeconds);
 				runningFuture = executorService.schedule(() -> {
