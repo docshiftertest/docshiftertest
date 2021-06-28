@@ -28,12 +28,22 @@ public class Requests{
 	public static VeevaResponse getQuery(String sessionId, String host, String apiVersion, String query) throws Exception {
 
 		String urlStr = "https://" + host + "/api/" + apiVersion + "/query";
+		log.debug("Using urlStr: {}", urlStr);
 		URL url = new URL(urlStr);
 
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("q", query);
+		log.debug("Query is: {}", query);
 		StringBuilder postData = new StringBuilder();
 		for (Map.Entry<String, Object> param : params.entrySet()) {
+			if ("password".equalsIgnoreCase(param.getKey())) {
+				log.debug("Param Key: {}, Value length: {}",
+						param.getKey(), (param.getValue() == null) ? "NULL!" : String.valueOf(param.getValue()).length());
+			}
+			else {
+				log.debug("Param Key: {}, Value: {}",
+						param.getKey(), param.getValue());
+			}
 			if (postData.length() != 0) {
 				postData.append('&');
 			}
@@ -45,6 +55,7 @@ public class Requests{
 
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("POST");
+		log.debug("Using Session Id: {}...", sessionId.substring(0, 10));
 		con.setRequestProperty("Authorization", sessionId);
 		con.setRequestProperty("accept", "*/*");
 		con.setDoOutput(true);

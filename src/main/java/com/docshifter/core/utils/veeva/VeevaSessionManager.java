@@ -64,10 +64,12 @@ public class VeevaSessionManager implements ISessionManager<VeevaSession> {
 		
 		Map<String,Object> params = new LinkedHashMap<>();
 		params.put("username", user);
+		log.debug("Using username: {} and password with length: {}",
+				user, (pass == null) ? "NULL!" : pass.length());
 		params.put("password", pass);
 		StringBuilder postData = new StringBuilder();
 		for (Map.Entry<String,Object> param : params.entrySet()) {
-			if (postData.length() != 0) { 
+			if (postData.length() != 0) {
 					postData.append('&');
 			}
 			postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
