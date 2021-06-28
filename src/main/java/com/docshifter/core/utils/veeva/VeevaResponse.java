@@ -17,7 +17,6 @@ import java.util.Map;
 
 @Log4j2
 public class VeevaResponse {
-	private static final String NEWLINE = System.getProperty("line.separator");
 	private static final String SUCCESS = "SUCCESS";
 	public static final String CONTENT_TYPE = "Content-Type";
 	public static final String APP_JSON = "application/json";
@@ -64,12 +63,10 @@ public class VeevaResponse {
 						dumpHeaders(headers));
 			}
 			else {
-				if (StringUtils.isBlank(contentTypes.get(0))) {
+				contentType = contentTypes.get(0);
+				if (StringUtils.isBlank(contentType)) {
 					log.error("Headers from Veeva returned a blank Content-Type! Headers received: {}",
 							dumpHeaders(headers));
-				}
-				else {
-					contentType = contentTypes.get(0);
 				}
 			}
 		}
@@ -84,6 +81,7 @@ public class VeevaResponse {
 		String content;
 		// Deal with application/json type of response
 		if (contentType.toLowerCase().startsWith(APP_JSON)) {
+			log.debug("Content-Type is APP_JSON...");
 			try {
 				content = new String(contentBody, charset);
 			}
@@ -93,12 +91,14 @@ public class VeevaResponse {
 				content = new String(contentBody);
 			}
 			if (SUCCESS.equals(VeevaResponse.getResponseStatus(content))) {
+				log.debug("Got SUCCESS!");
 				veevaResponse.setHeaders(headers);
 				return veevaResponse;
 			}
 		}
 		else {
 			if (contentType.toLowerCase().startsWith(APP_BINARY)) {
+				log.debug("Content-Type is APP_BINARY...");
 				veevaResponse.setHeaders(headers);
 				return veevaResponse;
 			}
@@ -138,6 +138,12 @@ public class VeevaResponse {
 			log.debug("getLoginResult() FAILED!");
 			result = readFailure(responseData);
 		}
+		if (result == null) {
+			log.warn("Result was NULL!");
+		}
+		else {
+			log.debug("Result was: {}", result);
+		}
 		return result;
 	}
 
@@ -147,6 +153,7 @@ public class VeevaResponse {
 	}
 
 	private static VeevaLoginSuccess readSuccess(String responseData) {
+		log.debug("Starting readSuccess({})", responseData);
 		VeevaLoginSuccess result = null;
 		ObjectMapper mapper = new ObjectMapper();
 		try {
@@ -168,6 +175,7 @@ public class VeevaResponse {
 	}
 
 	private static VeevaBadResponse readFailure(String responseData) {
+		log.debug("Starting readFailure({})", responseData);
 		VeevaBadResponse result = null;
 		ObjectMapper mapper = new ObjectMapper();
 		try {
@@ -202,8 +210,11 @@ public class VeevaResponse {
 	 */
 	public static String checkResponse(VeevaResponse veevaResponse, String sessionId, String host, String apiVersion,
                                        String veevaUser, String veevaPass) throws Exception {
+		log.debug("Into checkResponse...with Veeva Response: {}, Veeva User: {} and Veeva Password length: {}",
+				veevaResponse, veevaUser, veevaPass.length());
 		String responseStatus = SUCCESS;
 		if (veevaResponse instanceof VeevaBadResponse) {
+			log.debug("It's a BAD Response, go stand in the corner!");
 			// See if we have an expired session id
 			VeevaBadResponse badResponse  = (VeevaBadResponse) veevaResponse;
 			if (badResponse.getErrors() != null &&
@@ -226,6 +237,8 @@ public class VeevaResponse {
 				}
 				else {
 					VeevaLoginSuccess goodResponse = readSuccess(responseStr);
+					log.debug("Returning goodResponse Session Id: {}...",
+							goodResponse.getSessionId().substring(0, 10));
 					return goodResponse.getSessionId();
 				}
 			}
@@ -233,6 +246,8 @@ public class VeevaResponse {
 				throw new Exception("Error when doing request, Response received:" + veevaResponse.toString());
 			}
 		}
+		log.debug("At end, returning Session Id: {}...",
+				sessionId.substring(0, 10));
 		return sessionId;
 	}
 
@@ -298,7 +313,7 @@ public class VeevaResponse {
 			if (values.size() > 0) {
 				sBuf.setLength(sBuf.length() - 2);
 			}
-			sBuf.append(NEWLINE);
+			sBuf.append(System.lineSeparator());
 		}
 		sBuf.append("}");
 		return sBuf.toString();
