@@ -61,19 +61,29 @@ public class MockLicensingService implements ILicensingService {
 		// === Bayer ===
 		keys.put("2ad776f1-d715-4f39-a74b-c007f62228f1", new License(
 				null,
+				1));
+
+		// === Lorenz ===
+		keys.put("22f37141-f6b1-4478-ae53-43ae15aae19a", new License(
+				new GregorianCalendar(2022, Calendar.MARCH, 31, 23, 59, 59).getTime(),
+				null));
+
+		// === Volksbank ===
+		keys.put("2beb15ee-8292-42b2-85f1-dab53d9f5255", new License(
+				new GregorianCalendar(2021, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
 				null));
 
 		// === SPARE CODES (PoCs, new customers,...) ===
 		keys.put("5f4f7686-e502-4a89-aa64-834f0220107e", new License(
 				new GregorianCalendar(2021, Calendar.JUNE, 30, 23, 59, 59).getTime(),
 				null));
-		keys.put("2beb15ee-8292-42b2-85f1-dab53d9f5255", new License(
+		keys.put("5a4da8c5-e7a8-43d9-934f-bad86f77e4d8", new License(
 				new GregorianCalendar(2021, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
 				null));
 		keys.put("11206e6e-694b-43c7-906c-209134d3fadc", new License(
 				new GregorianCalendar(2021, Calendar.DECEMBER, 31, 23,	59,	59).getTime(),
 				null));
-		keys.put("22f37141-f6b1-4478-ae53-43ae15aae19a", new License(
+		keys.put("b0c46468-8476-42ac-8304-6e19316ff938", new License(
 				new GregorianCalendar(2022, Calendar.MARCH, 31, 23, 59, 59).getTime(),
 				null));
 		keys.put("edd36cc0-9bf5-4c21-bf00-91e48f2e521d", new License(

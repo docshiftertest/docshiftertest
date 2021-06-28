@@ -5,7 +5,6 @@ import com.docshifter.core.config.services.ConfigurationService;
 import com.docshifter.core.config.services.GeneralConfigService;
 import com.docshifter.core.config.services.IJmsTemplateFactory;
 import com.docshifter.core.config.services.JmsTemplateFactory;
-import com.docshifter.core.messaging.sender.AMQPSender;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.extern.log4j.Log4j2;
