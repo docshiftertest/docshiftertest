@@ -47,7 +47,8 @@
 		<aspose.slides.version>21.6</aspose.slides.version>
 		<aspose.slides.classifier>jdk16</aspose.slides.classifier>
 
-		<aspose.tasks.version>21.6</aspose.tasks.version>
+		<!-- Kept back to20.12 because of hideous spamming of tmp by awful borked Asspose lib -->
+		<aspose.tasks.version>20.12</aspose.tasks.version>
 		<aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
 
 		<aspose.words.version>21.6</aspose.words.version>
