@@ -38,7 +38,7 @@ public class Requests{
 		for (Map.Entry<String, Object> param : params.entrySet()) {
 			if ("password".equalsIgnoreCase(param.getKey())) {
 				log.debug("Param Key: {}, Value length: {}",
-						param.getKey(), String.valueOf(param.getValue()).length());
+						param.getKey(), (param.getValue() == null) ? "NULL!" : String.valueOf(param.getValue()).length());
 			}
 			else {
 				log.debug("Param Key: {}, Value: {}",

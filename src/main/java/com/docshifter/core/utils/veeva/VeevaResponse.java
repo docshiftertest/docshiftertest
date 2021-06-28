@@ -191,7 +191,6 @@ public class VeevaResponse {
 		}
 		catch (IOException ioe) {
 			log.error("Creating Bad Response, caught IOException", ioe);
-			ioe.printStackTrace();
 		}
 		return result;
 	}
@@ -211,7 +210,7 @@ public class VeevaResponse {
 	public static String checkResponse(VeevaResponse veevaResponse, String sessionId, String host, String apiVersion,
                                        String veevaUser, String veevaPass) throws Exception {
 		log.debug("Into checkResponse...with Veeva Response: {}, Veeva User: {} and Veeva Password length: {}",
-				veevaResponse, veevaUser, veevaPass.length());
+				veevaResponse, veevaUser, (veevaPass == null) ? "NULL!" : veevaPass.length());
 		String responseStatus = SUCCESS;
 		if (veevaResponse instanceof VeevaBadResponse) {
 			log.debug("It's a BAD Response, go stand in the corner!");

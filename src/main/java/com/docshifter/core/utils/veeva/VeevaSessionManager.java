@@ -65,7 +65,7 @@ public class VeevaSessionManager implements ISessionManager<VeevaSession> {
 		Map<String,Object> params = new LinkedHashMap<>();
 		params.put("username", user);
 		log.debug("Using username: {} and password with length: {}",
-				user, pass.length());
+				user, (pass == null) ? "NULL!" : pass.length());
 		params.put("password", pass);
 		StringBuilder postData = new StringBuilder();
 		for (Map.Entry<String,Object> param : params.entrySet()) {
