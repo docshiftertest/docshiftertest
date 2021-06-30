@@ -31,6 +31,8 @@ import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
 import javax.jms.ConnectionFactory;
+import javax.jms.ExceptionListener;
+import javax.jms.JMSException;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
@@ -106,9 +108,9 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
-	public JmsListenerContainerFactory<?> jmsListenerContainerFactory(@Qualifier("cachingConnectionFactory") ConnectionFactory connectionFactory) {
-		SimpleJmsListenerContainerFactory factory = new SimpleJmsListenerContainerFactory();
-		factory.setConnectionFactory(connectionFactory);
+	public JmsListenerContainerFactory<?> jmsListenerContainerFactory(@Qualifier("cachingConnectionFactory") ConnectionFactory connectionFactory,
+																	  DefaultJmsListenerContainerFactoryConfigurer configurer) {
+		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
 		factory.setErrorHandler(t -> {
 			// Make sure we only freak out if we encounter confirmed unrecoverable errors, as some/most errors with
 			// the JMS connection might be perfectly recoverable
@@ -122,6 +124,20 @@ public class DocShifterConfiguration {
 				log.warn("Not handling the following message queue error:", t);
 			}
 		});
+		factory.setExceptionListener(exception -> {
+			// Make sure we only freak out if we encounter confirmed unrecoverable errors, as some/most errors with
+			// the JMS connection might be perfectly recoverable
+
+			// This one arose sporadically in a NVS PROD environment (DPS-447)
+			if (exception instanceof javax.jms.IllegalStateException && "Session is closed".equals(exception.getMessage())) {
+				log.error("Caught an unrecoverable error related to the message queue, so setting the application " +
+						"state to broken!", exception);
+				AvailabilityChangeEvent.publish(appContext, LivenessState.BROKEN);
+			} else {
+				log.warn("Not handling the following message queue error:", exception);
+			}
+		});
+		configurer.configure(factory, connectionFactory);
 		return factory;
 	}
 	
