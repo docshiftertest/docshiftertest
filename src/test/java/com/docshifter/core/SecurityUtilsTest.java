@@ -60,4 +60,32 @@ public class SecurityUtilsTest {
 
         Assert.assertEquals(message, decryptedMessage);
     }
+
+    @Test
+    public void shouldDecrypt() {
+        log.info("Running shouldDecrypt...");
+        String message = "banana";
+        String encryptedMessage = "WzBZMDgGCSqGSIb3DQEFDDArBBSfE8LKnYX/wRE17zhb0KL5vVb2UAICEAACASAwDAYIKoZIhvcNAgoFADAdBglghkgBZQMEASoEEHB0F7LCwe83TZ97NK5rSQaAGIc9jNc3+kL53l6rOZKt";
+        String decryptedMessage = SecurityUtils.decryptMessage(message, SecurityProperties.DEFAULT_ALGORITHM.getValue(),
+                SecurityProperties.SECRET.getValue(), this);
+        Assert.assertEquals("Message: [" + message + "] should be equal to decryptedMessage: [" + decryptedMessage + "]!", message, decryptedMessage);
+    }
+
+    @Test
+    public void shouldDecryptEmpty() {
+        log.info("Running shouldDecryptEmpty...");
+        String message = "";
+        String encryptedMessage = "";
+        String decryptedMessage = SecurityUtils.decryptMessage(message, SecurityProperties.DEFAULT_ALGORITHM.getValue(),
+                SecurityProperties.SECRET.getValue(), this);
+        Assert.assertEquals("Message: [" + message + "] should be equal to decryptedMessage: [" + decryptedMessage + "] when empty!", message, decryptedMessage);
+    }
+
+    @Test
+    public void shouldDecryptNull() {
+        log.info("Running shouldDecryptNull...");
+        String decryptedMessage = SecurityUtils.decryptMessage(null, SecurityProperties.DEFAULT_ALGORITHM.getValue(),
+                SecurityProperties.SECRET.getValue(), this);
+        Assert.assertNull("Decrypted message should be null", decryptedMessage);
+    }
 }
