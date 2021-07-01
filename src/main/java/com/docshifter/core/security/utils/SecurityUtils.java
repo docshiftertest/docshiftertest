@@ -38,6 +38,10 @@ public class SecurityUtils {
 		SimplePBEStringEncryptor decrypt = new SimplePBEStringEncryptor(delegate);
 
 		String decryptedMessage;
+		// Early exit if there's nothing to decrypt
+		if (StringUtils.isEmpty(encryptedMessage)) {
+			return encryptedMessage;
+		}
 
 		if (StringUtils.isNotEmpty(algorithm)) {
 			delegate.setAlgorithm(algorithm);
@@ -58,11 +62,13 @@ public class SecurityUtils {
 			log.debug("Starting decryption for {} " ,logClass);
 			decryptedMessage = decrypt.decrypt(encryptedMessage);
 
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			if (e instanceof EncryptionOperationNotPossibleException || e instanceof IllegalArgumentException || e instanceof NegativeArraySizeException) {
 				log.debug("The password is in plain text...: ", e);
 				decryptedMessage = encryptedMessage;
-			} else {
+			}
+			else {
 				log.error(e);
 				throw new EncryptionOperationNotPossibleException("Occurred an error trying to decrypt " + logClass);
 			}
