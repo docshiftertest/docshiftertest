@@ -86,14 +86,29 @@ public class Task implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Task{" +
-				"id='" + id + '\'' +
-				", workFolder=" + workFolder +
-				", sourceFilePath=" + sourceFilePath +
-				", name='" + name + '\'' +
-				", folderStructure='" + folderStructure + '\'' +
-				", messages=" + messages +
-				", data=" + data +
-				'}';
+		StringBuilder sBuf = new StringBuilder();
+		sBuf.append("Task{id='");
+		sBuf.append(id);
+		sBuf.append("', workFolder='");
+		sBuf.append(workFolder);
+		sBuf.append("', sourceFilePath=");
+		sBuf.append(sourceFilePath);
+		sBuf.append("', name='");
+		sBuf.append(name);
+		sBuf.append("', folderStructure=");
+		sBuf.append(folderStructure);
+		sBuf.append("', messages=[");
+		for (String message : messages) {
+			sBuf.append("'");
+			sBuf.append(message);
+			sBuf.append("', ");
+		}
+		if (messages.size() > 0) {
+			sBuf.setLength(sBuf.length() - 3);
+		}
+		sBuf.append("], data=");
+		sBuf.append(data);
+		sBuf.append("'}");
+		return sBuf.toString();
 	}
 }

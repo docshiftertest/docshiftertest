@@ -1,14 +1,21 @@
 package com.docshifter.core.monitoring.mappings;
 
-import com.docshifter.core.monitoring.dtos.*;
-import com.docshifter.core.monitoring.entities.*;
-import com.docshifter.core.monitoring.mappings.DbConfigurationItemConverter;
-import com.docshifter.core.monitoring.mappings.MailConfigurationItemConverter;
-import com.docshifter.core.monitoring.mappings.SnmpConfigurationItemConverter;
-import com.docshifter.core.monitoring.mappings.WebhookConfigurationItemConverter;
+import com.docshifter.core.monitoring.dtos.AbstractConfigurationItemDto;
+import com.docshifter.core.monitoring.dtos.ConfigurationDto;
+import com.docshifter.core.monitoring.dtos.ConfigurationItemDto;
+import com.docshifter.core.monitoring.dtos.DbConfigurationItemDto;
+import com.docshifter.core.monitoring.dtos.MailConfigurationItemDto;
+import com.docshifter.core.monitoring.dtos.SnmpConfigurationItemDto;
+import com.docshifter.core.monitoring.dtos.WebhookConfigurationItemDto;
+import com.docshifter.core.monitoring.entities.AbstractConfigurationItem;
+import com.docshifter.core.monitoring.entities.Configuration;
+import com.docshifter.core.monitoring.entities.DbConfigurationItem;
+import com.docshifter.core.monitoring.entities.MailConfigurationItem;
+import com.docshifter.core.monitoring.entities.SnmpConfigurationItem;
+import com.docshifter.core.monitoring.entities.WebhookConfigurationItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,7 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Component
-public class ConfigurationConverter {
+public class ConfigurationConverter implements Serializable {
     @Autowired
     private MailConfigurationItemConverter mailConfigurationItemConverter;
 
@@ -216,5 +223,4 @@ public class ConfigurationConverter {
                 .map(nl -> nl.toString())
                 .collect(Collectors.joining(", "));
     }
-
 }

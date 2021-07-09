@@ -12,7 +12,7 @@ public class SyncTask extends Task {
 
 	public SyncTask() { }
 
-	public SyncTask(String filePath, WorkFolder wf,boolean discardReturnFile ,boolean keepReleasePathFiles) {
+	public SyncTask(String filePath, WorkFolder wf, boolean discardReturnFile, boolean keepReleasePathFiles) {
 		super(filePath, wf);
 		this.discardReturnFile = discardReturnFile;
 		this.keepReleasePathFiles = keepReleasePathFiles;
