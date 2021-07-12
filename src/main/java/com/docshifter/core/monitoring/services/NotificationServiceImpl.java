@@ -3,12 +3,12 @@ package com.docshifter.core.monitoring.services;
 import com.docshifter.core.monitoring.utils.EmailPlaceHolderConsts;
 import com.docshifter.core.monitoring.dtos.*;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.File;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +17,9 @@ import java.util.concurrent.ExecutorService;
 /**
  * Created by blazejm on 12.05.2017.
  */
+@Log4j2
 @Service
-public class NotificationServiceImpl implements NotificationService {
-    private static final Logger log = Logger.getLogger(com.docshifter.core.monitoring.services.NotificationServiceImpl.class.getName());
+public class NotificationServiceImpl implements Serializable, NotificationService {
 
     @Autowired
     private ConfigurationService configurationService;
@@ -44,13 +44,15 @@ public class NotificationServiceImpl implements NotificationService {
 
 	@Override
     public void sendNotification(long configurationId, NotificationLevels level, String taskId, String message) {
-        log.debug("No attachments, sendNotification(configId=" + configurationId + ", level=" + level.toString() + ", taskId=" + taskId + ", message=" + message + ")");
+        log.debug("No attachments, sendNotification(configId={}, level={}, taskId={}, message={})",
+				configurationId, level, taskId, message);
         sendNotification(configurationId, level, taskId, message, new File[0]);
     }
 
     @Override
     public void sendNotification(long configurationId, NotificationLevels level, String taskId, String message, File... attachments) {
-    	log.debug("With attachments, sendNotification(configId=" + configurationId + ", level=" + level.toString() + ", taskId=" + taskId + ", message=" + message + ")");
+    	log.debug("With attachments, sendNotification(configId={}, level={}, taskId={}, message={})",
+				configurationId, level, taskId, message);
     	sendNotification(configurationId, level, taskId, message, null, attachments);
     }
 
@@ -58,25 +60,28 @@ public class NotificationServiceImpl implements NotificationService {
     public void sendNotification(long configurationId, NotificationDto notification) {
     	log.debug("sendNotification() with configurationId: " + configurationId + " and a NotificationDto object");
     	if (notification != null) {		
-    		log.debug("Notification taskId: " + notification.getTaskId()
-    			+ "Notification message: " + notification.getMessage());
+    		log.debug("Notification taskId: {} Notification message: {}",
+					notification.getTaskId(), notification.getMessage());
     	    if (notification.getLevel() != null) {
-    	    	log.debug("Notification level: " + notification.getLevel().toString());
+    	    	log.debug("Notification level: {}", notification.getLevel());
     	    }
     	    else {
     	    	log.debug("Notification level is NULL!");
     	    }
     	}
     	else {
-    		log.debug("Notification is NULL!");
+    		log.error("Notification was NULL! No Notification can be sent!");
+    		throw new IllegalArgumentException("Notification cannot be NULL");
     	}
         ConfigurationDto configuration = configurationService.getById(configurationId);
         if (configuration == null) {
         	if (notification.getLevel() == NotificationLevels.ERROR || notification.getLevel() == NotificationLevels.WARN) {
-        		log.warn("Could not find Configuration by Id: " + configurationId + " to send a Notification with level: " + notification.getLevel());
+        		log.warn("Could not find Configuration by Id: {} to send a Notification with level: {}",
+						configurationId, notification.getLevel());
         	}
         	else {
-        		log.debug("Could not find Configuration by Id: " + configurationId + " to send a notification. Level was: " + notification.getLevel());
+        		log.debug("Could not find Configuration by Id: {} to send a notification. Level was: {}",
+						configurationId, notification.getLevel());
         	}
         }
         executorService.submit(() -> sendNotificationsInternal(configuration, notification));
@@ -95,19 +100,23 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void sendNotificationInternal(AbstractConfigurationItemDto item, NotificationDto notification) {
         if (item instanceof MailConfigurationItemDto) {
-        	log.debug("Sending email notification(s)... item Id: " + item.getId() + " item type: " + item.getType());
+        	log.debug("Sending email notification(s)... item Id: {} Item Type: {}",
+					item.getId(), item.getType());
             sendEmails((MailConfigurationItemDto)item, notification);
         }
         if (item instanceof WebhookConfigurationItemDto) {
-        	log.debug("Sending webhook notification(s)... item Id: " + item.getId() + " item type: " + item.getType());
+        	log.debug("Sending webhook notification(s)... item Id: {} Item Type: {}",
+					item.getId(), item.getType());
         	sendWebhookNotifications((WebhookConfigurationItemDto)item, notification);
         }
         if (item instanceof SnmpConfigurationItemDto) {
-        	log.debug("Sending snmp notification(s)... item Id: " + item.getId() + " item type: " + item.getType());
+        	log.debug("Sending snmp notification(s)... Item Id: {} Item Type: {}",
+					item.getId(), item.getType());
             sendSnmpNotifications((SnmpConfigurationItemDto)item, notification);
         }
         if (item instanceof DbConfigurationItemDto) {
-        	log.debug("Sending db notification(s)... item Id: " + item.getId() + " item type: " + item.getType());
+        	log.debug("Sending db notification(s)... Item Id: {} Item Type: {}",
+					item.getId(), item.getType());
         	sendDbNotifications((DbConfigurationItemDto)item, notification);
         }
     }
@@ -152,13 +161,11 @@ public class NotificationServiceImpl implements NotificationService {
 			
 			StringBuilder sb = new StringBuilder();
 
-			String emails = item.getToAddresses();
-
-			emails = item.getToAddresses().replace(EmailPlaceHolderConsts.DYNAMIC_EMAIL, StringUtils.EMPTY);
+			String emails = item.getToAddresses().replace(EmailPlaceHolderConsts.DYNAMIC_EMAIL, StringUtils.EMPTY);
 
 			sb.append(emails);
 
-			//Retriving message from taskData
+			//Retrieving message from taskData
 			Object dynamicEmail = listener.getMapOfTasks().get(notification.getTaskId()).getData()
 					.get(EmailPlaceHolderConsts.DYNAMIC_EMAIL);
 
@@ -167,9 +174,9 @@ public class NotificationServiceImpl implements NotificationService {
 
 				ArrayList<String> arrayEmail = (ArrayList<String>) dynamicEmail;
 
-				arrayEmail.forEach(placeHolder -> sb.append("," + placeHolder));
+				arrayEmail.forEach(placeHolder -> sb.append(",").append(placeHolder));
 			} else {
-				sb.append("," + (String) dynamicEmail);
+				sb.append(",").append(dynamicEmail);
 			}
 
 			item.setToAddresses(sb.toString());
@@ -189,11 +196,11 @@ public class NotificationServiceImpl implements NotificationService {
 			
 			if(listener.getMapOfTasks().get(taskId).getData().get(EmailPlaceHolderConsts.DCTM_RENDITION_REQUESTED_BY) != null) {
 				 placeHolder = placeHolder.replace(placeHolder,
-						 (String)listener.getMapOfTasks().get(taskId).getData().get(EmailPlaceHolderConsts.DCTM_RENDITION_REQUESTED_BY));
+						 (String) listener.getMapOfTasks().get(taskId).getData().get(EmailPlaceHolderConsts.DCTM_RENDITION_REQUESTED_BY));
 			}
 			else {
-				log.info("E-mail not found to placeholder:" + placeHolder);
-				placeHolder = placeHolder.replace(placeHolder,StringUtils.EMPTY);
+				log.info("E-mail not found to placeholder: {}", placeHolder);
+				placeHolder = StringUtils.EMPTY;
 			}
 		  
 			break;
@@ -201,11 +208,11 @@ public class NotificationServiceImpl implements NotificationService {
 			
 			if(listener.getMapOfTasks().get(taskId).getData().get(EmailPlaceHolderConsts.DCTM_LAST_CHECKED_IN_USER) != null) {
 				placeHolder = placeHolder.replace(placeHolder,
-						(String)listener.getMapOfTasks().get(taskId).getData().get(EmailPlaceHolderConsts.DCTM_LAST_CHECKED_IN_USER));
+						(String) listener.getMapOfTasks().get(taskId).getData().get(EmailPlaceHolderConsts.DCTM_LAST_CHECKED_IN_USER));
 			}
 			else {
-				log.info("E-mail not found to placeholder :" + placeHolder);
-				placeHolder = placeHolder.replace(placeHolder,StringUtils.EMPTY);
+				log.info("E-mail not found to placeholder: {}", placeHolder);
+				placeHolder = StringUtils.EMPTY;
 			}
 			break;
 		}
@@ -242,16 +249,16 @@ public class NotificationServiceImpl implements NotificationService {
 	@Override
 	public void sendNotification(long configurationId, NotificationLevels level, String taskId, String message,
 			String sourceFilePath) {
-		log.debug("No attachments, sendNotification(configId=" + configurationId + ", level=" + level.toString() + ", taskId=" + taskId + ", message=" + message +
-				", sourceFilePath=" + sourceFilePath + ")");
+		log.debug("No attachments, sendNotification(configId={}, level={}, taskId={}, message={}, sourceFilePath={})",
+				configurationId, level, taskId, message, sourceFilePath);
 		sendNotification(configurationId, level, taskId, message, sourceFilePath, new File[0]);
 	}
 
 	@Override
 	public void sendNotification(long configurationId, NotificationLevels level, String taskId, String message,
 			String sourceFilePath, File... attachments) {
-		log.debug("With attachments, sendNotification(configId=" + configurationId + ", level=" + level.toString() + ", taskId=" + taskId + ", message=" + message +
-				", sourceFilePath=" + sourceFilePath + ")");
+		log.debug("With attachments, sendNotification(configId={}, level={}, taskId={}, message={}, sourceFilePath={})",
+				configurationId, level, taskId, message, sourceFilePath);
             NotificationDto notification = new NotificationDto();
             notification.setLevel(level);
             notification.setTaskId(taskId);
