@@ -15,8 +15,13 @@ public class Task implements Serializable {
 	protected String sourceFilePath;
 	protected String name;
 	protected String folderStructure;
-	protected List<String> messages = new ArrayList<>();
-	protected Map<String, Object> data = new HashMap<>();
+	protected final List<String> messages = new ArrayList<>();
+	protected final Map<String, Object> data = new HashMap<>();
+	protected final List<String> extraFilesList = new ArrayList<>();
+
+	public List<String> getExtraFilesList() {
+		return extraFilesList;
+	}
 
 	public Task() {
 	}
@@ -66,10 +71,6 @@ public class Task implements Serializable {
 
 	public Map<String, Object> getData() {
 		return data;
-	}
-
-	public void setData(Map<String, Object> data) {
-		this.data = data;
 	}
 
 	public void addData(String identifier, Object dataObject){
