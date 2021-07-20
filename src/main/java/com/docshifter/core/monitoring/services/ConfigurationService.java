@@ -4,11 +4,13 @@ import com.docshifter.core.monitoring.dtos.ConfigurationDto;
 import com.docshifter.core.monitoring.dtos.ConfigurationItemDto;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by blazejm on 11.05.2017.
  */
 public interface ConfigurationService {
+
     ConfigurationDto getById(long id);
 
     List<ConfigurationDto> getAll();
@@ -20,4 +22,6 @@ public interface ConfigurationService {
     List<ConfigurationItemDto> getConfigurationItems(long configurationId);
 
     void deleteConfiguration(long id);
+
+    void deleteByIdIn(Set<Long> ids);
 }

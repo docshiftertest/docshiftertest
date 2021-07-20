@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by blazejm on 11.05.2017.
@@ -88,5 +89,10 @@ public class ConfigurationServiceImpl implements Serializable, ConfigurationServ
     public void deleteConfiguration(long id) {
         log.info("deleteConfiguration for id: {}", id);
         configurationRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteByIdIn(Set<Long> ids) {
+       configurationRepository.deleteByIdIn(ids);
     }
 }
