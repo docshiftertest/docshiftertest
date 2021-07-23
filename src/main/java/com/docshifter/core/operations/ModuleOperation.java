@@ -5,6 +5,7 @@ import com.docshifter.core.exceptions.EmptyOperationException;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.operations.annotations.ModuleParam;
 import com.docshifter.core.utils.ModuleClassLoader;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.log4j.Logger;
@@ -34,6 +35,7 @@ public abstract class ModuleOperation {
 		STRING,
 		UNKNOWN
 	};
+	public static final String MP_FILE_INDICATOR = "mp_file:";
 	protected String operation = "Abstract Operation";
 	public Task task;
 	protected ModuleWrapper moduleWrapper;
@@ -326,6 +328,15 @@ public abstract class ModuleOperation {
 		// Replace all placeholders that were not found
 		text = text.replaceAll("\\$\\{.+}", "");
 		logger.trace("result after substitution: " + text);
+		if (text.toLowerCase().startsWith(MP_FILE_INDICATOR)) {
+			// If the value starts 'mp_file:' indicates we should use a file from the multipart request
+			text = text.substring(MP_FILE_INDICATOR.length());
+			if (CollectionUtils.isNotEmpty(task.getExtraFilesList())) {
+				final String finalText = text;
+				text = task.getExtraFilesList().stream().filter(file -> file.endsWith(finalText))
+						.findFirst().orElse("");
+			}
+		}
 		return text;
 	}
 
