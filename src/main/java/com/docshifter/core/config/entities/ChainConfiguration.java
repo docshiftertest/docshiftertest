@@ -39,7 +39,7 @@ public class ChainConfiguration {
 	private boolean enabled;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	@ManyToOne(cascade=CascadeType.ALL) // TODO: shouldn't this be OneToOne instead?
+	@ManyToOne(cascade=CascadeType.ALL)
 	private Node rootNode;
 
 
