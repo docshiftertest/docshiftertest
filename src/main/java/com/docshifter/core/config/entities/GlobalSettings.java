@@ -17,6 +17,7 @@ public class GlobalSettings
 	private String mqSystem;
 	private String mqURL;
 	private String mqQueue;
+	private String mqMetricsQueue;
 	private String mqUser;
 	@Encrypted
 	private String mqUserPassword;
@@ -31,22 +32,24 @@ public class GlobalSettings
 		this.defaultTempFolder = defaultTempFolder;
 	}
 	
-	public GlobalSettings(String mqSystem, String mqQueue, String mqURL, String mqUser, String mqUserPassword)
+	public GlobalSettings(String mqSystem, String mqQueue, String mqMetricsQueue, String mqURL, String mqUser, String mqUserPassword)
 	{
 		this.mqSystem = mqSystem;
 		this.mqQueue = mqQueue;
+		this.mqMetricsQueue = mqMetricsQueue;
 		this.mqURL = mqURL;
 		this.mqUser = mqUser;
 		this.mqUserPassword = mqUserPassword;
 	}
 	
 	public GlobalSettings(String defaultTempFolder,
-						  String mqSystem, String mqQueue, String mqURL, String mqUser,
+					  String mqSystem, String mqQueue, String mqMetricsQueue, String mqURL, String mqUser,
 						  String mqUserPassword)
 	{
 		this.defaultTempFolder = defaultTempFolder;
 		this.mqSystem = mqSystem;
 		this.mqQueue = mqQueue;
+		this.mqMetricsQueue = mqMetricsQueue;
 		this.mqURL = mqURL;
 		this.mqUser = mqUser;
 		this.mqUserPassword = mqUserPassword;
@@ -67,6 +70,11 @@ public class GlobalSettings
 	public String getMqQueue()
 	{
 		return mqQueue;
+	}
+
+	public String getMqMetricsQueue()
+	{
+		return mqMetricsQueue;
 	}
 
 	public String getMqURL()
@@ -97,6 +105,11 @@ public class GlobalSettings
 	public void setMqQueue(String mqQueue)
 	{
 		this.mqQueue = mqQueue;
+	}
+
+	public void setMqMetricsQueue(String mqMetricsQueue)
+	{
+		this.mqMetricsQueue = mqMetricsQueue;
 	}
 
 	public void setMqURL(String mqURL)
