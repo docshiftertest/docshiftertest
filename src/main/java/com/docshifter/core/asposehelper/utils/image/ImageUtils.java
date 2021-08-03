@@ -12,7 +12,6 @@ import org.apache.commons.imaging.common.bytesource.ByteSourceFile;
 import org.apache.commons.imaging.formats.jpeg.JpegImageParser;
 import org.apache.commons.imaging.formats.jpeg.segments.UnknownSegment;
 import org.apache.commons.lang.StringUtils;
-
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -149,14 +148,23 @@ public class ImageUtils {
 	 * @return The desired java awt Color object or else the provided fallback Color
 	 */
 	public static Color getColor(String nm, Color fallback) {
+		Color result;
 		try {
-			return getColor(nm);
+			result = getColor(nm);
+			return result;
 		} catch (Exception ex) {
 			if (StringUtils.isNotEmpty(nm)) {
-				// If an unparseable String was provided, WARN the user that the fallback value was returned (this
-				// fallback event might possibly be an attention point)
-				log.warn("The color \"{}\" could not be parsed, so we will fallback to {}", nm, fallback);
-			} else if (fallback != null) {
+				result = getKnownColour(nm);
+				if (result == null) {
+					// If an unparseable String was provided, WARN the user that the fallback value was returned (this
+					// fallback event might possibly be an attention point)
+					log.warn("The color \"{}\" could not be parsed, so we will fallback to {}", nm, fallback);
+				}
+				else {
+					return result;
+				}
+			}
+			else if (fallback != null) {
 				// If an empty String was provided and the fallback is not NULL, INFORM the user that the fallback
 				// value was returned (we just assume no explicit value was provided)
 				log.info("The provided color is empty, so we will fallback to {}", fallback);
@@ -165,6 +173,44 @@ public class ImageUtils {
 			// Color is null
 			return fallback;
 		}
+	}
+
+	public static Color getKnownColour(String nm) {
+		Color result = null;
+		switch (nm.toLowerCase().replace(" ", "").replace("_", "")
+				.replace("-", "")) {
+			case "brown":
+				result = new Color(0xA5, 0x2A, 0x2A);
+				break;
+			case "lightblue":
+				result = new Color(0xAD, 0xD8, 0xE6);
+				break;
+			case "darkblue":
+				result = new Color(0x00, 0x00, 0x8B);
+				break;
+			case "darkorange":
+				result = new Color(0xFF, 0x8C, 0x00);
+				break;
+			case "lightgreen":
+				result = new Color(0x90, 0xEE, 0x90);
+				break;
+			case "darkgreen":
+				result = new Color(0x00, 0x64, 0x00);
+				break;
+			case "violet":
+				result = new Color(0xEE, 0x82, 0xEE);
+				break;
+			case "indigo":
+				result = new Color(0x4B, 0x00, 0x82);
+				break;
+			case "purple":
+				result = new Color(0x80, 0x00, 0x80);
+				break;
+			case "rebeccapurple":
+				result = new Color(0x66, 0x33, 0x99);
+				break;
+		}
+		return result;
 	}
 
 	/**
