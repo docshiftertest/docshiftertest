@@ -177,8 +177,7 @@ public class ImageUtils {
 
 	public static Color getKnownColour(String nm) {
 		Color result = null;
-		switch (nm.toLowerCase().replaceAll("[ _-]", "")
-				.replace("-", "")) {
+		switch (nm.toLowerCase().replaceAll("[ _-]", "")) {
 			case "brown":
 				result = new Color(0xA5, 0x2A, 0x2A);
 				break;
