@@ -113,9 +113,7 @@ public class ConfigurationService {
 			}
 		}
 		else {
-			log.error(
-					"Could not find ChainConfiguration (Workflow) using ID:{} , This may be because you have added/deleted Workflows and there ",
-					" are still messages on the Q referring to the old Workflow!", uid);
+			log.error("Could not find ChainConfiguration (Workflow) using ID:{}. This may be because you have added/deleted Workflows and there are still messages on the Q referring to the old Workflow!", uid);
 		}
 		return null;
 	}

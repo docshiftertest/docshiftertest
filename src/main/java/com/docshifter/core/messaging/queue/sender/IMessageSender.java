@@ -1,11 +1,11 @@
 package com.docshifter.core.messaging.queue.sender;
 
 import com.docshifter.core.config.entities.ChainConfiguration;
+import com.docshifter.core.messaging.message.DocShifterMetricsSenderMessage;
 import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.VeevaTask;
-
 import javax.jms.JMSException;
 
 public interface IMessageSender {
@@ -38,6 +38,14 @@ public interface IMessageSender {
 
 	int getMessageCount() throws JMSException;
 
+	int getMetricsMessageCount() throws JMSException;
+
 	SyncTask sendSyncTask(ChainConfiguration ChainConfiguration, Task task);
+
+	/**
+	 * Send a Metrics message
+	 * @param message The DocShifterMetricsSenderMessage to send
+	 */
+	void sendMetrics(DocShifterMetricsSenderMessage message);
 
 }

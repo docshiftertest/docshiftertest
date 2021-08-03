@@ -162,7 +162,12 @@ public class DocShifterConfiguration {
 	public ActiveMQQueue defaultQueue() {
 		return new ActiveMQQueue(generalConfigService.getString(Constants.MQ_QUEUE));
 	}
-	
+
+	@Bean
+	public ActiveMQQueue defaultMetricsQueue() {
+		return new ActiveMQQueue(generalConfigService.getString(Constants.MQ_METRICS_QUEUE));
+	}
+
 	@Bean
 	public ActiveMQTopic reloadExchange() {
 		return new ActiveMQTopic(Constants.RELOAD_QUEUE);

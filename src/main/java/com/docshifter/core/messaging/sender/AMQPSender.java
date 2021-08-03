@@ -1,7 +1,9 @@
 package com.docshifter.core.messaging.sender;
 
+import com.docshifter.core.utils.NetworkUtils;
 import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.services.IJmsTemplateFactory;
+import com.docshifter.core.messaging.message.DocShifterMetricsSenderMessage;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
@@ -13,7 +15,6 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
-
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,15 +25,17 @@ import java.util.concurrent.TimeUnit;
 public class AMQPSender implements IMessageSender {
 
 	private final ActiveMQQueue docshifterQueue;
+	private final ActiveMQQueue docshifterMetricsQueue;
 	private final JmsTemplate defaultJmsTemplate;
 	private final IJmsTemplateFactory jmsTemplateFactory;
 	private final int queueReplyTimeout;
 
 	public AMQPSender(JmsTemplate defaultJmsTemplate, IJmsTemplateFactory jmsTemplateFactory,
-					  ActiveMQQueue docshifterQueue, int queueReplyTimeout) {
+					  ActiveMQQueue docshifterQueue, ActiveMQQueue docshifterMetricsQueue, int queueReplyTimeout) {
 		this.defaultJmsTemplate = defaultJmsTemplate;
 		this.jmsTemplateFactory = jmsTemplateFactory;
 		this.docshifterQueue = docshifterQueue;
+		this.docshifterMetricsQueue = docshifterMetricsQueue;
 		this.queueReplyTimeout = queueReplyTimeout;
 	}
 
@@ -71,7 +74,18 @@ public class AMQPSender implements IMessageSender {
 		if (task == null) {
 			throw new IllegalArgumentException("The task to send cannot be NULL!");
 		}
-
+		log.debug("Creating metrics message in Sender...");
+		DocShifterMetricsSenderMessage metricsMessage = DocShifterMetricsSenderMessage
+				.builder()
+				.taskId(task.getId())
+				.hostName(NetworkUtils.getLocalHostName())
+				.senderPickedUp(System.currentTimeMillis())
+				.workflowName(chainConfiguration.getName())
+				.fileName(task.getSourceFilePath())
+				.build();
+		log.debug("...about to send it...");
+		sendMetrics(metricsMessage);
+		log.debug("...sent!");
 		DocshifterMessage message = new DocshifterMessage(
 				type,
 				task,
@@ -130,16 +144,25 @@ public class AMQPSender implements IMessageSender {
 		}
 	}
 
-  @Override
-  public int getMessageCount() {
-	  
-	  return this.defaultJmsTemplate.browse(docshifterQueue.getName(), (session, browser) -> {
-		  int counter = 0;
-		  while (browser.getEnumeration().hasMoreElements()) {
-			  counter += 1;
-		  }
-		  return counter;
-	  });
+	@Override
+	public int getMessageCount() {
+		return getMessageCount(docshifterQueue.getName());
+	}
+
+	@Override
+	public int getMetricsMessageCount() {
+		  return getMessageCount(docshifterMetricsQueue.getName());
+	  }
+
+	private int getMessageCount(String queue) {
+
+		return this.defaultJmsTemplate.browse(queue, (session, browser) -> {
+			int counter = 0;
+			while (browser.getEnumeration().hasMoreElements()) {
+				counter += 1;
+			}
+			return counter;
+		});
 	}
 
 	@Override
@@ -165,5 +188,14 @@ public class AMQPSender implements IMessageSender {
 	@Override
 	public SyncTask sendSyncTask(ChainConfiguration chainConfiguration, Task task) {
 		return sendSyncTask(docshifterQueue.getName(), chainConfiguration, task);
+	}
+
+	@Override
+	public void sendMetrics(DocShifterMetricsSenderMessage metricsMessage) {
+		defaultJmsTemplate.convertAndSend(docshifterMetricsQueue.getName(), metricsMessage, messagePostProcessor -> {
+			log.debug("'jmsTemplate.convertAndSend': metricsMessage.taskId={}",
+					metricsMessage::getTaskId);
+			return messagePostProcessor;
+		});
 	}
 }
