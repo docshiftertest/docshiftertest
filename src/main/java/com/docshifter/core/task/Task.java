@@ -15,7 +15,7 @@ public class Task implements Serializable {
 	protected String sourceFilePath;
 	protected String name;
 	protected String folderStructure;
-	protected final List<String> messages = new ArrayList<>();
+	protected final Map<TaskMessageSeverity, List<String>> messages = new HashMap<>();
 	protected final Map<String, Object> data = new HashMap<>();
 	protected final List<String> extraFilesList = new ArrayList<>();
 
@@ -54,11 +54,35 @@ public class Task implements Serializable {
 	}
 
 	public List<String> getMessages() {
-		return messages;
+		List<String> results = new ArrayList<>();
+		for (TaskMessageSeverity severity : messages.keySet()) {
+			results.addAll(getMessages(severity));
+		}
+		return results;
 	}
-	public String addMessage(String message) {
-		messages.add(message);
+
+	public List<String> getMessages(TaskMessageSeverity severity) {
+		List<String> results = new ArrayList<>();
+		if (messages.containsKey(severity)) {
+			for (String message : messages.get(severity)) {
+				results.add(severity.name() + ": " + message);
+			}
+		}
+		return results;
+	}
+
+	public String addMessage(TaskMessageSeverity severity, String message) {
+		List<String> messagesForSeverity = messages.get(severity);
+		if (messagesForSeverity == null) {
+			messagesForSeverity = new ArrayList<>();
+		}
+		messagesForSeverity.add(message);
+		messages.put(severity, messagesForSeverity);
 		return message;
+	}
+
+	public String addMessage(String message) {
+		return addMessage(TaskMessageSeverity.ERROR, message);
 	}
 
 	public String getName() {
@@ -99,17 +123,18 @@ public class Task implements Serializable {
 		sBuf.append("', folderStructure=");
 		sBuf.append(folderStructure);
 		sBuf.append("', messages=[");
-		for (String message : messages) {
-			sBuf.append("'");
-			sBuf.append(message);
-			sBuf.append("', ");
+		sBuf.append(String.join(", ", getMessages()));
+		sBuf.append("], data={");
+		for (Map.Entry<String, Object> dataEntry : data.entrySet()) {
+			sBuf.append(dataEntry.getKey());
+			sBuf.append("=");
+			sBuf.append(dataEntry.getValue());
+			sBuf.append(", ");
 		}
-		if (messages.size() > 0) {
-			sBuf.setLength(sBuf.length() - 3);
+		if (data.size() > 0) {
+			sBuf.setLength(sBuf.length() - 2);
 		}
-		sBuf.append("], data=");
-		sBuf.append(data);
-		sBuf.append("'}");
+		sBuf.append("}");
 		return sBuf.toString();
 	}
 }
