@@ -331,9 +331,9 @@ public abstract class ModuleOperation {
 		if (text.toLowerCase().startsWith(MP_FILE_INDICATOR)) {
 			// If the value starts 'mp_file:' indicates we should use a file from the multipart request
 			text = text.substring(MP_FILE_INDICATOR.length());
-			if (CollectionUtils.isNotEmpty(task.getExtraFilesList())) {
+			if (CollectionUtils.isNotEmpty(task.getConfigFilesList())) {
 				final String finalText = text;
-				text = task.getExtraFilesList().stream().filter(file -> file.endsWith(finalText))
+				text = task.getConfigFilesList().stream().filter(file -> file.endsWith(finalText))
 						.findFirst().orElse("");
 			}
 		}

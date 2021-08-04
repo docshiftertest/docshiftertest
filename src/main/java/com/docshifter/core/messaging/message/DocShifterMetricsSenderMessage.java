@@ -2,6 +2,7 @@ package com.docshifter.core.messaging.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -12,11 +13,11 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class DocShifterMetricsSenderMessage extends DocShifterMetricsMessage {
 
 	private Long senderPickedUp;
 	private String workflowName;
-	private String fileName;
 
 	public MessageSource getMessageSource() {
 		return MessageSource.SENDER;

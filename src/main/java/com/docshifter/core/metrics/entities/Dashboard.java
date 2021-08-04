@@ -22,17 +22,16 @@ public class Dashboard {
 
     @Id
     private String taskId;
-
     private String senderHostName;
     private String receiverHostName;
     private Long senderPickedUp;
     private String workflowName;
-    private String fileName;
     private Long onMessageHit;
     private Long processingDuration;
     private Long finishTimestamp;
-    private Long fileSize;
     private Boolean success;
     @OneToMany(mappedBy = "dashboard", cascade = CascadeType.ALL)
     private List<DashboardTaskMessage> taskMessages;
+    @OneToMany(mappedBy = "dashboard", cascade = CascadeType.ALL)
+    private List<DashboardFile> taskFiles;
 }
