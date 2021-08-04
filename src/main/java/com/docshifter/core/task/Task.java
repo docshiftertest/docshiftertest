@@ -6,7 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.docshifter.core.work.WorkFolder;
+import lombok.ToString;
+import lombok.extern.log4j.Log4j2;
 
+@ToString
+@Log4j2
 public class Task implements Serializable {
 
 	private static final long serialVersionUID = 4087826709318179760L;
@@ -18,9 +22,14 @@ public class Task implements Serializable {
 	protected final Map<TaskMessageSeverity, List<String>> messages = new HashMap<>();
 	protected final Map<String, Object> data = new HashMap<>();
 	protected final List<String> extraFilesList = new ArrayList<>();
+	protected final List<String> configFilesList = new ArrayList<>();
 
 	public List<String> getExtraFilesList() {
 		return extraFilesList;
+	}
+
+	public List<String> getConfigFilesList() {
+		return configFilesList;
 	}
 
 	public Task() {
