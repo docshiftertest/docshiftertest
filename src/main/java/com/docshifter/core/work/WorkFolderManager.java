@@ -30,6 +30,22 @@ public class WorkFolderManager {
 	@Autowired
 	public WorkFolderManager(GeneralConfigService generalConfiguration) throws ConfigurationException {
 
+		String applicationName = System.getProperty("program.name");
+		log.debug("App name: {}", applicationName);
+		boolean errorsAreWarnings;
+		// If we're in Metrics we don't even need to check the work/error folders
+		if ("DocShifterMetrics".equalsIgnoreCase(applicationName)) {
+			return;
+		}
+		// If we're in Console we should only warn if error or work folder bad, so user has chance to fix it in Admin Console
+		else if ("DocShifterConsole".equalsIgnoreCase(applicationName)) {
+			errorsAreWarnings = true;
+		}
+		else {
+			// All bets are off, we'll crash and burn on a bad work or error folder...
+			errorsAreWarnings = false;
+		}
+
 		log.debug("Temp (Work) folder param name: {}", Constants.TEMPFOLDER);
 		log.debug("Error folder param name: {}", Constants.ERRORFOLDER);
 		String tempFolder = generalConfiguration.getString(Constants.TEMPFOLDER);
@@ -40,30 +56,27 @@ public class WorkFolderManager {
 		boolean workFolderResult = validateFolder("Work", tempFolder);
 		boolean errorFolderResult = validateFolder("Error", errorFolder);
 		if (!workFolderResult) {
-			checkFatal("Work", tempFolder);
+			checkFatal("Work", tempFolder, errorsAreWarnings);
 		}
 		else {
 			workfolder = Paths.get(tempFolder).toAbsolutePath();
 		}
 		if (!errorFolderResult) {
-			checkFatal("Error", errorFolder);
+			checkFatal("Error", errorFolder, errorsAreWarnings);
 		}
 		else {
 			errorfolder = Paths.get(errorFolder).toAbsolutePath();
 		}
 	}
 
-	private void checkFatal(String workOrError, String folderPath) throws ConfigurationException {
+	private void checkFatal(String workOrError, String folderPath, boolean errorsAreWarnings) throws ConfigurationException {
 		String errorMessage = "There is an error with the configuration of the " 
 				+ workOrError 
 				+ " folder [" 
 				+ folderPath 
 				+ "]! Please check and correct";
 
-		String applicationName = System.getProperty("program.name");
-		log.debug("App name: {}", applicationName);
-		
-		if ((!StringUtils.isBlank(applicationName)) && applicationName.equalsIgnoreCase("DocShifterConsole")) {
+		if (errorsAreWarnings) {
 			log.warn(errorMessage);
 		}
 		else {
