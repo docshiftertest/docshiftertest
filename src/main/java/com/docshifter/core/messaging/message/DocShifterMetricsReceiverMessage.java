@@ -3,12 +3,14 @@ package com.docshifter.core.messaging.message;
 import com.docshifter.core.metrics.domain.TaskFile;
 import com.docshifter.core.metrics.domain.TaskMessage;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,10 +27,10 @@ public class DocShifterMetricsReceiverMessage extends DocShifterMetricsMessage {
 	private Long onMessageHit;
 	private Long processingDuration;
 	private Long finishTimestamp;
-	// Always initialise this when using a Builder or it'll be null even if we set it here
-	private List<TaskFile> taskFiles;
-	// Always initialise this when using a Builder or it'll be null even if we set it here
-	private List<TaskMessage> taskMessages;
+	@Builder.Default
+	private final List<TaskFile> taskFiles = new ArrayList<>();
+	@Builder.Default
+	private final List<TaskMessage> taskMessages = new ArrayList<>();
 	private Boolean success;
 
 	public MessageSource getMessageSource() {
