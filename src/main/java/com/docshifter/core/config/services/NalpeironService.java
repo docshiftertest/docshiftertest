@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Profile("licensing")
+// TODO: The snailProfile causes the ILicensingService Bean not to get picked up in Sender
+// ... but perhaps we need to check if this has implications for Sender?
+//@Profile("licensing")
 @Conditional(IsNotInAnyContainerCondition.class)
 public class NalpeironService implements ILicensingService {
 

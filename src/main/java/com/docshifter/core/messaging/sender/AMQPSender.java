@@ -1,5 +1,6 @@
 package com.docshifter.core.messaging.sender;
 
+import com.docshifter.core.config.services.MetricsLicenceCheckingService;
 import com.docshifter.core.utils.NetworkUtils;
 import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.services.IJmsTemplateFactory;
@@ -13,6 +14,7 @@ import com.docshifter.core.task.Task;
 import com.docshifter.core.task.VeevaTask;
 import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import java.util.concurrent.TimeUnit;
@@ -70,21 +72,24 @@ public class AMQPSender implements IMessageSender {
 		}
 	}
 	
-	private Object sendTask(DocshifterMessageType type, String queue, ChainConfiguration chainConfiguration, Task task) {
+	private Object sendTask(DocshifterMessageType type, String queue,
+							ChainConfiguration chainConfiguration, Task task) {
 		if (task == null) {
 			throw new IllegalArgumentException("The task to send cannot be NULL!");
 		}
-		log.debug("Creating metrics message in Sender...");
-		DocShifterMetricsSenderMessage metricsMessage = DocShifterMetricsSenderMessage
-				.builder()
-				.taskId(task.getId())
-				.hostName(NetworkUtils.getLocalHostName())
-				.senderPickedUp(System.currentTimeMillis())
-				.workflowName(chainConfiguration.getName())
-				.build();
-		log.debug("...about to send it...");
-		sendMetrics(metricsMessage);
-		log.debug("...sent!");
+		if (MetricsLicenceCheckingService.isLicensed()) {
+			log.debug("Creating metrics message in Sender...");
+			DocShifterMetricsSenderMessage metricsMessage = DocShifterMetricsSenderMessage
+					.builder()
+					.taskId(task.getId())
+					.hostName(NetworkUtils.getLocalHostName())
+					.senderPickedUp(System.currentTimeMillis())
+					.workflowName(chainConfiguration.getName())
+					.build();
+			log.debug("...about to send it...");
+			sendMetrics(metricsMessage);
+			log.debug("...sent!");
+		}
 		DocshifterMessage message = new DocshifterMessage(
 				type,
 				task,
@@ -154,14 +159,22 @@ public class AMQPSender implements IMessageSender {
 	  }
 
 	private int getMessageCount(String queue) {
-
-		return this.defaultJmsTemplate.browse(queue, (session, browser) -> {
-			int counter = 0;
-			while (browser.getEnumeration().hasMoreElements()) {
-				counter += 1;
-			}
-			return counter;
-		});
+		if (this.defaultJmsTemplate == null || StringUtils.isBlank(queue)) {
+			return 0;
+		}
+		else {
+			final Integer browse = this.defaultJmsTemplate.browse(queue, (session, browser) -> {
+				int counter = 0;
+				if (browser == null || browser.getEnumeration() == null) {
+					return counter;
+				}
+				while (browser.getEnumeration().hasMoreElements()) {
+					counter += 1;
+				}
+				return counter;
+			});
+			return browse;
+		}
 	}
 
 	@Override
@@ -175,12 +188,12 @@ public class AMQPSender implements IMessageSender {
 	}
 
 	@Override
-	public void sendVeevaTask(ChainConfiguration chainConfiguration,VeevaTask task) {
+	public void sendVeevaTask(ChainConfiguration chainConfiguration, VeevaTask task) {
 		sendTask(DocshifterMessageType.VEEVA, docshifterQueue.getName(), chainConfiguration, task);
 	}
 
 	@Override
-	public void sendPrintTask(ChainConfiguration chainConfiguration,Task task)  {
+	public void sendPrintTask(ChainConfiguration chainConfiguration, Task task)  {
 		sendTask(DocshifterMessageType.DEFAULT, docshifterQueue.getName(), chainConfiguration, task);
 	}
 	
