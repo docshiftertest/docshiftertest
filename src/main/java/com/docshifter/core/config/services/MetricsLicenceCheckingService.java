@@ -4,7 +4,6 @@ import com.docshifter.core.exceptions.DocShifterLicenseException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
 
