@@ -10,7 +10,6 @@ import java.util.HashMap;
 
 @Log4j2
 @Service
-@Scope("singleton")
 public class MetricsLicenceCheckingService {
 
     private static ILicensingService nalpeironService;
