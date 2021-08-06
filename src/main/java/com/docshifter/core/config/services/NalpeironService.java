@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.Arrays;
@@ -22,9 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-// TODO: The snailProfile causes the ILicensingService Bean not to get picked up in Sender
-// ... but perhaps we need to check if this has implications for Sender?
-//@Profile("licensing")
+@Profile("licensing")
 @Conditional(IsNotInAnyContainerCondition.class)
 public class NalpeironService implements ILicensingService {
 
