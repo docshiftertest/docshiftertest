@@ -25,11 +25,15 @@ public class MetricsLicenceCheckingService {
             try {
                 long[] fid = nalpeironService.validateAndStartModule("METR", new long[]{0L});
                 nalpeironService.endModule("METR", new HashMap<>(), fid);
-                log.debug("OK, Metrics is licensed");
+                log.info("OK, Metrics is licensed");
                 isLicensed = true;
-            } catch (DocShifterLicenseException dilly) {
-                log.debug("Licence exception!", dilly);
+            }
+            catch (DocShifterLicenseException dilly) {
+                log.info("Metrics Licence exception", dilly);
                 isLicensed = false;
+            }
+            catch (Throwable ball) {
+                log.warn("Threw throwable ball", ball);
             }
         }
         return isLicensed;
