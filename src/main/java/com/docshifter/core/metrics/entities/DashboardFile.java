@@ -26,6 +26,7 @@ public class DashboardFile {
     private Long id;
     private long fileSize;
     @Column(length = 8192)
+    private Long childFileCount;
     private String fileName;
     @ManyToOne()
     @JoinColumn(name="task_id")
