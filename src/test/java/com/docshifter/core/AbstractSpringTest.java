@@ -1,7 +1,9 @@
 package com.docshifter.core;
 
+import com.docshifter.core.config.services.ILicensingService;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -11,5 +13,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = BeansApplication.class)
 public abstract class AbstractSpringTest {
+
+    @MockBean
+    protected ILicensingService nalpeironService;
 
 }
