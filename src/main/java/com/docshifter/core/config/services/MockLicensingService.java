@@ -38,7 +38,6 @@ public class MockLicensingService implements ILicensingService {
 				null, MockLicensingModuleSet.DEV.getLicensableModules()));
 
 		// === PostFinance ===
-		// TODO: Check Module list w/ Paul
 		// Non-production usage
 		keys.put("006208ca-2054-4175-a6bd-c406ebb0d8df", new License(
 				new GregorianCalendar(2023, Calendar.MARCH, 31, 23, 59, 59).getTime(),
@@ -49,27 +48,24 @@ public class MockLicensingService implements ILicensingService {
 				2, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 
 		// === Novartis ===
-		// TODO: Check Module list w/ Paul
 		// Non-production usage
 		keys.put("bcccbf81-0a79-4da8-bd44-4abbc0ea85d9", new License(
 				null,
-				10, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
+				10, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
 		// Production usage
 		keys.put("855408d7-cd0d-4cbf-96e7-64efa6f6fefa", new License(
 				null,
-				4, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
+				4, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
 
 		// === Preyer ===
-		// TODO: Check Module list w/ Paul
 		keys.put("b1656ce3-6c9b-4382-895c-429378c37632", new License(
 				new GregorianCalendar(2023, Calendar.MARCH, 31, 23, 59, 59).getTime(),
 				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 
 		// === Bayer ===
-		// TODO: Check Module list w/ Paul
 		keys.put("2ad776f1-d715-4f39-a74b-c007f62228f1", new License(
 				null,
-				1, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
+				1, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
 
 		// === Lorenz ===
 		// TODO: Check Module list w/ Paul
@@ -81,31 +77,31 @@ public class MockLicensingService implements ILicensingService {
 		// DEV = Give me EVERYTHING for Licensable Modules!
 		keys.put("2beb15ee-8292-42b2-85f1-dab53d9f5255", new License(
 				new GregorianCalendar(2021, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
-				null, MockLicensingModuleSet.DEV.getLicensableModules()));
+				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
 
 		// === Volksbank July 1 2022 expiry ===
 		// DEV = Give me EVERYTHING for Licensable Modules!
 		keys.put("c9ed93e3-4400-43d4-8c2c-094dde86dbee", new License(
 				new GregorianCalendar(2022, Calendar.JULY, 1, 23,	59,	59).getTime(),
-				null, MockLicensingModuleSet.DEV.getLicensableModules()));
+				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
 
 		// === Volksbank July 1 2023 expiry ===
 		// DEV = Give me EVERYTHING for Licensable Modules!
 		keys.put("5ce91f09-d48e-4284-a46e-135e856fd44e", new License(
 				new GregorianCalendar(2023, Calendar.JULY, 1, 23,	59,	59).getTime(),
-				null, MockLicensingModuleSet.DEV.getLicensableModules()));
+				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
 
 		// === Volksbank July 1 2024 expiry ===
 		// DEV = Give me EVERYTHING for Licensable Modules!
 		keys.put("96d61229-d76c-40e0-80d7-3d95bd35f842", new License(
 				new GregorianCalendar(2024, Calendar.JULY, 1, 23,	59,	59).getTime(),
-				null, MockLicensingModuleSet.DEV.getLicensableModules()));
+				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
 
 		// === Volksbank July 1 2025 expiry ===
 		// DEV = Give me EVERYTHING for Licensable Modules!
 		keys.put("5d2f87db-33da-4eed-a33a-028b8c4768be", new License(
 				new GregorianCalendar(2025, Calendar.JULY, 1, 23,	59,	59).getTime(),
-				null, MockLicensingModuleSet.DEV.getLicensableModules()));
+				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
 
 		// === SPARE CODES (PoCs, new customers,...) ===
 		// TODO: ***** Be CAREFUL ***** We just alternate Base and HiFi profiles here as examples

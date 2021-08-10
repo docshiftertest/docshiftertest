@@ -117,33 +117,4 @@ public class Task implements Serializable {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
-	@Override
-	public String toString() {
-		StringBuilder sBuf = new StringBuilder();
-		sBuf.append("Task{id='");
-		sBuf.append(id);
-		sBuf.append("', workFolder='");
-		sBuf.append(workFolder);
-		sBuf.append("', sourceFilePath=");
-		sBuf.append(sourceFilePath);
-		sBuf.append("', name='");
-		sBuf.append(name);
-		sBuf.append("', folderStructure=");
-		sBuf.append(folderStructure);
-		sBuf.append("', messages=[");
-		sBuf.append(String.join(", ", getMessages()));
-		sBuf.append("], data={");
-		for (Map.Entry<String, Object> dataEntry : data.entrySet()) {
-			sBuf.append(dataEntry.getKey());
-			sBuf.append("=");
-			sBuf.append(dataEntry.getValue());
-			sBuf.append(", ");
-		}
-		if (data.size() > 0) {
-			sBuf.setLength(sBuf.length() - 2);
-		}
-		sBuf.append("}");
-		return sBuf.toString();
-	}
 }
