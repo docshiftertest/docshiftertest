@@ -14,5 +14,6 @@ import java.io.Serializable;
 @Builder
 public class TaskFile implements Serializable {
     private String fileName;
+    private Long childFileCount;
     private Long fileSize;
 }

@@ -1,33 +1,27 @@
 package com.docshifter.core.config.services;
 
 import com.docshifter.core.exceptions.DocShifterLicenseException;
-import com.docshifter.core.monitoring.services.AbstractServiceTest;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.fail;
 
-@ActiveProfiles("licensing")
-public class NalpeironServiceTest extends AbstractServiceTest {
+@RunWith(SpringRunner.class)
+public class NalpeironServiceTest {
 
-    @Autowired
-    private ApplicationContext applicationContext;
-
-    @Autowired
+    @MockBean
     private  NalpeironService nalpeironService;
 
     @Bean
     public PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
-
-
 
     @Test
     public void initialTest() {
@@ -44,14 +38,9 @@ public class NalpeironServiceTest extends AbstractServiceTest {
         try {
             nalpeironService.validateAndStartModule(moduleId, fid);
             nalpeironService.endModule(moduleId, testClientData, fid);
-        }catch (DocShifterLicenseException ex) {
+        }
+        catch (DocShifterLicenseException ex) {
             fail("Module could not be accessed: " + ex.getMessage());
         }
-    }
-
-
-    @Test
-    public void derpTest() {
-
     }
 }
