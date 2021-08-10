@@ -63,7 +63,7 @@ public class WebhookNotificationServiceImpl implements WebhookNotificationServic
 
     private HttpHeaders getHeaders(WebhookConfigurationItemDto webhookConfigItem) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8));
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         if (webhookConfigItem.getHeaderParams() != null) {
             webhookConfigItem.getHeaderParams()
                     .forEach(hp -> headers.add(hp.getKey(), hp.getValue()));
