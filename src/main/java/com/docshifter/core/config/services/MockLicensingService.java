@@ -73,7 +73,7 @@ public class MockLicensingService implements ILicensingService {
 				new GregorianCalendar(2022, Calendar.MARCH, 31, 23, 59, 59).getTime(),
 				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 
-		// === Volksbank ===
+		// === Volksbank & Gulfstream ===
 		// DEV = Give me EVERYTHING for Licensable Modules!
 		keys.put("2beb15ee-8292-42b2-85f1-dab53d9f5255", new License(
 				new GregorianCalendar(2021, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
@@ -107,9 +107,6 @@ public class MockLicensingService implements ILicensingService {
 		// TODO: ***** Be CAREFUL ***** We just alternate Base and HiFi profiles here as examples
 		// You can also merge a set (Base, HiFi, Advanced...) of Modules with individual extra Modules... e.g.
 		//	... MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Custom_module, LicensableModule.Metrics));
-		keys.put("5f4f7686-e502-4a89-aa64-834f0220107e", new License(
-				new GregorianCalendar(2021, Calendar.JUNE, 30, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 		keys.put("5a4da8c5-e7a8-43d9-934f-bad86f77e4d8", new License(
 				new GregorianCalendar(2021, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterBase.getLicensableModules()));
