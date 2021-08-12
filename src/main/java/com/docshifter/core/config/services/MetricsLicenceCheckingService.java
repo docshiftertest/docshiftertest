@@ -4,11 +4,13 @@ import com.docshifter.core.exceptions.DocShifterLicenseException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
 
 @Log4j2
 @Service
+@Profile("licensing")
 public class MetricsLicenceCheckingService {
 
     private static ILicensingService nalpeironService;

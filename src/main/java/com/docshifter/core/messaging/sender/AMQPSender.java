@@ -1,6 +1,5 @@
 package com.docshifter.core.messaging.sender;
 
-import com.docshifter.core.config.services.MetricsLicenceCheckingService;
 import com.docshifter.core.utils.NetworkUtils;
 import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.services.IJmsTemplateFactory;
@@ -77,7 +76,7 @@ public class AMQPSender implements IMessageSender {
 		if (task == null) {
 			throw new IllegalArgumentException("The task to send cannot be NULL!");
 		}
-		if (MetricsLicenceCheckingService.isLicensed()) {
+		//if (MetricsLicenceCheckingService.isLicensed()) {
 			log.debug("Creating metrics message in Sender...");
 			DocShifterMetricsSenderMessage metricsMessage = DocShifterMetricsSenderMessage
 					.builder()
@@ -89,7 +88,7 @@ public class AMQPSender implements IMessageSender {
 			log.debug("...about to send it...");
 			sendMetrics(metricsMessage);
 			log.debug("...sent!");
-		}
+		//}
 		DocshifterMessage message = new DocshifterMessage(
 				type,
 				task,
