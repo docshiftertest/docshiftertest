@@ -74,31 +74,36 @@ public class MockLicensingService implements ILicensingService {
 				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 
 		// === Volksbank & Gulfstream ===
-		// DEV = Give me EVERYTHING for Licensable Modules!
+		// DocShifterEverything = Give me EVERYTHING for Licensable Modules!
+		// Note we don't give DEV here, as DEV is everything we've written and everything we will write!
 		keys.put("2beb15ee-8292-42b2-85f1-dab53d9f5255", new License(
 				new GregorianCalendar(2021, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
 
 		// === Volksbank July 1 2022 expiry ===
-		// DEV = Give me EVERYTHING for Licensable Modules!
+		// DocShifterEverything = Give me EVERYTHING for Licensable Modules!
+		// Note we don't give DEV here, as DEV is everything we've written and everything we will write!
 		keys.put("c9ed93e3-4400-43d4-8c2c-094dde86dbee", new License(
 				new GregorianCalendar(2022, Calendar.JULY, 1, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
 
 		// === Volksbank July 1 2023 expiry ===
-		// DEV = Give me EVERYTHING for Licensable Modules!
+		// DocShifterEverything = Give me EVERYTHING for Licensable Modules!
+		// Note we don't give DEV here, as DEV is everything we've written and everything we will write!
 		keys.put("5ce91f09-d48e-4284-a46e-135e856fd44e", new License(
 				new GregorianCalendar(2023, Calendar.JULY, 1, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
 
 		// === Volksbank July 1 2024 expiry ===
-		// DEV = Give me EVERYTHING for Licensable Modules!
+		// DocShifterEverything = Give me EVERYTHING for Licensable Modules!
+		// Note we don't give DEV here, as DEV is everything we've written and everything we will write!
 		keys.put("96d61229-d76c-40e0-80d7-3d95bd35f842", new License(
 				new GregorianCalendar(2024, Calendar.JULY, 1, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
 
 		// === Volksbank July 1 2025 expiry ===
-		// DEV = Give me EVERYTHING for Licensable Modules!
+		// DocShifterEverything = Give me EVERYTHING for Licensable Modules!
+		// Note we don't give DEV here, as DEV is everything we've written and everything we will write!
 		keys.put("5d2f87db-33da-4eed-a33a-028b8c4768be", new License(
 				new GregorianCalendar(2025, Calendar.JULY, 1, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
