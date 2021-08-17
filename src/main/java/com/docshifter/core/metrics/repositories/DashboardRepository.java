@@ -12,5 +12,6 @@ import java.util.List;
 public interface DashboardRepository extends JpaRepository<Dashboard, String> {
 
     List<TasksDistributionSample> getAllBy();
+    List<Dashboard> findAllBySuccess(Boolean success);
 
 }
