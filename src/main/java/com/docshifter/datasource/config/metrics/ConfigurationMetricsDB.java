@@ -12,7 +12,6 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-
 import javax.sql.DataSource;
 import java.util.Properties;
 
@@ -24,7 +23,7 @@ import java.util.Properties;
 )
 public class ConfigurationMetricsDB {
 
-    @Value( "${spring.datasource.url}" )
+    @Value( "${spring.datasource.metrics.url}" )
     private String url;
     @Value("${spring.jpa.database-platform}")
     private String dialect;
