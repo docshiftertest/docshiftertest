@@ -28,7 +28,7 @@ public class DbNotificationServiceTest extends AbstractSpringTest {
        configurationItem = new DbConfigurationItemDto();
        configurationItem.setDriver("org.hsqldb.jdbc.JDBCDriver");
        configurationItem.setConnection("jdbc:hsqldb:mem:docshifter");
-       configurationItem.setUser("METRICS_SYSTEM");
+       configurationItem.setUser("metrics_system");
        configurationItem.setTableName("test_db_notification");
        configurationItem.setPassword("mb282wu7nvDkbQRkfXvA");
     }
