@@ -34,7 +34,7 @@ public class ConfigurationMetricsDB {
     public DataSource metricsDataSource(){
        return DataSourceBuilder.create()
         .url(url)
-        .username("METRICS_SYSTEM")
+        .username("metrics_system")
         .password("mb282wu7nvDkbQRkfXvA") // make it at least slightly less obvious that this is the password
                //make a new string from a byte array
                //.password(somestring);
