@@ -2,18 +2,19 @@ package com.docshifter.core.monitoring.dtos;
 
 import com.docshifter.core.security.utils.SecurityProperties;
 import com.docshifter.core.security.utils.SecurityUtils;
-import com.docshifter.core.monitoring.dtos.AbstractConfigurationItemDto;
 import com.docshifter.core.monitoring.enums.ConfigurationTypes;
+import lombok.ToString;
 import org.apache.commons.lang.StringUtils;
-
 
 /**
  * Created by blazejm on 29.09.2017.
  */
+@ToString
 public class DbConfigurationItemDto extends AbstractConfigurationItemDto {
     private String driver;
     private String connection;
     private String dbUser;
+    @ToString.Exclude
     private String password;
     private String encryptedPassword;
     private String tableName;
