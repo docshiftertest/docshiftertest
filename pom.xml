@@ -41,7 +41,7 @@
 
 <!--		<aspose.ocr.version>21.5</aspose.ocr.version>-->
 
-		<aspose.pdf.version>21.7</aspose.pdf.version>
+		<aspose.pdf.version>21.8</aspose.pdf.version>
 		<aspose.pdf.classifier>jdk17</aspose.pdf.classifier>
 
 		<aspose.slides.version>21.7</aspose.slides.version>
@@ -51,7 +51,7 @@
 		<aspose.tasks.version>20.12</aspose.tasks.version>
 		<aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
 
-		<aspose.words.version>21.7</aspose.words.version>
+		<aspose.words.version>21.8</aspose.words.version>
 		<aspose.words.classifier>jdk17</aspose.words.classifier>
 
 		<aspose.html.version>21.6</aspose.html.version>

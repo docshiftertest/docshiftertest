@@ -1,4 +1,4 @@
-package com.docshifter.core.metrics.dtos;
+package com.docshifter.core.metrics.Sample;
 
 /**
  * Sample class of Dashboard Entity

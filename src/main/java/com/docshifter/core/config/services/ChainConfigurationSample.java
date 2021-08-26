@@ -15,4 +15,6 @@ public interface ChainConfigurationSample {
     Boolean getEnabled();
 
     Integer getPriority();
+
+    Long getTimeout();
 }
