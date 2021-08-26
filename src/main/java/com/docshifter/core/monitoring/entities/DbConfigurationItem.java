@@ -14,7 +14,7 @@ import javax.persistence.Entity;
 public class DbConfigurationItem extends AbstractConfigurationItem {
     private String driver;
     private String connection;
-    private String user;
+    private String dbUser;
     @Encrypted
     private String password;
     private String tableName;
@@ -35,12 +35,12 @@ public class DbConfigurationItem extends AbstractConfigurationItem {
         this.connection = connection;
     }
 
-    public String getUser() {
-        return user;
+    public String getDbUser() {
+        return dbUser;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setDbUser(String dbUser) {
+        this.dbUser = dbUser;
     }
 
     public String getPassword() {

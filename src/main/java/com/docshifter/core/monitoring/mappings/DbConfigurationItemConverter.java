@@ -22,7 +22,7 @@ public class DbConfigurationItemConverter implements ConfigurationItemConverter<
         dto.setNotificationLevels(CommonConverter.convertToList(entity.getNotificationLevels()));
         dto.setConnection(entity.getConnection());
         dto.setDriver(entity.getDriver());
-        dto.setUser(entity.getUser());
+        dto.setDbUser(entity.getDbUser());
         dto.setPassword(entity.getPassword());
         dto.setTableName(entity.getTableName());
     }
@@ -41,7 +41,7 @@ public class DbConfigurationItemConverter implements ConfigurationItemConverter<
         entity.setNotificationLevels(CommonConverter.convertToSet(dto.getNotificationLevels()));
         entity.setConnection(dto.getConnection());
         entity.setDriver(dto.getDriver());
-        entity.setUser(dto.getUser());
+        entity.setDbUser(dto.getDbUser());
         entity.setPassword(dto.getPassword());
         entity.setTableName(dto.getTableName());
     }

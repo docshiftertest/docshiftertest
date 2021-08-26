@@ -78,18 +78,19 @@ public class DbNotificationServiceImpl implements DbNotificationService {
         Connection dbConnection = null;
         try {
             Class.forName(dbConfigurationItem.getDriver());
-        } catch (ClassNotFoundException e) {
-            log.error("Driver error", e);
+        }
+        catch (ClassNotFoundException cunfy) {
+            log.error("Driver error", cunfy);
         }
 
         try {
             dbConnection = DriverManager.getConnection(
                     dbConfigurationItem.getConnection(),
-                    dbConfigurationItem.getUser(),
+                    dbConfigurationItem.getDbUser(),
                     dbConfigurationItem.getPassword());
-            return dbConnection;
-        } catch (SQLException e) {
-            log.error("Connection error", e);
+        }
+        catch (SQLException squealy) {
+            log.error("Connection error", squealy);
         }
         return dbConnection;
     }

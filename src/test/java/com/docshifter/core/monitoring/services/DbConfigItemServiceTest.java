@@ -25,7 +25,7 @@ public class DbConfigItemServiceTest extends AbstractSpringTest {
         configurationItem = new DbConfigurationItemDto();
         configurationItem.setDriver("org.hsqldb.jdbc.JDBCDriver");
         configurationItem.setConnection("jdbc:hsqldb:mem:docshifter");
-        configurationItem.setUser("metrics_system");
+        configurationItem.setDbUser("metrics_system");
         configurationItem.setTableName("test_db_notification");
         configurationItem.setPassword("mb282wu7nvDkbQRkfXvA");
     }
@@ -42,7 +42,7 @@ public class DbConfigItemServiceTest extends AbstractSpringTest {
         assertThat(entity).isNotNull();
         assertThat(entity.getConnection()).isEqualTo(configurationItem.getConnection());
         assertThat(entity.getDriver()).isEqualTo(configurationItem.getDriver());
-        assertThat(entity.getUser()).isEqualTo(configurationItem.getUser());
+        assertThat(entity.getDbUser()).isEqualTo(configurationItem.getDbUser());
         assertThat(entity.getTableName()).isEqualTo(configurationItem.getTableName());
     }
 

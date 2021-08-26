@@ -13,7 +13,7 @@ import org.apache.commons.lang.StringUtils;
 public class DbConfigurationItemDto extends AbstractConfigurationItemDto {
     private String driver;
     private String connection;
-    private String user;
+    private String dbUser;
     private String password;
     private String encryptedPassword;
     private String tableName;
@@ -34,12 +34,12 @@ public class DbConfigurationItemDto extends AbstractConfigurationItemDto {
         this.connection = connection;
     }
 
-    public String getUser() {
-        return user;
+    public String getDbUser() {
+        return dbUser;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setDbUser(String dbUser) {
+        this.dbUser = dbUser;
     }
 
     public String getPassword() {
