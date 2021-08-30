@@ -23,9 +23,9 @@ import javax.persistence.SequenceGenerator;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DashboardFile {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dashboard_file_generator")
-    @SequenceGenerator(name="dashboard_file_generator", sequenceName = "dashboard_file_seq")
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
     private long fileSize;
     @Column(length = 8192)
