@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 
 /**
  * Created by Julian Isaac on 02.08.2021
@@ -22,12 +23,13 @@ import javax.persistence.ManyToOne;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DashboardTaskMessage {
-    @Id()
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dashboard_task_message_generator")
+    @SequenceGenerator(name="dashboard_task_message_generator", sequenceName = "dashboard_task_message_seq")
     private Long id;
     @Column(length = 8192)
     private String taskMessage;
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name="task_id")
     private Dashboard dashboard;
 
