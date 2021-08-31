@@ -25,7 +25,6 @@ import javax.persistence.SequenceGenerator;
 public class DashboardTaskMessage {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
     @Column(length = 8192)
     private String taskMessage;
