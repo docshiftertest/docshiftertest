@@ -73,47 +73,50 @@ public class MockLicensingService implements ILicensingService {
 				new GregorianCalendar(2022, Calendar.MARCH, 31, 23, 59, 59).getTime(),
 				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 
-		// === Volksbank & Gulfstream ===
-		// DocShifterEverything = Give me EVERYTHING for Licensable Modules!
-		// Note we don't give DEV here, as DEV is everything we've written and everything we will write!
-		keys.put("2beb15ee-8292-42b2-85f1-dab53d9f5255", new License(
-				new GregorianCalendar(2021, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
-				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
+		// === Gulfstream ===
+		// Non-production usage
+		keys.put("265a797a-bc7a-4208-8176-5d86c969222a", new License(
+				new GregorianCalendar(2022, Calendar.SEPTEMBER, 31, 23,	59,	59).getTime(),
+				1, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
+		// Production usage
+		keys.put("fe08d717-f8e8-4aa0-b641-9ed734f8cde7", new License(
+				new GregorianCalendar(2022, Calendar.SEPTEMBER, 31, 23,	59,	59).getTime(),
+				1, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 
 		// === Volksbank July 1 2022 expiry ===
 		// DocShifterEverything = Give me EVERYTHING for Licensable Modules!
 		// Note we don't give DEV here, as DEV is everything we've written and everything we will write!
 		keys.put("c9ed93e3-4400-43d4-8c2c-094dde86dbee", new License(
-				new GregorianCalendar(2022, Calendar.JULY, 1, 23,	59,	59).getTime(),
+				new GregorianCalendar(2022, Calendar.JULY, 31, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
 
 		// === Volksbank July 1 2023 expiry ===
 		// DocShifterEverything = Give me EVERYTHING for Licensable Modules!
 		// Note we don't give DEV here, as DEV is everything we've written and everything we will write!
 		keys.put("5ce91f09-d48e-4284-a46e-135e856fd44e", new License(
-				new GregorianCalendar(2023, Calendar.JULY, 1, 23,	59,	59).getTime(),
+				new GregorianCalendar(2023, Calendar.JULY, 31, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
 
 		// === Volksbank July 1 2024 expiry ===
 		// DocShifterEverything = Give me EVERYTHING for Licensable Modules!
 		// Note we don't give DEV here, as DEV is everything we've written and everything we will write!
 		keys.put("96d61229-d76c-40e0-80d7-3d95bd35f842", new License(
-				new GregorianCalendar(2024, Calendar.JULY, 1, 23,	59,	59).getTime(),
+				new GregorianCalendar(2024, Calendar.JULY, 31, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
 
 		// === Volksbank July 1 2025 expiry ===
 		// DocShifterEverything = Give me EVERYTHING for Licensable Modules!
 		// Note we don't give DEV here, as DEV is everything we've written and everything we will write!
 		keys.put("5d2f87db-33da-4eed-a33a-028b8c4768be", new License(
-				new GregorianCalendar(2025, Calendar.JULY, 1, 23,	59,	59).getTime(),
+				new GregorianCalendar(2025, Calendar.JULY, 31, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterEverything.getLicensableModules()));
 
 		// === SPARE CODES (PoCs, new customers,...) ===
 		// TODO: ***** Be CAREFUL ***** We just alternate Base and HiFi profiles here as examples
 		// You can also merge a set (Base, HiFi, Advanced...) of Modules with individual extra Modules... e.g.
 		//	... MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Custom_module, LicensableModule.Metrics));
-		keys.put("5a4da8c5-e7a8-43d9-934f-bad86f77e4d8", new License(
-				new GregorianCalendar(2021, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
+		keys.put("932c4745-9cab-4937-b704-236beb5dbb93", new License(
+				new GregorianCalendar(2021, Calendar.DECEMBER, 31, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterBase.getLicensableModules()));
 		keys.put("11206e6e-694b-43c7-906c-209134d3fadc", new License(
 				new GregorianCalendar(2021, Calendar.DECEMBER, 31, 23,	59,	59).getTime(),
@@ -121,17 +124,35 @@ public class MockLicensingService implements ILicensingService {
 		keys.put("b0c46468-8476-42ac-8304-6e19316ff938", new License(
 				new GregorianCalendar(2022, Calendar.MARCH, 31, 23, 59, 59).getTime(),
 				null, MockLicensingModuleSet.DocShifterBase.getLicensableModules()));
+		keys.put("f760beff-3023-47f4-a6af-494b93862a20", new License(
+				new GregorianCalendar(2022, Calendar.MARCH, 31, 23, 59, 59).getTime(),
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
+		keys.put("ae782ac9-4706-4bf4-8cb8-489a896a212f", new License(
+				new GregorianCalendar(2022, Calendar.JUNE, 30, 23, 59, 59).getTime(),
+				null, MockLicensingModuleSet.DocShifterBase.getLicensableModules()));
 		keys.put("edd36cc0-9bf5-4c21-bf00-91e48f2e521d", new License(
 				new GregorianCalendar(2022, Calendar.JUNE, 30, 23, 59, 59).getTime(),
 				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 		keys.put("e3dbd68b-96b3-4b21-8a27-1bc28d3f4ed2", new License(
 				new GregorianCalendar(2022, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterBase.getLicensableModules()));
-		keys.put("fe08d717-f8e8-4aa0-b641-9ed734f8cde7", new License(
+		keys.put("397d459e-6fe3-4869-bda6-c40d0bf86971", new License(
+				new GregorianCalendar(2022, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
+		keys.put("abcf2659-895f-4a85-982e-1b4032d46254", new License(
+				new GregorianCalendar(2022, Calendar.DECEMBER, 31, 23,	59,	59).getTime(),
+				null, MockLicensingModuleSet.DocShifterBase.getLicensableModules()));
+		keys.put("b2066068-5816-4a71-af8a-58685d8d3ab7", new License(
 				new GregorianCalendar(2022, Calendar.DECEMBER, 31, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 		keys.put("dfa4d4e4-39c1-424c-b717-305b99f1eb71", new License(
 				new GregorianCalendar(2023, Calendar.MARCH, 31, 23, 59, 59).getTime(),
+				null, MockLicensingModuleSet.DocShifterBase.getLicensableModules()));
+		keys.put("d0763080-8751-4942-a262-102ec5c29122", new License(
+				new GregorianCalendar(2023, Calendar.MARCH, 31, 23, 59, 59).getTime(),
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
+		keys.put("9f01ba19-f9ec-40ee-a619-400551b1bd07", new License(
+				new GregorianCalendar(2023, Calendar.JUNE, 30, 23, 59, 59).getTime(),
 				null, MockLicensingModuleSet.DocShifterBase.getLicensableModules()));
 		keys.put("5e995acd-77ca-4fea-a487-b060eceb096a", new License(
 				new GregorianCalendar(2023, Calendar.JUNE, 30, 23, 59, 59).getTime(),
@@ -139,8 +160,20 @@ public class MockLicensingService implements ILicensingService {
 		keys.put("c76f6d84-7e35-46e2-a608-978d08bf6d72", new License(
 				new GregorianCalendar(2023, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterBase.getLicensableModules()));
+		keys.put("92b89aa4-f34d-4262-9181-fa9a3f3efe1a", new License(
+				new GregorianCalendar(2023, Calendar.SEPTEMBER, 30, 23,	59,	59).getTime(),
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
+		keys.put("a89cc318-9a57-4e9a-ae48-98eaee70da96", new License(
+				new GregorianCalendar(2023, Calendar.DECEMBER, 31, 23,	59,	59).getTime(),
+				null, MockLicensingModuleSet.DocShifterBase.getLicensableModules()));
 		keys.put("a0136286-5f01-49c4-9441-96d5c0e159bc", new License(
 				new GregorianCalendar(2023, Calendar.DECEMBER, 31, 23,	59,	59).getTime(),
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
+		keys.put("6a4dcb38-5713-4d14-8c2a-a01ba50922f4", new License(
+				new GregorianCalendar(2024, Calendar.MARCH, 31, 23,	59,	59).getTime(),
+				null, MockLicensingModuleSet.DocShifterBase.getLicensableModules()));
+		keys.put("3a8aab91-ecf7-4b03-93c3-ca2b444810a6", new License(
+				new GregorianCalendar(2024, Calendar.MARCH, 31, 23,	59,	59).getTime(),
 				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 	}
 
