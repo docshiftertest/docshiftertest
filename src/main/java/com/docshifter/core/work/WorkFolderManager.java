@@ -5,17 +5,16 @@ import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.services.GeneralConfigService;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/11/15.
@@ -26,10 +25,11 @@ public class WorkFolderManager {
 
 	private Path workfolder;
 	private Path errorfolder;
+	private final ScheduledExecutorService scheduler;
 
 	@Autowired
-	public WorkFolderManager(GeneralConfigService generalConfiguration) throws ConfigurationException {
-
+	public WorkFolderManager(GeneralConfigService generalConfiguration, ScheduledExecutorService scheduler) throws ConfigurationException {
+		this.scheduler = scheduler;
 		String applicationName = System.getProperty("program.name");
 		log.debug("App name: {}", applicationName);
 		boolean errorsAreWarnings;
@@ -158,67 +158,33 @@ public class WorkFolderManager {
 		deleteWorkfolder(folder, false);
 	}
 
-	public void deleteWorkfolder(WorkFolder folder, boolean force) {
+	public void deleteWorkfolder(WorkFolder folder, boolean forceIfNotEmpty) {
 		if (!folder.isRoot()) {
-			deleteWorkfolder(folder.getParent(), force);
+			deleteWorkfolder(folder.getParent(), forceIfNotEmpty);
 			folder.setParent(null);
 		}
-		deletePath(folder.getFolder(), force);
+		FileUtils.deletePath(scheduler, folder.getFolder(), forceIfNotEmpty);
 	}
 
 	public void deleteErrorfolder(WorkFolder folder){
 		deleteErrorfolder(folder, false);
 	}
 
-	public void deleteErrorfolder(WorkFolder folder, boolean force) {
+	public void deleteErrorfolder(WorkFolder folder, boolean forceIfNotEmpty) {
 		if (!folder.isRoot()) {
-			deleteErrorfolder(folder.getParent(), force);
+			deleteErrorfolder(folder.getParent(), forceIfNotEmpty);
 			folder.setParent(null);
 		}
 
 		if (folder.getErrorFolder() == null){
 			log.info("ERRORFOLDER IS NULL *****");
 		} else {
-			deletePath(folder.getErrorFolder(), force);
+			FileUtils.deletePath(scheduler, folder.getErrorFolder(), forceIfNotEmpty);
 		}
 	}
 
 	public void copyToErrorFolder(WorkFolder folder) throws Exception{
 		FileUtils.copyFolder(folder.getFolder(), folder.getErrorFolder());
-	}
-
-	private boolean deletePath(Path dir, boolean force) {
-		log.warn("Into deletePath({}, {})", dir, force);
-		if (Files.isDirectory(dir)) {
-			log.debug("Is directory...");
-			try (DirectoryStream<Path> ds = Files.newDirectoryStream(dir)) {
-
-				for (Path child : ds)
-					if (force) {
-						if (!deletePath(child, force)) {
-							return false;
-						}
-					} else {
-						log.debug("Returning false because force is not set?");
-						return false;
-					}
-			} catch (IOException ioe) {
-				log.warn("deletePath({}) in 'for Path', caught IOException.", dir, ioe);
-				return false;
-			}
-		}
-		log.debug("Will delete [{}], if exists...", dir);
-		try {
-			File bunny = new File(dir.toString());
-			if (bunny.exists()) {
-				org.apache.commons.io.FileUtils.forceDelete(bunny);
-			}
-		} catch (IOException ioe) {
-			log.warn("deletePath({}) after 'forceDelete', caught IOException.", dir, ioe);
-			return false;
-		}
-		log.debug("Returning true!");
-		return true;
 	}
 
 	@Override
