@@ -8,15 +8,18 @@ import java.io.*;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -584,7 +587,7 @@ public final class FileUtils {
 	 */
 	public static boolean deletePath(ScheduledExecutorService scheduler, Path dir, boolean forceIfNotEmpty,
 									 int retryCounter) {
-		return deletePath(scheduler, dir, dir, forceIfNotEmpty, retryCounter, false);
+		return deletePath(scheduler, dir, dir, forceIfNotEmpty, retryCounter, null);
 	}
 
 	/**
@@ -597,29 +600,31 @@ public final class FileUtils {
 	 * @param forceIfNotEmpty Should a directory be deleted if it is not empty?
 	 * @param retryCounter The number of retries to allow for in case a file/directory could not be deleted. Backoff
 	 *                        time is 1 minute.
-	 * @param bypassDirCheck Whether to bypass the Files.isDirectory check for currDir and automatically assume it's
+	 * @param bypassDir Whether to bypass the Files.isDirectory check for a certain path and automatically assume it's
 	 *                          a directory, used for tracking purposes in a recursive call.
 	 * @return Whether the file/directory could be deleted immediately, without any errors. If an error did occur, it
 	 * might be possible that after the backoff period the item will have been deleted successfully anyway.
 	 */
 	private static boolean deletePath(ScheduledExecutorService scheduler, Path currDir, Path rootDir,
-									  boolean forceIfNotEmpty, int retryCounter, boolean bypassDirCheck) {
+									  boolean forceIfNotEmpty, int retryCounter, Path bypassDir) {
 		IOException encounteredIOE = null;
-		log.info("Into deletePath({}, {}, {}, {}, {})", currDir, rootDir, forceIfNotEmpty, retryCounter, bypassDirCheck);
+		log.info("Into deletePath({}, {}, {}, {}, {})", currDir, rootDir, forceIfNotEmpty, retryCounter, bypassDir);
 		// If it's a directory, try to delete all files inside of it
-		if (Files.isDirectory(currDir) || bypassDirCheck) {
+		if (Files.isDirectory(currDir) || currDir.equals(bypassDir)) {
 			log.debug("Is directory...");
-			try (DirectoryStream<Path> ds = Files.newDirectoryStream(currDir)) {
-
-				for (Path child : ds) {
-					if (forceIfNotEmpty) {
-						if (!deletePath(scheduler, child, rootDir, true, retryCounter, false)) {
-							return false;
-						}
-					} else {
-						log.info("Returning false because the directory contains files and forceIfNotEmpty is false?");
-						return false;
-					}
+			try (Stream<Path> stream = Files.list(currDir)) {
+				// Results need to be in predictable order so we get consistent results when retrying after errors.
+				// We also need to sort and collect the results first because allMatch is a short-circuiting
+				// operation so it would ignore the sort if it is all used together in one stream.
+				List<Path> sorted = stream.sorted(Comparator.comparing(Path::toString)).collect(Collectors.toList());
+				if (!sorted.isEmpty() && !forceIfNotEmpty) {
+					log.info("Returning false because the directory contains files and forceIfNotEmpty is false?");
+					return false;
+				}
+				boolean result = sorted.stream().allMatch(child ->
+						deletePath(scheduler, child, rootDir, true, retryCounter,	bypassDir));
+				if (!result) {
+					return false;
 				}
 			} catch (NotDirectoryException ndex) {
 				// False positive? Move on and try to delete the file anyways
@@ -650,12 +655,12 @@ public final class FileUtils {
 
 		// We've reached the "uh-oh, stuff's not going so great" part of this method...
 		final int finalRetryCounter;
-		final boolean finalBypassDirCheck;
+		final Path finalBypassDir;
 		// If we tried to delete a directory that somehow was not empty, it must mean that the Files.isDirectory(currDir)
 		// check lied to us and returned a false negative!
 		if (encounteredIOE instanceof DirectoryNotEmptyException) {
 			// But if we're already bypassing the check this time, then something is seriously off, so let's not retry
-			if (bypassDirCheck) {
+			if (bypassDir.equals(currDir)) {
 				log.error("Getting DirectoryNotEmptyException for this directory even after bypassing the " +
 						"isDirectory check! This should absolutely not happen! Returning false...");
 				return false;
@@ -663,32 +668,20 @@ public final class FileUtils {
 
 			log.warn("And it was a DirectoryNotEmptyException! This should not happen! Will circumvent the " +
 					"directory check next time.");
-			finalBypassDirCheck = true;
+			finalBypassDir = currDir;
 			finalRetryCounter = retryCounter;
 		} else {
 			// Any other errors: subtract 1 from the retryCounter and hope that it works out next time
-			finalBypassDirCheck = false;
+			finalBypassDir = null;
 			finalRetryCounter = retryCounter - 1;
 		}
 
 		if (retryCounter > 0) {
 			log.warn("Will retry deletion in 1 minute...");
-			scheduler.schedule(() -> {
-				boolean success = true;
-				// Retry deletion for the current directory if we ran into a DirectoryNotEmptyException before, but
-				// this time we're asking to bypass the Files.isDirectory(currDir) check
-				if (finalBypassDirCheck) {
-					success = deletePath(scheduler, currDir, rootDir, forceIfNotEmpty, finalRetryCounter, true);
-				}
-				// If we ran into any other errors, just try deleting everything from the beginning/root again.
-				// Additionally, if the error was the DirectoryNotEmptyException problem and the workaround/bypass
-				// appeared to be successful, we also need to restart the deletion process from root again (given
-				// that the current directory wasn't root already), as the entire call stack all the way up to root
-				// would've returned false recursively.
-				if (!finalBypassDirCheck || (success && !currDir.equals(rootDir))) {
-					deletePath(scheduler, rootDir, rootDir, forceIfNotEmpty, finalRetryCounter, false);
-				}
-			}, 1, TimeUnit.MINUTES);
+			scheduler.schedule(() ->
+				// Retry deletion all the way from the beginning/root again
+				deletePath(scheduler, rootDir, rootDir, forceIfNotEmpty, finalRetryCounter, finalBypassDir),
+					1, TimeUnit.MINUTES);
 		} else {
 			log.error("There are no more retries left! {} failed to delete!", currDir);
 		}
