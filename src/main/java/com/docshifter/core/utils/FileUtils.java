@@ -660,7 +660,7 @@ public final class FileUtils {
 		// check lied to us and returned a false negative!
 		if (encounteredIOE instanceof DirectoryNotEmptyException) {
 			// But if we're already bypassing the check this time, then something is seriously off, so let's not retry
-			if (bypassDir.equals(currDir)) {
+			if (currDir.equals(bypassDir)) {
 				log.error("Getting DirectoryNotEmptyException for this directory even after bypassing the " +
 						"isDirectory check! This should absolutely not happen! Returning false...");
 				return false;
