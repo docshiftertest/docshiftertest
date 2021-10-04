@@ -4,14 +4,33 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.SystemUtils;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.net.URL;
 import java.nio.channels.FileChannel;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
+import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  *
@@ -549,5 +568,130 @@ public final class FileUtils {
 					.append(ioe);
 		}
 		return sBuf.toString();
+	}
+
+	/**
+	 * Attempts to delete a file or directory, taking into account the possibility of shenanigans happening related
+	 * to calling the Java I/O API on unconventional storage types (such as NAS). For example: File.exists()
+	 * or Files.isDirectory(...) being unreliable and returning false negatives.
+	 * @param scheduler Used to schedule retries after a failure.
+	 * @param dir The directory or file to delete.
+	 * @param forceIfNotEmpty Should a directory be deleted if it is not empty?
+	 * @return Whether the file/directory could be deleted immediately, without any errors. If an error did occur, it
+	 * might be possible that after the backoff period the item will have been deleted successfully anyway.
+	 */
+	public static boolean deletePath(ScheduledExecutorService scheduler, Path dir, boolean forceIfNotEmpty) {
+		return deletePath(scheduler, dir, forceIfNotEmpty, 3);
+	}
+
+	/**
+	 * Attempts to delete a file or directory, taking into account the possibility of shenanigans happening related
+	 * to calling the Java I/O API on unconventional storage types (such as NAS). For example: File.exists()
+	 * or Files.isDirectory(...) being unreliable and returning false negatives.
+	 * @param scheduler Used to schedule retries after a failure.
+	 * @param dir The directory or file to delete.
+	 * @param forceIfNotEmpty Should a directory be deleted if it is not empty?
+	 * @param retryCounter The number of retries to allow for in case a file/directory could not be deleted. Backoff
+	 *                        time is 1 minute.
+	 * @return Whether the file/directory could be deleted immediately, without any errors. If an error did occur, it
+	 * might be possible that after the backoff period the item will have been deleted successfully anyway.
+	 */
+	public static boolean deletePath(ScheduledExecutorService scheduler, Path dir, boolean forceIfNotEmpty,
+									 int retryCounter) {
+		return deletePath(scheduler, dir, dir, forceIfNotEmpty, retryCounter, new HashSet<>());
+	}
+
+	/**
+	 * Attempts to delete a file or directory, taking into account the possibility of shenanigans happening related
+	 * to calling the Java I/O API on unconventional storage types (such as NAS). For example: File.exists()
+	 * or Files.isDirectory(...) being unreliable and returning false negatives.
+	 * @param scheduler Used to schedule retries after a failure.
+	 * @param currDir The current directory or file to delete.
+	 * @param rootDir The root directory, used for tracking purposes in a recursive call.
+	 * @param forceIfNotEmpty Should a directory be deleted if it is not empty?
+	 * @param retryCounter The number of retries to allow for in case a file/directory could not be deleted. Backoff
+	 *                        time is 1 minute.
+	 * @param bypassDirs Known paths where the Files.isDirectory check needs to be bypassed and automatically assume
+	 *                      it's a directory, used for tracking purposes in a recursive call.
+	 * @return Whether the file/directory could be deleted immediately, without any errors. If an error did occur, it
+	 * might be possible that after the backoff period the item will have been deleted successfully anyway.
+	 */
+	private static boolean deletePath(ScheduledExecutorService scheduler, Path currDir, Path rootDir,
+									  boolean forceIfNotEmpty, int retryCounter, Set<Path> bypassDirs) {
+		IOException encounteredIOE = null;
+		log.info("Into deletePath({}, {}, {}, {}, bypassDirs)", currDir, rootDir, forceIfNotEmpty, retryCounter);
+		// If it's a directory, try to recursively delete all files and subdirectories inside of it
+		if (Files.isDirectory(currDir) || bypassDirs.contains(currDir)) {
+			log.debug("Is directory...");
+			try (Stream<Path> stream = Files.list(currDir)) {
+				boolean result = stream.allMatch(child -> {
+					if (!forceIfNotEmpty) {
+						log.info("Returning false because the directory contains files and forceIfNotEmpty is false?");
+						return false;
+					}
+					return deletePath(scheduler, child, rootDir, true, retryCounter, bypassDirs);
+				});
+				if (!result) {
+					return false;
+				}
+			} catch (NotDirectoryException ndex) {
+				// False positive? Move on and try to delete the file anyways
+				log.warn("{} was somehow not a directory?", currDir, ndex);
+			} catch (IOException ioe) {
+				// This is a bit more serious... Might be fixable though by trying later as it might be a temporary
+				// problem with the underlying storage
+				log.warn("deletePath({}) in 'for Path', caught IOException.", currDir, ioe);
+				encounteredIOE = ioe;
+			}
+		}
+		// Now try to delete the file/directory itself (given that we didn't run into the serious error before)
+		log.debug("Will delete [{}], if exists...", currDir);
+		if (encounteredIOE == null) {
+			try {
+				Files.deleteIfExists(currDir);
+			} catch (IOException ioe) {
+				log.warn("deletePath({}) after 'deleteIfExists', caught IOException.", currDir, ioe);
+				encounteredIOE = ioe;
+			}
+		}
+
+		// Everything still OK? Great, we successfully deleted it!
+		if (encounteredIOE == null) {
+			bypassDirs.remove(currDir);
+			log.debug("Returning true!");
+			return true;
+		}
+
+		// We've reached the "uh-oh, stuff's not going so great" part of this method...
+		final int finalRetryCounter;
+		// If we tried to delete a directory that somehow was not empty, it must mean that the Files.isDirectory(currDir)
+		// check lied to us and returned a false negative!
+		if (encounteredIOE instanceof DirectoryNotEmptyException) {
+			// But if we're already bypassing the check this time, then something is seriously off, so let's not retry
+			if (bypassDirs.contains(currDir)) {
+				log.error("Getting DirectoryNotEmptyException for this directory even after bypassing the " +
+						"isDirectory check! This should absolutely not happen! Returning false...");
+				return false;
+			}
+
+			log.warn("And it was a DirectoryNotEmptyException! This should not happen! Will circumvent the " +
+					"directory check next time.");
+			bypassDirs.add(currDir);
+			finalRetryCounter = retryCounter;
+		} else {
+			// Any other errors: subtract 1 from the retryCounter and hope that it works out next time
+			finalRetryCounter = retryCounter - 1;
+		}
+
+		if (retryCounter > 0) {
+			log.warn("Will retry deletion in 1 minute...");
+			scheduler.schedule(() ->
+				// Retry deletion all the way from the beginning/root again
+				deletePath(scheduler, rootDir, rootDir, forceIfNotEmpty, finalRetryCounter, bypassDirs),
+					1, TimeUnit.MINUTES);
+		} else {
+			log.error("There are no more retries left! {} failed to delete!", currDir);
+		}
+		return false;
 	}
 }
