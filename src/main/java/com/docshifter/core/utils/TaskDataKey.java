@@ -9,5 +9,6 @@ public enum TaskDataKey {
 
 	DOCUMENT_BOUNDARY_TEXT,
 	ADD_BOUNDARY_TITLE,
-	PROCESS_DIRECTORY
+	PROCESS_DIRECTORY,
+	mergeFiles // TODO: deprecate and make naming consistent with other keys?
 }
