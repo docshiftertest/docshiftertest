@@ -3,7 +3,6 @@ package com.docshifter.core.config.services;
 import com.docshifter.core.utils.nalpeiron.LicensableModule;
 import lombok.Getter;
 import static com.docshifter.core.utils.nalpeiron.LicensableModule.*;
-import static com.docshifter.core.utils.nalpeiron.LicensableModule.Transformation_OCR;
 
 /**
  * For the Mock Licensing Service, provides a way to define sets of Modules for licensing, like we define Profiles in Nalpeiron
