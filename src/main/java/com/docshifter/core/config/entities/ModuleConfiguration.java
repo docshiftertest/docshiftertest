@@ -45,7 +45,7 @@ public class ModuleConfiguration {
 	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
 	@MapKeyClass(Parameter.class)
 	@Encrypted
-	private Map<Parameter, String> parameterValues = new HashMap<Parameter, String>();
+	private Map<Parameter, String> parameterValues = new HashMap<>();
 
 	public ModuleConfiguration() {}
 

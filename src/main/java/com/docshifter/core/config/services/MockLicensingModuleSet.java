@@ -3,6 +3,7 @@ package com.docshifter.core.config.services;
 import com.docshifter.core.utils.nalpeiron.LicensableModule;
 import lombok.Getter;
 import static com.docshifter.core.utils.nalpeiron.LicensableModule.*;
+import static com.docshifter.core.utils.nalpeiron.LicensableModule.Transformation_OCR;
 
 /**
  * For the Mock Licensing Service, provides a way to define sets of Modules for licensing, like we define Profiles in Nalpeiron
@@ -17,11 +18,11 @@ public enum MockLicensingModuleSet {
             Transformation_AllToImage, Transformation_AllToPDF, Transformation_Audio, Transformation_Cells,
             Transformation_Characterisation_Check, Transformation_Count_Pages, Transformation_Diagram, Transformation_Document_Generation,
             Transformation_Email, Transformation_eP2AS_Validation, Transformation_EPUB, Transformation_Hash_Check, Transformation_HiFi,
-            Transformation_Image_Overlay, Transformation_Index, Transformation_Merge, Transformation_Nop, Transformation_PDF, Transformation_Pdf_Form_Filler,
-            Transformation_PDF_Optimization, Transformation_PDF_Overlay, Transformation_PDF_Security, Transformation_PdfToTiff_Transformation,
-            Transformation_PDFaValidation, Transformation_PNG, Transformation_Preprocessing, Transformation_Project, Transformation_Rendition_Check,
-            Transformation_Santander_Custom_XML_transformation, Transformation_Signing, Transformation_Slides, Transformation_Thumbnail,
-            Transformation_TIFF, Transformation_ToC_Generator, Transformation_Unzip, Transformation_Video,
+            Transformation_Image_Overlay, Transformation_Index, Transformation_Merge, Transformation_Nop, Transformation_OCR, Transformation_PDF,
+            Transformation_Pdf_Form_Filler, Transformation_PDF_Optimization, Transformation_PDF_Overlay, Transformation_PDF_Security,
+            Transformation_PdfToTiff_Transformation, Transformation_PDFaValidation, Transformation_PNG, Transformation_Preprocessing, Transformation_Project,
+            Transformation_Rendition_Check, Transformation_Santander_Custom_XML_transformation, Transformation_Signing, Transformation_Slides,
+            Transformation_Thumbnail, Transformation_TIFF, Transformation_ToC_Generator, Transformation_Unzip, Transformation_Video,
             Transformation_Words, Transformation_XML_to_PDF, Transformation_XSL,
             T0043, T0044, T0045, T0046, T0047, T0048, T0049,
             T0050, T0051, T0052, T0053, T0054, T0055, T0056, T0057, T0058, T0059,
@@ -35,11 +36,11 @@ public enum MockLicensingModuleSet {
             Transformation_AllToImage, Transformation_AllToPDF, Transformation_Audio, Transformation_Cells,
             Transformation_Characterisation_Check, Transformation_Count_Pages, Transformation_Diagram, Transformation_Document_Generation,
             Transformation_Email, Transformation_eP2AS_Validation, Transformation_EPUB, Transformation_Hash_Check, Transformation_HiFi,
-            Transformation_Image_Overlay, Transformation_Index, Transformation_Merge, Transformation_Nop, Transformation_PDF, Transformation_Pdf_Form_Filler,
-            Transformation_PDF_Optimization, Transformation_PDF_Overlay, Transformation_PDF_Security, Transformation_PdfToTiff_Transformation,
-            Transformation_PDFaValidation, Transformation_PNG, Transformation_Preprocessing, Transformation_Project, Transformation_Rendition_Check,
-            Transformation_Santander_Custom_XML_transformation, Transformation_Signing, Transformation_Slides, Transformation_Thumbnail,
-            Transformation_TIFF, Transformation_ToC_Generator, Transformation_Unzip, Transformation_Video,
+            Transformation_Image_Overlay, Transformation_Index, Transformation_Merge, Transformation_Nop, Transformation_OCR, Transformation_PDF,
+            Transformation_Pdf_Form_Filler, Transformation_PDF_Optimization, Transformation_PDF_Overlay, Transformation_PDF_Security,
+            Transformation_PdfToTiff_Transformation, Transformation_PDFaValidation, Transformation_PNG, Transformation_Preprocessing, Transformation_Project,
+            Transformation_Rendition_Check, Transformation_Santander_Custom_XML_transformation, Transformation_Signing, Transformation_Slides,
+            Transformation_Thumbnail, Transformation_TIFF, Transformation_ToC_Generator, Transformation_Unzip, Transformation_Video,
             Transformation_Words, Transformation_XML_to_PDF, Transformation_XSL),
     DocShifterBase(Release_Email_Release, Release_FTP_release,
             Release_Filesystem_Out, Release_Sync_Return, Release_Web_Service_Rest_Release,
@@ -80,10 +81,10 @@ public enum MockLicensingModuleSet {
             Transformation_AllToImage, Transformation_AllToPDF, Transformation_Audio, Transformation_Cells,
             Transformation_Characterisation_Check, Transformation_Count_Pages, Transformation_Diagram, Transformation_Document_Generation,
             Transformation_Email, Transformation_EPUB, Transformation_Hash_Check, Transformation_HiFi,
-            Transformation_Image_Overlay, Transformation_Index, Transformation_Merge, Transformation_Nop, Transformation_PDF, Transformation_Pdf_Form_Filler,
-            Transformation_PDF_Optimization, Transformation_PDF_Overlay, Transformation_PDF_Security, Transformation_PdfToTiff_Transformation,
-            Transformation_PDFaValidation, Transformation_PNG, Transformation_Preprocessing, Transformation_Project, Transformation_Rendition_Check,
-            Transformation_Signing, Transformation_Slides, Transformation_Thumbnail,
+            Transformation_Image_Overlay, Transformation_Index, Transformation_Merge, Transformation_Nop, Transformation_OCR, Transformation_PDF,
+            Transformation_Pdf_Form_Filler, Transformation_PDF_Optimization, Transformation_PDF_Overlay, Transformation_PDF_Security,
+            Transformation_PdfToTiff_Transformation, Transformation_PDFaValidation, Transformation_PNG, Transformation_Preprocessing, Transformation_Project,
+            Transformation_Rendition_Check, Transformation_Signing, Transformation_Slides, Transformation_Thumbnail,
             Transformation_TIFF, Transformation_ToC_Generator, Transformation_Unzip, Transformation_Video,
             Transformation_Words, Transformation_XML_to_PDF, Transformation_XSL),
     DocShifterDocGen(Release_Email_Release, Release_FTP_release,
