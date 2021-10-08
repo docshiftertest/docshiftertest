@@ -101,6 +101,7 @@ public enum LicensableModule {
     Transformation_Index("T0013"),
     Transformation_Merge("T0014"),
     Transformation_Nop("T0039"),
+    Transformation_OCR("T0015"),
     Transformation_PDF("T0016"),
     Transformation_Pdf_Form_Filler("T0033"),
     Transformation_PDF_Optimization("T0017"),
