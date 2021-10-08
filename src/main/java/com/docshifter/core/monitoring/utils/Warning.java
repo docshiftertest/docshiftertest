@@ -5,9 +5,11 @@ import com.docshifter.core.monitoring.dtos.NotificationDto;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
 import com.docshifter.core.monitoring.services.NotificationService;
 import lombok.extern.log4j.Log4j2;
-
-import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -38,8 +40,8 @@ public abstract class Warning {
 	 * @param task
 	 * @return A Map of Map of Lists of warnings by identifier (e.g. AsposeWarning), then by type (e.g. FONT_SUBSTITUTION)
 	 */
-	public static Map<String, Map<String, List<com.docshifter.core.monitoring.utils.Warning>>> warningsOnTask(Task task) {
-		List<com.docshifter.core.monitoring.utils.Warning> warnings = (List<com.docshifter.core.monitoring.utils.Warning>)task.getData().get(GLOBAL_WARNING_IDENTIFIER);
+	public static Map<String, Map<String, List<Warning>>> warningsOnTask(Task task) {
+		List<Warning> warnings = (List<Warning>)task.getData().get(GLOBAL_WARNING_IDENTIFIER);
 		if (warnings == null) {
 			return new HashMap<>();
 		}
@@ -47,7 +49,7 @@ public abstract class Warning {
 		return warnings.stream()
 				.filter(Objects::nonNull)
 				.distinct()
-				.collect(Collectors.groupingBy(com.docshifter.core.monitoring.utils.Warning::getIdentifier, Collectors.groupingBy(com.docshifter.core.monitoring.utils.Warning::getWarningTypeDesc)));
+				.collect(Collectors.groupingBy(Warning::getIdentifier, Collectors.groupingBy(Warning::getWarningTypeDesc)));
 	}
 
 	/**
@@ -58,10 +60,10 @@ public abstract class Warning {
 	 */
 	// TODO: callers shouldn't have to pass htmlMarkup to this method. It should probably be the responsibility of the notification system
 	//  to determine how the message should be formatted (e.g. webhook = plain text, mail = html).
-	public static String getFormattedList(Map<String, Map<String, List<com.docshifter.core.monitoring.utils.Warning>>> warningsOnTask, boolean htmlMarkup) {
+	public static String getFormattedList(Map<String, Map<String, List<Warning>>> warningsOnTask, boolean htmlMarkup) {
 		StringBuilder sBuf = new StringBuilder();
 		String nl = htmlMarkup ? "<br>" : NEWLINE;
-		for (Map.Entry<String, Map<String, List<com.docshifter.core.monitoring.utils.Warning>>> warningsForIdentifier : warningsOnTask.entrySet()) {
+		for (Map.Entry<String, Map<String, List<Warning>>> warningsForIdentifier : warningsOnTask.entrySet()) {
 			if (htmlMarkup) {
 				sBuf.append("<b>");
 			}
@@ -72,9 +74,9 @@ public abstract class Warning {
 				sBuf.append("</b>");
 			}
 			sBuf.append(nl);
-			for (Map.Entry<String, List<com.docshifter.core.monitoring.utils.Warning>> warningsForGrouping : warningsForIdentifier.getValue().entrySet()) {
+			for (Map.Entry<String, List<Warning>> warningsForGrouping : warningsForIdentifier.getValue().entrySet()) {
 				boolean firstOfGroup = true;
-				for (com.docshifter.core.monitoring.utils.Warning warning : warningsForGrouping.getValue()) {
+				for (Warning warning : warningsForGrouping.getValue()) {
 					if (warning == null) {
 						continue;
 					}
@@ -123,8 +125,8 @@ public abstract class Warning {
 	 * @param htmlMarkup Whether to use rich HTML markup or plain text in the formatted message
 	 * @return A String nicely formatted per warning identifier and type or an empty String
 	 */
-	public static String getFormattedList(Map<String, Map<String, List<com.docshifter.core.monitoring.utils.Warning>>> warningsOnTask, String identifier, boolean htmlMarkup) {
-		Map<String, Map<String, List<com.docshifter.core.monitoring.utils.Warning>>> singleWarningsOnTask = new HashMap<>();
+	public static String getFormattedList(Map<String, Map<String, List<Warning>>> warningsOnTask, String identifier, boolean htmlMarkup) {
+		Map<String, Map<String, List<Warning>>> singleWarningsOnTask = new HashMap<>();
 		if (warningsOnTask.containsKey(identifier)) {
 			singleWarningsOnTask.put(identifier, warningsOnTask.get(identifier));
 		}
@@ -139,11 +141,11 @@ public abstract class Warning {
 	 * @param htmlMarkup Whether to use rich HTML markup or plain text in the formatted message
 	 * @return A String nicely formatted per warning identifier and type or an empty String
 	 */
-	public static String getFormattedList(Map<String, Map<String, List<com.docshifter.core.monitoring.utils.Warning>>> warningsOnTask, String identifier, String warningType, boolean htmlMarkup) {
-		Map<String, Map<String, List<com.docshifter.core.monitoring.utils.Warning>>> singleWarningsOnTask = new HashMap<>();
+	public static String getFormattedList(Map<String, Map<String, List<Warning>>> warningsOnTask, String identifier, String warningType, boolean htmlMarkup) {
+		Map<String, Map<String, List<Warning>>> singleWarningsOnTask = new HashMap<>();
 		if (warningsOnTask.containsKey(identifier) &&
 				warningsOnTask.get(identifier).containsKey(warningType)) {
-			Map<String, List<com.docshifter.core.monitoring.utils.Warning>> single = new HashMap<>();
+			Map<String, List<Warning>> single = new HashMap<>();
 			single.put(warningType, warningsOnTask.get(identifier).get(warningType));
 			singleWarningsOnTask.put(identifier, single);
 		}
@@ -193,14 +195,14 @@ public abstract class Warning {
 		notifier.sendNotification(notificationConfigId, notification);
 
 		// Perform cleanup
-		List<com.docshifter.core.monitoring.utils.Warning> warnings = (List<com.docshifter.core.monitoring.utils.Warning>)task.getData().get(GLOBAL_WARNING_IDENTIFIER);
+		List<Warning> warnings = (List<Warning>)task.getData().get(GLOBAL_WARNING_IDENTIFIER);
 		if (warnings != null) {
 			warnings.clear();
 		}
 	}
 
 	public void serializeToTask(Task task) {
-		List<com.docshifter.core.monitoring.utils.Warning> warnings = (List<com.docshifter.core.monitoring.utils.Warning>)task.getData().get(GLOBAL_WARNING_IDENTIFIER);
+		List<Warning> warnings = (List<Warning>)task.getData().get(GLOBAL_WARNING_IDENTIFIER);
 		if (warnings == null) {
 			warnings = new ArrayList<>();
 			task.getData().put(GLOBAL_WARNING_IDENTIFIER, warnings);
@@ -237,7 +239,7 @@ public abstract class Warning {
 			return false;
 		}
 
-		com.docshifter.core.monitoring.utils.Warning warning = (com.docshifter.core.monitoring.utils.Warning) o;
+		Warning warning = (Warning) o;
 		return getIdentifier().equals(warning.getIdentifier()) &&
 				warningTypeDesc.equals(warning.warningTypeDesc) &&
 				description.equals(warning.description);

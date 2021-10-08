@@ -47,7 +47,7 @@ public class ChainConfiguration {
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
 			  long timeout, long priority) {
-		this(name, description, enabled, rootNode, printerName, queueName, timeout, Integer.valueOf((int) priority));
+		this(name, description, enabled, rootNode, printerName, queueName, timeout, (int) priority);
 	}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
