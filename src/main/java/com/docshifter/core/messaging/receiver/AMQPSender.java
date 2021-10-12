@@ -15,13 +15,13 @@ import org.springframework.jms.core.JmsTemplate;
 public class AMQPSender implements IMessageSender {
 
 	private final ActiveMQQueue docshifterMetricsQueue;
-	private final JmsTemplate defaultJmsTemplate;
+	private final JmsTemplate metricsJmsTemplate;
 	private final IJmsTemplateFactory jmsTemplateFactory;
 	private final int queueReplyTimeout;
 
-	public AMQPSender(JmsTemplate defaultJmsTemplate, IJmsTemplateFactory jmsTemplateFactory,
+	public AMQPSender(JmsTemplate metricsJmsTemplate, IJmsTemplateFactory jmsTemplateFactory,
                       ActiveMQQueue docshifterMetricsQueue, int queueReplyTimeout) {
-		this.defaultJmsTemplate = defaultJmsTemplate;
+		this.metricsJmsTemplate = metricsJmsTemplate;
 		this.jmsTemplateFactory = jmsTemplateFactory;
 		this.docshifterMetricsQueue = docshifterMetricsQueue;
 		this.queueReplyTimeout = queueReplyTimeout;
@@ -29,7 +29,7 @@ public class AMQPSender implements IMessageSender {
 
 	@Override
 	public void sendMetrics(DocShifterMetricsReceiverMessage metricsMessage) {
-		defaultJmsTemplate.convertAndSend(docshifterMetricsQueue.getName(), metricsMessage, messagePostProcessor -> {
+		metricsJmsTemplate.convertAndSend(docshifterMetricsQueue.getName(), metricsMessage, messagePostProcessor -> {
 			log.debug("'jmsTemplate.convertAndSend': metricsMessage.taskId={}",
 					metricsMessage::getTaskId);
 			return messagePostProcessor;

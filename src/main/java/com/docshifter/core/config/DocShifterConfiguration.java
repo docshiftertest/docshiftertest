@@ -25,14 +25,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
-import org.springframework.jms.config.SimpleJmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
-
 import javax.jms.ConnectionFactory;
-import javax.jms.ExceptionListener;
-import javax.jms.JMSException;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
@@ -44,6 +40,10 @@ public class DocShifterConfiguration {
 
 	@Value("${queue.replytimeout:300}")
 	private int queueReplyTimeout;
+
+	// Default to 5 minutes (5*60*1000)
+	@Value("${metrics.timetolive:300000}")
+	private long metricsTimeToLive;
 
 	public GeneralConfigService generalConfigService;
 	
@@ -93,9 +93,23 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
+	public JmsTemplate metricsJmsTemplate() {
+		JmsTemplate template = jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY,
+				queueReplyTimeout);
+		template.setTimeToLive(metricsTimeToLive);
+		return template;
+	}
+
+	@Bean
 	@DependsOn("defaultJmsTemplate")
 	public JmsMessagingTemplate defaultMessagingTemplate () {
 		return new JmsMessagingTemplate(defaultJmsTemplate());
+	}
+
+	@Bean
+	@DependsOn("metricsJmsTemplate")
+	public JmsMessagingTemplate metricsMessagingTemplate () {
+		return new JmsMessagingTemplate(metricsJmsTemplate());
 	}
 
 	@Bean
