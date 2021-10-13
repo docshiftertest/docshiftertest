@@ -9,5 +9,33 @@ public enum TaskDataKey {
 
 	DOCUMENT_BOUNDARY_TEXT,
 	ADD_BOUNDARY_TITLE,
-	PROCESS_DIRECTORY
+
+	/**
+	 * TODO: we added mergeFiles in 7.0, but in the name of consistency we should point people as much as
+	 * 	possible to using MERGE_FILES instead, which is in a more similar format compared to other
+	 *  "special" task data keys such as DOCUMENT_BOUNDARY_TEXT and ADD_BOUNDARY_TITLE. So this should be
+	 * 	completely removed one day...
+	 */
+	@Deprecated
+	MERGE_FILES_OLD("mergeFiles"),
+
+	PROCESS_DIRECTORY("MERGE_FILES");
+
+	private final String alias;
+
+	TaskDataKey(String alias) {
+		this.alias = alias;
+	}
+
+	TaskDataKey() {
+		alias = null;
+	}
+
+	@Override
+	public String toString() {
+		if (alias == null) {
+			return name();
+		}
+		return alias;
+	}
 }
