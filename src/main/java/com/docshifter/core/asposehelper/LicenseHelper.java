@@ -1,5 +1,6 @@
 package com.docshifter.core.asposehelper;
 
+import com.docshifter.core.utils.FileUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.LocaleUtils;
 import java.io.IOException;
@@ -10,6 +11,8 @@ import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 @Log4j2
 public class LicenseHelper {
@@ -58,9 +61,9 @@ public class LicenseHelper {
 	private final com.aspose.cad.License cadLicense;
 	private final com.aspose.html.License htmlLicense;
 
-	private static final LicenseHelper licenseHelper = new LicenseHelper();
+	private static final LicenseHelper licenseHelper = new LicenseHelper(Executors.newSingleThreadScheduledExecutor());
 
-	private LicenseHelper() {
+	private LicenseHelper(ScheduledExecutorService sExe) {
 		byte[] licenceBytes = Base64.getDecoder().decode(B64.getBytes(StandardCharsets.UTF_8));
 		String tmpFileName = UUID.randomUUID().toString();
 		String tmpDir = System.getProperty("java.io.tmpdir");
@@ -116,15 +119,19 @@ public class LicenseHelper {
 			cadLicense.setLicense(tmpFileFullPathStr);
 			diagramLicense.setLicense(tmpFileFullPathStr);
 			htmlLicense.setLicense(tmpFileFullPathStr);
-			Files.deleteIfExists(tmpFileFullPath);
 		}
 		catch (Exception ex) {
 			log.error("An error occurred while loading in an Aspose license.", ex);
 		}
+		finally {
+			FileUtils.deletePath(sExe, tmpFileFullPath, true);
+		}
 
-		log.debug("Following Aspose versions are in use:");
-		for (String feature : AsposeVersionUtil.getSupportedFeatures()) {
-			log.debug(AsposeVersionUtil.getImplementationVersions(feature));
+		if (log.isDebugEnabled()) {
+			log.debug("Following Aspose versions are in use:");
+			for (String feature : AsposeVersionUtil.getSupportedFeatures()) {
+				log.debug(AsposeVersionUtil.getImplementationVersions(feature));
+			}
 		}
 	}
 

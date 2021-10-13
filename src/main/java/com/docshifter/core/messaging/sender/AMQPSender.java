@@ -28,12 +28,16 @@ public class AMQPSender implements IMessageSender {
 	private final ActiveMQQueue docshifterQueue;
 	private final ActiveMQQueue docshifterMetricsQueue;
 	private final JmsTemplate defaultJmsTemplate;
+	private final JmsTemplate metricsJmsTemplate;
 	private final IJmsTemplateFactory jmsTemplateFactory;
 	private final int queueReplyTimeout;
 
-	public AMQPSender(JmsTemplate defaultJmsTemplate, IJmsTemplateFactory jmsTemplateFactory,
-					  ActiveMQQueue docshifterQueue, ActiveMQQueue docshifterMetricsQueue, int queueReplyTimeout) {
+	public AMQPSender(JmsTemplate defaultJmsTemplate, JmsTemplate metricsJmsTemplate,
+					  IJmsTemplateFactory jmsTemplateFactory,
+					  ActiveMQQueue docshifterQueue, ActiveMQQueue docshifterMetricsQueue,
+					  int queueReplyTimeout) {
 		this.defaultJmsTemplate = defaultJmsTemplate;
+		this.metricsJmsTemplate = metricsJmsTemplate;
 		this.jmsTemplateFactory = jmsTemplateFactory;
 		this.docshifterQueue = docshifterQueue;
 		this.docshifterMetricsQueue = docshifterMetricsQueue;
@@ -203,7 +207,7 @@ public class AMQPSender implements IMessageSender {
 
 	@Override
 	public void sendMetrics(DocShifterMetricsSenderMessage metricsMessage) {
-		defaultJmsTemplate.convertAndSend(docshifterMetricsQueue.getName(), metricsMessage, messagePostProcessor -> {
+		metricsJmsTemplate.convertAndSend(docshifterMetricsQueue.getName(), metricsMessage, messagePostProcessor -> {
 			log.debug("'jmsTemplate.convertAndSend': metricsMessage.taskId={}",
 					metricsMessage::getTaskId);
 			return messagePostProcessor;
