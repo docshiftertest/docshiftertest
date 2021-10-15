@@ -1,444 +1,450 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>beans</artifactId>
-	<version>${revision}${sha1}${changelist}</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>beans</artifactId>
+    <version>${revision}${sha1}${changelist}</version>
 
-	<parent>
-		<groupId>com.docshifter</groupId>
-		<artifactId>parent</artifactId>
-		<version>1.0</version>
-	</parent>
+    <parent>
+        <groupId>com.docshifter</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0</version>
+    </parent>
 
-	<properties>
-		<revision>7.0.1</revision>
-		<sha1 />
-		<hsqldb.version>2.3.4</hsqldb.version>
+    <properties>
+        <revision>7.0.1</revision>
+        <sha1/>
+        <hsqldb.version>2.3.4</hsqldb.version>
 
-		<aspose.cad.version>21.4</aspose.cad.version>
-		<!-- Despite the fact Aspose show a classifier, it's apparently not needed -->
-		<!-- SIGHS -->
-		<!-- aspose.cad.classifier>jdk16</aspose.cad.classifier -->
+        <aspose.cad.version>21.4</aspose.cad.version>
+        <!-- Despite the fact Aspose show a classifier, it's apparently not needed -->
+        <!-- SIGHS -->
+        <!-- aspose.cad.classifier>jdk16</aspose.cad.classifier -->
 
-		<aspose.cells.version>21.7</aspose.cells.version>
+        <aspose.cells.version>21.7</aspose.cells.version>
 
-		<aspose.diagram.version>21.8</aspose.diagram.version>
-		<aspose.diagram.classifier>jdk16</aspose.diagram.classifier>
+        <aspose.diagram.version>21.8</aspose.diagram.version>
+        <aspose.diagram.classifier>jdk16</aspose.diagram.classifier>
 
-		<aspose.email.version>21.7</aspose.email.version>
-		<aspose.email.classifier>jdk16</aspose.email.classifier>
+        <aspose.email.version>21.7</aspose.email.version>
+        <aspose.email.classifier>jdk16</aspose.email.classifier>
 
-		<aspose.imaging.version>21.8</aspose.imaging.version>
-		<aspose.imaging.classifier>jdk16</aspose.imaging.classifier>
+        <aspose.imaging.version>21.8</aspose.imaging.version>
+        <aspose.imaging.classifier>jdk16</aspose.imaging.classifier>
 
-		<!-- This is not used at the moment but we try to keep it up-to-date
+        <!-- This is not used at the moment but we try to keep it up-to-date
         <aspose.note.version>21.5</aspose.note.version>
         <aspose.note.classifier>jdk17</aspose.note.classifier>
         -->
 
-<!--		<aspose.ocr.version>21.5</aspose.ocr.version>-->
+        <!--		<aspose.ocr.version>21.5</aspose.ocr.version>-->
 
-		<aspose.pdf.version>21.8</aspose.pdf.version>
-		<aspose.pdf.classifier>jdk17</aspose.pdf.classifier>
+        <aspose.pdf.version>21.8</aspose.pdf.version>
+        <aspose.pdf.classifier>jdk17</aspose.pdf.classifier>
 
-		<aspose.slides.version>21.7</aspose.slides.version>
-		<aspose.slides.classifier>jdk16</aspose.slides.classifier>
+        <aspose.slides.version>21.7</aspose.slides.version>
+        <aspose.slides.classifier>jdk16</aspose.slides.classifier>
 
-		<!-- Kept back to 20.12 because of hideous spamming of tmp by awful borked Asspose lib -->
-		<aspose.tasks.version>20.12</aspose.tasks.version>
-		<aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
+        <!-- Kept back to 20.12 because of hideous spamming of tmp by awful borked Asspose lib -->
+        <aspose.tasks.version>20.12</aspose.tasks.version>
+        <aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
 
-		<aspose.words.version>21.8</aspose.words.version>
-		<aspose.words.classifier>jdk17</aspose.words.classifier>
+        <aspose.words.version>21.8</aspose.words.version>
+        <aspose.words.classifier>jdk17</aspose.words.classifier>
 
-		<aspose.html.version>21.6</aspose.html.version>
-		<!-- Despite fact Aspose claim a classifier is not needed, apparently it is -->
-		<!-- SIGHS again -->
-		<aspose.html.classifier>jdk1.8</aspose.html.classifier>
+        <aspose.html.version>21.6</aspose.html.version>
+        <!-- Despite fact Aspose claim a classifier is not needed, apparently it is -->
+        <!-- SIGHS again -->
+        <aspose.html.classifier>jdk1.8</aspose.html.classifier>
 
-		<kubernetes-client.version>5.3.0</kubernetes-client.version>
+        <kubernetes-client.version>5.3.0</kubernetes-client.version>
 
-	</properties>
+    </properties>
 
-	<repositories>
-		<repository>
-			<id>internal</id>
-			<name>Archiva Managed Internal Repository</name>
-			<url>https://mvn.docshifter.com/repository/releases/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <id>internal</id>
+            <name>Archiva Managed Internal Repository</name>
+            <url>https://mvn.docshifter.com/repository/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.snmp4j</groupId>
-			<artifactId>snmp4j</artifactId>
-			<!-- This should be updated to 3.0.5 but appears to be missing the class
-				org.snmp4j.test.MultiThreadedTrapReceiver which is weird, and kind of scary! -->
-			<version>2.6.3</version>
-			<exclusions>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.snmp4j</groupId>
+            <artifactId>snmp4j</artifactId>
+            <!-- This should be updated to 3.0.5 but appears to be missing the class
+                org.snmp4j.test.MultiThreadedTrapReceiver which is weird, and kind of scary! -->
+            <version>2.6.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-artemis</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-artemis</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4.7</version>
-		</dependency>
-		<dependency>
-			<groupId>com.icegreen</groupId>
-			<artifactId>greenmail</artifactId>
-			<version>1.5.8</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-			<version>2.4.1</version>
-		</dependency>
-		<!-- test -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-email</artifactId>
-			<version>1.5</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail</artifactId>
+            <version>1.5.8</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+            <version>2.4.1</version>
+        </dependency>
+        <!-- test -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>1.5</version>
+            <scope>test</scope>
+        </dependency>
 
-		<!-- Aspose dependencies -->
-		<dependency>
-			<groupId>com.aspose</groupId>
-			<artifactId>aspose-cells</artifactId>
-			<version>${aspose.cells.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.aspose</groupId>
-			<artifactId>aspose-slides</artifactId>
-			<version>${aspose.slides.version}</version>
-			<classifier>${aspose.slides.classifier}</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.aspose</groupId>
-			<artifactId>aspose-words</artifactId>
-			<version>${aspose.words.version}</version>
-			<classifier>${aspose.words.classifier}</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.aspose</groupId>
-			<artifactId>aspose-pdf</artifactId>
-			<version>${aspose.pdf.version}</version>
-			<classifier>${aspose.pdf.classifier}</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.aspose</groupId>
-			<artifactId>aspose-email</artifactId>
-			<version>${aspose.email.version}</version>
-			<classifier>${aspose.email.classifier}</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.aspose</groupId>
-			<artifactId>aspose-imaging</artifactId>
-			<version>${aspose.imaging.version}</version>
-			<classifier>${aspose.imaging.classifier}</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.aspose</groupId>
-			<artifactId>aspose-cad</artifactId>
-			<version>${aspose.cad.version}</version>
-			<!-- classifier>${aspose.cad.classifier}</classifier -->
-		</dependency>
-		<dependency>
-			<groupId>com.aspose</groupId>
-			<artifactId>aspose-diagram</artifactId>
-			<version>${aspose.diagram.version}</version>
-			<classifier>${aspose.diagram.classifier}</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.aspose</groupId>
-			<artifactId>aspose-tasks</artifactId>
-			<version>${aspose.tasks.version}</version>
-			<classifier>${aspose.tasks.classifier}</classifier>
-		</dependency>
-<!--		<dependency>
-			<groupId>com.aspose</groupId>
-			<artifactId>aspose-ocr</artifactId>
-			<version>${aspose.ocr.version}</version>
-		</dependency>-->
-		<dependency>
-			<groupId>com.aspose</groupId>
-			<artifactId>aspose-html</artifactId>
-			<version>${aspose.html.version}</version>
-			<classifier>${aspose.html.classifier}</classifier>
-		</dependency>
+        <!-- Aspose dependencies -->
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-cells</artifactId>
+            <version>${aspose.cells.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-slides</artifactId>
+            <version>${aspose.slides.version}</version>
+            <classifier>${aspose.slides.classifier}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-words</artifactId>
+            <version>${aspose.words.version}</version>
+            <classifier>${aspose.words.classifier}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-pdf</artifactId>
+            <version>${aspose.pdf.version}</version>
+            <classifier>${aspose.pdf.classifier}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-email</artifactId>
+            <version>${aspose.email.version}</version>
+            <classifier>${aspose.email.classifier}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-imaging</artifactId>
+            <version>${aspose.imaging.version}</version>
+            <classifier>${aspose.imaging.classifier}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-cad</artifactId>
+            <version>${aspose.cad.version}</version>
+            <!-- classifier>${aspose.cad.classifier}</classifier -->
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-diagram</artifactId>
+            <version>${aspose.diagram.version}</version>
+            <classifier>${aspose.diagram.classifier}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-tasks</artifactId>
+            <version>${aspose.tasks.version}</version>
+            <classifier>${aspose.tasks.classifier}</classifier>
+        </dependency>
+        <!--		<dependency>
+                    <groupId>com.aspose</groupId>
+                    <artifactId>aspose-ocr</artifactId>
+                    <version>${aspose.ocr.version}</version>
+                </dependency>-->
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-html</artifactId>
+            <version>${aspose.html.version}</version>
+            <classifier>${aspose.html.classifier}</classifier>
+        </dependency>
 
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-configuration</groupId>
-			<artifactId>commons-configuration</artifactId>
-			<version>1.10</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.6</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.6</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-pool</groupId>
-			<artifactId>commons-pool</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.google.jimfs</groupId>
-			<artifactId>jimfs</artifactId>
-			<version>1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish</groupId>
-			<artifactId>javax.el</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-rest-core</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.10</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.jimfs</groupId>
+            <artifactId>jimfs</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-rest-core</artifactId>
+        </dependency>
 
-		<!-- jasypt to encrypt properties -->
-		<dependency>
-			<groupId>com.github.ulisesbocchio</groupId>
-			<artifactId>jasypt-spring-boot-starter</artifactId>
-			<version>3.0.0</version>
-		</dependency>
+        <!-- jasypt to encrypt properties -->
+        <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
+            <version>3.0.0</version>
+        </dependency>
 
-		<!-- SharePoint SDK -->
-		<dependency>
-			<groupId>com.microsoft.graph</groupId>
-			<artifactId>microsoft-graph</artifactId>
-			<version>3.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20210307</version>
-		</dependency>
+		<!-- Sharepoint SDK -->
+        <dependency>
+            <groupId>com.microsoft.graph</groupId>
+            <artifactId>microsoft-graph</artifactId>
+            <version>5.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-identity</artifactId>
+            <version>1.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20210307</version>
+        </dependency>
 
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-text</artifactId>
-			<version>1.6</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.emc.documentum.dfc</groupId>
-			<artifactId>dfc</artifactId>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-imaging</artifactId>
-			<version>1.0-alpha1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.jcraft</groupId>
-			<artifactId>jsch</artifactId>
-			<version>0.1.55</version>
-		</dependency>
-		
-       <!--Caching Dependency-->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-ehcache</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.6</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.emc.documentum.dfc</groupId>
+            <artifactId>dfc</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-imaging</artifactId>
+            <version>1.0-alpha1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.55</version>
+        </dependency>
 
-		<dependency>
-			<groupId>io.fabric8</groupId>
-			<artifactId>kubernetes-client</artifactId>
-			<version>${kubernetes-client.version}</version>
-		</dependency>
+        <!--Caching Dependency-->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-ehcache</artifactId>
+        </dependency>
 
-		<!-- Not sure where else pdfbox is brought in, but we do use it here and there -->
-		<dependency>
-			<groupId>org.apache.pdfbox</groupId>
-			<artifactId>pdfbox</artifactId>
-			<version>2.0.24</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.pdfbox</groupId>
-			<artifactId>fontbox</artifactId>
-			<version>2.0.24</version>
-		</dependency>
-		<!-- Unzip 7z -->
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-compress</artifactId>
-			<version>1.21</version>
-		</dependency>
-		<!-- Unzip 7z dependency with commons-compress for 7z-->
-		<!-- https://mvnrepository.com/artifact/org.tukaani/xz -->
-		<dependency>
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-client</artifactId>
+            <version>${kubernetes-client.version}</version>
+        </dependency>
+
+        <!-- Not sure where else pdfbox is brought in, but we do use it here and there -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>2.0.24</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>fontbox</artifactId>
+            <version>2.0.24</version>
+        </dependency>
+        <!-- Unzip 7z -->
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.21</version>
+        </dependency>
+        <!-- Unzip 7z dependency with commons-compress for 7z-->
+        <!-- https://mvnrepository.com/artifact/org.tukaani/xz -->
+        <dependency>
             <groupId>org.tukaani</groupId>
             <artifactId>xz</artifactId>
             <version>1.9</version>
         </dependency>
-	</dependencies>
+    </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<finalName>docshifter-beans</finalName>
-					<outputDirectory>${project.build.directory}/jars/</outputDirectory>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0.0</version>
-				<executions>
-					<execution>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>write-project-properties</goal>
-						</goals>
-						<configuration>
-							<outputFile>${project.build.outputDirectory}/aspose_versions.properties</outputFile>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <finalName>docshifter-beans</finalName>
+                    <outputDirectory>${project.build.directory}/jars/</outputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>write-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <outputFile>${project.build.outputDirectory}/aspose_versions.properties</outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
-	<profiles>
-		<profile>
-			<id>test</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.1.0</version>
-						<executions>
-							<execution>
-								<id>make-assembly</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<finalName>DocShifter-Beans</finalName>
-									<descriptors>
-										<descriptor>src/main/assembly/assembly.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.1.0</version>
-						<executions>
-							<execution>
-								<id>make-assembly</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<finalName>DocShifter-Beans</finalName>
-									<descriptors>
-										<descriptor>src/main/assembly/assembly.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-							<execution>
-								<id>make-assembly-docker</id> <!-- this is used for inheritance merges -->
-								<phase>package</phase> <!-- bind to the packaging phase -->
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<descriptors>
-										<descriptor>src/main/assembly/assembly-docker.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>com.spotify</groupId>
-						<artifactId>dockerfile-maven-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+    <profiles>
+        <profile>
+            <id>test</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <finalName>DocShifter-Beans</finalName>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/assembly.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <finalName>DocShifter-Beans</finalName>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/assembly.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>make-assembly-docker</id> <!-- this is used for inheritance merges -->
+                                <phase>package</phase> <!-- bind to the packaging phase -->
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/assembly-docker.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.spotify</groupId>
+                        <artifactId>dockerfile-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
