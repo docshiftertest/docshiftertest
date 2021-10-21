@@ -1,6 +1,8 @@
 package com.docshifter.core.task;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +82,10 @@ public class Task implements Serializable {
 		return results;
 	}
 
+	public String addMessage(String message) {
+		return addMessage(TaskMessageSeverity.ERROR, message);
+	}
+
 	public String addMessage(TaskMessageSeverity severity, String message) {
 		List<String> messagesForSeverity = messages.get(severity);
 		if (messagesForSeverity == null) {
@@ -90,8 +96,19 @@ public class Task implements Serializable {
 		return message;
 	}
 
-	public String addMessage(String message) {
-		return addMessage(TaskMessageSeverity.ERROR, message);
+	public String addMessage(String message, Exception exc) {
+		return(addMessage(TaskMessageSeverity.ERROR, message, exc));
+	}
+
+	public String addMessage(TaskMessageSeverity severity, String message, Exception exc) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		exc.printStackTrace(pw);
+		String exceptionMessage = message + " - " + sw;
+		if (exceptionMessage.length() > 8192) {
+			exceptionMessage = exceptionMessage.substring(0, 8192);
+		}
+		return addMessage(severity, exceptionMessage);
 	}
 
 	public String getName() {
