@@ -15,16 +15,16 @@ import java.util.List;
  */
 public interface DashboardRepository extends JpaRepository<Dashboard, String> {
 
-    @Query("select dash.finishTimestamp as finishTimestamp from Dashboard dash where dash.isLicensed")
+    @Query("select dash.finishTimestamp as finishTimestamp from Dashboard dash where dash.isLicensed = TRUE")
     List<TasksDistributionSample> findAllFinishTimestamp();
 
-    @Query(value = "select dash.processingDuration as processingDuration from Dashboard dash where dash.onMessageHit BETWEEN :startDate AND :endDate AND dash.isLicensed")
+    @Query(value = "select dash.processingDuration as processingDuration from Dashboard dash where dash.onMessageHit BETWEEN :startDate AND :endDate AND dash.isLicensed = TRUE")
     List<TasksStatisticsSample> findAllProcessingDurationBetweenDates(@Param("startDate") Long startDate, @Param("endDate") Long endDate);
 
-    @Query("select dash.processingDuration as processingDuration from Dashboard dash where dash.isLicensed")
+    @Query("select dash.processingDuration as processingDuration from Dashboard dash where dash.isLicensed = TRUE")
     List<TasksStatisticsSample> findAllProcessingDuration();
 
-    @Query("select dash.onMessageHit as onMessageHit , dash.success as success from Dashboard dash where dash.isLicensed")
+    @Query("select dash.onMessageHit as onMessageHit , dash.success as success from Dashboard dash where dash.isLicensed = TRUE")
     List<ProcessedTasksSample> findAllOnMessageHitAndSuccess();
 
     List<Dashboard> findAllBySuccess(Boolean success);
