@@ -30,6 +30,7 @@ public class Dashboard {
     private Long processingDuration;
     private Long finishTimestamp;
     private Boolean success;
+    private Boolean isLicensed;
     @OneToMany(mappedBy = "dashboard", cascade = CascadeType.ALL)
     private List<DashboardTaskMessage> taskMessages;
     @OneToMany(mappedBy = "dashboard", cascade = CascadeType.ALL)
