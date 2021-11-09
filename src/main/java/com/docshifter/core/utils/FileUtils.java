@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.URL;
@@ -24,7 +25,9 @@ import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -693,5 +696,25 @@ public final class FileUtils {
 			log.error("There are no more retries left! {} failed to delete!", currDir);
 		}
 		return false;
+	}
+
+	/**
+	 * Gets the output (stdout or stderr) as a List of Strings
+	 * @param strm An input stream (normally stdout or stderr of a command)
+	 * @return List<String> The lines of (error) output
+	 * @throws IOException
+	 */
+	public static List<String> getOutputLines(InputStream strm) throws IOException {
+		BufferedReader output = new BufferedReader( new InputStreamReader( strm ) );
+		List<String> outLines = new ArrayList<>();
+		log.debug("Starting loop for readLine...");
+		String line = output.readLine();
+		while( line != null) {
+			// Handle the line
+			outLines.add(line);
+			// Read the next line
+			line = output.readLine();
+		}
+		return outLines;
 	}
 }
