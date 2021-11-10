@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -20,14 +21,15 @@ import java.util.stream.Collectors;
 @Log4j2
 public final class HashUtils {
 	private static final Pattern DIGEST_PATTERN = Pattern.compile("[\\s\\-]");
-	private static final Map<String, String> digestMap = fillDigestMap("MD5", "SHA-1", "SHA-256", "SHA-512");
+	public static final Map<String, String> SUPPORTED_DIGEST_MAP = fillDigestMap("MD5", "SHA-1", "SHA-256", "SHA-512");
 
 	private HashUtils() {}
 
 	private static Map<String, String> fillDigestMap(String... digests) {
-		return Arrays.stream(digests).collect(
-				Collectors.toMap(digest -> DIGEST_PATTERN.matcher(digest).replaceAll("").toLowerCase(),
-				digest -> digest));
+		return Collections.unmodifiableMap(
+				Arrays.stream(digests).collect(
+						Collectors.toMap(digest -> DIGEST_PATTERN.matcher(digest).replaceAll("").toLowerCase(),
+								digest -> digest)));
 	}
 
 	/**
@@ -47,7 +49,7 @@ public final class HashUtils {
 		}
 
 		digestMethod = DIGEST_PATTERN.matcher(digestMethod).replaceAll("").toLowerCase();
-		digestMethodToUse = digestMap.get(digestMethod);
+		digestMethodToUse = SUPPORTED_DIGEST_MAP.get(digestMethod);
 		if (digestMethodToUse == null) {
 			log.error("digestMethod is not available: {}", digestMethod);
 			return null;
