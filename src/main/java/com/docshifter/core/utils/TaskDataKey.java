@@ -19,7 +19,15 @@ public enum TaskDataKey {
 	@Deprecated
 	MERGE_FILES_OLD("mergeFiles"),
 
-	PROCESS_DIRECTORY("MERGE_FILES");
+	PROCESS_DIRECTORY("MERGE_FILES"),
+
+	// Used in FileSystem input module and Document hash check option
+	PROVIDED_HASH,
+	PROVIDED_DIGEST_METHOD,
+
+	// Used in FileSystem export module and Document hash generation (Hash Snapshot module)
+	GENERATED_HASH,
+	GENERATED_DIGEST_METHOD;
 
 	private final String alias;
 
