@@ -22,11 +22,12 @@ public enum TaskDataKey {
 	PROCESS_DIRECTORY("MERGE_FILES"),
 
 	// Used in FileSystem input module and Document hash check option
-	PROVIDED_HASH("providedHash"),
-	DIGEST_METHOD("digestMethod"),
+	PROVIDED_HASH,
+	PROVIDED_DIGEST_METHOD,
 
-	// Used in FileSystem export module and Document hash generation
-	GENERATED_HASH("generatedHash");
+	// Used in FileSystem export module and Document hash generation (Hash Snapshot module)
+	GENERATED_HASH,
+	GENERATED_DIGEST_METHOD;
 
 	private final String alias;
 
