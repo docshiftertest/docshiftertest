@@ -53,6 +53,7 @@ public enum MockLicensingModuleSet {
     DocShifterHiFi(Release_Email_Release, Release_FTP_release,
             Release_Filesystem_Out, Release_Sync_Return, Release_Web_Service_Rest_Release,
             Transformation_AllToPDF,
+            Transformation_Diagram,
             Transformation_Email,
             Transformation_HiFi,
             Transformation_Image_Overlay, Transformation_Index, Transformation_Merge, Transformation_Nop, Transformation_PDF,
