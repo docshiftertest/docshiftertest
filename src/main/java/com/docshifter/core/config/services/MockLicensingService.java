@@ -77,11 +77,11 @@ public class MockLicensingService implements ILicensingService {
 		// Non-production usage
 		keys.put("265a797a-bc7a-4208-8176-5d86c969222a", new License(
 				new GregorianCalendar(2022, Calendar.SEPTEMBER, 31, 23,	59,	59).getTime(),
-				1, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Transformation_Diagram));
+				1, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 		// Production usage
 		keys.put("fe08d717-f8e8-4aa0-b641-9ed734f8cde7", new License(
 				new GregorianCalendar(2022, Calendar.SEPTEMBER, 31, 23,	59,	59).getTime(),
-				1, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Transformation_Diagram));
+				1, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 
 		// === Volksbank July 1 2022 expiry ===
 		// DocShifterEverything = Give me EVERYTHING for Licensable Modules!
