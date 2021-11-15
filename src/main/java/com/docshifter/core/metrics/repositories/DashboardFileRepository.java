@@ -13,9 +13,9 @@ import java.util.List;
  */
 public interface DashboardFileRepository extends JpaRepository<DashboardFile,Long> {
 
-    @Query("select file.fileName as filename,file.dashboard.onMessageHit as onMessaeHit,file.fileSize as fileSize from DashboardFile file")
-    List<FileTypeDistributionSample> findAllFileTypeDistribution();
+    @Query("select file.fileName as filename,file.dashboard.onMessageHit as onMessaeHit,file.fileSize as fileSize from DashboardFile file where (file.dashboard.workflowName = :workflowName or :workflowName = 'ALL')")
+    List<FileTypeDistributionSample> findAllFileTypeDistribution(@Param("workflowName") String workflowName);
 
-    @Query("select file.fileName as filename,file.dashboard.onMessageHit as onMessaeHit,file.fileSize as fileSize from DashboardFile file where file.dashboard.onMessageHit BETWEEN :startDate AND :endDate")
-    List<FileTypeDistributionSample> findAllFileTypeDistributionBetweenDates(@Param("startDate") Long startDate, @Param("endDate") Long endDate);
+    @Query("select file.fileName as filename,file.dashboard.onMessageHit as onMessaeHit,file.fileSize as fileSize from DashboardFile file where file.dashboard.onMessageHit BETWEEN :startDate AND :endDate AND (file.dashboard.workflowName = :workflowName or :workflowName = 'ALL')")
+    List<FileTypeDistributionSample> findAllFileTypeDistributionBetweenDates(@Param("startDate") Long startDate, @Param("endDate") Long endDate, @Param("workflowName") String workflowName);
 }
