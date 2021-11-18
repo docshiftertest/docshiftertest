@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,19 +92,23 @@ public final class CLIUtils {
 	 * Gets the output (stdout or stderr) as a List of Strings
 	 * @param strm An input stream (normally stdout or stderr of a command)
 	 * @return List<String> The lines of (error) output
-	 * @throws IOException
+	 * @throws IOException If an I/O error occurs while reading the lines from the input stream
 	 */
 	public static String[] getOutputLines(InputStream strm) throws IOException {
-		BufferedReader output = new BufferedReader( new InputStreamReader( strm ) );
 		List<String> outLines = new ArrayList<>();
-		log.debug("Starting loop for readLine...");
-		String line = output.readLine();
-		while( line != null) {
-			// Handle the line
-			outLines.add(line);
-			// Read the next line
-			line = output.readLine();
+
+		try (Reader reader = new InputStreamReader(strm);
+			 BufferedReader output = new BufferedReader(reader)) {
+			log.debug("Starting loop for readLine...");
+			String line = output.readLine();
+			while (line != null) {
+				// Handle the line
+				outLines.add(line);
+				// Read the next line
+				line = output.readLine();
+			}
 		}
+
 		return outLines.toArray(new String[0]);
 	}
 
@@ -111,7 +116,7 @@ public final class CLIUtils {
 	 * Gets the output (stdout or stderr) as a single String
 	 * @param strm An input stream (normally stdout or stderr of a command)
 	 * @return The (error) output, with lines concatenated using the appropriate line separator of the operating system
-	 * @throws IOException
+	 * @throws IOException If an I/O error occurs while reading the lines from the input stream
 	 */
 	public static String getOutputString(InputStream strm) throws IOException {
 		return String.join(System.lineSeparator(), getOutputLines(strm));
