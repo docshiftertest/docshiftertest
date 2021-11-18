@@ -1,6 +1,6 @@
 package com.docshifter.core.utils.ffmpeg;
 
-import com.docshifter.core.utils.FileUtils;
+import com.docshifter.core.utils.CLIUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -14,6 +14,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -163,8 +165,8 @@ public class FfmpegUtils {
      * @return An FfprobeResult object, or null
      */
     public static FfprobeResult probeMediaFile(String ffprobePath, String filename) {
-        log.debug("Attempting to probe the video");
-        String result = null;
+        log.debug("Attempting to probe the media");
+        String outputString;
         // Build the command line
         // We need to use a (List that we convert to a) String[] for the command options as files with spaces in the name don't work otherwise
         List<String> options = new ArrayList<>();
@@ -179,26 +181,33 @@ public class FfmpegUtils {
         Process proc = null;
         try {
             // Execute the command
-            proc = Runtime.getRuntime().exec(options.toArray(new String[options.size()]));
+            proc = Runtime.getRuntime().exec(options.toArray(new String[0]));
+            int exitCode = proc.waitFor();
+            if (exitCode != 0) {
+                log.error("Exit code of ffprobe was not 0, it was {}! Probing likely failed?", exitCode);
+            }
             // Get the stdout stream
-            List<String> outLines = FileUtils.getOutputLines(proc.getInputStream());
-            if (outLines.size() == 0) {
+            outputString = CLIUtils.getOutputString(proc.getInputStream());
+            if (StringUtils.isBlank(outputString)) {
                 log.warn("Did not get stdout as expected, trying stderr to see if some error was reported");
-                outLines = FileUtils.getOutputLines(proc.getErrorStream());
-                if (outLines.size() > 0) {
-                    log.error("Got {} lines of stderr: {}", outLines.size(), String.join(System.lineSeparator(), outLines));
-                    return null;
+                outputString = CLIUtils.getOutputString(proc.getErrorStream());
+                if (StringUtils.isNotBlank(outputString)) {
+                    if (exitCode == 0) {
+                        log.debug("Got stderr:{}", System.lineSeparator() + outputString);
+                    } else {
+                        log.error("Got stderr:{}", System.lineSeparator() + outputString);
+                        return null;
+                    }
                 }
                 else {
                     log.error("Did not get stdout, and stderr was empty too! Giving up and returning a null result...");
                     return null;
                 }
+            } else {
+                log.debug("Got stdout:{}", System.lineSeparator() + outputString);
             }
-            result = String.join(System.lineSeparator(), outLines);
-            log.debug("Got {} stdout outLines: {}", outLines.size(), result);
-
         }
-        catch (IOException ioe) {
+        catch (IOException | InterruptedException ioe) {
             log.error("We caught an IOException, so returning null!", ioe);
             return null;
         }
@@ -207,7 +216,7 @@ public class FfmpegUtils {
                 proc.destroy();
             }
         }
-        return parseFfprobeResult(result);
+        return parseFfprobeResult(outputString);
     }
 
     public static Float getDuration(String ffprobePath, String filename) {
