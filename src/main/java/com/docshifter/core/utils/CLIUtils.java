@@ -1,5 +1,7 @@
 package com.docshifter.core.utils;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.BufferedReader;
@@ -9,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Log4j2
 public final class CLIUtils {
@@ -123,6 +126,65 @@ public final class CLIUtils {
 	}
 
 	/**
+	 * Fetches the stdout, stderr and exit code of a {@link Process} in an orderly fashion.
+	 * @param process The process to evaluate.
+	 * @return A {@link ProcessResult} containing information about the process execution.
+	 * @throws InterruptedException The current thread was interrupted.
+	 * @throws IOException An error occurred while reading from either the stdout or stderr stream.
+	 */
+	public static ProcessResult getResultForProcess(Process process) throws InterruptedException, IOException {
+		AtomicReference<IOException> ioe = new AtomicReference<>();
+
+		AtomicReference<String> stdout = new AtomicReference<>();
+		Thread outThread = new Thread(() -> {
+			try {
+				stdout.set(getOutputString(process.getInputStream()));
+			} catch (IOException e) {
+				// Try to interrupt the other thread by forcibly closing the other stream which will throw an
+				// IOException
+				if (ioe.compareAndSet(null, e)) {
+					try {
+						process.getErrorStream().close();
+					} catch (IOException ex) {
+						log.error("And an error occurred while trying to close/interrupt the error stream!");
+					}
+				}
+			}
+		});
+		outThread.start();
+
+		AtomicReference<String> stderr = new AtomicReference<>();
+		Thread errThread = new Thread(() -> {
+			try {
+				stderr.set(getOutputString(process.getErrorStream()));
+			} catch (IOException e) {
+				// Try to interrupt the other thread by forcibly closing the other stream which will throw an
+				// IOException
+				if (ioe.compareAndSet(null, e)) {
+					try {
+						process.getInputStream().close();
+					} catch (IOException ex) {
+						log.error("And an error occurred while trying to close/interrupt the input stream!");
+					}
+				}
+			}
+		});
+		errThread.start();
+
+		// Wait for both threads to finish or fail
+		outThread.join();
+		errThread.join();
+
+		// Bubble up the IOException if we got one
+		if (ioe.get() != null) {
+			throw ioe.get();
+		}
+		// And wait for the entire process to finish, so we can get the exit code
+		int exitCode = process.waitFor();
+		return new ProcessResult(stdout.get(), stderr.get(), exitCode);
+	}
+
+	/**
 	 * Overrides an option in the list of options, or adds it if it doesn't exist yet or if it is incomplete.
 	 * @param options The list of options to update
 	 * @param option The option to add/replace
@@ -140,5 +202,16 @@ public final class CLIUtils {
 		} else {
 			options.set(index + 1, value);
 		}
+	}
+
+	/**
+	 * Holds the results of a process execution: stdout, stderr and exit code.
+	 */
+	@Getter
+	@AllArgsConstructor
+	public static class ProcessResult {
+		private final String stdout;
+		private final String stderr;
+		private final int exitCode;
 	}
 }

@@ -182,17 +182,16 @@ public class FfmpegUtils {
         try {
             // Execute the command
             proc = Runtime.getRuntime().exec(options.toArray(new String[0]));
-            int exitCode = proc.waitFor();
-            if (exitCode != 0) {
-                log.error("Exit code of ffprobe was not 0, it was {}! Probing likely failed?", exitCode);
+            CLIUtils.ProcessResult procResult = CLIUtils.getResultForProcess(proc);
+            if (procResult.getExitCode() != 0) {
+                log.error("Exit code of ffprobe was not 0, it was {}! Probing likely failed?", procResult.getExitCode());
             }
-            // Get the stdout stream
-            outputString = CLIUtils.getOutputString(proc.getInputStream());
+            outputString = procResult.getStdout();
             if (StringUtils.isBlank(outputString)) {
                 log.warn("Did not get stdout as expected, trying stderr to see if some error was reported");
-                outputString = CLIUtils.getOutputString(proc.getErrorStream());
+                outputString = procResult.getStderr();
                 if (StringUtils.isNotBlank(outputString)) {
-                    if (exitCode == 0) {
+                    if (procResult.getExitCode() == 0) {
                         log.debug("Got stderr:{}", System.lineSeparator() + outputString);
                     } else {
                         log.error("Got stderr:{}", System.lineSeparator() + outputString);
