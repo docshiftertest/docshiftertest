@@ -55,6 +55,18 @@ public class CLIUtilsTest {
 	}
 
 	@Test
+	public void parseArgs_trailingQuote() {
+		Assert.assertArrayEquals(new String[] {"some_command", "quote", "at", "end"},
+				CLIUtils.parseArgs("some_command quote at end\""));
+	}
+
+	@Test
+	public void parseArgs_multipleSpaces() {
+		Assert.assertArrayEquals(new String[] {"some_command", "do", "not", "group"},
+				CLIUtils.parseArgs("   some_command do   not group   "));
+	}
+
+	@Test
 	public void addOrReplaceOption_nonExisting() {
 		List<String> options = new ArrayList<>(Arrays.asList("ffmpeg", "-i", "input.avi", "output.mov"));
 		CLIUtils.addOrReplaceOption(options, "-c:v", "libx264");
@@ -69,9 +81,18 @@ public class CLIUtilsTest {
 	}
 
 	@Test
-	public void addOrReplaceOption_existing() {
+	public void addOrReplaceOption_existingAtEnd() {
 		List<String> options = new ArrayList<>(Arrays.asList("ffmpeg", "-i", "input.avi", "output.mov", "-c:v", "libx265"));
 		CLIUtils.addOrReplaceOption(options, "-c:v", "libx264");
 		Assert.assertArrayEquals(new String[] {"ffmpeg", "-i", "input.avi", "output.mov", "-c:v", "libx264"}, options.toArray());
+	}
+
+	@Test
+	public void addOrReplaceOption_existingInMiddle() {
+		List<String> options = new ArrayList<>(Arrays.asList("ffmpeg", "-i", "input.avi", "output.mov", "-c:v",
+				"libx265", "-c:a", "aac"));
+		CLIUtils.addOrReplaceOption(options, "-c:v", "libx264");
+		Assert.assertArrayEquals(new String[] {"ffmpeg", "-i", "input.avi", "output.mov", "-c:v", "libx264", "-c:a", "aac"},
+				options.toArray());
 	}
 }

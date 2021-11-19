@@ -63,8 +63,10 @@ public final class CLIUtils {
 						escape = false;
 					}
 					if (!groupTogether) {
-						args.add(sb.toString());
-						sb.setLength(0);
+						if (sb.length() > 0) {
+							args.add(sb.toString());
+							sb.setLength(0);
+						}
 					} else {
 						sb.append(inputChar);
 					}
@@ -141,12 +143,12 @@ public final class CLIUtils {
 				stdout.set(getOutputString(process.getInputStream()));
 			} catch (IOException e) {
 				// Try to interrupt the other thread by forcibly closing the other stream which will throw an
-				// IOException
+				// IOException in that thread
 				if (ioe.compareAndSet(null, e)) {
 					try {
 						process.getErrorStream().close();
 					} catch (IOException ex) {
-						log.error("And an error occurred while trying to close/interrupt the error stream!");
+						log.error("And an error occurred while trying to close/interrupt the error stream!", ex);
 					}
 				}
 			}
@@ -159,12 +161,12 @@ public final class CLIUtils {
 				stderr.set(getOutputString(process.getErrorStream()));
 			} catch (IOException e) {
 				// Try to interrupt the other thread by forcibly closing the other stream which will throw an
-				// IOException
+				// IOException in that thread
 				if (ioe.compareAndSet(null, e)) {
 					try {
 						process.getInputStream().close();
 					} catch (IOException ex) {
-						log.error("And an error occurred while trying to close/interrupt the input stream!");
+						log.error("And an error occurred while trying to close/interrupt the input stream!", ex);
 					}
 				}
 			}
@@ -172,8 +174,26 @@ public final class CLIUtils {
 		errThread.start();
 
 		// Wait for both threads to finish or fail
-		outThread.join();
-		errThread.join();
+		try {
+			outThread.join();
+			errThread.join();
+		} catch (InterruptedException iex) {
+			// If the current thread receives an interrupt while waiting: try to interrupt the other threads by
+			// forcibly closing the other streams which will throw an IOException in those threads
+			try {
+				process.getInputStream().close();
+			} catch (IOException ex) {
+				log.error("While handling InterruptedException: an error occurred while trying to close/interrupt the" +
+						" input stream!", ex);
+			}
+			try {
+				process.getErrorStream().close();
+			} catch (IOException ex) {
+				log.error("While handling InterruptedException: an error occurred while trying to close/interrupt the" +
+						" error stream!", ex);
+			}
+			throw iex;
+		}
 
 		// Bubble up the IOException if we got one
 		if (ioe.get() != null) {
