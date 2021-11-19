@@ -43,6 +43,7 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 		
 		if (allParams.containsKey(name)) {
 			String value = allParams.get(name);
+			// Redact any password fields
 			if (name.contains("pass")) {
 				log.debug("containsKey {} so returning a value of length: {}",
 						name, value.length());
