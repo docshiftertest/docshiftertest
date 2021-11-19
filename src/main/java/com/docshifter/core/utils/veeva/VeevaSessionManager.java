@@ -59,42 +59,7 @@ public class VeevaSessionManager implements ISessionManager<VeevaSession> {
 	}
 
 	public VeevaSession getSession() throws Exception {
-		String urlStr = "https://" + host + "/api/" + API_VERSION + "/auth";
-		URL url = new URL(urlStr);
-		
-		Map<String,Object> params = new LinkedHashMap<>();
-		params.put("username", user);
-		log.debug("Using username: {} and password with length: {}",
-				user, (pass == null) ? "NULL!" : pass.length());
-		params.put("password", pass);
-		StringBuilder postData = new StringBuilder();
-		for (Map.Entry<String,Object> param : params.entrySet()) {
-			if (postData.length() != 0) {
-					postData.append('&');
-			}
-			postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
-			postData.append('=');
-			postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
-			//postData.append(String.valueOf(param.getValue()));
-		}
-		byte[] postDataBytes = postData.toString().getBytes(StandardCharsets.UTF_8);
-
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		con.setRequestMethod("POST");
-		con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-		con.setDoOutput(true);
-
-		OutputStreamWriter osw = new OutputStreamWriter(
-                con.getOutputStream());
-		osw.write(postData.toString());
-		osw.flush();
-		osw.close();
-
-		int responseCode = con.getResponseCode();
-		log.info("Sent 'POST' request to URL: {}", url);
-		log.info("Post parameters: {}", new String(postDataBytes));
-		log.info("Response Code: {}", responseCode);
-	 
+		HttpURLConnection con = Requests.postSessionRequest(host, API_VERSION, user, pass);
 		BufferedReader in = new BufferedReader(
 				new InputStreamReader(con.getInputStream()));
 		String inputLine;
@@ -107,8 +72,6 @@ public class VeevaSessionManager implements ISessionManager<VeevaSession> {
 		log.info(response.toString());
 
 		JSONObject jsonObj = new JSONObject(response.toString());
-		//getBinders(jsonObj.get("sessionId").toString());
-		//getSpecificBinders(jsonObj.get("sessionId").toString(), "SELECT id FROM documents WHERE binder__v=true");
-		return new VeevaSession("", jsonObj.get("sessionId").toString(), Instant.now());
+		return new VeevaSession(host, jsonObj.get("sessionId").toString(), Instant.now());
 	}
 }

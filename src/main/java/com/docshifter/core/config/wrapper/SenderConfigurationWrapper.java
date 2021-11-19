@@ -42,10 +42,19 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 		log.debug("getString({}, {}) called", name, defaultValue);
 		
 		if (allParams.containsKey(name)) {
-			log.debug("containsKey so returning: {}", allParams.get(name));
-			return allParams.get(name);
+			String value = allParams.get(name);
+			if (name.contains("pass")) {
+				log.debug("containsKey {} so returning a value of length: {}",
+						name, value.length());
+			}
+			else {
+				log.debug("containsKey {} so returning: {}",
+						name, value);
+			}
+			return value;
 		} else {
-			log.debug("returning (defaultValue): {}", defaultValue);
+			log.debug("returning (defaultValue): {} for key: {}",
+					defaultValue, name);
 			return defaultValue;
 		}
 		

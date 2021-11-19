@@ -229,7 +229,7 @@ public class VeevaResponse {
 					badResponse  = readFailure(responseStr);
 					if (badResponse.getErrors() != null &&
 							badResponse.getErrors().size() == 1 &&
-							badResponse.getErrors().get(0).getType().toString().equalsIgnoreCase("USERNAME_OR_PASSWORD_INCORRECT")) {
+							"USERNAME_OR_PASSWORD_INCORRECT".equalsIgnoreCase(badResponse.getErrors().get(0).getType())) {
 						throw new Exception("Error retrieving session=> AUTHENTICATION_FAILED:" + responseStr);
 					}
 					throw new Exception("Error when retrieving session again.., Response received: [" + responseStr + "]");
@@ -242,7 +242,7 @@ public class VeevaResponse {
 				}
 			}
 			else {
-				throw new Exception("Error when doing request, Response received:" + veevaResponse.toString());
+				throw new Exception("Error when doing request, Response received:" + veevaResponse);
 			}
 		}
 		log.debug("At end, returning Session Id: {}...",
@@ -290,8 +290,11 @@ public class VeevaResponse {
 		if (this.contentBody == null) {
 			sBuf.append("null");
 		}
-		else {
+		else if (this.contentBody[0] == '{') {
 			sBuf.append(new String(this.contentBody));
+		}
+		else {
+			sBuf.append("** BINARY **");
 		}
 		sBuf.append(", ");
 		sBuf.append(dumpHeaders(this.getHeaders()));
