@@ -697,24 +697,4 @@ public final class FileUtils {
 		}
 		return false;
 	}
-
-	/**
-	 * Gets the output (stdout or stderr) as a List of Strings
-	 * @param strm An input stream (normally stdout or stderr of a command)
-	 * @return List<String> The lines of (error) output
-	 * @throws IOException
-	 */
-	public static List<String> getOutputLines(InputStream strm) throws IOException {
-		BufferedReader output = new BufferedReader( new InputStreamReader( strm ) );
-		List<String> outLines = new ArrayList<>();
-		log.debug("Starting loop for readLine...");
-		String line = output.readLine();
-		while( line != null) {
-			// Handle the line
-			outLines.add(line);
-			// Read the next line
-			line = output.readLine();
-		}
-		return outLines;
-	}
 }
