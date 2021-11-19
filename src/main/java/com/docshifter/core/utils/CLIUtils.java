@@ -63,6 +63,7 @@ public final class CLIUtils {
 						escape = false;
 					}
 					if (!groupTogether) {
+						// When not in group together mode we shouldn't be adding consecutive spaces as empty args
 						if (sb.length() > 0) {
 							args.add(sb.toString());
 							sb.setLength(0);
