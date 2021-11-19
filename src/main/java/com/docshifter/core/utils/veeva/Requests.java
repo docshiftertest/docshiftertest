@@ -244,17 +244,14 @@ public class Requests{
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
 
-	/**https://developer.veevavault.com/api/18.3/#user-name-and-password
-	 *
-	 *
-	 * @return Returns a veevaResponse.
-	 */
-	public static VeevaResponse getSession(String host, String apiVersion, String user, String pass) throws Exception {
+	public static HttpURLConnection postSessionRequest(String host, String apiVersion, String user, String pass) throws Exception {
 		String urlStr = "https://" + host + "/api/" + apiVersion + "/auth";
 		URL url = new URL(urlStr);
 
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("username", user);
+		log.debug("Using username: {} and password with length: {}",
+				user, (pass == null) ? "NULL!" : pass.length());
 		params.put("password", pass);
 		StringBuilder postData = new StringBuilder();
 		for (Map.Entry<String, Object> param : params.entrySet()) {
@@ -281,9 +278,18 @@ public class Requests{
 
 		int responseCode = con.getResponseCode();
 		log.debug("Sent 'POST' request to URL: {}", url);
-		log.debug("Post parameters: {}", new String(postDataBytes));
+		log.trace("Post parameters: {}", new String(postDataBytes));
 		log.debug("Response Code: {}", responseCode);
+		return con;
+	}
 
+	/**https://developer.veevavault.com/api/18.3/#user-name-and-password
+	 *
+	 *
+	 * @return Returns a VeevaResponse.
+	 */
+	public static VeevaResponse getSession(String host, String apiVersion, String user, String pass) throws Exception {
+		HttpURLConnection con = postSessionRequest(host, apiVersion, user, pass);
 		return VeevaResponse.getVeevaResponse(con.getInputStream(), con.getHeaderFields());
 	}
 

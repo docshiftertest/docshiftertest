@@ -16,6 +16,7 @@ import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
+import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -171,7 +172,9 @@ public class AMQPSender implements IMessageSender {
 				if (browser == null || browser.getEnumeration() == null) {
 					return counter;
 				}
-				while (browser.getEnumeration().hasMoreElements()) {
+				Enumeration enumeration = browser.getEnumeration();
+				while (enumeration.hasMoreElements()) {
+					enumeration.nextElement();
 					counter += 1;
 				}
 				return counter;
