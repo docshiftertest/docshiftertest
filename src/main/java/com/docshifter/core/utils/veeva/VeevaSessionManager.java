@@ -2,17 +2,10 @@ package com.docshifter.core.utils.veeva;
 
 import lombok.extern.log4j.Log4j2;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Implementation class of the ISessionManager interface
@@ -24,9 +17,9 @@ import java.util.Map;
 public class VeevaSessionManager implements ISessionManager<VeevaSession> {
 
 	private static final String API_VERSION = "v18.3";
-	private String host = "";
-	private String user = "";
-	private String pass = "";
+	private String host;
+	private String user;
+	private String pass;
 
 	public VeevaSessionManager(String host, String user, String pass) {
 		this.host = host;
@@ -60,15 +53,14 @@ public class VeevaSessionManager implements ISessionManager<VeevaSession> {
 
 	public VeevaSession getSession() throws Exception {
 		HttpURLConnection con = Requests.postSessionRequest(host, API_VERSION, user, pass);
-		BufferedReader in = new BufferedReader(
-				new InputStreamReader(con.getInputStream()));
-		String inputLine;
 		StringBuilder response = new StringBuilder();
-	
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
+		try (BufferedReader in = new BufferedReader(
+				new InputStreamReader(con.getInputStream()))) {
+			String inputLine;
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
 		}
-		in.close();
 		log.info(response.toString());
 
 		JSONObject jsonObj = new JSONObject(response.toString());
