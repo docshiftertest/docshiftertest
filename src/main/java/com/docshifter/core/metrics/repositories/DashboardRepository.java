@@ -15,17 +15,20 @@ import java.util.List;
  */
 public interface DashboardRepository extends JpaRepository<Dashboard, String> {
 
-    @Query("select dash.finishTimestamp as finishTimestamp from Dashboard dash where dash.isLicensed = TRUE")
-    List<TasksDistributionSample> findAllFinishTimestamp();
+    @Query("select dash.finishTimestamp as finishTimestamp from Dashboard dash where dash.isLicensed = TRUE AND (dash.workflowName = :workflowName or :workflowName = 'ALL')")
+    List<TasksDistributionSample> findAllFinishTimestamp(@Param("workflowName") String workflowName);
 
-    @Query(value = "select dash.processingDuration as processingDuration from Dashboard dash where dash.onMessageHit BETWEEN :startDate AND :endDate AND dash.isLicensed = TRUE")
-    List<TasksStatisticsSample> findAllProcessingDurationBetweenDates(@Param("startDate") Long startDate, @Param("endDate") Long endDate);
+    @Query(value = "select dash.processingDuration as processingDuration from Dashboard dash where dash.isLicensed = TRUE AND dash.onMessageHit BETWEEN :startDate AND :endDate AND (dash.workflowName = :workflowName or :workflowName = 'ALL')")
+    List<TasksStatisticsSample> findAllProcessingDurationBetweenDates(@Param("startDate") Long startDate, @Param("endDate") Long endDate, @Param("workflowName") String workflowName);
 
-    @Query("select dash.processingDuration as processingDuration from Dashboard dash where dash.isLicensed = TRUE")
-    List<TasksStatisticsSample> findAllProcessingDuration();
+    @Query("select dash.processingDuration as processingDuration from Dashboard dash where dash.isLicensed = TRUE AND (dash.workflowName = :workflowName or :workflowName = 'ALL')")
+    List<TasksStatisticsSample> findAllProcessingDuration(@Param("workflowName") String workflowName);
 
-    @Query("select dash.onMessageHit as onMessageHit , dash.success as success from Dashboard dash where dash.isLicensed = TRUE")
-    List<ProcessedTasksSample> findAllOnMessageHitAndSuccess();
+    @Query("select dash.onMessageHit as onMessageHit , dash.success as success, dash.workflowName from Dashboard dash where dash.isLicensed = TRUE AND (dash.workflowName = :workflowName or :workflowName = 'ALL')")
+    List<ProcessedTasksSample> findAllOnMessageHitAndSuccess(@Param("workflowName") String workflowName);
+
+    @Query("select distinct dash.workflowName as workflowName from Dashboard dash where dash.isLicensed = TRUE")
+    List<String> findAllDistinctDashboardWorkflowName();
 
     List<Dashboard> findAllBySuccess(Boolean success);
 
