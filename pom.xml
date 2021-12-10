@@ -19,7 +19,7 @@
         <sha1/>
         <hsqldb.version>2.3.4</hsqldb.version>
 
-        <aspose.cad.version>21.4</aspose.cad.version>
+        <aspose.cad.version>21.8</aspose.cad.version>
         <!-- Despite the fact Aspose show a classifier, it's apparently not needed -->
         <!-- SIGHS -->
         <!-- aspose.cad.classifier>jdk16</aspose.cad.classifier -->
