@@ -74,6 +74,10 @@ public class MockLicensingService implements ILicensingService {
 				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 
 		// === Gulfstream ===
+		// CAD MODULE TRIAL (VALID FOR 1 WEEK + 1 EXTRA WEEK AS MARGIN)
+		keys.put("b115be2b-0ee3-429f-b48b-63d57bb902c2", new License(
+				new GregorianCalendar(2021, Calendar.DECEMBER, 26, 23,	59,	59).getTime(),
+				1, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Transformation_CAD));
 		// Non-production usage
 		keys.put("265a797a-bc7a-4208-8176-5d86c969222a", new License(
 				new GregorianCalendar(2022, Calendar.SEPTEMBER, 31, 23,	59,	59).getTime(),
@@ -82,6 +86,14 @@ public class MockLicensingService implements ILicensingService {
 		keys.put("fe08d717-f8e8-4aa0-b641-9ed734f8cde7", new License(
 				new GregorianCalendar(2022, Calendar.SEPTEMBER, 31, 23,	59,	59).getTime(),
 				1, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
+		// Non-production usage with CAD, in case they do decide to move forward
+		keys.put("0319ae02-13d5-45b2-8f2c-6baa8229e590", new License(
+				new GregorianCalendar(2022, Calendar.SEPTEMBER, 31, 23,	59,	59).getTime(),
+				1, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Transformation_CAD));
+		// Production usage with CAD, in case they do decide to move forward
+		keys.put("9680c8af-8ce3-42ac-86ad-463f67abf6dd", new License(
+				new GregorianCalendar(2022, Calendar.SEPTEMBER, 31, 23,	59,	59).getTime(),
+				1, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Transformation_CAD));
 
 		// === Volksbank July 1 2022 expiry ===
 		// DocShifterEverything = Give me EVERYTHING for Licensable Modules!
