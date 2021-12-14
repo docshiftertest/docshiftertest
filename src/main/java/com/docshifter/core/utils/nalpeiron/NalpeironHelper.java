@@ -9,6 +9,7 @@ import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
 import com.nalpeiron.nalplibrary.NalpError;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 
 import java.io.File;
@@ -85,59 +86,6 @@ public class NalpeironHelper {
         NalpeironAnalyticsSender sender = new NalpeironAnalyticsSender(this, NalpeironService.NALPEIRON_USERNAME);
         sender.run();
         analyticsSenderScheduler.scheduleAtFixedRate(sender, 1, cachingDurationMinutes, TimeUnit.MINUTES);
-    }
-
-    public static void dllTest() {
-        boolean foundNalpLib = false;
-        String nalpLibName = "";
-
-        if (SystemUtils.IS_OS_UNIX) {
-            nalpLibName = "libnalpjava.so";
-        } else if (SystemUtils.IS_OS_WINDOWS) {
-            nalpLibName += "nalpjava.dll";
-        } else {
-            int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            log.fatal("The operating system you are using is not recognized as a UNIX or WINDOWS operating system. This is not supported. Stopping Application");
-            log.debug("Exited Spring app, doing system.exit()");
-
-            System.exit(errorCode);
-        }
-
-        String property = System.getProperty("java.library.path");
-        log.debug("java.library.path: {}", property);
-
-        StringTokenizer parser = new StringTokenizer(property, File.pathSeparator);
-        log.debug("looking for nalpjava library in the following location");
-
-        while (parser.hasMoreTokens()) {
-            String libPath = parser.nextToken();
-            log.debug(libPath);
-
-            if (libPath.endsWith(nalpLibName)) {
-                log.debug("found {} here: {}", nalpLibName, libPath);
-                foundNalpLib = true;
-            }
-
-            File pathFile = new File(libPath);
-            if (pathFile.isDirectory()) {
-                File childPath = new File(libPath + "/" + nalpLibName);
-                if (childPath.exists()) {
-                    log.debug("found {} here: {}", nalpLibName, childPath);
-                    foundNalpLib = true;
-                }
-            }
-
-            if (foundNalpLib) {
-                log.debug("nalpeiron core library found");
-                return;
-            }
-        }
-
-        if (!foundNalpLib) {
-            log.fatal("The {} file used for your operating system cannot be found in the included java library paths." +
-                    " Stopping Application", nalpLibName);
-            System.exit(0);
-        }
     }
 
 
@@ -388,13 +336,14 @@ public class NalpeironHelper {
         }
     }
 
-    public void openNalpLibrary(String Filename, boolean NSAEnable, boolean NSLEnable, int LogLevel, String WorkDir,
+    public void openNalpLibrary(boolean NSAEnable, boolean NSLEnable, int LogLevel, String WorkDir,
                                 int LogQLen, int CacheQLen, int NetThMin, int NetThMax, int OfflineMode,
                                 String ProxyIP, String ProxyPort, String ProxyUsername, String ProxyPass,
                                 String DaemonIP, String DaemonPort, String DaemonUser, String DaemonPass, int security)
             throws DocShifterLicenseException {
         try {
-            int i = nalp.callNalpLibOpen(Filename, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin, NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername,
+            int i = nalp.callNalpLibOpen(NSAEnable, NSLEnable, LogLevel, WorkDir, "", LogQLen, CacheQLen, NetThMin,
+                    NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername,
                     ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
 
             if (i < 0) {
@@ -558,7 +507,7 @@ public class NalpeironHelper {
 
     public LicenseStatus getLicense(String licenseNo, String xmlRegInfo) throws DocShifterLicenseException {
         try {
-            int i = nsl.callNSLGetLicense(licenseNo, xmlRegInfo);
+            int i = nsl.callNSLObtainLicense(licenseNo, xmlRegInfo, "");
             return LicenseStatus.getLicenseStatus(i);
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -779,9 +728,9 @@ public class NalpeironHelper {
         }
     }
 
-    public int getNumberAvailableSimultaneousLicenses(int[] maxProc, int[] availProc) throws DocShifterLicenseException {
+    public int getNumberAvailableSimultaneousLicenses() throws DocShifterLicenseException {
         try {
-            int i = nsl.callNSLGetNumbAvailProc(maxProc, availProc);
+            int i = nsl.callNSLGetAvailProcs();
             if (i < 0) {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLGetNumbAvailProc"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
@@ -967,20 +916,6 @@ public class NalpeironHelper {
         }
     }
 
-    public void getAnalyticsLocation() throws DocShifterLicenseException {
-        try {
-            int i = nsa.callNSAGetLocation();
-
-            if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAGetLocation"), new NalpError(i, resolveNalpErrorMsg(i)));
-            }
-        } catch (NalpError error) {
-                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
-                    error.getErrorCode(), error.getErrorMessage(), error);
-            throw new DocShifterLicenseException(error);
-        }
-    }
-
     public PrivacyValue getPrivacy() throws DocShifterLicenseException {
         try {
             int i = nsa.callNSAGetPrivacy();
@@ -1022,39 +957,45 @@ public class NalpeironHelper {
     }
 
     public String resolveLicenseNo() {
-        String licenseCode = null;
-        try {
-            byte[] bytes = Files.readAllBytes(Paths.get(workDir + "DSLicenseCode.txt"));
-            licenseCode = new String(bytes, Charset.defaultCharset());
-        } catch (Exception e) {
-            licenseCode = getLicenseCode();
-        } finally {
-            return licenseCode == null ? "" : licenseCode;
+        String licenseCode = System.getenv("DS_LICENSE_CODE");
+        if (StringUtils.isBlank(licenseCode)) {
+            try {
+                byte[] bytes = Files.readAllBytes(Paths.get(workDir + "DSLicenseCode.txt"));
+                licenseCode = new String(bytes, Charset.defaultCharset());
+            } catch (Exception e) {
+                try {
+                    licenseCode = getLicenseCode();
+                } catch (Exception ignored) {
+                }
+            }
         }
+        return licenseCode == null ? "" : licenseCode;
     }
 
     public String resolveLicenseActivationRequest() {
-        String activationRequest = null;
-        try {
-            byte[] bytes = Files.readAllBytes(Paths.get(workDir + "DSLicenseActivationRequest.txt"));
-            activationRequest = new String(bytes, Charset.defaultCharset());
-        } catch (Exception e) {
-            activationRequest = "";
-        } finally {
-            return activationRequest;
+        String activationRequest = System.getenv("DS_LICENSE_ACTIVATION_REQUEST");
+        if (StringUtils.isBlank(activationRequest)) {
+            try {
+                byte[] bytes = Files.readAllBytes(Paths.get(workDir + "DSLicenseActivationRequest.txt"));
+                activationRequest = new String(bytes, Charset.defaultCharset());
+            } catch (Exception e) {
+                activationRequest = "";
+            }
         }
+        return activationRequest;
     }
 
     public String resolveLicenseActivationAnswer() {
-        String ActivationAnswer = null;
-        try {
-            byte[] bytes = Files.readAllBytes(Paths.get(workDir + "DSLicenseActivationAnswer.txt"));
-            ActivationAnswer = new String(bytes, Charset.defaultCharset());
-        } catch (Exception e) {
-            ActivationAnswer = "";
-        } finally {
-            return ActivationAnswer;
+        String ActivationAnswer = System.getenv("DS_LICENSE_ACTIVATION_ANSWER");
+        if (StringUtils.isBlank(ActivationAnswer)) {
+            try {
+                byte[] bytes = Files.readAllBytes(Paths.get(workDir + "DSLicenseActivationAnswer.txt"));
+                ActivationAnswer = new String(bytes, Charset.defaultCharset());
+            } catch (Exception e) {
+                ActivationAnswer = "";
+            }
         }
+        return ActivationAnswer;
     }
 
     public void writeLicenseActivationRequest(String licenseActivationRequest) throws DocShifterLicenseException {
