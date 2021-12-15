@@ -3,7 +3,6 @@ package com.docshifter.core.utils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -234,5 +233,13 @@ public final class CLIUtils {
 		private final String stdout;
 		private final String stderr;
 		private final int exitCode;
+
+		@Override
+		public String toString() {
+			return "Exit Code: " + exitCode + System.lineSeparator() +
+					"stdout: [" + stdout +
+					"]" + System.lineSeparator() + "stderr: [" + stderr +
+					"]";
+		}
 	}
 }
