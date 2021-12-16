@@ -24,7 +24,7 @@
         <!-- SIGHS -->
         <!-- aspose.cad.classifier>jdk16</aspose.cad.classifier -->
 
-        <aspose.cells.version>21.10</aspose.cells.version>
+        <aspose.cells.version>21.12</aspose.cells.version>
 
         <aspose.diagram.version>21.8</aspose.diagram.version>
         <aspose.diagram.classifier>jdk16</aspose.diagram.classifier>
@@ -42,7 +42,7 @@
 
         <!--		<aspose.ocr.version>21.5</aspose.ocr.version>-->
 
-        <aspose.pdf.version>21.10</aspose.pdf.version>
+        <aspose.pdf.version>21.11</aspose.pdf.version>
         <aspose.pdf.classifier>jdk17</aspose.pdf.classifier>
 
         <aspose.slides.version>21.10</aspose.slides.version>
@@ -52,7 +52,7 @@
         <aspose.tasks.version>20.12</aspose.tasks.version>
         <aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
 
-        <aspose.words.version>21.10</aspose.words.version>
+        <aspose.words.version>21.12</aspose.words.version>
         <aspose.words.classifier>jdk17</aspose.words.classifier>
 
         <aspose.html.version>21.6</aspose.html.version>
