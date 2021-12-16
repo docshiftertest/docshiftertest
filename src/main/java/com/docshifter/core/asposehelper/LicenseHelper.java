@@ -17,37 +17,33 @@ import java.util.concurrent.ScheduledExecutorService;
 @Log4j2
 public class LicenseHelper {
 
-	private static final String B64_5 =  "ZW5zZVR5cGU+RGV2ZWxvcGVyIE9FTTwvTGljZW5zZVR5cGU+DQ";
-	private static final String B64_P =  "RUVPN0R1N3JZUHNJTXo5aXFBeWVScjI0Rzk3WUY4SlZhODZuTi";
-	private static final String B64_M =  "AgPFNpZ25hdHVyZT53YmxPWkJLZ3NRcDR3dElCZkErbFdhcTdi";
-	private static final String B64_4 =  "hlbUBkb2NzaGlmdGVyLmNvbTwvRW1haWxUbz4NCiAgICA8TGlj";
-	private static final String B64_2 =  "RhdGE+DQogICAgPExpY2Vuc2VkVG8+RG9jU2hpZnRlcjwvTGlj";
-	private static final String B64_A =  "AgPE9FTT5UaGlzIGlzIGEgcmVkaXN0cmlidXRhYmxlIGxpY2Vu";
-	private static final String B64_N =  "blRtUnc0V1VadWc2Uk1JVklRRlZSbng5SnNoTXZPVjlka3VWem";
-	private static final String B64_Q =  "tuZXErVWUrUjU2elQ5RDMzTDlvUGpIb0tXekZJWmZiUmc9PC9T";
-	private static final String B64_8 =  "5vdGU+DQogICAgPE9yZGVySUQ+MjAxMTIwMTE1NjI5PC9PcmRl";
-	private static final String B64_I =  "AgICA8TGljZW5zZVZlcnNpb24+My4wPC9MaWNlbnNlVmVyc2lv";
-	private static final String B64_O =  "JaV1RIeW5BdTU1VTdOV3Y3Y0YxRFBvbXc1alVXRVo1emZMOHJB";
-	private static final String B64_6 =  "ogICAgPExpY2Vuc2VOb3RlPk9uZSBEZXZlbG9wZXIgQW5kIFVu";
-	private static final String B64_H =  "eHBpcnk+MjAyMTEyMDM8L1N1YnNjcmlwdGlvbkV4cGlyeT4NCi";
-	private static final String B64_L =  "c2U8L0xpY2Vuc2VJbnN0cnVjdGlvbnM+DQogIDwvRGF0YT4NCi";
-	private static final String B64_1 =  "PD94bWwgdmVyc2lvbj0iMS4wIj8+DQo8TGljZW5zZT4NCiAgPE";
-	private static final String B64_D =  "ICAgPC9Qcm9kdWN0cz4NCiAgICA8RWRpdGlvblR5cGU+UHJvZm";
-	private static final String B64_7 =  "bGltaXRlZCBEZXBsb3ltZW50IExvY2F0aW9uczwvTGljZW5zZU";
-	private static final String B64_F =  "YmVyPjU4YmZmZjU2LTQ3ODQtNDBhZS1iZGM5LWE5NjJkNDRmNm";
-	private static final String B64_C =  "VjdD5Bc3Bvc2UuVG90YWwgZm9yIEphdmE8L1Byb2R1Y3Q+DQog";
-	private static final String B64_K =  "B1cmNoYXNlLmFzcG9zZS5jb20vcG9saWNpZXMvdXNlLWxpY2Vu";
-	private static final String B64_G =  "E0NDwvU2VyaWFsTnVtYmVyPg0KICAgIDxTdWJzY3JpcHRpb25F";
-	private static final String B64_9 =  "cklEPg0KICAgIDxVc2VySUQ+ODQwMDE1PC9Vc2VySUQ+DQogIC";
-	private static final String B64_B =  "c2U8L09FTT4NCiAgICA8UHJvZHVjdHM+DQogICAgICA8UHJvZH";
-	private static final String B64_3 =  "ZW5zZWRUbz4NCiAgICA8RW1haWxUbz5nZWVydC52YW5wZXRlZ2";
-	private static final String B64_E =  "Vzc2lvbmFsPC9FZGl0aW9uVHlwZT4NCiAgICA8U2VyaWFsTnVt";
-	private static final String B64_J =  "bj4NCiAgICA8TGljZW5zZUluc3RydWN0aW9ucz5odHRwczovL3";
-	private static final String B64_R =  "aWduYXR1cmU+DQo8L0xpY2Vuc2U+";
+	private static final String B64_15 = "b24+DQogICAgPExpY2Vuc2VJbnN0cnVjdGlvbnM+aHR0cHM6Ly9wdXJjaGFzZS5h";
+	private static final String B64_16 = "c3Bvc2UuY29tL3BvbGljaWVzL3VzZS1saWNlbnNlPC9MaWNlbnNlSW5zdHJ1Y3Rp";
+	private static final String B64_9 = "ICAgPFByb2R1Y3RzPg0KICAgICAgPFByb2R1Y3Q+QXNwb3NlLlRvdGFsIGZvciBK";
+	private static final String B64_10 = "YXZhPC9Qcm9kdWN0Pg0KICAgIDwvUHJvZHVjdHM+DQogICAgPEVkaXRpb25UeXBl";
+	private static final String B64_17 = "b25zPg0KICA8L0RhdGE+DQogIDxTaWduYXR1cmU+ZGZraGNyWU81NVhEY2xhTVNo";
+	private static final String B64_2 = "PExpY2Vuc2VkVG8+RG9jU2hpZnRlcjwvTGljZW5zZWRUbz4NCiAgICA8RW1haWxU";
+	private static final String B64_5 = "PExpY2Vuc2VOb3RlPjEgRGV2ZWxvcGVyIEFuZCBVbmxpbWl0ZWQgRGVwbG95bWVu";
+	private static final String B64_6 = "dCBMb2NhdGlvbnM8L0xpY2Vuc2VOb3RlPg0KICAgIDxPcmRlcklEPjIxMTExOTAw";
+	private static final String B64_7 = "NTY1MTwvT3JkZXJJRD4NCiAgICA8VXNlcklEPjg0MDAxNTwvVXNlcklEPg0KICAg";
+	private static final String B64_8 = "IDxPRU0+VGhpcyBpcyBhIHJlZGlzdHJpYnV0YWJsZSBsaWNlbnNlPC9PRU0+DQog";
+	private static final String B64_20 = "bGU5SXNtTk1jalZYWGdMT3RlWGxNNE1pdmQ2M0ozN2hHL3hLY01jcy9IZHFrUURP";
+	private static final String B64_21 = "cHh6bitJK0hzPTwvU2lnbmF0dXJlPg0KPC9MaWNlbnNlPg==";
+	private static final String B64_18 = "NkZZYjBPRTdkUUxJYXpKN2NPMlBabGNJOVBhSmx5MGFQb3dsaC9WS0JWZkxBZWxz";
+	private static final String B64_3 = "bz5nZWVydC52YW5wZXRlZ2hlbUBkb2NzaGlmdGVyLmNvbTwvRW1haWxUbz4NCiAg";
+	private static final String B64_4 = "ICA8TGljZW5zZVR5cGU+RGV2ZWxvcGVyIE9FTTwvTGljZW5zZVR5cGU+DQogICAg";
+	private static final String B64_11 = "PlByb2Zlc3Npb25hbDwvRWRpdGlvblR5cGU+DQogICAgPFNlcmlhbE51bWJlcj5j";
+	private static final String B64_1 = "PD94bWwgdmVyc2lvbj0iMS4wIj8+DQo8TGljZW5zZT4NCiAgPERhdGE+DQogICAg";
+	private static final String B64_12 = "OWMxYzNlNi00OWQ2LTQxY2YtODAyYy0yYzA4NzU3NTZmODQ8L1NlcmlhbE51bWJl";
+	private static final String B64_13 = "cj4NCiAgICA8U3Vic2NyaXB0aW9uRXhwaXJ5PjIwMjIxMjAzPC9TdWJzY3JpcHRp";
+	private static final String B64_14 = "b25FeHBpcnk+DQogICAgPExpY2Vuc2VWZXJzaW9uPjMuMDwvTGljZW5zZVZlcnNp";
+	private static final String B64_19 = "c2twdFYvNXl5c3VsSFRDdUdKMkQ4L2tpK1Nka0EzMkNGa24wckpYN2dKRFFmMkR4";
+
+
 	private static final String B64 =
 			B64_1 + B64_2 + B64_3 + B64_4 + B64_5 + B64_6 + B64_7 + B64_8 + B64_9 +
-					B64_A + B64_B + B64_C + B64_D + B64_E + B64_F + B64_G + B64_H + B64_I +
-					B64_J + B64_K + B64_L + B64_M + B64_N + B64_O + B64_P + B64_Q + B64_R;
+					B64_10 + B64_11 + B64_12 + B64_13 + B64_14 + B64_15 + B64_16 + B64_17 +
+					B64_18 + B64_19 + B64_20 + B64_21;
 
 	private final com.aspose.words.License wordsLicense;
 	private final com.aspose.cells.License cellsLicense;
