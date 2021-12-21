@@ -6,6 +6,7 @@ import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import com.nalpeiron.nalplibrary.NALP;
 import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,14 +165,8 @@ public class NalpeironService implements ILicensingService {
             log.debug("validateLibrary finished, starting periodic license checking");
 
             helper.validateLicenseAndInitiatePeriodicChecking();
-            if (containerChecker != null) {
-                log.debug("Container environment detected.");
-                if (!containerChecker.checkReplicas(helper.getNumberAvailableSimultaneousLicenses())) {
-                    log.fatal("Container licensing check failed. Exiting application.");
-                    System.exit(0);
-                }
-                log.debug("Container licensing check succeeded.");
-            }
+
+            doContainerCheck();
 
             log.debug("Periodic license checking thread started, staring analytics");
 
@@ -194,10 +189,39 @@ public class NalpeironService implements ILicensingService {
             log.debug("Periodic analytics sending thread started");
         } catch (Exception e) {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            log.fatal("Error in docshifter license processing. Could not complete opening and validating Nalpeiron Library.", e);
+            log.fatal("Error in DocShifter license processing. Could not complete opening and validating Nalpeiron Library.", e);
 
             System.exit(errorCode);
         }
+    }
+
+    private void doContainerCheck() throws DocShifterLicenseException {
+        if (containerChecker == null) {
+            return;
+        }
+
+        log.debug("Container environment detected.");
+
+        String maxReceiversUDF = helper.getUDFValue("maxReceivers");
+        int maxReceivers = 0;
+
+        if (!StringUtils.isBlank(maxReceiversUDF)) {
+            log.debug("Got maximum allotted receivers: {}", maxReceiversUDF);
+            try {
+                maxReceivers = Integer.parseInt(maxReceiversUDF);
+            } catch (NumberFormatException nfex) {
+                log.fatal("Could not parse field value \"" + maxReceiversUDF + "\" as an " +
+                        "integer. Please contact DocShifter for support.", nfex);
+                System.exit(0);
+            }
+        }
+
+        if (!containerChecker.checkReplicas(maxReceivers)) {
+            log.fatal("Container licensing check failed (look for any errors above). Exiting application.");
+            System.exit(0);
+        }
+
+        log.debug("Container licensing check succeeded.");
     }
 
     public long[] validateAndStartModule(String moduleId, long[] fid) throws DocShifterLicenseException {

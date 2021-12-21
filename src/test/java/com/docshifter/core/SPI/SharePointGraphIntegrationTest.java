@@ -14,6 +14,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -90,6 +91,7 @@ public class SharePointGraphIntegrationTest {
 	}
 
 	@Test
+	@Ignore("Per Juan: it's taking longer and longer to run this test, and it's not proving anything useful!")
 	public void badCredentialsTest() {
 
 		GraphClient badGraphClient = new GraphClient(MSGraphAuthenticationBuilder.createGraphClient("b081-42d7-a8e1-4c93452d9a3c",
