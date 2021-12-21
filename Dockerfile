@@ -2,8 +2,8 @@
 #
 # VERSION       6.2.4.1
 
-# using the openjdk11-openj9 image
-FROM adoptopenjdk:11-jre-openj9
+# using the IBM Semeru openj9 image
+FROM ibm-semeru-runtimes:open-11-jre
 
 LABEL maintainer="DocShifter, support@docshifter.com"
 
