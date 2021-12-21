@@ -10,7 +10,6 @@ import com.nalpeiron.nalplibrary.NSL;
 import com.nalpeiron.nalplibrary.NalpError;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -19,7 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -546,9 +544,9 @@ public class NalpeironHelper {
         }
     }
 
-    public String getActivationCertificateRequest(String licenseNo, String xmlRegInfo) throws DocShifterLicenseException {
+    public String getActivationCertificateRequest(String licenseNo, String xmlRegInfo, String specialID) throws DocShifterLicenseException {
         try {
-            String i = nsl.callNSLGetActivationCertReq(licenseNo, xmlRegInfo);
+            String i = nsl.callNSLRequestActivationCert(licenseNo, xmlRegInfo, specialID);
             return i;
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -756,9 +754,9 @@ public class NalpeironHelper {
         }
     }
 
-    public void testNalpeironLicencingConnection() throws DocShifterLicenseException {
+    public void testNalpeironLicencingConnection(long connTO, long transTO) throws DocShifterLicenseException {
         try {
-            int i = nsl.callNSLTestConnection();
+            int i = nsl.callNSLTestConnection2(connTO, transTO);
             if (i < 0) {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLTestConnection"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
