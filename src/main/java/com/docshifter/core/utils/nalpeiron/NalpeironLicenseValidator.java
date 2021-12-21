@@ -3,8 +3,6 @@ package com.docshifter.core.utils.nalpeiron;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @Log4j2
 public class NalpeironLicenseValidator implements Runnable {
@@ -97,7 +95,7 @@ public class NalpeironLicenseValidator implements Runnable {
 
 				//if the current activation request is empty, or the file does not exist create it
 				if (StringUtils.isBlank(activationRequest)) {
-					activationRequest = nalpeironHelper.getActivationCertificateRequest(licenseNo, xmlRegInfo);
+					activationRequest = nalpeironHelper.getActivationCertificateRequest(licenseNo, xmlRegInfo, "");
 
 					nalpeironHelper.writeLicenseActivationRequest(activationRequest);
 				}
@@ -149,7 +147,7 @@ public class NalpeironLicenseValidator implements Runnable {
 		boolean hasConnection = !offlineActivation;
 		if (!offlineActivation) {
 			try {
-				nalpeironHelper.testNalpeironLicencingConnection();
+				nalpeironHelper.testNalpeironLicencingConnection(0, 0);
 			} catch (DocShifterLicenseException e) {
 				hasConnection = false;
 				log.debug("No connection to the Nalpeiron server could be established, will try offline activation");

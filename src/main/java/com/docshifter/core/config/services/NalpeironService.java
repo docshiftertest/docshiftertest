@@ -1,12 +1,11 @@
 package com.docshifter.core.config.services;
 
 import com.docshifter.core.exceptions.DocShifterLicenseException;
-import com.docshifter.core.utils.nalpeiron.KubernetesChecker;
+import com.docshifter.core.utils.nalpeiron.IContainerChecker;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import com.nalpeiron.nalplibrary.NALP;
 import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,11 +97,11 @@ public class NalpeironService implements ILicensingService {
     public static final List<NalpeironHelper.FeatureStatus> VALID_FEATURE_STATUS = Arrays.asList(NalpeironHelper.FeatureStatus.AUTHORIZED);
     public static final List<NalpeironHelper.LicenseStatus> VALID_LICENSE_STATUS = Arrays.asList(NalpeironHelper.LicenseStatus.PROD_AUTHORIZED, NalpeironHelper.LicenseStatus.PROD_INTRIAL, NalpeironHelper.LicenseStatus.PROD_NETWORK, NalpeironHelper.LicenseStatus.PROD_NETWORK_LTCO);
 
-    private final KubernetesClient k8sClient;
+    private final IContainerChecker containerChecker;
 
     @Autowired(required = false)
-    public NalpeironService(KubernetesClient k8sClient) {
-        this.k8sClient = k8sClient;
+    public NalpeironService(IContainerChecker containerChecker) {
+        this.containerChecker = containerChecker;
     }
 
     public NalpeironService() {
@@ -165,9 +164,13 @@ public class NalpeironService implements ILicensingService {
             log.debug("validateLibrary finished, starting periodic license checking");
 
             helper.validateLicenseAndInitiatePeriodicChecking();
-            if (k8sClient != null) {
+            if (containerChecker != null) {
                 log.debug("Container environment detected.");
-                new KubernetesChecker(k8sClient, helper).checkPods();
+                if (!containerChecker.checkReplicas(helper.getNumberAvailableSimultaneousLicenses())) {
+                    log.fatal("Container licensing check failed. Exiting application.");
+                    System.exit(0);
+                }
+                log.debug("Container licensing check succeeded.");
             }
 
             log.debug("Periodic license checking thread started, staring analytics");
