@@ -12,6 +12,7 @@ import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.VeevaTask;
 import lombok.extern.log4j.Log4j2;
+import org.apache.activemq.artemis.jms.client.ActiveMQMessage;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jms.core.JmsMessagingTemplate;
