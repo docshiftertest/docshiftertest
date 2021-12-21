@@ -205,7 +205,7 @@ public class NalpeironService implements ILicensingService {
         String maxReceiversUDF = helper.getUDFValue("maxReceivers");
         int maxReceivers = 0;
 
-        if (!StringUtils.isBlank(maxReceiversUDF)) {
+        if (StringUtils.isNotBlank(maxReceiversUDF)) {
             log.debug("Got maximum allotted receivers: {}", maxReceiversUDF);
             try {
                 maxReceivers = Integer.parseInt(maxReceiversUDF);
