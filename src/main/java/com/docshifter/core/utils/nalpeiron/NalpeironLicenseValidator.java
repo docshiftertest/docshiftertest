@@ -3,6 +3,8 @@ package com.docshifter.core.utils.nalpeiron;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @Log4j2
 public class NalpeironLicenseValidator implements Runnable {
@@ -52,7 +54,6 @@ public class NalpeironLicenseValidator implements Runnable {
 			int errorCode = -455;//we need to exit with non zero error so yajsw will restart the service and validation will be run again
 			log.debug(" NALP ERRORCODE: {} NALP ERROR MESSAGE: {}", ex.getNalpErrorCode(), ex.getNalpErrorMsg());
 			log.fatal("Exception while trying to validate the Nalpeiron license, exiting with error", ex);
-
 			System.exit(errorCode);
 		}
 	}

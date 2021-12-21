@@ -1,17 +1,16 @@
 package com.docshifter.core.config.services;
 
-import com.docshifter.core.config.conditions.IsNotInAnyContainerCondition;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
+import com.docshifter.core.utils.nalpeiron.KubernetesChecker;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import com.nalpeiron.nalplibrary.NALP;
 import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
-import com.nalpeiron.nalplibrary.NalpError;
-import org.apache.commons.lang.SystemUtils;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
@@ -22,9 +21,10 @@ import java.util.Map;
 
 @Service
 @Profile("licensing")
-@Conditional(IsNotInAnyContainerCondition.class)
 public class NalpeironService implements ILicensingService {
 
+    // Don't use Lombok @Log4j2 because we're getting the general logger for the interface instead of this particular
+    // class
     private static final Logger log = LogManager.getLogger(ILicensingService.class);
 
     //These private ints are unique to your product and must
@@ -98,7 +98,17 @@ public class NalpeironService implements ILicensingService {
     public static final List<NalpeironHelper.FeatureStatus> VALID_FEATURE_STATUS = Arrays.asList(NalpeironHelper.FeatureStatus.AUTHORIZED);
     public static final List<NalpeironHelper.LicenseStatus> VALID_LICENSE_STATUS = Arrays.asList(NalpeironHelper.LicenseStatus.PROD_AUTHORIZED, NalpeironHelper.LicenseStatus.PROD_INTRIAL, NalpeironHelper.LicenseStatus.PROD_NETWORK, NalpeironHelper.LicenseStatus.PROD_NETWORK_LTCO);
 
-    //TODO: LOGGING
+    private final KubernetesClient k8sClient;
+
+    @Autowired(required = false)
+    public NalpeironService(KubernetesClient k8sClient) {
+        this.k8sClient = k8sClient;
+    }
+
+    public NalpeironService() {
+        this(null);
+    }
+
     @PostConstruct
     private void init() {
         log.info("|===========================| LICENSING SERVICE INIT START |===========================|");
@@ -108,10 +118,6 @@ public class NalpeironService implements ILicensingService {
         }
 
         log.debug("Using nalpeiron workdir: {}", WorkDir);
-
-        //Test if the DLL is present
-        NalpeironHelper.dllTest();
-
         log.debug("Opening nalpeiron library");
 
         openValidateNalpeironLibrary();
@@ -147,21 +153,7 @@ public class NalpeironService implements ILicensingService {
 
             log.debug("initialized NalpeironHelper");
 
-            String dllPath = libDir + "/docShifterFileCheck.";
-            if (SystemUtils.IS_OS_UNIX) {
-                dllPath += "so";
-            } else if (SystemUtils.IS_OS_WINDOWS) {
-                dllPath += "dll";
-            } else {
-                int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-                log.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application");
-
-                System.exit(errorCode);
-            }
-
-            log.debug("using '{}' as the nalpeiron connection dll", dllPath);
-
-            helper.openNalpLibrary(dllPath, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin,
+            helper.openNalpLibrary(NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin,
                     NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort,
                     DaemonUser, DaemonPass, security);
 
@@ -173,6 +165,10 @@ public class NalpeironService implements ILicensingService {
             log.debug("validateLibrary finished, starting periodic license checking");
 
             helper.validateLicenseAndInitiatePeriodicChecking();
+            if (k8sClient != null) {
+                log.debug("Container environment detected.");
+                new KubernetesChecker(k8sClient, helper).checkPods();
+            }
 
             log.debug("Periodic license checking thread started, staring analytics");
 
@@ -193,7 +189,7 @@ public class NalpeironService implements ILicensingService {
             helper.sendAnalyticsAndInitiatePeriodicReporting();
 
             log.debug("Periodic analytics sending thread started");
-        } catch (DocShifterLicenseException | NalpError e) {
+        } catch (Exception e) {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
             log.fatal("Error in docshifter license processing. Could not complete opening and validating Nalpeiron Library.", e);
 
@@ -220,6 +216,10 @@ public class NalpeironService implements ILicensingService {
     public void endModule(String moduleId, Map<String, Object> clientData, long[] fid) throws DocShifterLicenseException {
         //call end feature
         helper.stopFeature(NALPEIRON_USERNAME, moduleId, clientData, fid);
+    }
+
+    public boolean hasModuleAccess(String moduleId) throws DocShifterLicenseException {
+        return helper.getFeatureStatus(moduleId) == NalpeironHelper.FeatureStatus.AUTHORIZED;
     }
 
     @PreDestroy
