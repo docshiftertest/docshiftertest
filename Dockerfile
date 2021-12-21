@@ -1,6 +1,4 @@
 # DocShifter-base
-#
-# VERSION       6.2.4.1
 
 # using the openjdk11-openj9 image
 FROM adoptopenjdk:11-jre-openj9
@@ -18,5 +16,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN mkdir -p /opt/DocShifter/beans \
     && chown -R docshifter:docshifter /opt/DocShifter
 
-COPY --chown=docshifter:docshifter target/jars target/classes/license/ShaferFilechck.so target/${DEPENDENCY}-Beans-docker/lib-doc /opt/DocShifter/beans/lib/
-COPY --chown=docshifter:docshifter target/classes/license/DSLicenseCode.txt target/classes/license/DSLicenseActivationRequest.txt target/classes/license/DSLicenseActivationAnswer.txt /opt/DocShifter/licensing/
+COPY --chown=docshifter:docshifter target/jars target/classes/license/libShaferFilechck.so target/${DEPENDENCY}-Beans-docker/lib-doc /opt/DocShifter/beans/lib/

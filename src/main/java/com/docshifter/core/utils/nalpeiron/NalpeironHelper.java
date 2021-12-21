@@ -959,42 +959,54 @@ public class NalpeironHelper {
     public String resolveLicenseNo() {
         String licenseCode = System.getenv("DS_LICENSE_CODE");
         if (StringUtils.isBlank(licenseCode)) {
+            log.debug("DS_LICENSE_CODE environment variable is not set or empty, will try to read DSLicenseCode.txt.");
             try {
                 byte[] bytes = Files.readAllBytes(Paths.get(workDir + "DSLicenseCode.txt"));
                 licenseCode = new String(bytes, Charset.defaultCharset());
             } catch (Exception e) {
+                log.error("Error while reading DSLicenseCode.txt! Will try resolving license code internally.", e);
                 try {
                     licenseCode = getLicenseCode();
-                } catch (Exception ignored) {
+                } catch (Exception e2) {
+                    log.error("And got an error while trying to resolve the license code internally!", e2);
                 }
             }
         }
+        log.debug("Final license code is {}", licenseCode);
         return licenseCode == null ? "" : licenseCode;
     }
 
     public String resolveLicenseActivationRequest() {
         String activationRequest = System.getenv("DS_LICENSE_ACTIVATION_REQUEST");
         if (StringUtils.isBlank(activationRequest)) {
+            log.debug("DS_LICENSE_ACTIVATION_REQUEST environment variable is not set or empty, will try to read" +
+                    "DSLicenseActivationRequest.txt.");
             try {
                 byte[] bytes = Files.readAllBytes(Paths.get(workDir + "DSLicenseActivationRequest.txt"));
                 activationRequest = new String(bytes, Charset.defaultCharset());
             } catch (Exception e) {
+                log.error("Error while reading DSLicenseActivationRequest.txt!", e);
                 activationRequest = "";
             }
         }
+        log.debug("Final license activation request is {}", activationRequest);
         return activationRequest;
     }
 
     public String resolveLicenseActivationAnswer() {
         String ActivationAnswer = System.getenv("DS_LICENSE_ACTIVATION_ANSWER");
         if (StringUtils.isBlank(ActivationAnswer)) {
+            log.debug("DS_LICENSE_ACTIVATION_ANSWER environment variable is not set or empty, will try to read" +
+                    "DSLicenseActivationAnswer.txt.");
             try {
                 byte[] bytes = Files.readAllBytes(Paths.get(workDir + "DSLicenseActivationAnswer.txt"));
                 ActivationAnswer = new String(bytes, Charset.defaultCharset());
             } catch (Exception e) {
+                log.error("Error while reading DSLicenseActivationAnswer.txt!", e);
                 ActivationAnswer = "";
             }
         }
+        log.debug("Final license activation answer is {}", ActivationAnswer);
         return ActivationAnswer;
     }
 

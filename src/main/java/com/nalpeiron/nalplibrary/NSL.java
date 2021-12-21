@@ -188,7 +188,7 @@ public class NSL {
 	 * @return A String containing the version of the Nalpeiron library
 	 * @throws NalpError: If there was a problem calling the NSL function,
 	 *                    this error will be thrown (\ref V10ERROR)
-	 * @brief Gets the vewrsion of the NSL library being accessed. See NSLGetVersion()
+	 * @brief Gets the version of the NSL library being accessed. See NSLGetVersion()
 	 */
 	public String callNSLGetVersion()
 			throws NalpError {

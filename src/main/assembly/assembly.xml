@@ -33,7 +33,7 @@
             <outputDirectory>lib</outputDirectory>
             <includes>
                 <include>ShaferFilechck.dll</include>
-                <include>ShaferFilechck.so</include>
+                <include>libShaferFilechck.so</include>
             </includes>
         </fileSet>
         <fileSet>
