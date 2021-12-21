@@ -32,6 +32,7 @@ public class NalpError extends Error {
 	 * @param msg A descriptive error message
 	 */
 	public NalpError(int i, String msg) {
+		super("License error code " + i + ": " + msg);
 		NalpErrorCode = i;
 		NalpErrorMsg = msg;
 	}
