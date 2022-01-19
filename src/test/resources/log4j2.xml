@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration>
+<Configuration packages="com.docshifter.core.logging.appenders" status="WARN">
     <Appenders>
         <Console name="STDOUT" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{DATE} %5p [%t] (%F:%L) - %m%n"/>
@@ -25,6 +25,9 @@
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
         </RollingFile>
+        <TaskMessage name="TASK_MESSAGE">
+            <PatternLayout alwaysWriteExceptions="false"/>
+        </TaskMessage>
     </Appenders>
     <Loggers>
         <Logger name="org.apache.log4j.xml" level="info"/>
@@ -39,6 +42,9 @@
         </Logger>
         <Logger name="com.docshifter.core.config.services.ILicensingService" level="info" additivity="false">
             <AppenderRef ref="LICENSING"/>
+        </Logger>
+        <Logger name="com.docshifter.modules" level="warn">
+            <AppenderRef ref="TASK_MESSAGE"/>
         </Logger>
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
