@@ -124,7 +124,7 @@ public class AMQPSender implements IMessageSender {
 			}
 		}
 
-		log.info("Sending message: {} (priority = {}, timeout = {} seconds) for file: {} using workflow {}", message,
+		log.info("Sending message: {} (priority = {}, timeout = {} ms) for file: {} using workflow {}", message,
 				taskPriority, taskTimeoutInMillis, task.getSourceFilePath(), chainConfiguration.getName());
 
 
