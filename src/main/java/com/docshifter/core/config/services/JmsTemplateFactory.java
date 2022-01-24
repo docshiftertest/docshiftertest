@@ -12,7 +12,7 @@ public class JmsTemplateFactory implements IJmsTemplateFactory {
 		this.connectionFactory = connectionFactory;
 	}
 
-	public JmsTemplate create(int priority, long queueReplyTimeout) {
+	public JmsTemplate create(int priority, long queueReplyTimeout,long timeToLive) {
 		JmsTemplate template = new JmsTemplate(connectionFactory);
 		template.setPriority(priority);
 		if (queueReplyTimeout <= 0) {
@@ -24,6 +24,10 @@ public class JmsTemplateFactory implements IJmsTemplateFactory {
 		template.setDeliveryPersistent(true);
 		// JMS tuning  - http://activemq.apache.org/components/artemis/documentation/1.3.0/perf-tuning.html
 		template.setMessageTimestampEnabled(false);
+		if (timeToLive > 0) {
+			template.setTimeToLive(timeToLive);
+		}
 		return template;
 	}
+
 }

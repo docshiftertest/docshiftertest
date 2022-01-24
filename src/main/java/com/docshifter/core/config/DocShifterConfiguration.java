@@ -89,14 +89,13 @@ public class DocShifterConfiguration {
 
 	@Bean
 	public JmsTemplate defaultJmsTemplate() {
-		return jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY, queueReplyTimeout);
+		return jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY, queueReplyTimeout,0);
 	}
 
 	@Bean
 	public JmsTemplate metricsJmsTemplate() {
 		JmsTemplate template = jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY,
-				queueReplyTimeout);
-		template.setTimeToLive(metricsTimeToLive);
+				queueReplyTimeout,metricsTimeToLive);
 		return template;
 	}
 
