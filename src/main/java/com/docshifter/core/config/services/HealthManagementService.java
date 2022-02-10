@@ -10,9 +10,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 
+/**
+ * Keeps track of different health events happening across the application. If there are no problems, application
+ * state will be kept at Correct. As soon as any problems are reported however, application state will be set to Broken.
+ */
 @Service
 @Log4j2
 public class HealthManagementService {
+	/**
+	 * An enumeration of health events that can potentially be detrimental to application performance. Some events
+	 * are distinct (they can either be active or not application-wide) whereas other types can be stacked up next to
+	 * each other.
+	 */
 	@Getter
 	@AllArgsConstructor
 	public enum Event {
@@ -31,8 +40,12 @@ public class HealthManagementService {
 		this.appContext = appContext;
 	}
 
+	/**
+	 * Reports a health event. The application state will be set to Broken if this is necessary.
+	 * @param event The event to report.
+	 */
 	public void reportEvent(Event event) {
-		int eventCount = eventOccurrenceMap.getOrDefault(event, 0);
+		int eventCount = getEventCount(event);
 		if (!event.isDistinct() || eventCount <= 0) {
 			eventCount++;
 			log.error("{}, so setting the application state to BROKEN! This event has now occurred {} time(s).",
@@ -42,8 +55,21 @@ public class HealthManagementService {
 		}
 	}
 
+	/**
+	 * Returns how many unresolved events there are for a certain type. Distinct event types will always return 0 or 1.
+	 * @param event The event type to check.
+	 * @return
+	 */
+	public int getEventCount(Event event) {
+		return eventOccurrenceMap.getOrDefault(event, 0);
+	}
+
+	/**
+	 * Resolves a health event. Updates the application state to Correct if there are no more outstanding events.
+	 * @param event The event to mark as resolved.
+	 */
 	public void resolveEvent(Event event) {
-		int eventCount = eventOccurrenceMap.getOrDefault(event, 0);
+		int eventCount = getEventCount(event);
 		if (eventCount > 0) {
 			eventCount--;
 			log.info("The previously reported event \"{}\" has now been marked as resolved, there is/are now {} event(s) " +
