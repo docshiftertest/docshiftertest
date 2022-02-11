@@ -125,7 +125,6 @@ public class DiagnosticsService {
 			healthManagementService.reportEvent(HealthManagementService.Event.MEMORY_SHORTAGE);
 			consecutiveChecksBelowThreshold = 0;
 		} else if (++consecutiveChecksBelowThreshold >= lowMemoryConsecutivePasses) {
-			consecutiveChecksBelowThreshold = 0;
 			// Make sure to not log useless warnings if we've never even reported the memory shortage
 			if (healthManagementService.getEventCount(HealthManagementService.Event.MEMORY_SHORTAGE) > 0) {
 				healthManagementService.resolveEvent(HealthManagementService.Event.MEMORY_SHORTAGE);
@@ -134,6 +133,8 @@ public class DiagnosticsService {
 						"attempt.");
 			}
 			runningFuture.cancel(false);
+			runningFuture = null;
+			consecutiveChecksBelowThreshold = 0;
 		}
 	}
 
