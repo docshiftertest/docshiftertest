@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Keeps track of different health events happening across the application. If there are no problems, application
@@ -34,7 +35,7 @@ public class HealthManagementService {
 	}
 
 	private final ApplicationContext appContext;
-	private final HashMap<Event, Integer> eventOccurrenceMap = new HashMap<>();
+	private final Map<Event, Integer> eventOccurrenceMap = new HashMap<>();
 
 	public HealthManagementService(ApplicationContext appContext) {
 		this.appContext = appContext;
@@ -44,7 +45,7 @@ public class HealthManagementService {
 	 * Reports a health event. The application state will be set to Broken if this is necessary.
 	 * @param event The event to report.
 	 */
-	public void reportEvent(Event event) {
+	public synchronized void reportEvent(Event event) {
 		int eventCount = getEventCount(event);
 		if (!event.isDistinct() || eventCount <= 0) {
 			eventCount++;
@@ -58,9 +59,9 @@ public class HealthManagementService {
 	/**
 	 * Returns how many unresolved events there are for a certain type. Distinct event types will always return 0 or 1.
 	 * @param event The event type to check.
-	 * @return
+	 * @return The number of unresolved events.
 	 */
-	public int getEventCount(Event event) {
+	public synchronized int getEventCount(Event event) {
 		return eventOccurrenceMap.getOrDefault(event, 0);
 	}
 
@@ -68,7 +69,7 @@ public class HealthManagementService {
 	 * Resolves a health event. Updates the application state to Correct if there are no more outstanding events.
 	 * @param event The event to mark as resolved.
 	 */
-	public void resolveEvent(Event event) {
+	public synchronized void resolveEvent(Event event) {
 		int eventCount = getEventCount(event);
 		if (eventCount > 0) {
 			eventCount--;

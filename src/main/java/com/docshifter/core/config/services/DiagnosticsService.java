@@ -31,30 +31,48 @@ public class DiagnosticsService {
 	private Future<?> runningFuture;
 	private int consecutiveChecksBelowThreshold;
 
-	private final float relativeMemoryThreshold;
+	private final ScheduledExecutorService scheduler;
 	private final HealthManagementService healthManagementService;
+	private final float relativeMemoryThreshold;
+	private final long lowMemoryInitialDelay;
+	private final long lowMemoryDelay;
 	private final int lowMemoryConsecutivePasses;
+	private final MemoryPoolMXBean tenuredGen;
 
 	public DiagnosticsService(ScheduledExecutorService scheduler,
 							  HealthManagementService healthManagementService,
 							  @Value("${diagnostics.enable-startup-log:true}") boolean enableStartupLog,
-							  @Value("${diagnostics.memory-monitor.relative-threshold:0.8}") float relativeMemoryThreshold,
+							  @Value("${diagnostics.memory-monitor.relative-threshold:0.95}") float relativeMemoryThreshold,
 							  @Value("${diagnostics.memory-monitor.low-memory-initial-delay:10}") long lowMemoryInitialDelay,
 							  @Value("${diagnostics.memory-monitor.low-memory-delay:5}") long lowMemoryDelay,
 							  @Value("${diagnostics.memory-monitor.low-memory-consecutive-passes:12}") int lowMemoryConsecutivePasses) {
+		this.scheduler = scheduler;
 		this.healthManagementService = healthManagementService;
 		this.relativeMemoryThreshold = relativeMemoryThreshold;
+		this.lowMemoryInitialDelay = lowMemoryInitialDelay;
+		this.lowMemoryDelay = lowMemoryDelay;
 		this.lowMemoryConsecutivePasses = lowMemoryConsecutivePasses;
-		MemoryPoolMXBean tenuredGen = ManagementFactory.getMemoryPoolMXBeans().stream()
+		tenuredGen = ManagementFactory.getMemoryPoolMXBeans().stream()
 				.filter(pool -> pool.getType() == MemoryType.HEAP)
 				.filter(MemoryPoolMXBean::isUsageThresholdSupported)
 				.filter(MemoryPoolMXBean::isCollectionUsageThresholdSupported)
 				.findFirst()
 				.orElseThrow(() -> new IllegalStateException("Can't find tenured generation MemoryPoolMXBean"));
+
 		if (enableStartupLog) {
-			logJVMInfo(tenuredGen);
+			logJVMInfo();
 		}
-		updateThresholds(tenuredGen);
+
+		if (relativeMemoryThreshold > 0) {
+			setupMemoryListeners();
+		}
+	}
+
+	/**
+	 * Configures the thresholds and listeners of the low memory warning system.
+	 */
+	private void setupMemoryListeners() {
+		updateThresholds();
 		NotificationEmitter notificationEmitter = (NotificationEmitter) ManagementFactory.getMemoryMXBean();
 		notificationEmitter.addNotificationListener((notification, handback) -> {
 			if (MemoryNotificationInfo.MEMORY_COLLECTION_THRESHOLD_EXCEEDED.equals(notification.getType())) {
@@ -79,27 +97,26 @@ public class DiagnosticsService {
 				// finalizers.
 				System.gc();
 				log.warn("JVM cleanup suggestion complete, will now start polling memory usage. Usage = {}B, " +
-								"collection usage = {}B", tenuredGen.getUsage().getUsed(), tenuredGen.getCollectionUsage().getUsed());
+						"collection usage = {}B", tenuredGen.getUsage().getUsed(), tenuredGen.getCollectionUsage().getUsed());
 
-				runningFuture = scheduler.scheduleWithFixedDelay(() -> monitorMemory(tenuredGen),
-						lowMemoryInitialDelay, lowMemoryDelay, TimeUnit.SECONDS);
+				runningFuture = scheduler.scheduleWithFixedDelay(this::monitorMemory, lowMemoryInitialDelay,
+						lowMemoryDelay, TimeUnit.SECONDS);
 			} else if (MemoryNotificationInfo.MEMORY_THRESHOLD_EXCEEDED.equals(notification.getType())) {
 				log.warn("Memory usage threshold has exceeded configured threshold (usage = {}B, collection usage = " +
-						"{}B! Will take action as soon as the memory collection usage threshold exceeds.", tenuredGen.getUsage().getUsed(),
+								"{}B! Will take action as soon as the memory collection usage threshold exceeds.", tenuredGen.getUsage().getUsed(),
 						tenuredGen.getCollectionUsage().getUsed());
 				// This should trigger right before MEMORY_COLLECTION_THRESHOLD_EXCEEDED, here we make sure the
 				// thresholds are kept up to date if the maximum available bytes of the tenured generation memory
 				// pool somehow grew.
-				updateThresholds(tenuredGen);
+				updateThresholds();
 			}
 		}, null, null);
 	}
 
 	/**
 	 * Polls memory usage and reports noteworthy events.
-	 * @param tenuredGen The memory pool bean.
 	 */
-	private void monitorMemory(MemoryPoolMXBean tenuredGen) {
+	private void monitorMemory() {
 		long memoryUsage = tenuredGen.getUsage().getUsed();
 		long absoluteThreshold = (long) (tenuredGen.getUsage().getMax() * relativeMemoryThreshold);
 		log.debug("Memory usage is now at {}B, threshold is {}B", memoryUsage, absoluteThreshold);
@@ -121,9 +138,8 @@ public class DiagnosticsService {
 
 	/**
 	 * Actualizes the memory thresholds of the memory pool bean.
-	 * @param tenuredGen The memory pool bean.
 	 */
-	private void updateThresholds(MemoryPoolMXBean tenuredGen) {
+	private void updateThresholds() {
 		long maxUsage = tenuredGen.getUsage().getMax();
 		log.debug("Max usage is {}B, max collection usage is {}B", maxUsage, tenuredGen.getCollectionUsage().getMax());
 		long absoluteThreshold = (long) (maxUsage * relativeMemoryThreshold);
@@ -135,9 +151,8 @@ public class DiagnosticsService {
 	/**
 	 * Logs useful information related to the JVM and environment. This includes memory, Java Cryptography Extensions
 	 * (JCE), supported charsets, fonts and system properties.
-	 * @param tenuredGen The memory pool bean.
 	 */
-	private void logJVMInfo(MemoryPoolMXBean tenuredGen) {
+	private void logJVMInfo() {
 		TextStringBuilder sb = new TextStringBuilder();
 		sb.appendln("=== Here is some information related to the JVM and environment ===");
 
