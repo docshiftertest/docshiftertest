@@ -17,6 +17,7 @@ import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -166,14 +167,14 @@ public class DiagnosticsService {
 		sb.appendln("--- JCE ---");
 		try {
 			int maxKeyLen = Cipher.getMaxAllowedKeyLength("AES");
-			sb.appendln("Max AES: %d", maxKeyLen);
+			sb.appendln("Max AES key length: %d", maxKeyLen);
 		}
 		catch (NoSuchAlgorithmException nsay) {
 			sb.appendln("AES: No such algorithm!");
 		}
 		try {
 			int maxKeyLen = Cipher.getMaxAllowedKeyLength("PBEWITHACSHA512ANDAES_256");
-			sb.appendln("Max PBEWITHACSHA512ANDAES_256: %d", maxKeyLen);
+			sb.appendln("Max PBEWITHACSHA512ANDAES_256 key length: %d", maxKeyLen);
 		}
 		catch (NoSuchAlgorithmException nsay) {
 			sb.appendln("PBEWITHHMACSHA512ANDAES_256: No such algorithm!");
@@ -182,13 +183,17 @@ public class DiagnosticsService {
 		sb.appendln("--- CHARSETS ---");
 		sb.appendln("Default charset: %s", Charset.defaultCharset());
 		sb.appendln("Available charsets:");
-		Charset.availableCharsets().forEach((name, cSet) -> sb.appendln("  Name: [%s], Charset: [%s]", name, cSet));
+		Set<String> charsetNames = Charset.availableCharsets().keySet();
+		int charsetNum = 1;
+		for (String name : charsetNames) {
+			sb.appendln("  Charset %d: %s", charsetNum++, name);
+		}
 
 		sb.appendln("--- FONTS ---");
-		sb.appendln("All font names:");
+		sb.appendln("All font family names:");
 		String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 		for (int i = 0; i < fontNames.length; i++) {
-			sb.appendln("  Font %d name: %s", i + 1, fontNames[i]);
+			sb.appendln("  Font family %d: %s", i + 1, fontNames[i]);
 		}
 		sb.appendln("All fonts:");
 		Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
