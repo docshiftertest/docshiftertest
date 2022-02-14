@@ -33,6 +33,7 @@ public interface DashboardRepository extends JpaRepository<Dashboard, String> {
     @Query("select distinct dash.workflowName as workflowName from Dashboard dash where dash.isLicensed = TRUE")
     List<String> findAllDistinctDashboardWorkflowName();
 
-    List<Dashboard> findAllBySuccess(Boolean success);
+    @Query("select dash from Dashboard dash where dash.success = :success AND dash.onMessageHit BETWEEN :startDate AND :endDate")
+    List<Dashboard> findAllBySuccess(@Param("success") Boolean success, @Param("startDate") Long startDate, @Param("endDate") Long endDate);
 
 }
