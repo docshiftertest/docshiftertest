@@ -81,7 +81,7 @@ public class HealthManagementService {
 				AvailabilityChangeEvent.publish(appContext, LivenessState.CORRECT);
 			}
 		} else {
-			log.warn("An event was marked as resolved, but it somehow wasn't reported before!");
+			log.warn("An event ({}) was marked as resolved, but it somehow wasn't reported before!", event.name());
 		}
 	}
 }
