@@ -3,6 +3,7 @@ package com.docshifter.core.config;
 import com.docshifter.core.config.conditions.IsInKubernetesCondition;
 import com.docshifter.core.config.services.ConfigurationService;
 import com.docshifter.core.config.services.GeneralConfigService;
+import com.docshifter.core.config.services.HealthManagementService;
 import com.docshifter.core.config.services.IJmsTemplateFactory;
 import com.docshifter.core.config.services.JmsTemplateFactory;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -15,9 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
-import org.springframework.boot.availability.AvailabilityChangeEvent;
-import org.springframework.boot.availability.LivenessState;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
@@ -49,15 +47,15 @@ public class DocShifterConfiguration {
 	
 	public ConfigurationService configurationService;
 
-	private ApplicationContext appContext;
+	private HealthManagementService healthManagementService;
 
 	@Autowired
 	public DocShifterConfiguration(GeneralConfigService generalConfigService,
 								   ConfigurationService configurationService,
-								   ApplicationContext appContext) {
+								   HealthManagementService healthManagementService) {
 		this.generalConfigService = generalConfigService;
 		this.configurationService = configurationService;
-		this.appContext = appContext;
+		this.healthManagementService = healthManagementService;
 	}
 	
 	public DocShifterConfiguration () {
@@ -124,34 +122,23 @@ public class DocShifterConfiguration {
 	public JmsListenerContainerFactory<?> jmsListenerContainerFactory(@Qualifier("cachingConnectionFactory") ConnectionFactory connectionFactory,
 																	  DefaultJmsListenerContainerFactoryConfigurer configurer) {
 		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-		factory.setErrorHandler(t -> {
-			// Make sure we only freak out if we encounter confirmed unrecoverable errors, as some/most errors with
-			// the JMS connection might be perfectly recoverable
-
-			// This one arose sporadically in a NVS PROD environment (DPS-447)
-			if (t instanceof javax.jms.IllegalStateException && "Session is closed".equals(t.getMessage())) {
-				log.error("Caught an unrecoverable error related to the message queue, so setting the application " +
-						"state to broken!", t);
-				AvailabilityChangeEvent.publish(appContext, LivenessState.BROKEN);
-			} else {
-				log.warn("Not handling the following message queue error:", t);
-			}
-		});
-		factory.setExceptionListener(exception -> {
-			// Make sure we only freak out if we encounter confirmed unrecoverable errors, as some/most errors with
-			// the JMS connection might be perfectly recoverable
-
-			// This one arose sporadically in a NVS PROD environment (DPS-447)
-			if (exception instanceof javax.jms.IllegalStateException && "Session is closed".equals(exception.getMessage())) {
-				log.error("Caught an unrecoverable error related to the message queue, so setting the application " +
-						"state to broken!", exception);
-				AvailabilityChangeEvent.publish(appContext, LivenessState.BROKEN);
-			} else {
-				log.warn("Not handling the following message queue error:", exception);
-			}
-		});
+		factory.setErrorHandler(this::handleMQException);
+		factory.setExceptionListener(this::handleMQException);
 		configurer.configure(factory, connectionFactory);
 		return factory;
+	}
+
+	private void handleMQException(Throwable t) {
+		// Make sure we only freak out if we encounter confirmed unrecoverable errors, as some/most errors with
+		// the JMS connection might be perfectly recoverable
+
+		// This one arose sporadically in a NVS PROD environment (DPS-447)
+		if (t instanceof javax.jms.IllegalStateException && "Session is closed".equals(t.getMessage())) {
+			log.error("Caught an unrecoverable error related to the message queue:", t);
+			healthManagementService.reportEvent(HealthManagementService.Event.CRITICAL_MQ_ERROR);
+		} else {
+			log.warn("Not handling the following message queue error:", t);
+		}
 	}
 	
 	/**
