@@ -15,6 +15,7 @@ import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -76,21 +77,25 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
 	public CachingConnectionFactory cachingConnectionFactory() {
 		return new CachingConnectionFactory(activeMQConnectionFactory());
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
 	public JmsTemplateFactory jmsTemplateFactory() {
 		return new JmsTemplateFactory(cachingConnectionFactory());
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
 	public JmsTemplate defaultJmsTemplate() {
 		return jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY, queueReplyTimeout,0);
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
 	public JmsTemplate metricsJmsTemplate() {
 		JmsTemplate template = jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY,
 				queueReplyTimeout,metricsTimeToLive);
@@ -98,18 +103,21 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
 	@DependsOn("defaultJmsTemplate")
 	public JmsMessagingTemplate defaultMessagingTemplate () {
 		return new JmsMessagingTemplate(defaultJmsTemplate());
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
 	@DependsOn("metricsJmsTemplate")
 	public JmsMessagingTemplate metricsMessagingTemplate () {
 		return new JmsMessagingTemplate(metricsJmsTemplate());
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
 	public JmsTemplate jmsTemplateMulticast() {
 		JmsTemplate template = new JmsTemplate(cachingConnectionFactory());
 		template.setPubSubDomain(true);
@@ -119,6 +127,7 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
 	public JmsListenerContainerFactory<?> jmsListenerContainerFactory(@Qualifier("cachingConnectionFactory") ConnectionFactory connectionFactory,
 																	  DefaultJmsListenerContainerFactoryConfigurer configurer) {
 		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
@@ -149,6 +158,7 @@ public class DocShifterConfiguration {
 	 * @param configurer The {@link DefaultJmsListenerContainerFactoryConfigurer} to be customized. 
 	 */
 	@Bean
+	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
 	public JmsListenerContainerFactory<?> topicListener(@Qualifier("cachingConnectionFactory") ConnectionFactory connectionFactory,
 			DefaultJmsListenerContainerFactoryConfigurer configurer) {
 		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
@@ -159,16 +169,19 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
 	public ActiveMQQueue defaultQueue() {
 		return new ActiveMQQueue(generalConfigService.getString(Constants.MQ_QUEUE));
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
 	public ActiveMQQueue defaultMetricsQueue() {
 		return new ActiveMQQueue(generalConfigService.getString(Constants.MQ_METRICS_QUEUE));
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
 	public ActiveMQTopic reloadExchange() {
 		return new ActiveMQTopic(Constants.RELOAD_QUEUE);
 	}
