@@ -11,7 +11,6 @@
         <groupId>com.docshifter</groupId>
         <artifactId>parent</artifactId>
         <version>7.1.1</version>
-		<relativePath/>
     </parent>
 
     <properties>
@@ -60,6 +59,7 @@
         <!-- SIGHS again -->
         <aspose.html.classifier>jdk1.8</aspose.html.classifier>
 
+        <artemis.version>2.16.0</artemis.version>
         <kubernetes-client.version>5.3.0</kubernetes-client.version>
 
     </properties>
