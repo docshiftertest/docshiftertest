@@ -46,6 +46,10 @@
         <Logger name="com.docshifter.modules" level="warn">
             <AppenderRef ref="TASK_MESSAGE"/>
         </Logger>
+        <!-- Needed for TaskMessageAppenderTest -->
+        <Logger name="com.docshifter.core.logging.appenders" level="warn">
+            <AppenderRef ref="TASK_MESSAGE"/>
+        </Logger>
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
         </Root>
