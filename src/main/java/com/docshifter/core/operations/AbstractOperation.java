@@ -1,5 +1,6 @@
 package com.docshifter.core.operations;
 
+import com.docshifter.core.task.TaskStatus;
 import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.asposehelper.LicenseHelper;
 import com.docshifter.core.config.wrapper.ModuleWrapper;
@@ -52,7 +53,7 @@ public abstract class AbstractOperation extends ModuleOperation {
         if (valid) {
             return execute();
         }
-        operationParams.setSuccess(false);
+        operationParams.setSuccess(TaskStatus.FAILURE);
         return operationParams;
     }
 
@@ -67,7 +68,7 @@ public abstract class AbstractOperation extends ModuleOperation {
         if (valid) {
             return execute();
         }
-        operationParams.setSuccess(false);
+        operationParams.setSuccess(TaskStatus.FAILURE);
         return operationParams;
     }
 

@@ -20,7 +20,7 @@ public class OptionParams extends OperationParams {
 		super(operationParams.getSourcePath(),
 				operationParams.getResultPath(),
 				operationParams.getParameters(),
-				operationParams.isSuccess()
+				operationParams.getSuccess()
 		);
 	}
 
