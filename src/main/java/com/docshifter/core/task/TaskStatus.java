@@ -4,7 +4,8 @@ public enum TaskStatus {
 	SUCCESS,
 	FAILURE,
 	BAD_INPUT,
-	BAD_CONFIG;
+	BAD_CONFIG,
+	TIMED_OUT;
 
 	public boolean isSuccess() {
 		return this == SUCCESS;

@@ -19,7 +19,7 @@ public class Task implements Serializable {
 	protected String sourceFilePath;
 	protected String name;
 	protected String folderStructure;
-	protected TaskStatus taskStatus = TaskStatus.FAILURE;
+	protected TaskStatus status = TaskStatus.FAILURE;
 	protected final Map<TaskMessageSeverity, List<String>> messages = new HashMap<>();
 	protected final Map<String, Object> data = new HashMap<>();
 	protected final List<String> extraFilesList = new ArrayList<>();
@@ -119,11 +119,11 @@ public class Task implements Serializable {
 		this.id = id;
 	}
 
-	public TaskStatus getTaskStatus() {
-		return taskStatus;
+	public TaskStatus getStatus() {
+		return status;
 	}
 
-	public void setTaskStatus(TaskStatus taskStatus) {
-		this.taskStatus = taskStatus;
+	public void setStatus(TaskStatus status) {
+		this.status = status;
 	}
 }
