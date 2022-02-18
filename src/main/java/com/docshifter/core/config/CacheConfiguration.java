@@ -19,7 +19,7 @@ import lombok.extern.log4j.Log4j2;
  * Central cache configuration responsible for cleaning sender configuration and 2nd level cache from hibernate - ehcache.
  */
 @Configuration
-@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
+@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 @EnableCaching
 @Log4j2
 public class CacheConfiguration {
