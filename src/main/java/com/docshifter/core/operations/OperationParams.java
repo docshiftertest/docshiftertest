@@ -1,5 +1,7 @@
 package com.docshifter.core.operations;
 
+import com.docshifter.core.task.TaskStatus;
+
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,13 +14,13 @@ public class OperationParams implements Cloneable {
     private Path sourcePath;
     private Path resultPath = null;
     private Map<String, Object> parameters = new HashMap<>();
-    private boolean success = false;
+    private TaskStatus success = TaskStatus.FAILURE;
 
     public OperationParams(Path sourcePath){
         this.sourcePath = sourcePath;
     }
 
-    public OperationParams(Path sourcePath, Path resultPath, Map<String, Object> parameters, boolean success) {
+    public OperationParams(Path sourcePath, Path resultPath, Map<String, Object> parameters, TaskStatus success) {
         this.sourcePath = sourcePath;
         this.resultPath = resultPath;
         this.parameters = parameters;
@@ -63,10 +65,14 @@ public class OperationParams implements Cloneable {
     }
 
     public boolean isSuccess() {
-        return success;
+        return success.isSuccess();
     }
 
-    public void setSuccess(boolean success) {
+	public TaskStatus getSuccess() {
+		return success;
+	}
+
+    public void setSuccess(TaskStatus success) {
         this.success = success;
     }
     

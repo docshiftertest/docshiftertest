@@ -5,6 +5,7 @@ import com.docshifter.core.config.wrapper.ModuleWrapper;
 import com.docshifter.core.exceptions.EmptyOperationException;
 import com.docshifter.core.operations.ModuleOperation;
 import com.docshifter.core.operations.OptionParams;
+import com.docshifter.core.task.TaskStatus;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -149,14 +150,14 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 				}
 			}
 
-			parameters.setSuccess(true);
+			parameters.setSuccess(TaskStatus.SUCCESS);
 			parameters.setSelectedNodes(returnNodes);
 			if (parameters.getResultPath() == null) {
 				parameters.setResultPath(parameters.getSourcePath());
 			}
 			return parameters;
 		}
-		parameters.setSuccess(false);
+		parameters.setSuccess(TaskStatus.FAILURE);
 		return parameters;
 	}
 
