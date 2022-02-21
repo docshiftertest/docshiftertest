@@ -6,8 +6,8 @@ import com.docshifter.core.config.wrapper.ModuleWrapper;
 import com.docshifter.core.exceptions.EmptyOperationException;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.operations.annotations.ModuleParam;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -17,9 +17,8 @@ import java.util.Map;
  * Created by samnang.nop on 5/09/2016.
  */
 
+@Log4j2
 public abstract class AbstractOperation extends ModuleOperation {
-
-    private static final Logger logger = Logger.getLogger(AbstractOperation.class);
 
     private final static String TEMP_DIR = System.getProperty("java.io.tmpdir");
 
@@ -48,7 +47,7 @@ public abstract class AbstractOperation extends ModuleOperation {
 		if (StringUtils.isBlank(tempFolder)) {
 			tempFolder = TEMP_DIR;
 		}
-        logger.info("Executing operation: " + operation);
+        log.info("Executing operation: {}", operation);
         if (valid) {
             return execute();
         }
@@ -62,7 +61,7 @@ public abstract class AbstractOperation extends ModuleOperation {
         this.task = task;
         this.operationParams = operationParams;
         LicenseHelper.getLicenseHelper();
-        logger.info("Executing operation: " + operation);
+        log.info("Executing operation: {}", operation);
         boolean valid = fillInParameters();
         if (valid) {
             return execute();
@@ -87,19 +86,19 @@ public abstract class AbstractOperation extends ModuleOperation {
 
 
     public static AbstractOperation getOperation(String op) throws EmptyOperationException {
-    	logger.debug("Into getOperation with op: " + op);
+    	log.debug("Into getOperation with op: {}", op);
         ModuleOperation operation = ModuleOperation.getModuleOperation(op);
         if (operation == null) {
-        	logger.warn("Returned operation was NULL for op: " + op);
+        	log.warn("Returned operation was NULL for op: {}", op);
         }
         else {
-        	logger.debug("operation is: " + operation.toString());
+        	log.debug("operation is: {}", operation);
         }
 
         if (operation instanceof AbstractOperation) {
             return (AbstractOperation) operation;
         } else {
-            logger.error("Incorrect operation [" + op + "], please check your configuration");
+            log.error("Incorrect operation [{}], please check your configuration", op);
             throw new EmptyOperationException();
         }
 
