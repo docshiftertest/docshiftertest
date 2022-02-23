@@ -77,25 +77,25 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public CachingConnectionFactory cachingConnectionFactory() {
 		return new CachingConnectionFactory(activeMQConnectionFactory());
 	}
 
 	@Bean
-	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public JmsTemplateFactory jmsTemplateFactory() {
 		return new JmsTemplateFactory(cachingConnectionFactory());
 	}
 
 	@Bean
-	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public JmsTemplate defaultJmsTemplate() {
 		return jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY, queueReplyTimeout,0);
 	}
 
 	@Bean
-	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public JmsTemplate metricsJmsTemplate() {
 		JmsTemplate template = jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY,
 				queueReplyTimeout,metricsTimeToLive);
@@ -103,21 +103,21 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	@DependsOn("defaultJmsTemplate")
 	public JmsMessagingTemplate defaultMessagingTemplate () {
 		return new JmsMessagingTemplate(defaultJmsTemplate());
 	}
 
 	@Bean
-	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	@DependsOn("metricsJmsTemplate")
 	public JmsMessagingTemplate metricsMessagingTemplate () {
 		return new JmsMessagingTemplate(metricsJmsTemplate());
 	}
 
 	@Bean
-	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public JmsTemplate jmsTemplateMulticast() {
 		JmsTemplate template = new JmsTemplate(cachingConnectionFactory());
 		template.setPubSubDomain(true);
@@ -127,7 +127,7 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public JmsListenerContainerFactory<?> jmsListenerContainerFactory(@Qualifier("cachingConnectionFactory") ConnectionFactory connectionFactory,
 																	  DefaultJmsListenerContainerFactoryConfigurer configurer) {
 		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
@@ -158,7 +158,7 @@ public class DocShifterConfiguration {
 	 * @param configurer The {@link DefaultJmsListenerContainerFactoryConfigurer} to be customized. 
 	 */
 	@Bean
-	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public JmsListenerContainerFactory<?> topicListener(@Qualifier("cachingConnectionFactory") ConnectionFactory connectionFactory,
 			DefaultJmsListenerContainerFactoryConfigurer configurer) {
 		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
@@ -169,19 +169,19 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public ActiveMQQueue defaultQueue() {
 		return new ActiveMQQueue(generalConfigService.getString(Constants.MQ_QUEUE));
 	}
 
 	@Bean
-	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public ActiveMQQueue defaultMetricsQueue() {
 		return new ActiveMQQueue(generalConfigService.getString(Constants.MQ_METRICS_QUEUE));
 	}
 
 	@Bean
-	@ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public ActiveMQTopic reloadExchange() {
 		return new ActiveMQTopic(Constants.RELOAD_QUEUE);
 	}
