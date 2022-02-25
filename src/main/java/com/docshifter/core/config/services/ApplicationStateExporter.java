@@ -9,6 +9,7 @@ import org.springframework.boot.availability.ReadinessState;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -29,6 +30,8 @@ public class ApplicationStateExporter {
 	public ApplicationStateExporter(@Value("${applicationState.exportPath}") String exportPath) {
 		readyFile = Paths.get(exportPath, "ready").toFile();
 		healthyFile = Paths.get(exportPath, "healthy").toFile();
+		readyFile.deleteOnExit();
+		healthyFile.deleteOnExit();
 	}
 
 	@EventListener
