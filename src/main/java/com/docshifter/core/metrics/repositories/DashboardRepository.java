@@ -1,5 +1,6 @@
 package com.docshifter.core.metrics.repositories;
 
+import com.docshifter.core.metrics.Sample.ErrorLogDistributionSample;
 import com.docshifter.core.metrics.Sample.ProcessedTasksSample;
 import com.docshifter.core.metrics.Sample.TasksDistributionSample;
 import com.docshifter.core.metrics.Sample.TasksStatisticsSample;
@@ -33,7 +34,21 @@ public interface DashboardRepository extends JpaRepository<Dashboard, String> {
     @Query("select distinct dash.workflowName as workflowName from Dashboard dash where dash.isLicensed = TRUE")
     List<String> findAllDistinctDashboardWorkflowName();
 
-    @Query("select dash from Dashboard dash where dash.success = :success AND dash.onMessageHit BETWEEN :startDate AND :endDate")
-    List<Dashboard> findAllBySuccess(@Param("success") Boolean success, @Param("startDate") Long startDate, @Param("endDate") Long endDate);
+    @Query(value = "select (REGEXP_REPLACE(substring(dsf.file_name, 0, position ('.' in dsf.file_name)), '^.+([/\\\\])', '')) as fileName, " +
+                        "ds.task_id            AS taskId, " +
+                        "ds.receiver_host_name AS senderHostName, " +
+                        "ds.workflow_name      AS workflowName, " +
+                        "to_char(to_timestamp(ds.on_message_hit/1000), 'dd-MM-yyyy HH:mm') as processDate, " +
+                        "ds.on_message_hit as processDateEpoch, " +
+                        "trim(substring(dtm.task_message, position(':' in dtm.task_message) + 1)) AS taskMessage " +
+                    "from (select ds.task_id, " +
+                                    "ds.receiver_host_name, " +
+                                    "ds.workflow_name, " +
+                                    "ds.on_message_hit as on_message_hit " +
+                         "from metrics.dashboard ds " +
+                    " where  :success or (ds.on_message_hit between :startDate and :endDate)) ds " +
+                    "left join metrics.dashboard_file dsf on ds.task_id = dsf.task_id " +
+                    "left join metrics.dashboard_task_message dtm on ds.task_id = dtm.task_id", nativeQuery = true)
+    List<ErrorLogDistributionSample> findAllBySuccess(@Param("success") Boolean success, @Param("startDate") Long startDate, @Param("endDate") Long endDate);
 
 }
