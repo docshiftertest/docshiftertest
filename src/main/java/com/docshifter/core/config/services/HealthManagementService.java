@@ -31,13 +31,20 @@ public class HealthManagementService {
 		TASK_STUCK(false, "A task appears to be stuck"),
 		CRITICAL_MQ_ERROR(false, "A critical message queue error has occurred"),
 		MEMORY_SHORTAGE(false, "Memory shortage has been detected");
+		// TODO: whenever adding an event type that is distinct, make sure to update and unignore the unit tests!
 
 		private final boolean distinct;
 		private final String description;
 	}
 
 	private final ApplicationContext appContext;
+	/**
+	 * Map holding specific events with each event's data grouped per event type.
+	 */
 	private final Map<Event, Set<Object>> eventDataMap = new HashMap<>();
+	/**
+	 * Map holding the counts of generic events (with no data) grouped per event type.
+	 */
 	private final Map<Event, Integer> genericEventOccurrenceMap = new HashMap<>();
 
 	public HealthManagementService(ApplicationContext appContext) {
@@ -54,16 +61,26 @@ public class HealthManagementService {
 	public synchronized void reportEvent(Event event, Object data) {
 		int eventCount = getEventCount(event);
 		if (!event.isDistinct() || eventCount <= 0) {
-			log.error("{}, so setting the application state to BROKEN! This event has now occurred {} time(s).",
-					event.getDescription(),	eventCount);
+			boolean added = true;
 			if (data == null) {
-				genericEventOccurrenceMap.put(event, genericEventOccurrenceMap.getOrDefault(event, 0) + 1);
+				genericEventOccurrenceMap.put(event, getGenericEventCount(event) + 1);
 			} else {
 				Set<Object> dataSet = eventDataMap.getOrDefault(event, new HashSet<>());
-				dataSet.add(data);
-				eventDataMap.put(event, dataSet);
+				if (dataSet.add(data)) {
+					eventDataMap.put(event, dataSet);
+				} else {
+					log.debug("Event {} already contains data: {}", event, data);
+					added = false;
+				}
 			}
-			AvailabilityChangeEvent.publish(appContext, LivenessState.BROKEN);
+
+			if (added) {
+				log.error("{}, so setting the application state to BROKEN! This event has now occurred {} time(s).",
+						event.getDescription(),	++eventCount);
+				AvailabilityChangeEvent.publish(appContext, LivenessState.BROKEN);
+			}
+		} else {
+			log.debug("Event {} is distinct and it's already been reported before!", event);
 		}
 	}
 
@@ -97,12 +114,30 @@ public class HealthManagementService {
 	 * @return The number of unresolved events.
 	 */
 	public synchronized int getEventCount(Event event) {
+		return getGenericEventCount(event) + getSpecificEventCount(event);
+	}
+
+	/**
+	 * Returns how many unresolved generic events (events with no data) there are for a certain type.
+	 * @param event The event type to check.
+	 * @return The number of unresolved events.
+	 */
+	public synchronized int getGenericEventCount(Event event) {
+		return genericEventOccurrenceMap.getOrDefault(event, 0);
+	}
+
+	/**
+	 * Returns how many unresolved specific events (events with some data) there are for a certain type.
+	 * @param event The event type to check.
+	 * @return The number of unresolved events.
+	 */
+	public synchronized int getSpecificEventCount(Event event) {
 		int numData = 0;
 		Set<Object> eventData = eventDataMap.get(event);
 		if (eventData != null) {
 			numData = eventData.size();
 		}
-		return numData + genericEventOccurrenceMap.getOrDefault(event, 0);
+		return numData;
 	}
 
 	/**
@@ -113,18 +148,43 @@ public class HealthManagementService {
 	 *                distinct type.
 	 */
 	public synchronized void resolveEvent(Event event, Object data) {
-		int eventCount = getEventCount(event);
-		if (eventCount > 0) {
-			eventCount--;
-			log.info("The previously reported event \"{}\" has now been marked as resolved, there is/are now {} event(s) " +
-					"of this type being tracked.", event.getDescription(), eventCount);
-			genericEventOccurrenceMap.put(event, eventCount);
-			if (eventCount <= 0 && genericEventOccurrenceMap.values().stream().allMatch(count -> count <= 0)) {
-				log.info("There are no more outstanding health events, so setting the application state to CORRECT!");
-				AvailabilityChangeEvent.publish(appContext, LivenessState.CORRECT);
+		int eventCount;
+		// Make an exception for distinct events.
+		if (event.isDistinct()) {
+			if (getEventCount(event) <= 0) {
+				log.warn("A distinct event ({}) was marked as resolved, but no event of this type was reported before!",
+						event.name());
+				return;
 			}
+			eventDataMap.put(event, new HashSet<>());
+			genericEventOccurrenceMap.put(event, 0);
+			eventCount = 0;
+		} else if (data == null) {
+			int genericEventCount = getGenericEventCount(event);
+			if (genericEventCount <= 0) {
+				log.warn("A generic event ({}) was marked as resolved, but it somehow wasn't reported before!",
+						event.name());
+				return;
+			}
+			genericEventOccurrenceMap.put(event, --genericEventCount);
+			eventCount = genericEventCount + getSpecificEventCount(event);
 		} else {
-			log.warn("An event ({}) was marked as resolved, but it somehow wasn't reported before!", event.name());
+			Set<Object> dataSet = eventDataMap.getOrDefault(event, null);
+			if (dataSet == null || !dataSet.remove(data)) {
+				log.warn("A specific event ({}) was marked as resolved, but it somehow wasn't reported before! " +
+						"Searched for following data: {}", event.name(), data);
+				return;
+			}
+			eventCount = dataSet.size() + getGenericEventCount(event);
+		}
+
+		log.info("The previously reported event \"{}\" has now been marked as resolved, there is/are now {} event(s) " +
+				"of this type being tracked.", event.getDescription(), eventCount);
+		if (eventCount <= 0
+				&& genericEventOccurrenceMap.values().stream().allMatch(count -> count <= 0)
+				&& eventDataMap.values().stream().allMatch(set -> set == null || set.isEmpty())) {
+			log.info("There are no more outstanding health events, so setting the application state to CORRECT!");
+			AvailabilityChangeEvent.publish(appContext, LivenessState.CORRECT);
 		}
 	}
 
