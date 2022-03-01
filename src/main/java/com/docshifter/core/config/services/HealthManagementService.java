@@ -149,7 +149,9 @@ public class HealthManagementService {
 	 */
 	public synchronized void resolveEvent(Event event, Object data) {
 		int eventCount;
-		// Make an exception for distinct events.
+		// Make an exception for distinct events: if we resolve it, we don't care about matching the data for it if
+		// it's a specific event or subtracting the occurrence counter if it's a generic event. The fact that it's a
+		// distinct event across the entire application (it's either active or not) takes priority.
 		if (event.isDistinct()) {
 			if (getEventCount(event) <= 0) {
 				log.warn("A distinct event ({}) was marked as resolved, but no event of this type was reported before!",
