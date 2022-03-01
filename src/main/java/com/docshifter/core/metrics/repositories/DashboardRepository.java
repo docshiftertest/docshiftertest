@@ -34,17 +34,19 @@ public interface DashboardRepository extends JpaRepository<Dashboard, String> {
     @Query("select distinct dash.workflowName as workflowName from Dashboard dash where dash.isLicensed = TRUE")
     List<String> findAllDistinctDashboardWorkflowName();
 
-    @Query(value = "select (REGEXP_REPLACE(substring(dsf.file_name, 0, position ('.' in dsf.file_name)), '^.+([/\\\\])', '')) as fileName, " +
+    @Query(value = "select (REGEXP_REPLACE(dsf.file_name, '^.+([/\\\\])', '')) AS fileName, " +
                         "ds.task_id            AS taskId, " +
-                        "ds.receiver_host_name AS senderHostName, " +
+                        "ds.receiver_host_name AS receiverHostName, " +
+                        "ds.sender_host_name AS senderHostName, " +
                         "ds.workflow_name      AS workflowName, " +
-                        "to_char(to_timestamp(ds.on_message_hit/1000), 'dd-MM-yyyy HH:mm') as processDate, " +
-                        "ds.on_message_hit as processDateEpoch, " +
-                        "trim(substring(dtm.task_message, position(':' in dtm.task_message) + 1)) AS taskMessage " +
+                        "to_char(to_timestamp(ds.on_message_hit/1000), 'dd-MM-yyyy HH:mm') AS processDate, " +
+                        "ds.on_message_hit AS processDateEpoch, " +
+                        "coalesce(trim(substring(dtm.task_message, position(':' in dtm.task_message) + 1)), 'Unexpected error, please check the logs') AS taskMessage " +
                     "from (select ds.task_id, " +
                                     "ds.receiver_host_name, " +
+                                    "ds.sender_host_name, " +
                                     "ds.workflow_name, " +
-                                    "ds.on_message_hit as on_message_hit " +
+                                    "ds.on_message_hit AS on_message_hit " +
                          "from metrics.dashboard ds " +
                     " where  :success or (ds.on_message_hit between :startDate and :endDate)) ds " +
                     "left join metrics.dashboard_file dsf on ds.task_id = dsf.task_id " +
