@@ -3,6 +3,7 @@ package com.docshifter.core.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.ExecutorService;
@@ -13,6 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
  * Created by blazejm on 30.05.2017.
  */
 @Configuration
+@EnableAsync
 public class MonitoringConfiguration {
 	@Bean
 	public RestTemplate restTemplate() {
@@ -22,7 +24,8 @@ public class MonitoringConfiguration {
 	/**
 	 * ExecutorService that dynamically spawns and reuses threads as needed, recommended for general-purpose tasks.
 	 */
-	@Bean(name = "generalES")
+	// We need to designate a bean called "taskExecutor" for Async support.
+	@Bean(name = {"generalES", "taskExecutor"})
 	@Primary
 	public ExecutorService executorService() {
 		return Executors.newCachedThreadPool();

@@ -1,16 +1,23 @@
 package com.docshifter.core.config.services;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.boot.availability.AvailabilityChangeEvent;
 import org.springframework.boot.availability.LivenessState;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -37,6 +44,16 @@ public class HealthManagementService {
 		private final String description;
 	}
 
+	/**
+	 * A POJO detailing the source of a Liveness changed event which can be used by any event listeners registered to
+	 * it.
+	 */
+	@Data
+	public static class EventSource {
+		private final Event eventType;
+		private final Object data;
+	}
+
 	private final ApplicationContext appContext;
 	/**
 	 * Map holding specific events with each event's data grouped per event type.
@@ -47,8 +64,24 @@ public class HealthManagementService {
 	 */
 	private final Map<Event, Integer> genericEventOccurrenceMap = new HashMap<>();
 
+	private boolean appReady = false;
+	private final Queue<Pair<EventSource, LivenessState>> earlyEvents = new LinkedList<>();
+
 	public HealthManagementService(ApplicationContext appContext) {
 		this.appContext = appContext;
+	}
+
+	/**
+	 * We should wait with firing any events until the application has fully started up, otherwise Spring won't
+	 * notify the event listeners listening for Liveness changed events.
+	 */
+	@EventListener(ApplicationReadyEvent.class)
+	public synchronized void onAppReady() {
+		Pair<EventSource, LivenessState> earlyEvent;
+		while ((earlyEvent = earlyEvents.poll()) != null) {
+			AvailabilityChangeEvent.publish(appContext, earlyEvent.getKey(), earlyEvent.getValue());
+		}
+		appReady = true;
 	}
 
 	/**
@@ -75,9 +108,15 @@ public class HealthManagementService {
 			}
 
 			if (added) {
-				log.error("{}, so setting the application state to BROKEN! This event has now occurred {} time(s).",
-						event.getDescription(),	++eventCount);
-				AvailabilityChangeEvent.publish(appContext, LivenessState.BROKEN);
+				if (appReady) {
+					log.error("{}, so setting the application state to BROKEN! This event has now occurred {} time(s).",
+							event.getDescription(), ++eventCount);
+					AvailabilityChangeEvent.publish(appContext, new EventSource(event, data), LivenessState.BROKEN);
+				} else {
+					log.error("{}, so will set the application state to BROKEN! This event has now occurred {} time(s).",
+							event.getDescription(), ++eventCount);
+					earlyEvents.offer(new ImmutablePair<>(new EventSource(event, data), LivenessState.BROKEN));
+				}
 			}
 		} else {
 			log.debug("Event {} is distinct and it's already been reported before!", event);
@@ -185,8 +224,13 @@ public class HealthManagementService {
 		if (eventCount <= 0
 				&& genericEventOccurrenceMap.values().stream().allMatch(count -> count <= 0)
 				&& eventDataMap.values().stream().allMatch(set -> set == null || set.isEmpty())) {
-			log.info("There are no more outstanding health events, so setting the application state to CORRECT!");
-			AvailabilityChangeEvent.publish(appContext, LivenessState.CORRECT);
+			if (appReady) {
+				log.info("There are no more outstanding health events, so setting the application state to CORRECT!");
+				AvailabilityChangeEvent.publish(appContext, new EventSource(event, data), LivenessState.CORRECT);
+			} else {
+				log.info("There are no more outstanding health events, so will set the application state to CORRECT!");
+				earlyEvents.offer(new ImmutablePair<>(new EventSource(event, data), LivenessState.CORRECT));
+			}
 		}
 	}
 

@@ -3,6 +3,8 @@ package com.docshifter.core.config.services;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.TextStringBuilder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -35,6 +37,7 @@ public class DiagnosticsService {
 	private Map<MemoryPoolMXBean, Integer> consecutiveChecksBelowThresholdMap;
 	private final AtomicBoolean runningGc;
 	private final NotificationEmitter notificationEmitter;
+	private final MemoryPoolMXBean[] tenuredGens;
 
 	private final ScheduledExecutorService scheduler;
 	private final HealthManagementService healthManagementService;
@@ -48,8 +51,6 @@ public class DiagnosticsService {
 							  @Value("${diagnostics.memory-monitor.relative-threshold:0.95}") float relativeMemoryThreshold,
 							  @Value("${diagnostics.memory-monitor.low-memory-delay:5}") long lowMemoryDelay,
 							  @Value("${diagnostics.memory-monitor.low-memory-consecutive-passes:12}") int lowMemoryConsecutivePasses) {
-		notificationEmitter = (NotificationEmitter) ManagementFactory.getMemoryMXBean();
-		runningGc = new AtomicBoolean();
 		this.scheduler = scheduler;
 		this.healthManagementService = healthManagementService;
 		this.relativeMemoryThreshold = relativeMemoryThreshold;
@@ -57,13 +58,16 @@ public class DiagnosticsService {
 		this.lowMemoryConsecutivePasses = lowMemoryConsecutivePasses;
 
 		if (enableStartupLog) {
-			logJVMInfo();
+			log.info(getJVMInfo());
 		} else {
 			log.info("JVM & environment information startup log is disabled.");
 		}
 
 		if (relativeMemoryThreshold > 0) {
-			MemoryPoolMXBean[] tenuredGens = ManagementFactory.getMemoryPoolMXBeans().stream()
+			runningGc = new AtomicBoolean();
+			notificationEmitter = (NotificationEmitter) ManagementFactory.getMemoryMXBean();
+
+			tenuredGens = ManagementFactory.getMemoryPoolMXBeans().stream()
 					.filter(pool -> pool.getType() == MemoryType.HEAP)
 					.filter(MemoryPoolMXBean::isUsageThresholdSupported)
 					.filter(MemoryPoolMXBean::isCollectionUsageThresholdSupported)
@@ -77,10 +81,35 @@ public class DiagnosticsService {
 			for (MemoryPoolMXBean tenuredGen : tenuredGens) {
 				runningFutures.put(tenuredGen, new AtomicReference<>());
 				consecutiveChecksBelowThresholdMap.put(tenuredGen, 0);
-				setupMemoryListener(tenuredGen);
+
+				// At startup: check if we're over the usage threshold as the emitter we're about to configure might not already
+				// fire (on select JDK/JREs only) if that's the case! Check the usage because the collection usage might still
+				// be 0B as the garbage collector possibly hasn't had a chance to run yet.
+				updateThresholds(tenuredGen);
+				log.debug("Memory usage of pool {} is now at {}B, threshold is {}B", tenuredGen.getName(), tenuredGen.getUsage().getUsed(),
+						tenuredGen.getUsageThreshold());
+				if (tenuredGen.isUsageThresholdExceeded()) {
+					onCollectionUsageThresholdExceeded(tenuredGen);
+				}
 			}
 		} else {
+			runningGc = null;
+			notificationEmitter = null;
+			tenuredGens = null;
 			log.info("Low memory warning system is disabled.");
+		}
+	}
+
+	/**
+	 * Defer setting up the memory listeners until after the application has fully started up, as we don't want any
+	 * shenanigans such as forced garbage collections to take place during startup if we're already over the
+	 * thresholds! Instead we'll perform a single check in the constructor during bean creation and just start
+	 * monitoring memory if we're over the cap.
+	 */
+	@EventListener(ApplicationReadyEvent.class)
+	public void onAppReady() {
+		for (MemoryPoolMXBean tenuredGen : tenuredGens) {
+			setupMemoryListener(tenuredGen);
 		}
 	}
 
@@ -90,15 +119,6 @@ public class DiagnosticsService {
 	private void setupMemoryListener(MemoryPoolMXBean tenuredGen) {
 		log.info("Configuring memory listener for following pool: {}", tenuredGen.getName());
 		updateThresholds(tenuredGen);
-
-		// At startup: check if we're over the usage threshold as the emitter we're about to configure won't already
-		// fire if that's the case! Check the usage because the collection usage might still be 0B as the garbage
-		// collector possibly hasn't had a chance to run yet.
-		log.debug("Memory usage of pool {} is now at {}B, threshold is {}B", tenuredGen.getName(), tenuredGen.getUsage().getUsed(),
-				tenuredGen.getUsageThreshold());
-		if (tenuredGen.isUsageThresholdExceeded()) {
-			onCollectionUsageThresholdExceeded(tenuredGen);
-		}
 
 		notificationEmitter.addNotificationListener((notification, handback) -> {
 			if (MemoryNotificationInfo.MEMORY_COLLECTION_THRESHOLD_EXCEEDED.equals(notification.getType())) {
@@ -119,7 +139,7 @@ public class DiagnosticsService {
 	 */
 	private void onUsageThresholdExceeded(MemoryPoolMXBean tenuredGen) {
 		log.warn("Memory usage threshold of pool {} has exceeded configured threshold of {}B (usage = {}B, " +
-						"collection usage = {}B! Will check if memory pool was resized in the meantime and will start" +
+						"collection usage = {}B)! Will check if memory pool was resized in the meantime and will start" +
 						" monitoring memory as soon as the memory collection usage threshold exceeds.", tenuredGen.getName(),
 				tenuredGen.getUsageThreshold(), tenuredGen.getUsage().getUsed(), tenuredGen.getCollectionUsage().getUsed());
 		if (!updateThresholds(tenuredGen) && runningGc.compareAndSet(false, true)) {
@@ -220,10 +240,10 @@ public class DiagnosticsService {
 	}
 
 	/**
-	 * Logs useful information related to the JVM and environment. This includes CPU, memory, Java Cryptography
-	 * Extensions (JCE), supported charsets, fonts and system properties.
+	 * Retrieves useful information related to the JVM and environment and collects it to a formatted {@link String}.
+	 * This includes CPU, memory, Java Cryptography Extensions (JCE), supported charsets, fonts and system properties.
 	 */
-	private void logJVMInfo() {
+	public String getJVMInfo() {
 		TextStringBuilder sb = new TextStringBuilder();
 		Runtime runtime = Runtime.getRuntime();
 		sb.appendln("=== Here is some information related to the JVM and environment ===");
@@ -317,6 +337,6 @@ public class DiagnosticsService {
 			sb.appendln("  %s = %s", prop.getKey(), prop.getValue());
 		}
 
-		log.info(sb);
+		return sb.toString();
 	}
 }
