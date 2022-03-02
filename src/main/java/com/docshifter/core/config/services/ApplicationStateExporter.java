@@ -29,6 +29,10 @@ public class ApplicationStateExporter {
 	public ApplicationStateExporter(@Value("${applicationState.exportPath}") String exportPath) {
 		readyFile = Paths.get(exportPath, "ready").toFile();
 		healthyFile = Paths.get(exportPath, "healthy").toFile();
+		// Make sure to clean up these indicator files whenever we exit the JVM (if we exit regularly and don't crash
+		// at least)
+		readyFile.deleteOnExit();
+		healthyFile.deleteOnExit();
 	}
 
 	@EventListener
