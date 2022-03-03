@@ -30,6 +30,7 @@ public class HealthManagementServiceTest {
 	@Before
 	public void before() {
 		sut = new HealthManagementService(appContext);
+		sut.onAppReady();
 	}
 
 	@Test
