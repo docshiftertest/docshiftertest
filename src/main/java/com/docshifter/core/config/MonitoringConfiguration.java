@@ -24,7 +24,7 @@ public class MonitoringConfiguration {
 	/**
 	 * ExecutorService that dynamically spawns and reuses threads as needed, recommended for general-purpose tasks.
 	 */
-	// We need to designate a bean called "taskExecutor" for Async support.
+	// We need to designate a bean called "taskExecutor" for Spring Async support.
 	@Bean(name = {"generalES", "taskExecutor"})
 	@Primary
 	public ExecutorService executorService() {

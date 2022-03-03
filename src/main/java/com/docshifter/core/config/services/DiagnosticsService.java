@@ -33,8 +33,8 @@ import java.util.concurrent.atomic.AtomicReference;
 @Service
 @Log4j2
 public class DiagnosticsService {
-	private Map<MemoryPoolMXBean, AtomicReference<Future<?>>> runningFutures;
-	private Map<MemoryPoolMXBean, Integer> consecutiveChecksBelowThresholdMap;
+	private final Map<MemoryPoolMXBean, AtomicReference<Future<?>>> runningFutures;
+	private final Map<MemoryPoolMXBean, Integer> consecutiveChecksBelowThresholdMap;
 	private final AtomicBoolean runningGc;
 	private final NotificationEmitter notificationEmitter;
 	private final MemoryPoolMXBean[] tenuredGens;
@@ -64,6 +64,8 @@ public class DiagnosticsService {
 		}
 
 		if (relativeMemoryThreshold > 0) {
+			runningFutures = new HashMap<>();
+			consecutiveChecksBelowThresholdMap = new HashMap<>();
 			runningGc = new AtomicBoolean();
 			notificationEmitter = (NotificationEmitter) ManagementFactory.getMemoryMXBean();
 
@@ -75,24 +77,9 @@ public class DiagnosticsService {
 			if (tenuredGens.length <= 0) {
 				throw new IllegalStateException("Can't find any tenured generation MemoryPoolMXBeans");
 			}
-
-			runningFutures = new HashMap<>();
-			consecutiveChecksBelowThresholdMap = new HashMap<>();
-			for (MemoryPoolMXBean tenuredGen : tenuredGens) {
-				runningFutures.put(tenuredGen, new AtomicReference<>());
-				consecutiveChecksBelowThresholdMap.put(tenuredGen, 0);
-
-				// At startup: check if we're over the usage threshold as the emitter we're about to configure might not already
-				// fire (on select JDK/JREs only) if that's the case! Check the usage because the collection usage might still
-				// be 0B as the garbage collector possibly hasn't had a chance to run yet.
-				updateThresholds(tenuredGen);
-				log.debug("Memory usage of pool {} is now at {}B, threshold is {}B", tenuredGen.getName(), tenuredGen.getUsage().getUsed(),
-						tenuredGen.getUsageThreshold());
-				if (tenuredGen.isUsageThresholdExceeded()) {
-					onCollectionUsageThresholdExceeded(tenuredGen);
-				}
-			}
 		} else {
+			runningFutures = null;
+			consecutiveChecksBelowThresholdMap = null;
 			runningGc = null;
 			notificationEmitter = null;
 			tenuredGens = null;
@@ -118,7 +105,18 @@ public class DiagnosticsService {
 	 */
 	private void setupMemoryListener(MemoryPoolMXBean tenuredGen) {
 		log.info("Configuring memory listener for following pool: {}", tenuredGen.getName());
+		runningFutures.put(tenuredGen, new AtomicReference<>());
+		consecutiveChecksBelowThresholdMap.put(tenuredGen, 0);
+
+		// Right after startup: check if we're over the usage threshold as the emitter we're about to configure might
+		// not already fire (on select JDK/JREs only) if that's the case! Check the usage because the collection
+		// usage might still be 0B as the garbage collector possibly hasn't had a chance to run yet.
 		updateThresholds(tenuredGen);
+		log.debug("Memory usage of pool {} is now at {}B, threshold is {}B", tenuredGen.getName(), tenuredGen.getUsage().getUsed(),
+				tenuredGen.getUsageThreshold());
+		if (tenuredGen.isUsageThresholdExceeded()) {
+			onCollectionUsageThresholdExceeded(tenuredGen);
+		}
 
 		notificationEmitter.addNotificationListener((notification, handback) -> {
 			if (MemoryNotificationInfo.MEMORY_COLLECTION_THRESHOLD_EXCEEDED.equals(notification.getType())) {
