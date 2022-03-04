@@ -77,6 +77,7 @@ public class LicenseHelper {
 			Locale workingLocale = new Locale("en", "US");
 			com.aspose.email.CurrentThreadSettings.setLocale(workingLocale);
 			com.aspose.slides.CurrentThreadSettings.setLocale(workingLocale);
+			com.aspose.pdf.LocaleOptions.setLocale(workingLocale);
 			com.aspose.words.CurrentThreadSettings.setLocale(workingLocale);
 			com.aspose.imaging.CurrentThreadSettings.setLocale(workingLocale);
 			com.aspose.cad.CurrentThreadSettings.setLocale(workingLocale);
