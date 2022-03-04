@@ -60,6 +60,7 @@
         <aspose.html.classifier>jdk1.8</aspose.html.classifier>
 
         <artemis.version>2.16.0</artemis.version>
+        <javax.json-api.version>1.1.4</javax.json-api.version>
         <kubernetes-client.version>5.3.0</kubernetes-client.version>
 
     </properties>
@@ -96,6 +97,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-artemis</artifactId>
+        </dependency>
+        <!-- Needed for Artemis beans setup -->
+        <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+            <version>${javax.json-api.version}</version>
         </dependency>
 
         <dependency>
