@@ -43,6 +43,21 @@
         <Logger name="com.docshifter.core.config.services.ILicensingService" level="info" additivity="false">
             <AppenderRef ref="LICENSING"/>
         </Logger>
+        <!-- Following are all the loggers in Beans that have a notion of what a task is. We don’t care about
+        adding other ones as they won’t have a viable Task context registered (and thus the TaskMessage Appender will
+        always fail there). -->
+        <Logger name="com.docshifter.core.operations.option.AbstractOption" level="warn">
+            <AppenderRef ref="TASK_MESSAGE"/>
+        </Logger>
+        <Logger name="com.docshifter.core.operations.option.ExtensionOption" level="warn">
+            <AppenderRef ref="TASK_MESSAGE"/>
+        </Logger>
+        <Logger name="com.docshifter.core.operations.ModuleOperation" level="warn">
+            <AppenderRef ref="TASK_MESSAGE"/>
+        </Logger>
+        <Logger name="com.docshifter.core.operations.AbstractOperation" level="warn">
+            <AppenderRef ref="TASK_MESSAGE"/>
+        </Logger>
         <Logger name="com.docshifter.modules" level="warn">
             <AppenderRef ref="TASK_MESSAGE"/>
         </Logger>

@@ -43,17 +43,17 @@ public abstract class AbstractOperation extends ModuleOperation {
         this.task = task;
         this.moduleWrapper = moduleWrapper;
         this.operationParams = operationParams;
-        boolean valid = fillInParameters();
+        TaskStatus valid = fillInParameters();
+        if (!valid.isSuccess()) {
+            operationParams.setSuccess(valid);
+            return operationParams;
+        }
         LicenseHelper.getLicenseHelper();
 		if (StringUtils.isBlank(tempFolder)) {
 			tempFolder = TEMP_DIR;
 		}
         log.info("Executing operation: {}", operation);
-        if (valid) {
-            return execute();
-        }
-        operationParams.setSuccess(TaskStatus.FAILURE);
-        return operationParams;
+        return execute();
     }
 
     //Use this execute-method for transformation called within a transformation
@@ -63,12 +63,12 @@ public abstract class AbstractOperation extends ModuleOperation {
         this.operationParams = operationParams;
         LicenseHelper.getLicenseHelper();
         log.info("Executing operation: {}", operation);
-        boolean valid = fillInParameters();
-        if (valid) {
-            return execute();
+        TaskStatus valid = fillInParameters();
+        if (!valid.isSuccess()) {
+            operationParams.setSuccess(valid);
+            return operationParams;
         }
-        operationParams.setSuccess(TaskStatus.FAILURE);
-        return operationParams;
+        return execute();
     }
 
     public abstract OperationParams execute();

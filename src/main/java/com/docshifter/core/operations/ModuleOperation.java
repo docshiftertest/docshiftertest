@@ -1,30 +1,40 @@
 package com.docshifter.core.operations;
 
+import com.docshifter.core.asposehelper.utils.image.ImageUtils;
 import com.docshifter.core.config.wrapper.ModuleWrapper;
+import com.docshifter.core.exceptions.ConfigFileNotFoundException;
 import com.docshifter.core.exceptions.EmptyOperationException;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.operations.annotations.ModuleParam;
+import com.docshifter.core.task.TaskStatus;
 import com.docshifter.core.utils.ModuleClassLoader;
+import com.google.common.base.Defaults;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.text.StringSubstitutor;
-import org.apache.log4j.Logger;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.awt.*;
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Created by michiel.vandriessche on 15/03/17.
  */
+@Log4j2
 public abstract class ModuleOperation {
 
-	private static final Logger logger = Logger.getLogger(ModuleOperation.class);
-
-	private static enum ParamType {
+	private enum ParamType {
 		BOOLEAN,
 		BYTE,
 		DOUBLE,
@@ -33,19 +43,22 @@ public abstract class ModuleOperation {
 		LONG,
 		SHORT,
 		STRING,
+		ENUM,
+		XML_FILE,
+		COLOR,
 		UNKNOWN
-	};
+	}
+
 	public static final String MP_FILE_INDICATOR = "mp_file:";
 	protected String operation = "Abstract Operation";
 	public Task task;
 	protected ModuleWrapper moduleWrapper;
 	protected OperationParams operationParams;
 
-	protected boolean fillInParameters() {
+	protected TaskStatus fillInParameters() {
 
 		//WHEN FAULT => add fault to task.addMessage()
 		Class<?> calledClass = this.getClass();
-		HashMap<String, Field> moduleParamFieldMap = new HashMap<>();
 
 		Map<String, Object> valuesMap;
 		
@@ -57,79 +70,61 @@ public abstract class ModuleOperation {
 			valuesMap.putAll( moduleWrapper.getParamMap());
 		}
 
-		boolean access_old;
-		Field field;
-		String fieldName;
-
-		// Get the class (private and public) Fields and put them in the module param field map
-		// if they have a module param annotation defined 
-		for (Field fld : calledClass.getDeclaredFields()) {
-			Optional<ModuleParam> modder = extractModuleParamAnnotation(fld.getDeclaredAnnotations());
-			if (modder.isPresent()) {
-				moduleParamFieldMap.put(fld.getName(), fld);
-			}
-		}
-
 		//Match and fill in ModuleParam
-		for (Map.Entry<String, Field> entry : moduleParamFieldMap.entrySet()) {
+		return Arrays.stream(calledClass.getDeclaredFields())
+				.map(fld -> new ImmutablePair<>(fld, extractModuleParamAnnotation(fld.getDeclaredAnnotations())))
+				.filter(entry -> entry.getRight() != null)
+				.map(entry -> {
+					//Select field + select fieldname to set
+					Field field = entry.getLeft();
+					ModuleParam modder = entry.getRight();
+					log.trace("field value = {}", field);
+					String fieldName = modder.value();
+					log.trace("field name = {}", fieldName);
+					if (fieldName.isEmpty()) {
+						fieldName = field.getName();
+						log.trace("fieldname is empty. Newname = {}", fieldName);
+					}
 
-			//Select field + select fieldname to set
-			field = entry.getValue();
-			logger.trace("field value = " + field);
-			fieldName = ((ModuleParam) (field.getDeclaredAnnotations()[0])).value();
-			logger.trace("field name = " + fieldName);
-			if (fieldName.isEmpty()) {
-				fieldName = entry.getKey();
-				logger.trace("fieldname is empty. Newname = " + fieldName);
-			}
+					boolean required = modder.required();
+					boolean supportPlaceholder = modder.supportPlaceholder();
+					Object moduleValue = valuesMap.get(fieldName);
 
-			ModuleParam modder = extractModuleParamAnnotation(field.getDeclaredAnnotations()).orElseThrow(NullPointerException::new);
+					log.trace("Field Type is: {}", field.getType().getName());
+					ParamType paramType = parseParamType(field, modder);
 
-			boolean empty = false;
-			boolean required = modder.required();
-			boolean supportPlaceholder = modder.supportPlaceholder();
-			Object moduleValue = valuesMap.get(fieldName);
+					if (moduleValue == null || moduleValue.toString().isEmpty()) {
+						if (StringUtils.isNotEmpty((modder.defaultValue()))) {
+							moduleValue = modder.defaultValue();
+							if (required) {
+								log.info("Required Moduleparameter '{}' in {} was not set. The default value ({}) was used.",
+										fieldName, calledClass, moduleValue);
+							} else {
+								log.debug("Moduleparameter '{}' in {} was not set. The default value ({}) was used.",
+										fieldName, calledClass, moduleValue);
+							}
+						}
+						else if (paramType == ParamType.BOOLEAN) {
+							moduleValue = false;
+						}
+						else if (required) {
+							log.error("Required Moduleparameter '{}' has not been set for usage in {}", fieldName, calledClass);
+							return TaskStatus.BAD_CONFIG;
+						} else {
+							log.trace("Empty Moduleparameter '{}' in {} is not required and does not have a default value",
+									fieldName,	calledClass);
+						}
+					}
 
-			logger.trace("Field Type is: " + field.getType().getName());
-			ParamType paramType = parseParamType(field);
-			try {
-				if (StringUtils.isBlank(String.valueOf(moduleValue))) {
-					logger.trace("Setting empty to true... field.getType(): " + field.getType() + " and moduleValue: " + String.valueOf(moduleValue));
-					empty = true;
-				}
-			}
-			catch (ClassCastException cce) {
-				logger.error("Field with name: " + fieldName + " is marked as Type String"
-						+ " but trying to cast the value to a String gave a ClassCastException." 
-						+ " Check your ModuleParams for type consistency, particularly if"
-						+ " using chained parameters!");
-			}
-
-			if ((moduleValue == null || empty) && required) {
-				if (StringUtils.isNotBlank((modder.defaultValue()))) {
-					moduleValue = modder.defaultValue();
-					logger.info("Required Moduleparameter '" + fieldName + "' in " + calledClass + " was not set. The default value (" + moduleValue + ") was used.");
-				}
-				else if (paramType == ParamType.BOOLEAN) {
-					moduleValue = false;
-				}
-				else {
-					logger.error("Required Moduleparameter '" + fieldName + "' has not been set for usage in " + calledClass);
-					return false;
-				}
-			}
-
-			access_old = field.isAccessible();
-			field.setAccessible(true);
-			String defaultValue = modder.defaultValue();
-			if (moduleValue == null && StringUtils.isNotBlank(defaultValue)) {
-				moduleValue = defaultValue;
-			}
-			setModuleValue(paramType, field, moduleValue, supportPlaceholder);
-			field.setAccessible(access_old);
-		}
-
-		return true;
+					boolean access_old = field.isAccessible();
+					field.setAccessible(true);
+					TaskStatus status = setModuleValue(paramType, fieldName, field, moduleValue, supportPlaceholder);
+					field.setAccessible(access_old);
+					return status;
+				})
+				.filter(status -> !status.isSuccess())
+				.findAny()
+				.orElse(TaskStatus.SUCCESS);
 	}
 
 	/**
@@ -137,8 +132,8 @@ public abstract class ModuleOperation {
 	 * @param field
 	 * @return ParamType the type of parameter e.g. STRING, INTEGER, LONG, BOOLEAN etc.
 	 */
-	private ParamType parseParamType(Field field) {
-		logger.debug("Parsing the param type for field: " + field.toString());
+	private ParamType parseParamType(Field field, ModuleParam modder) {
+		log.debug("Parsing the param type for field: {}", field);
 		switch (field.getType().getSimpleName().toLowerCase()) {
 			case "int":
 			case "integer":
@@ -166,8 +161,16 @@ public abstract class ModuleOperation {
 			case "java.lang.string":
 			case "string":
 				return ParamType.STRING;
+			case "java.awt.color":
+				return ParamType.COLOR;
 			default:
-				logger.warn("Returning ParamType of UNKNOWN!");
+				if (ModuleParam.ConfigFileType.JAXB_XML.equals(modder.configFile())) {
+					return ParamType.XML_FILE;
+				}
+				if (field.getType().isEnum()) {
+					return ParamType.ENUM;
+				}
+				log.warn("Returning ParamType of UNKNOWN for field: {}", field);
 				return ParamType.UNKNOWN;
 		}
 	}
@@ -175,26 +178,33 @@ public abstract class ModuleOperation {
 	/**
 	 * Factored-out code to set the Module Value to the specified value
 	 * @param paramType the type of field it is (STRING, INTEGER, BYTE ...)
+	 * @param fieldName the name of the module parameter we're setting, for logging purposes
 	 * @param field The field whose value we want to set
 	 * @param moduleValue The value to set, as an Object
 	 * @param supportPlaceholder boolean whether we support placeholders or not ${something}
-	 * @return true we set a value, false we hit a problem or had no value to set
+	 * @return whether we were able to set the value successfully or if there was some kind of user or programming
+	 * problem...
 	 */
-	private boolean setModuleValue(ParamType paramType, Field field, Object moduleValue, boolean supportPlaceholder) {
+	private TaskStatus setModuleValue(ParamType paramType, String fieldName, Field field, Object moduleValue,
+									  boolean supportPlaceholder) {
+		String moduleValueStr = null;
 		try {
-			logger.trace("modulevalue is === " + moduleValue);
+			log.trace("modulevalue is === {}", moduleValue);
 			if (moduleValue == null) {
 				if (paramType == ParamType.BOOLEAN) {
 					field.set(this, false);
 				}
 				else {
-					field.set(this, null);
+					field.set(this, Defaults.defaultValue(field.getType()));
 				}
-				return false;
+				return TaskStatus.SUCCESS;
 			}
-			String moduleValueStr = moduleValue.toString();
+			moduleValueStr = moduleValue.toString();
 			if (supportPlaceholder) {
 				moduleValueStr = processPlaceHolders(task, moduleValueStr);
+			}
+			if (moduleValueStr.isEmpty()) {
+
 			}
 			switch (paramType) {
 				case INTEGER:
@@ -256,41 +266,81 @@ public abstract class ModuleOperation {
 				case STRING:
 					field.set(this, moduleValueStr);
 					break;
+				case COLOR:
+					if (moduleValue instanceof Color) {
+						field.set(this, moduleValue);
+					} else {
+						field.set(this, ImageUtils.getColor(moduleValueStr));
+					}
+				case XML_FILE:
+					if (field.getType().isAssignableFrom(moduleValue.getClass())) {
+						field.set(this, moduleValue);
+					} else {
+						File xmlConfigFile = new File(moduleValueStr);
+						if (!xmlConfigFile.exists()) {
+							throw new ConfigFileNotFoundException();
+						}
+						JAXBContext jaxbContext = JAXBContext.newInstance(field.getType());
+						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+						field.set(this, jaxbUnmarshaller.unmarshal(xmlConfigFile));
+					}
+					break;
+				case ENUM:
+					if (field.getType().isAssignableFrom(moduleValue.getClass())) {
+						field.set(this, moduleValue);
+					}
+					else {
+						field.set(this, Enum.valueOf(field.getType().asSubclass(Enum.class), moduleValueStr));
+					}
+					break;
 				case UNKNOWN:
 				default:
-					logger.warn("Got an UNKNOWN type: [" + field.getType().getSimpleName() + "] for field: " + field + ". Setting value to: " + moduleValue);
+					log.warn("Got an UNKNOWN type: [{}] for field: {}. Attempting to set value to: {}",
+							field.getType().getSimpleName(), field.getName(), moduleValue);
 					field.set(this, moduleValue);
 					break;
 			}
 		} catch (IllegalAccessException ex) {
-			logger.error("Illegal access of field", ex);
-			return false;
+			log.error("Illegal access of field: {}", field.getName(), ex);
+			return TaskStatus.FAILURE;
 		} catch (IllegalArgumentException ex) {
-			logger.error("Module parameter doesn't match the type of fieldname '" + field.getName() + "' type " + field.getType().getSimpleName().toLowerCase(), ex);
-			return false;
+			log.error("Value '{}' of module parameter '{}' doesn't match the expected type: {}", moduleValue, fieldName,
+					field.getType().getSimpleName().toLowerCase(), ex);
+			return TaskStatus.BAD_CONFIG;
+		} catch (ConfigFileNotFoundException ex) {
+			log.error("The XML config file [pre-placeholder = " + moduleValue + "] " +
+			"[post-placeholder = " + moduleValueStr + "] specified in the module parameter " + fieldName +
+							" does not exist: is it accessible on the file system?", ex);
+			return TaskStatus.BAD_CONFIG;
+		} catch (JAXBException ex) {
+			log.error("Unable to deserialize XML config file [pre-placeholder = " + moduleValue + "] " +
+					"[post-placeholder = " + moduleValueStr + "] specified in the module parameter " + fieldName +
+					": is it valid XML? See causing exception for more details.", ex);
+			return TaskStatus.BAD_CONFIG;
 		} catch (Exception ex) {
-			logger.error("Something went wrong while filling Moduleparameters", ex);
-			return false;
+			log.error("Something ({}) went wrong while filling module parameter '{}' associated with field: {}",
+					ex.getClass(), fieldName, field.getName(), ex);
+			return TaskStatus.FAILURE;
 		}
-		return true;
+		return TaskStatus.SUCCESS;
 	}
 
 	/**
 	 * Extracts a ModuleParam Annotation, if there is one, out of an Annotation array
 	 * @param annotations An array of Annotations
-	 * @return Optionally a ModuleParam Annotation, otherwise empty
+	 * @return Optionally a ModuleParam Annotation, otherwise null
 	 */
-	private Optional<ModuleParam> extractModuleParamAnnotation(Annotation[] annotations) {
+	private ModuleParam extractModuleParamAnnotation(Annotation[] annotations) {
 		for (Annotation annie : annotations) {
 			if (annie instanceof ModuleParam) {
-				return Optional.of((ModuleParam) annie);
+				return (ModuleParam) annie;
 			}
 		}
-		return Optional.empty();
+		return null;
 	}
 
 	public static String processPlaceHolders(Task task, String text) {
-		logger.trace("Trying to process placeholders for: " + text);
+		log.trace("Trying to process placeholders for: {}", text);
 		Map<String, Object> substituteData = new HashMap<>();
 		if (task.getData() != null) {
 			for (Map.Entry<String, Object> entry : task.getData().entrySet()) {
@@ -327,7 +377,7 @@ public abstract class ModuleOperation {
 
 		// Replace all placeholders that were not found
 		text = text.replaceAll("\\$\\{.+}", "");
-		logger.trace("result after substitution: " + text);
+		log.trace("result after substitution: {}", text);
 		if (text.toLowerCase().startsWith(MP_FILE_INDICATOR)) {
 			// If the value starts 'mp_file:' indicates we should use a file from the multipart request
 			text = text.substring(MP_FILE_INDICATOR.length());
@@ -343,7 +393,7 @@ public abstract class ModuleOperation {
 	protected static ModuleOperation getModuleOperation(String opClassName) throws EmptyOperationException {
 		ModuleOperation operation = null;
 		if (opClassName == null) {
-			logger.error("Tried to access an invalid operation");
+			log.error("Tried to access an invalid operation (it was NULL!)");
 			throw new EmptyOperationException();
 		}
 
@@ -351,13 +401,14 @@ public abstract class ModuleOperation {
 		Object obj;
 		try {
 			classLoader = ModuleClassLoader.getInstance();
-			logger.debug("Got a class loader, now calling getSpringBean for opClassName: " + opClassName);
+			log.debug("Got a class loader, now calling getSpringBean for opClassName: {}", opClassName);
 			obj = classLoader.getSpringBean(opClassName);
 			if (obj == null) {
 			    obj = classLoader.getClassObject(opClassName);
 			}
 		} catch (InstantiationException insE) {
-			logger.warn("Failed to instantiate ModuleClassLoader. Probably running test. Trying to use standard classloader for opClassName: " + opClassName, null);
+			log.warn("Failed to instantiate ModuleClassLoader. Probably running test. Trying to use standard " +
+					"classloader for opClassName: {}", opClassName, insE);
 			try {
 				Class<?> opClass=Class.forName(opClassName, true, ModuleOperation.class.getClassLoader());
 				obj=opClass.getDeclaredConstructor().newInstance();
@@ -376,7 +427,7 @@ public abstract class ModuleOperation {
 		} else if (obj instanceof ModuleOperation) {
 			operation = (ModuleOperation) obj;
 		} else {
-			logger.error("Incorrect operation, please check your configuration");
+			log.error("Incorrect operation, please check your configuration");
 			throw new EmptyOperationException();
 		}
 
@@ -423,7 +474,7 @@ public abstract class ModuleOperation {
     public static List<int[]> parseIntRanges(String param) {
     	List<int[]> result = new ArrayList<>();
     	if (!isValidIntRangeInput(param)) {
-    		logger.warn("Bad range specified: [" + param + "]");
+    		log.warn("Bad range specified: [{}]", param);
     	}
     	else {
     		Pattern reNextVal = Pattern.compile(

@@ -75,89 +75,87 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 
 		this.operationParams = parameters;
 
-		boolean valid = fillInParameters();
+		TaskStatus valid = fillInParameters();
+		if (!valid.isSuccess()) {
+			parameters.setSuccess(valid);
+			return parameters;
+		}
 		logger.info("Executing option: " + operation);
 		logger.info("Parameter result: " + valid);
 		logger.info("with parameters: " + moduleWrapper);
 		
-		
-		if (valid) {
+
+		Map<String, String> conditions = processCondition();
+
+		if (conditions == null) {
+			logger.warn("Conditions were set to null", null);
+			return null;
+		}
+
+		Set<String> nodeIds = new HashSet<>();
+		Set<Node> returnNodes = new HashSet<>();
 
 
-			Map<String, String> conditions = processCondition();
+		logger.info("initClassLoader Option execute", null);
+		T result = this.getResult();
 
-			if (conditions == null) {
-				logger.warn("Conditions were set to null", null);
+		logger.info("The option module returned the result: " + result, null);
+
+
+		for (String condition : conditions.keySet()) {
+			logger.info("Condition: " + condition, null);
+			if (condition.equalsIgnoreCase("all")) {
+				nodeIds.add(conditions.get(condition));
+			} else if (!condition.equalsIgnoreCase("default")) {
+				String[] breakFirst = null;
+				String[] conditionArray;
+				if (!condition.contains("||")) {
+					conditionArray = new String[] {condition};
+				}
+				else {
+					breakFirst = condition.split(Pattern.quote("'"));
+					conditionArray = breakFirst[1].split(Pattern.quote("||"));
+				}
+				for (String aCondition : conditionArray) {
+					if (!aCondition.startsWith("#result")) {
+						aCondition = breakFirst[0] + "'" + aCondition + "'";
+					}
+					if (evaluateExpression(result, aCondition)) {
+						logger.debug("Match found adding node", null);
+						nodeIds.add(conditions.get(condition));
+					} else {
+						logger.debug("Expression did not match not adding node", null);
+					}
+				}
+			}
+
+		}
+		if (nodeIds.isEmpty()) {
+			if (conditions.containsKey("default")) {
+				logger.info("result does not match any of the configured options using default.", null);
+				nodeIds.add(conditions.get("default"));
+			} else {
+				logger.warn("result does not match any of the configured options and no default is set.", null);
 				return null;
 			}
-
-			Set<String> nodeIds = new HashSet<>();
-			Set<Node> returnNodes = new HashSet<>();
-
-
-			logger.info("initClassLoader Option execute", null);
-			T result = this.getResult();
-
-			logger.info("The option module returned the result: " + result, null);
-
-
-			for (String condition : conditions.keySet()) {
-				logger.info("Condition: " + condition, null);
-				if (condition.equalsIgnoreCase("all")) {
-					nodeIds.add(conditions.get(condition));
-				} else if (!condition.equalsIgnoreCase("default")) {
-					String[] breakFirst = null;
-					String[] conditionArray;
-					if (!condition.contains("||")) {
-						conditionArray = new String[] {condition};
-					}
-					else {
-						breakFirst = condition.split(Pattern.quote("'"));
-						conditionArray = breakFirst[1].split(Pattern.quote("||"));
-					}
-					for (String aCondition : conditionArray) {
-						if (!aCondition.startsWith("#result")) {
-							aCondition = breakFirst[0] + "'" + aCondition + "'";
-						}
-						if (evaluateExpression(result, aCondition)) {
-							logger.debug("Match found adding node", null);
-							nodeIds.add(conditions.get(condition));
-						} else {
-							logger.debug("Expression did not match not adding node", null);
-						}
-					}
-				}
-
-			}
-			if (nodeIds.isEmpty()) {
-				if (conditions.containsKey("default")) {
-					logger.info("result does not match any of the configured options using default.", null);
-					nodeIds.add(conditions.get("default"));
-				} else {
-					logger.warn("result does not match any of the configured options and no default is set.", null);
-					return null;
-				}
-			}
-			
-			logger.debug("looping nodes list " + Arrays.toString(nodes.toArray()), null);
-			for (Node cn : nodes) {
-
-
-				logger.debug("checking if the list contains node " + cn.getModuleConfiguration().getName(), null);
-				if (nodeIds.contains(cn.getModuleConfiguration().getName())) {
-					logger.debug("node found adding to returns " + cn.getModuleConfiguration().getName(), null);
-					returnNodes.add(cn);
-				}
-			}
-
-			parameters.setSuccess(TaskStatus.SUCCESS);
-			parameters.setSelectedNodes(returnNodes);
-			if (parameters.getResultPath() == null) {
-				parameters.setResultPath(parameters.getSourcePath());
-			}
-			return parameters;
 		}
-		parameters.setSuccess(TaskStatus.FAILURE);
+
+		logger.debug("looping nodes list " + Arrays.toString(nodes.toArray()), null);
+		for (Node cn : nodes) {
+
+
+			logger.debug("checking if the list contains node " + cn.getModuleConfiguration().getName(), null);
+			if (nodeIds.contains(cn.getModuleConfiguration().getName())) {
+				logger.debug("node found adding to returns " + cn.getModuleConfiguration().getName(), null);
+				returnNodes.add(cn);
+			}
+		}
+
+		parameters.setSuccess(TaskStatus.SUCCESS);
+		parameters.setSelectedNodes(returnNodes);
+		if (parameters.getResultPath() == null) {
+			parameters.setResultPath(parameters.getSourcePath());
+		}
 		return parameters;
 	}
 
