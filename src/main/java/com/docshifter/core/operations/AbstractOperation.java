@@ -10,6 +10,7 @@ import com.docshifter.core.operations.annotations.ModuleParam;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
 
+import javax.validation.Validator;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,15 @@ public abstract class AbstractOperation extends ModuleOperation {
     protected Map<String, Object> moduleData = new HashMap<>();
 
     protected String operation = "Abstract Operation";
+
+    @Deprecated
+    public AbstractOperation() {
+        super();
+    }
+
+    public AbstractOperation(Validator validator) {
+        super(validator);
+    }
 
     public String getModuleId() {
         return "CSTM";

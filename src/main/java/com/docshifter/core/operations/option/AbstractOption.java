@@ -15,6 +15,8 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+
+import javax.validation.Validator;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -27,6 +29,15 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 	protected String option="Abstract Option";
 
 	private static final Logger logger = Logger.getLogger(new Object() { }.getClass().getEnclosingClass());
+
+	@Deprecated
+	public AbstractOption() {
+		super();
+	}
+
+	public AbstractOption(Validator validator) {
+		super(validator);
+	}
 
 	public String toString(){
 		return option;

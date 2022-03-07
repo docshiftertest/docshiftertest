@@ -148,21 +148,13 @@ public class ImageUtils {
 	 * @return The desired java awt Color object or else the provided fallback Color
 	 */
 	public static Color getColor(String nm, Color fallback) {
-		Color result;
 		try {
-			result = getColor(nm);
-			return result;
+			return getColor(nm);
 		} catch (Exception ex) {
-			if (StringUtils.isNotEmpty(nm)) {
-				result = getKnownColour(nm);
-				if (result == null) {
-					// If an unparseable String was provided, WARN the user that the fallback value was returned (this
-					// fallback event might possibly be an attention point)
-					log.warn("The color \"{}\" could not be parsed, so we will fallback to {}", nm, fallback);
-				}
-				else {
-					return result;
-				}
+			if (StringUtils.isNotBlank(nm)) {
+				// If an unparseable String was provided, WARN the user that the fallback value was returned (this
+				// fallback event might possibly be an attention point)
+				log.warn("The color \"{}\" could not be parsed, so we will fallback to {}", nm, fallback);
 			}
 			else if (fallback != null) {
 				// If an empty String was provided and the fallback is not NULL, INFORM the user that the fallback
@@ -175,9 +167,9 @@ public class ImageUtils {
 		}
 	}
 
-	public static Color getKnownColour(String nm) {
+	private static Color getKnownColour(String nm) {
 		Color result = null;
-		switch (nm.toLowerCase().replaceAll("[ _-]", "")) {
+		switch (nm.toLowerCase().replaceAll("[ _-]+", "")) {
 			case "brown":
 				result = new Color(0xA5, 0x2A, 0x2A);
 				break;
@@ -223,13 +215,24 @@ public class ImageUtils {
 			throw new NumberFormatException("A null, empty or blank value is not a valid colour!");
 		}
 
+		if (nm.startsWith("#")) {
+			log.debug("Color {} starts with # so will assume it is a hex value.", nm);
+			return decodeWithAlpha(nm);
+		}
+
+		Color knownColor = getKnownColour(nm);
+		if (knownColor != null) {
+			return knownColor;
+		}
+		log.debug("Color {} was not a known color, so will try to get it from AWT next.", nm);
+
 		nm = nm.trim().toUpperCase();
 		try {
 			Field field = Class.forName("java.awt.Color")
 					.getField(nm.replace(' ', '_').replace("GREY", "GRAY"));
 			return (Color)field.get(null);
 		} catch (Exception e) {
-			log.debug("Color {} was not found in AWT, so we'll try to decode it as a hex string.", nm);
+			log.debug("Color {} was not found in AWT, so we'll try to decode it as a hex string as a last resort.", nm);
 			return decodeWithAlpha(nm);
 		}
 	}

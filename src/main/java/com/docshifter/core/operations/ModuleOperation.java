@@ -15,18 +15,24 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.text.StringSubstitutor;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.awt.*;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by michiel.vandriessche on 15/03/17.
@@ -54,6 +60,20 @@ public abstract class ModuleOperation {
 	public Task task;
 	protected ModuleWrapper moduleWrapper;
 	protected OperationParams operationParams;
+	private final Validator validator;
+
+	@Deprecated
+	public ModuleOperation() {
+		this(null);
+	}
+
+	public ModuleOperation(Validator validator) {
+		if (validator == null) {
+			log.info("No validator instance was passed so will not validate annotations on module parameters " +
+					"pre-transformation.");
+		}
+		this.validator = validator;
+	}
 
 	protected TaskStatus fillInParameters() {
 
@@ -70,8 +90,10 @@ public abstract class ModuleOperation {
 			valuesMap.putAll( moduleWrapper.getParamMap());
 		}
 
+		List<Object> nestedValuesToValidate = new ArrayList<>();
+
 		//Match and fill in ModuleParam
-		return Arrays.stream(calledClass.getDeclaredFields())
+		Set<TaskStatus> failStatuses = Arrays.stream(calledClass.getDeclaredFields())
 				.map(fld -> new ImmutablePair<>(fld, extractModuleParamAnnotation(fld.getDeclaredAnnotations())))
 				.filter(entry -> entry.getRight() != null)
 				.map(entry -> {
@@ -118,13 +140,22 @@ public abstract class ModuleOperation {
 
 					boolean access_old = field.isAccessible();
 					field.setAccessible(true);
-					TaskStatus status = setModuleValue(paramType, fieldName, field, moduleValue, supportPlaceholder);
+					TaskStatus status = setModuleValue(paramType, fieldName, field, moduleValue, supportPlaceholder, nestedValuesToValidate);
 					field.setAccessible(access_old);
 					return status;
 				})
 				.filter(status -> !status.isSuccess())
-				.findAny()
-				.orElse(TaskStatus.SUCCESS);
+				.collect(Collectors.toSet());
+
+		if (!failStatuses.isEmpty()) {
+			// If we have any errors besides the expected BAD_CONFIG then return one of those, as they are more severe
+			if (!failStatuses.contains(TaskStatus.BAD_CONFIG)) {
+				return failStatuses.stream().findFirst().get();
+			}
+			return TaskStatus.BAD_CONFIG;
+		}
+
+		return validateParams(nestedValuesToValidate);
 	}
 
 	/**
@@ -186,8 +217,11 @@ public abstract class ModuleOperation {
 	 * problem...
 	 */
 	private TaskStatus setModuleValue(ParamType paramType, String fieldName, Field field, Object moduleValue,
-									  boolean supportPlaceholder) {
-		String moduleValueStr = null;
+									  boolean supportPlaceholder, List<Object> nestedValuesToValidate) {
+		// Array of one element because we just need to have a String we can keep a reference to when calling into the
+		// other methods which can throw exceptions (and we need to access the potential String value inside the catch
+		// clauses)
+		String[] moduleValueStr = new String[1];
 		try {
 			log.trace("modulevalue is === {}", moduleValue);
 			if (moduleValue == null) {
@@ -199,99 +233,51 @@ public abstract class ModuleOperation {
 				}
 				return TaskStatus.SUCCESS;
 			}
-			moduleValueStr = moduleValue.toString();
-			if (supportPlaceholder) {
-				moduleValueStr = processPlaceHolders(task, moduleValueStr);
-			}
-			if (moduleValueStr.isEmpty()) {
-
-			}
+			StringHandler stringHandler = null;
 			switch (paramType) {
 				case INTEGER:
-					if (moduleValue instanceof Integer) {
-						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
-						field.set(this, Integer.parseInt(moduleValueStr));
-					}
+					stringHandler = Integer::parseInt;
 					break;
 				case BOOLEAN:
-					if (moduleValue instanceof Boolean) {
-						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
-						field.set(this, Boolean.parseBoolean(moduleValueStr));
-					}
+					stringHandler = Boolean::parseBoolean;
 					break;
 				case LONG:
-					if (moduleValue instanceof Long) {
-						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
-						field.set(this, Long.parseLong(moduleValueStr));
-					}
+					stringHandler = Long::parseLong;
 					break;
 				case DOUBLE:
-					if (moduleValue instanceof Double) {
-						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
-						field.set(this, Double.parseDouble(moduleValueStr));
-					}
+					stringHandler = Double::parseDouble;
 					break;
 				case FLOAT:
-					if (moduleValue instanceof Float) {
-						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
-						field.set(this, Float.parseFloat(moduleValueStr));
-					}
+					stringHandler = Float::parseFloat;
 					break;
 				case BYTE:
-					if (moduleValue instanceof Byte) {
-						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
-						field.set(this, Byte.parseByte(moduleValueStr));
-					}
+					stringHandler = Byte::parseByte;
 					break;
 				case SHORT:
-					if (moduleValue instanceof Short) {
-						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
-						field.set(this, Short.parseShort(moduleValueStr));
-					}
+					stringHandler = Short::parseShort;
 					break;
 				case STRING:
-					field.set(this, moduleValueStr);
+					valueAsString(moduleValueStr, moduleValue, supportPlaceholder);
+					field.set(this, moduleValueStr[0]);
 					break;
 				case COLOR:
-					if (moduleValue instanceof Color) {
-						field.set(this, moduleValue);
-					} else {
-						field.set(this, ImageUtils.getColor(moduleValueStr));
-					}
+					stringHandler = ImageUtils::getColor;
+					break;
 				case XML_FILE:
-					if (field.getType().isAssignableFrom(moduleValue.getClass())) {
-						field.set(this, moduleValue);
-					} else {
-						File xmlConfigFile = new File(moduleValueStr);
+					stringHandler = configPath -> {
+						File xmlConfigFile = new File(configPath);
 						if (!xmlConfigFile.exists()) {
 							throw new ConfigFileNotFoundException();
 						}
 						JAXBContext jaxbContext = JAXBContext.newInstance(field.getType());
 						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-						field.set(this, jaxbUnmarshaller.unmarshal(xmlConfigFile));
-					}
+						Object deserializedObj = jaxbUnmarshaller.unmarshal(xmlConfigFile);
+						nestedValuesToValidate.add(deserializedObj);
+						return deserializedObj;
+					};
 					break;
 				case ENUM:
-					if (field.getType().isAssignableFrom(moduleValue.getClass())) {
-						field.set(this, moduleValue);
-					}
-					else {
-						field.set(this, Enum.valueOf(field.getType().asSubclass(Enum.class), moduleValueStr));
-					}
+					stringHandler = enumValue -> Enum.valueOf(field.getType().asSubclass(Enum.class), enumValue);
 					break;
 				case UNKNOWN:
 				default:
@@ -299,6 +285,10 @@ public abstract class ModuleOperation {
 							field.getType().getSimpleName(), field.getName(), moduleValue);
 					field.set(this, moduleValue);
 					break;
+			}
+			if (stringHandler != null) {
+				field.set(this, getRealModuleValue(moduleValueStr, field, moduleValue, supportPlaceholder,
+						stringHandler));
 			}
 		} catch (IllegalAccessException ex) {
 			log.error("Illegal access of field: {}", field.getName(), ex);
@@ -308,13 +298,13 @@ public abstract class ModuleOperation {
 					field.getType().getSimpleName().toLowerCase(), ex);
 			return TaskStatus.BAD_CONFIG;
 		} catch (ConfigFileNotFoundException ex) {
-			log.error("The XML config file [pre-placeholder = " + moduleValue + "] " +
-			"[post-placeholder = " + moduleValueStr + "] specified in the module parameter " + fieldName +
+			log.error("The config file [pre-placeholder = " + moduleValue + "] " +
+			"[post-placeholder = " + moduleValueStr[0] + "] specified in the module parameter " + fieldName +
 							" does not exist: is it accessible on the file system?", ex);
 			return TaskStatus.BAD_CONFIG;
 		} catch (JAXBException ex) {
 			log.error("Unable to deserialize XML config file [pre-placeholder = " + moduleValue + "] " +
-					"[post-placeholder = " + moduleValueStr + "] specified in the module parameter " + fieldName +
+					"[post-placeholder = " + moduleValueStr[0] + "] specified in the module parameter " + fieldName +
 					": is it valid XML? See causing exception for more details.", ex);
 			return TaskStatus.BAD_CONFIG;
 		} catch (Exception ex) {
@@ -323,6 +313,52 @@ public abstract class ModuleOperation {
 			return TaskStatus.FAILURE;
 		}
 		return TaskStatus.SUCCESS;
+	}
+
+	@FunctionalInterface
+	private interface StringHandler {
+		Object apply(String str) throws ConfigFileNotFoundException, JAXBException;
+	}
+
+	private Object getRealModuleValue(String[] moduleValueStr, Field field, Object moduleValue,
+										boolean supportPlaceholder, StringHandler stringHandler)
+			throws ConfigFileNotFoundException, JAXBException {
+		if (field.getType().isInstance(moduleValue)) {
+			return moduleValue;
+		}
+
+		valueAsString(moduleValueStr, moduleValue, supportPlaceholder);
+		if (moduleValueStr[0].isEmpty()) {
+			return Defaults.defaultValue(field.getType());
+		}
+		return stringHandler.apply(moduleValueStr[0]);
+	}
+
+	private void valueAsString(String[] moduleValueStr, Object moduleValue, boolean supportPlaceholder) {
+		moduleValueStr[0] = moduleValue.toString();
+		if (supportPlaceholder) {
+			moduleValueStr[0] = processPlaceHolders(task, moduleValueStr[0]);
+		}
+	}
+
+	private TaskStatus validateParams(List<Object> nestedValuesToValidate) {
+		if (validator == null) {
+			return TaskStatus.SUCCESS;
+		}
+
+		Set<ConstraintViolation<Object>> constraintViolations = validator.validate(this);
+		for (Object nestedValue : nestedValuesToValidate) {
+			constraintViolations.addAll(validator.validate(nestedValue));
+		}
+
+		if (constraintViolations.isEmpty()) {
+			return TaskStatus.SUCCESS;
+		}
+
+		for (ConstraintViolation<Object> constraintViolation : constraintViolations) {
+			log.error(constraintViolation.getMessage());
+		}
+		return TaskStatus.BAD_CONFIG;
 	}
 
 	/**
