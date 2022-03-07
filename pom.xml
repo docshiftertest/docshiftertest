@@ -60,7 +60,6 @@
         <aspose.html.classifier>jdk1.8</aspose.html.classifier>
 
         <artemis.version>2.16.0</artemis.version>
-        <javax.json-api.version>1.1.4</javax.json-api.version>
         <kubernetes-client.version>5.3.0</kubernetes-client.version>
 
     </properties>
@@ -102,7 +101,6 @@
         <dependency>
             <groupId>javax.json</groupId>
             <artifactId>javax.json-api</artifactId>
-            <version>${javax.json-api.version}</version>
         </dependency>
 
         <dependency>
@@ -116,11 +114,9 @@
             <version>1.5.8</version>
             <scope>test</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
-            <version>2.4.1</version>
         </dependency>
         <!-- test -->
         <dependency>
