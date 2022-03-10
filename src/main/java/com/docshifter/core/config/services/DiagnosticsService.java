@@ -15,6 +15,8 @@ import java.lang.management.MemoryNotificationInfo;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
 import java.lang.management.MemoryUsage;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -335,6 +337,36 @@ public class DiagnosticsService {
 			sb.appendln("  %s = %s", prop.getKey(), prop.getValue());
 		}
 
+		return sb.toString();
+	}
+
+	/**
+	 * Generates a thread dump of the entire application, going down as deep as possible.
+	 * @return A thread dump in a friendly stringified format.
+	 */
+	public String generateThreadDump() {
+		return generateThreadDump(Integer.MAX_VALUE);
+	}
+
+	/**
+	 * Generates a thread dump of the entire application, going down to a certain depth.
+	 * @param depth The maximum depth to descend to.
+	 * @return A thread dump in a friendly stringified format.
+	 */
+	public String generateThreadDump(int depth) {
+		final TextStringBuilder sb = new TextStringBuilder();
+		final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+		final ThreadInfo[] threadInfos = threadMXBean.getThreadInfo(threadMXBean.getAllThreadIds(), depth);
+		for (ThreadInfo threadInfo : threadInfos) {
+			sb.append('"').append(threadInfo.getThreadName()).appendln('"');
+			final Thread.State state = threadInfo.getThreadState();
+			sb.append("   java.lang.Thread.State: ").appendln(state);
+			final StackTraceElement[] stackTraceElements = threadInfo.getStackTrace();
+			for (final StackTraceElement stackTraceElement : stackTraceElements) {
+				sb.append("        at ").appendln(stackTraceElement);
+			}
+			sb.appendNewLine();
+		}
 		return sb.toString();
 	}
 }
