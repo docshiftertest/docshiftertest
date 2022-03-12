@@ -24,9 +24,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -58,12 +58,17 @@ public class HealthManagementServiceTest {
 			assertNotNull(resultingEventFuture);
 			return resultingEventFuture.get();
 		} catch (InterruptedException ex) {
-			fail("We shouldn't get any InterruptedExceptions during test setup! " + ex);
+			throw new RuntimeException("We shouldn't get any InterruptedExceptions during test setup!", ex);
 		} catch (ExecutionException ex) {
-			fail("Execution of onAppReady method threw an exception: " + ex);
+			throw new RuntimeException("Execution of onAppReady method threw an exception.", ex);
 		}
+	}
 
-		return null;
+	@Test
+	public void onAppReady_correct_setsAppReady() {
+		assertFalse(sut.isAppReady());
+		fireOnAppReady(LivenessState.CORRECT);
+		assertTrue(sut.isAppReady());
 	}
 
 	@Test
@@ -72,6 +77,12 @@ public class HealthManagementServiceTest {
 		assertNotNull(resultingEvent);
 		assertEquals(appContext, resultingEvent.getApplicationContext());
 		assertEquals(appContext, resultingEvent.getSource());
+	}
+
+	@Test
+	public void onAppReady_broken_appNotReady() {
+		fireOnAppReady(LivenessState.BROKEN);
+		assertFalse(sut.isAppReady());
 	}
 
 	@Test
@@ -88,6 +99,109 @@ public class HealthManagementServiceTest {
 	}
 
 	@Test
+	public void onAppReady_differentTypes_publishesEarlyEvents() {
+		sut.reportEvent(HealthManagementService.Event.TASK_STUCK);
+		sut.reportEvent(HealthManagementService.Event.MEMORY_SHORTAGE, "some data");
+		fireOnAppReady();
+
+		ArgumentCaptor<AvailabilityChangeEvent<LivenessState>> captor = ArgumentCaptor.forClass(AvailabilityChangeEvent.class);
+		verify(appContext, times(2)).publishEvent(captor.capture());
+		verifyNoMoreInteractions(appContext);
+		assertArrayEquals(new LivenessState[]{LivenessState.BROKEN, LivenessState.BROKEN},
+				captor.getAllValues().stream().map(AvailabilityChangeEvent::getState).toArray(LivenessState[]::new));
+		assertTrue(captor.getAllValues().stream().allMatch(value -> value.getSource() instanceof HealthManagementService.EventSource));
+		List<HealthManagementService.EventSource> sources = captor.getAllValues().stream()
+				.map(value -> (HealthManagementService.EventSource) value.getSource())
+				.collect(Collectors.toList());
+		assertArrayEquals(new HealthManagementService.Event[]{HealthManagementService.Event.TASK_STUCK,
+						HealthManagementService.Event.MEMORY_SHORTAGE},
+				sources.stream().map(HealthManagementService.EventSource::getEventType).toArray(HealthManagementService.Event[]::new));
+		assertArrayEquals(new Object[]{null, "some data"},
+				sources.stream().map(HealthManagementService.EventSource::getData).toArray());
+	}
+
+	@Test
+	public void onAppReady_genericEvents_publishesSingleEarlyEvent() {
+		sut.reportEvent(HealthManagementService.Event.TASK_STUCK);
+		sut.reportEvent(HealthManagementService.Event.TASK_STUCK);
+		fireOnAppReady();
+
+		ArgumentCaptor<AvailabilityChangeEvent<LivenessState>> captor = ArgumentCaptor.forClass(AvailabilityChangeEvent.class);
+		verify(appContext).publishEvent(captor.capture());
+		verifyNoMoreInteractions(appContext);
+		assertEquals(LivenessState.BROKEN, captor.getValue().getState());
+		assertTrue(captor.getValue().getSource() instanceof HealthManagementService.EventSource);
+		HealthManagementService.EventSource source = (HealthManagementService.EventSource) captor.getValue().getSource();
+		assertEquals(HealthManagementService.Event.TASK_STUCK, source.getEventType());
+		assertNull(source.getData());
+	}
+
+	@Test
+	public void onAppReady_specificEvents_publishesEarlyEvents() {
+		sut.reportEvent(HealthManagementService.Event.TASK_STUCK, "some data");
+		sut.reportEvent(HealthManagementService.Event.TASK_STUCK, "some other data");
+		fireOnAppReady();
+
+		ArgumentCaptor<AvailabilityChangeEvent<LivenessState>> captor = ArgumentCaptor.forClass(AvailabilityChangeEvent.class);
+		verify(appContext, times(2)).publishEvent(captor.capture());
+		verifyNoMoreInteractions(appContext);
+		assertArrayEquals(new LivenessState[]{LivenessState.BROKEN, LivenessState.BROKEN},
+				captor.getAllValues().stream().map(AvailabilityChangeEvent::getState).toArray(LivenessState[]::new));
+		assertTrue(captor.getAllValues().stream().allMatch(value -> value.getSource() instanceof HealthManagementService.EventSource));
+		List<HealthManagementService.EventSource> sources = captor.getAllValues().stream()
+				.map(value -> (HealthManagementService.EventSource) value.getSource())
+				.collect(Collectors.toList());
+		assertArrayEquals(new HealthManagementService.Event[]{HealthManagementService.Event.TASK_STUCK,
+						HealthManagementService.Event.TASK_STUCK},
+				sources.stream().map(HealthManagementService.EventSource::getEventType).toArray(HealthManagementService.Event[]::new));
+		assertArrayEquals(new Object[]{"some data", "some other data"},
+				sources.stream().map(HealthManagementService.EventSource::getData).toArray());
+	}
+
+	@Test
+	public void onAppReady_cancelOut_doesNotPublishEarlyEvents() {
+		sut.reportEvent(HealthManagementService.Event.TASK_STUCK);
+		sut.resolveEvent(HealthManagementService.Event.TASK_STUCK);
+		fireOnAppReady();
+
+		verifyNoInteractions(appContext);
+	}
+
+	@Test
+	@Ignore("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
+	public void onAppReady_cancelOutDistinct_doesNotPublishEarlyEvents() {
+		sut.reportEvent(HealthManagementService.Event.MEMORY_SHORTAGE);
+		sut.resolveEvent(HealthManagementService.Event.MEMORY_SHORTAGE, "some data");
+		fireOnAppReady();
+
+		verifyNoInteractions(appContext);
+	}
+
+	@Test
+	public void onAppReady_cancelOut2_publishesSomeEarlyEvents() {
+		sut.reportEvent(HealthManagementService.Event.TASK_STUCK);
+		sut.reportEvent(HealthManagementService.Event.TASK_STUCK, "some data");
+		sut.resolveEvent(HealthManagementService.Event.TASK_STUCK);
+		sut.reportEvent(HealthManagementService.Event.MEMORY_SHORTAGE);
+		fireOnAppReady();
+
+		ArgumentCaptor<AvailabilityChangeEvent<LivenessState>> captor = ArgumentCaptor.forClass(AvailabilityChangeEvent.class);
+		verify(appContext, times(2)).publishEvent(captor.capture());
+		verifyNoMoreInteractions(appContext);
+		assertArrayEquals(new LivenessState[]{LivenessState.BROKEN, LivenessState.BROKEN},
+				captor.getAllValues().stream().map(AvailabilityChangeEvent::getState).toArray(LivenessState[]::new));
+		assertTrue(captor.getAllValues().stream().allMatch(value -> value.getSource() instanceof HealthManagementService.EventSource));
+		List<HealthManagementService.EventSource> sources = captor.getAllValues().stream()
+				.map(value -> (HealthManagementService.EventSource) value.getSource())
+				.collect(Collectors.toList());
+		assertArrayEquals(new HealthManagementService.Event[]{HealthManagementService.Event.TASK_STUCK,
+						HealthManagementService.Event.MEMORY_SHORTAGE},
+				sources.stream().map(HealthManagementService.EventSource::getEventType).toArray(HealthManagementService.Event[]::new));
+		assertArrayEquals(new Object[]{"some data", null},
+				sources.stream().map(HealthManagementService.EventSource::getData).toArray());
+	}
+
+	@Test
 	public void reportEvent_breaksAppState() {
 		fireOnAppReady();
 		sut.reportEvent(HealthManagementService.Event.TASK_STUCK);
@@ -100,6 +214,13 @@ public class HealthManagementServiceTest {
 		HealthManagementService.EventSource source = (HealthManagementService.EventSource) captor.getValue().getSource();
 		assertEquals(HealthManagementService.Event.TASK_STUCK, source.getEventType());
 		assertNull(source.getData());
+	}
+
+	@Test
+	public void reportEvent_early_doesNotBreakAppState() {
+		sut.reportEvent(HealthManagementService.Event.TASK_STUCK);
+
+		verifyNoInteractions(appContext);
 	}
 
 	@Test
@@ -307,6 +428,11 @@ public class HealthManagementServiceTest {
 	}
 
 	@Test
+	public void getEventCount_early_zero() {
+		assertEquals(0, sut.getEventCount(HealthManagementService.Event.TASK_STUCK));
+	}
+
+	@Test
 	public void getEventCount_one() {
 		fireOnAppReady();
 		sut.reportEvent(HealthManagementService.Event.TASK_STUCK);
@@ -314,8 +440,21 @@ public class HealthManagementServiceTest {
 	}
 
 	@Test
+	public void getEventCount_early_one() {
+		sut.reportEvent(HealthManagementService.Event.TASK_STUCK);
+		assertEquals(1, sut.getEventCount(HealthManagementService.Event.TASK_STUCK));
+	}
+
+	@Test
 	public void getEventCount_two() {
 		fireOnAppReady();
+		sut.reportEvent(HealthManagementService.Event.TASK_STUCK);
+		sut.reportEvent(HealthManagementService.Event.TASK_STUCK, "some data");
+		assertEquals(2, sut.getEventCount(HealthManagementService.Event.TASK_STUCK));
+	}
+
+	@Test
+	public void getEventCount_early_two() {
 		sut.reportEvent(HealthManagementService.Event.TASK_STUCK);
 		sut.reportEvent(HealthManagementService.Event.TASK_STUCK, "some data");
 		assertEquals(2, sut.getEventCount(HealthManagementService.Event.TASK_STUCK));
@@ -362,6 +501,12 @@ public class HealthManagementServiceTest {
 	@Test
 	public void containsData_match_returnsTrue() {
 		fireOnAppReady();
+		sut.reportEvent(HealthManagementService.Event.TASK_STUCK, "some data");
+		assertTrue(sut.containsData(HealthManagementService.Event.TASK_STUCK, "some data"));
+	}
+
+	@Test
+	public void containsData_earlyMatch_returnsTrue() {
 		sut.reportEvent(HealthManagementService.Event.TASK_STUCK, "some data");
 		assertTrue(sut.containsData(HealthManagementService.Event.TASK_STUCK, "some data"));
 	}

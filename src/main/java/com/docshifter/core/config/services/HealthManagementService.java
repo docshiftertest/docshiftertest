@@ -60,7 +60,7 @@ public class HealthManagementService {
 
 		/**
 		 * If the event is a distinct event, then equality checking based on data doesn't matter. Two distinct events
-		 * of the same type will always be equal to each other.
+		 * of the same type will always be equal to each other, no matter which data they hold.
 		 * @return null if the event is distinct, or the data specified on the event otherwise.
 		 */
 		@EqualsAndHashCode.Include(replaces = "data")
@@ -129,10 +129,19 @@ public class HealthManagementService {
 
 		// Sleep for a bit to make sure any other event listeners have captured this CORRECT event and are already
 		// processing it
+		log.debug("Sleeping for 250ms to make sure other event listeners are already processing the first " +
+				"LivenessState = CORRECT event.");
 		try {
 			Thread.sleep(250);
+			if (earlyEvents.size() > 0) {
+				log.debug("Woke up after 250ms, will now start publishing {} BROKEN events...",
+						earlyEvents.size());
+			} else {
+				log.debug("Woke up after 250ms, but there are no BROKEN events to publish.");
+			}
 		} catch (InterruptedException ex) {
-			log.warn("Current thread interrupted while sleeping in event listener? Continuing anyway...");
+			log.warn("Current thread interrupted while sleeping in event listener? Will continue to publish {} BROKEN" +
+					" event(s) anyway...", earlyEvents.size());
 		}
 
 		// Push all the broken events through in encounter order
