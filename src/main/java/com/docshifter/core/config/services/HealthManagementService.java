@@ -2,23 +2,27 @@ package com.docshifter.core.config.services;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.boot.availability.AvailabilityChangeEvent;
 import org.springframework.boot.availability.LivenessState;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.EventListener;
+import org.springframework.context.event.SmartApplicationListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Keeps track of different health events happening across the application. If there are no problems, application
@@ -50,11 +54,39 @@ public class HealthManagementService {
 	 */
 	@Data
 	public static class EventSource {
+		@NonNull
 		private final Event eventType;
 		private final Object data;
+
+		/**
+		 * If the event is a distinct event, then equality checking based on data doesn't matter. Two distinct events
+		 * of the same type will always be equal to each other, no matter which data they hold.
+		 * @return null if the event is distinct, or the data specified on the event otherwise.
+		 */
+		@EqualsAndHashCode.Include(replaces = "data")
+		private Object relevantData() {
+			return eventType.isDistinct() ? null : data;
+		}
 	}
 
+	/**
+	 * An event marking the fact that the application has received its first {@link LivenessState#CORRECT} event and
+	 * has therefore successfully started up.
+	 */
+	@Getter
+	public static class FirstCorrectFiredEvent extends ApplicationEvent {
+		private final ApplicationContext applicationContext;
+
+		public FirstCorrectFiredEvent(Object source, ApplicationContext applicationContext) {
+			super(source);
+			this.applicationContext = applicationContext;
+		}
+	}
+
+	private static final String FIRST_CORRECT_FIRED_EVENT_ID = "FIRST_CORRECT_FIRED";
+
 	private final ApplicationContext appContext;
+	private final ApplicationEventMulticaster appEventMulticaster;
 	/**
 	 * Map holding specific events with each event's data grouped per event type.
 	 */
@@ -64,24 +96,62 @@ public class HealthManagementService {
 	 */
 	private final Map<Event, Integer> genericEventOccurrenceMap = new HashMap<>();
 
-	private boolean appReady = false;
-	private final Queue<Pair<EventSource, LivenessState>> earlyEvents = new LinkedList<>();
+	private Set<EventSource> earlyEvents = new LinkedHashSet<>();
 
-	public HealthManagementService(ApplicationContext appContext) {
+	public HealthManagementService(ApplicationContext appContext, ApplicationEventMulticaster appEventMulticaster) {
 		this.appContext = appContext;
+		this.appEventMulticaster = appEventMulticaster;
 	}
 
 	/**
-	 * We should wait with firing any events until the application has fully started up, otherwise Spring won't
-	 * notify the event listeners listening for Liveness changed events.
+	 * We should wait with firing any events until the application has fully started up and we have received our
+	 * first {@link LivenessState#CORRECT} event, otherwise Spring won't notify the event listeners listening for
+	 * {@link LivenessState} changed events.
+	 * @return A resulting event if we encountered the first {@link LivenessState#CORRECT}, null otherwise.
 	 */
-	@EventListener(ApplicationReadyEvent.class)
-	public synchronized void onAppReady() {
-		Pair<EventSource, LivenessState> earlyEvent;
-		while ((earlyEvent = earlyEvents.poll()) != null) {
-			AvailabilityChangeEvent.publish(appContext, earlyEvent.getKey(), earlyEvent.getValue());
+	@EventListener(id = FIRST_CORRECT_FIRED_EVENT_ID)
+	@Async
+	public synchronized CompletableFuture<FirstCorrectFiredEvent> onAppReady(AvailabilityChangeEvent<LivenessState> event) {
+		if (isAppReady()) {
+			log.debug("LivenessState changed event was called after having unsubscribed this event listener?");
+			return CompletableFuture.completedFuture(null);
 		}
-		appReady = true;
+
+		if (event.getState() != LivenessState.CORRECT) {
+			log.info("We expected a CORRECT LivenessState changed event during application startup but have " +
+						"received {} instead!", event.getState());
+			return CompletableFuture.completedFuture(null);
+		}
+
+		// We only need this to fire once, so unsubscribe
+		appEventMulticaster.removeApplicationListeners(l -> l instanceof SmartApplicationListener
+				&& FIRST_CORRECT_FIRED_EVENT_ID.equals(((SmartApplicationListener)l).getListenerId()));
+
+		// Sleep for a bit to make sure any other event listeners have captured this CORRECT event and are already
+		// processing it
+		log.debug("Sleeping for 250ms to make sure other event listeners are already processing the first " +
+				"LivenessState = CORRECT event.");
+		try {
+			Thread.sleep(250);
+			if (earlyEvents.size() > 0) {
+				log.debug("Woke up after 250ms, will now start publishing {} BROKEN events...",
+						earlyEvents.size());
+			} else {
+				log.debug("Woke up after 250ms, but there are no BROKEN events to publish.");
+			}
+		} catch (InterruptedException ex) {
+			log.warn("Current thread interrupted while sleeping in event listener? Will continue to publish {} BROKEN" +
+					" event(s) anyway...", earlyEvents.size());
+		}
+
+		// Push all the broken events through in encounter order
+		for (Iterator<EventSource> it = earlyEvents.iterator(); it.hasNext();) {
+			EventSource earlyEvent = it.next();
+			AvailabilityChangeEvent.publish(appContext, earlyEvent, LivenessState.BROKEN);
+			it.remove();
+		}
+		earlyEvents = null;
+		return CompletableFuture.completedFuture(new FirstCorrectFiredEvent(event.getSource(), appContext));
 	}
 
 	/**
@@ -108,14 +178,14 @@ public class HealthManagementService {
 			}
 
 			if (added) {
-				if (appReady) {
+				if (isAppReady()) {
 					log.error("{}, so setting the application state to BROKEN! This event has now occurred {} time(s).",
 							event.getDescription(), ++eventCount);
 					AvailabilityChangeEvent.publish(appContext, new EventSource(event, data), LivenessState.BROKEN);
 				} else {
 					log.error("{}, so will set the application state to BROKEN! This event has now occurred {} time(s).",
 							event.getDescription(), ++eventCount);
-					earlyEvents.offer(new ImmutablePair<>(new EventSource(event, data), LivenessState.BROKEN));
+					earlyEvents.add(new EventSource(event, data));
 				}
 			}
 		} else {
@@ -200,6 +270,9 @@ public class HealthManagementService {
 			eventDataMap.put(event, new HashSet<>());
 			genericEventOccurrenceMap.put(event, 0);
 			eventCount = 0;
+			if (!isAppReady()) {
+				earlyEvents.remove(new EventSource(event, data));
+			}
 		} else if (data == null) {
 			int genericEventCount = getGenericEventCount(event);
 			if (genericEventCount <= 0) {
@@ -209,6 +282,9 @@ public class HealthManagementService {
 			}
 			genericEventOccurrenceMap.put(event, --genericEventCount);
 			eventCount = genericEventCount + getSpecificEventCount(event);
+			if (!isAppReady() && genericEventCount <= 0) {
+				earlyEvents.remove(new EventSource(event, null));
+			}
 		} else {
 			Set<Object> dataSet = eventDataMap.getOrDefault(event, null);
 			if (dataSet == null || !dataSet.remove(data)) {
@@ -217,6 +293,9 @@ public class HealthManagementService {
 				return;
 			}
 			eventCount = dataSet.size() + getGenericEventCount(event);
+			if (!isAppReady()) {
+				earlyEvents.remove(new EventSource(event, data));
+			}
 		}
 
 		log.info("The previously reported event \"{}\" has now been marked as resolved, there is/are now {} event(s) " +
@@ -224,12 +303,11 @@ public class HealthManagementService {
 		if (eventCount <= 0
 				&& genericEventOccurrenceMap.values().stream().allMatch(count -> count <= 0)
 				&& eventDataMap.values().stream().allMatch(set -> set == null || set.isEmpty())) {
-			if (appReady) {
+			if (isAppReady()) {
 				log.info("There are no more outstanding health events, so setting the application state to CORRECT!");
 				AvailabilityChangeEvent.publish(appContext, new EventSource(event, data), LivenessState.CORRECT);
 			} else {
-				log.info("There are no more outstanding health events, so will set the application state to CORRECT!");
-				earlyEvents.offer(new ImmutablePair<>(new EventSource(event, data), LivenessState.CORRECT));
+				log.info("There are no more outstanding health events, so will keep the application state as CORRECT!");
 			}
 		}
 	}
@@ -241,5 +319,15 @@ public class HealthManagementService {
 	 */
 	public synchronized void resolveEvent(Event event) {
 		resolveEvent(event, null);
+	}
+
+	/**
+	 * Whether we have received the first {@link LivenessState#CORRECT} event since application startup. It is not
+	 * advisable to continuously poll this value, listen to {@link FirstCorrectFiredEvent} if you would like to run
+	 * logic once this flag has been set.
+	 * @return true if we have received it and the application is truly ready, false otherwise.
+	 */
+	public synchronized boolean isAppReady() {
+		return earlyEvents == null;
 	}
 }
