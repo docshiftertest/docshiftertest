@@ -12,6 +12,7 @@ import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.VeevaTask;
 import lombok.extern.log4j.Log4j2;
+import org.apache.activemq.artemis.jms.client.ActiveMQMessage;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jms.core.JmsMessagingTemplate;
@@ -50,8 +51,9 @@ public class AMQPSender implements IMessageSender {
 		Object response = sendTask(DocshifterMessageType.SYNC, queue, chainConfiguration, task);
 
 		if (response == null) {
-			//TODO: update to good exception message
-			throw new IllegalArgumentException("response object is null");
+			task.addMessage("Timeout exception: Your task has expired and has been removed from the queue." +
+					"You have defined a timeout of " + task.getData().getOrDefault("timeout",chainConfiguration.getTimeout()) + " seconds");
+			return (SyncTask) task;
 		}
 		
 		if (!(response instanceof DocshifterMessage)) {
@@ -81,7 +83,6 @@ public class AMQPSender implements IMessageSender {
 		if (task == null) {
 			throw new IllegalArgumentException("The task to send cannot be NULL!");
 		}
-		//if (MetricsLicenceCheckingService.isLicensed()) {
 			log.debug("Creating metrics message in Sender...");
 			DocShifterMetricsSenderMessage metricsMessage = DocShifterMetricsSenderMessage
 					.builder()
@@ -93,7 +94,6 @@ public class AMQPSender implements IMessageSender {
 			log.debug("...about to send it...");
 			sendMetrics(metricsMessage);
 			log.debug("...sent!");
-		//}
 		DocshifterMessage message = new DocshifterMessage(
 				type,
 				task,
@@ -108,13 +108,13 @@ public class AMQPSender implements IMessageSender {
 		// Try to get the priority from webservice request otherwise uses workflow priority
 		int taskPriority = (int) task.getData().getOrDefault("priority", chainConfiguration.getPriority());
 
-		// Use the provided timeout value if explicitly specified on the task data, otherwise use the configured
-		// queue reply timeout
+		// Use the provided timeout value if explicitly specified on the task data, otherwise use the configured reply timeout
 		Integer wsTimeout = (Integer) task.getData().get("timeout");
-
 		long taskTimeoutInMillis;
 		if (wsTimeout != null) {
-			taskTimeoutInMillis = wsTimeout;
+			taskTimeoutInMillis =  TimeUnit.SECONDS.toMillis(wsTimeout);
+			//The receiver expects to receive a long value instead of an integer
+			task.getData().put("timeout", Long.valueOf(wsTimeout));
 		} else {
 			taskTimeoutInMillis = queueReplyTimeout;
 			if (DocshifterMessageType.SYNC.equals(type)) {
@@ -127,8 +127,9 @@ public class AMQPSender implements IMessageSender {
 		log.info("Sending message: {} (priority = {}, timeout = {} ms) for file: {} using workflow {}", message,
 				taskPriority, taskTimeoutInMillis, task.getSourceFilePath(), chainConfiguration.getName());
 
-		JmsTemplate jmsTemplate = jmsTemplateFactory.create(taskPriority, taskTimeoutInMillis);
+
 		if (DocshifterMessageType.SYNC.equals(type)) {
+			JmsTemplate jmsTemplate = jmsTemplateFactory.create(taskPriority, taskTimeoutInMillis, taskTimeoutInMillis);
 			JmsMessagingTemplate messagingTemplate = new JmsMessagingTemplate(jmsTemplate);
 			Object obj = messagingTemplate.convertSendAndReceive(queue, message, DocshifterMessage.class, messagePostProcessor -> {
 				log.debug("'messagingTemplate.convertSendAndReceive': message.task type={}",
@@ -143,6 +144,7 @@ public class AMQPSender implements IMessageSender {
 			return obj;
 		}
 		else {
+			JmsTemplate jmsTemplate = jmsTemplateFactory.create(taskPriority, taskTimeoutInMillis, 0);
 			jmsTemplate.convertAndSend(queue, message, messagePostProcessor -> {
 				log.debug("'jmsTemplate.convertAndSend': message.task type={}",
 						() -> message.getTask().getClass().getSimpleName());

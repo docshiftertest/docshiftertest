@@ -10,6 +10,10 @@ public enum TaskDataKey {
 	DOCUMENT_BOUNDARY_TEXT,
 	ADD_BOUNDARY_TITLE,
 
+	VEEVA_DOCUMENT_ID,
+	VEEVA_MAJOR_VERSION,
+	VEEVA_MINOR_VERSION,
+
 	/**
 	 * TODO: we added mergeFiles in 7.0, but in the name of consistency we should point people as much as
 	 * 	possible to using MERGE_FILES instead, which is in a more similar format compared to other

@@ -3,7 +3,6 @@ package com.docshifter.core.utils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.SystemUtils;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -209,6 +208,8 @@ public final class FileUtils {
 		output = output.replace('>', '_');
 		output = output.replace('|', '_');
 		output = output.replace("\t", "_");
+        //Removing extra spaces as this was causing issues on windows
+        output = output.trim();
 		output = output.replaceAll("(\\.{2,})","_");
 
 		//replace all control characters (DS-318)

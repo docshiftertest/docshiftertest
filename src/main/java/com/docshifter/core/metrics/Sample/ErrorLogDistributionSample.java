@@ -10,5 +10,4 @@ public interface ErrorLogDistributionSample {
     String getWorkflowName();
     String getFilename();
     String getTaskMessage();
-
 }

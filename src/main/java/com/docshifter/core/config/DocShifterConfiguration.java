@@ -3,6 +3,7 @@ package com.docshifter.core.config;
 import com.docshifter.core.config.conditions.IsInKubernetesCondition;
 import com.docshifter.core.config.services.ConfigurationService;
 import com.docshifter.core.config.services.GeneralConfigService;
+import com.docshifter.core.config.services.HealthManagementService;
 import com.docshifter.core.config.services.IJmsTemplateFactory;
 import com.docshifter.core.config.services.JmsTemplateFactory;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -14,10 +15,8 @@ import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
-import org.springframework.boot.availability.AvailabilityChangeEvent;
-import org.springframework.boot.availability.LivenessState;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
@@ -49,15 +48,15 @@ public class DocShifterConfiguration {
 	
 	public ConfigurationService configurationService;
 
-	private ApplicationContext appContext;
+	private HealthManagementService healthManagementService;
 
 	@Autowired
 	public DocShifterConfiguration(GeneralConfigService generalConfigService,
 								   ConfigurationService configurationService,
-								   ApplicationContext appContext) {
+								   HealthManagementService healthManagementService) {
 		this.generalConfigService = generalConfigService;
 		this.configurationService = configurationService;
-		this.appContext = appContext;
+		this.healthManagementService = healthManagementService;
 	}
 	
 	public DocShifterConfiguration () {
@@ -78,41 +77,47 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public CachingConnectionFactory cachingConnectionFactory() {
 		return new CachingConnectionFactory(activeMQConnectionFactory());
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public JmsTemplateFactory jmsTemplateFactory() {
 		return new JmsTemplateFactory(cachingConnectionFactory());
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public JmsTemplate defaultJmsTemplate() {
-		return jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY, queueReplyTimeout);
+		return jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY, queueReplyTimeout,0);
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public JmsTemplate metricsJmsTemplate() {
 		JmsTemplate template = jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY,
-				queueReplyTimeout);
-		template.setTimeToLive(metricsTimeToLive);
+				queueReplyTimeout,metricsTimeToLive);
 		return template;
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	@DependsOn("defaultJmsTemplate")
 	public JmsMessagingTemplate defaultMessagingTemplate () {
 		return new JmsMessagingTemplate(defaultJmsTemplate());
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	@DependsOn("metricsJmsTemplate")
 	public JmsMessagingTemplate metricsMessagingTemplate () {
 		return new JmsMessagingTemplate(metricsJmsTemplate());
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public JmsTemplate jmsTemplateMulticast() {
 		JmsTemplate template = new JmsTemplate(cachingConnectionFactory());
 		template.setPubSubDomain(true);
@@ -122,37 +127,27 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public JmsListenerContainerFactory<?> jmsListenerContainerFactory(@Qualifier("cachingConnectionFactory") ConnectionFactory connectionFactory,
 																	  DefaultJmsListenerContainerFactoryConfigurer configurer) {
 		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-		factory.setErrorHandler(t -> {
-			// Make sure we only freak out if we encounter confirmed unrecoverable errors, as some/most errors with
-			// the JMS connection might be perfectly recoverable
-
-			// This one arose sporadically in a NVS PROD environment (DPS-447)
-			if (t instanceof javax.jms.IllegalStateException && "Session is closed".equals(t.getMessage())) {
-				log.error("Caught an unrecoverable error related to the message queue, so setting the application " +
-						"state to broken!", t);
-				AvailabilityChangeEvent.publish(appContext, LivenessState.BROKEN);
-			} else {
-				log.warn("Not handling the following message queue error:", t);
-			}
-		});
-		factory.setExceptionListener(exception -> {
-			// Make sure we only freak out if we encounter confirmed unrecoverable errors, as some/most errors with
-			// the JMS connection might be perfectly recoverable
-
-			// This one arose sporadically in a NVS PROD environment (DPS-447)
-			if (exception instanceof javax.jms.IllegalStateException && "Session is closed".equals(exception.getMessage())) {
-				log.error("Caught an unrecoverable error related to the message queue, so setting the application " +
-						"state to broken!", exception);
-				AvailabilityChangeEvent.publish(appContext, LivenessState.BROKEN);
-			} else {
-				log.warn("Not handling the following message queue error:", exception);
-			}
-		});
+		factory.setErrorHandler(this::handleMQException);
+		factory.setExceptionListener(this::handleMQException);
 		configurer.configure(factory, connectionFactory);
 		return factory;
+	}
+
+	private void handleMQException(Throwable t) {
+		// Make sure we only freak out if we encounter confirmed unrecoverable errors, as some/most errors with
+		// the JMS connection might be perfectly recoverable
+
+		// This one arose sporadically in a NVS PROD environment (DPS-447)
+		if (t instanceof javax.jms.IllegalStateException && "Session is closed".equals(t.getMessage())) {
+			log.error("Caught an unrecoverable error related to the message queue:", t);
+			healthManagementService.reportEvent(HealthManagementService.Event.CRITICAL_MQ_ERROR);
+		} else {
+			log.warn("Not handling the following message queue error:", t);
+		}
 	}
 	
 	/**
@@ -163,6 +158,7 @@ public class DocShifterConfiguration {
 	 * @param configurer The {@link DefaultJmsListenerContainerFactoryConfigurer} to be customized. 
 	 */
 	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public JmsListenerContainerFactory<?> topicListener(@Qualifier("cachingConnectionFactory") ConnectionFactory connectionFactory,
 			DefaultJmsListenerContainerFactoryConfigurer configurer) {
 		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
@@ -173,16 +169,19 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public ActiveMQQueue defaultQueue() {
 		return new ActiveMQQueue(generalConfigService.getString(Constants.MQ_QUEUE));
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public ActiveMQQueue defaultMetricsQueue() {
 		return new ActiveMQQueue(generalConfigService.getString(Constants.MQ_METRICS_QUEUE));
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public ActiveMQTopic reloadExchange() {
 		return new ActiveMQTopic(Constants.RELOAD_QUEUE);
 	}
