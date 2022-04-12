@@ -383,6 +383,12 @@
     <profiles>
         <profile>
             <id>test</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <changelist>-SNAPSHOT</changelist>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -409,6 +415,16 @@
         </profile>
         <profile>
             <id>release</id>
+            <activation>
+                <property>
+                    <name>env.PROFILE</name>
+                    <value>release</value>
+                </property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <changelist />
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -450,5 +466,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>
