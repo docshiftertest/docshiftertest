@@ -141,6 +141,9 @@ public class WorkFolder implements Serializable {
 		return newPath;
 	}
 
+	public Path getNewFolderPath() {
+		return getNewFolderPath(null);
+	}
 
 	private void writeObject(ObjectOutputStream oos)
 			throws IOException {

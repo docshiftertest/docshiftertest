@@ -1,5 +1,6 @@
 package com.docshifter.core.config.entities;
 
+import com.docshifter.core.operations.FailureLevel;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -34,9 +35,11 @@ public class ChainConfiguration {
 
 	private long timeout;
 	@Column(columnDefinition = "int default 2")
-	private  Integer priority;
+	private Integer priority;
 
 	private boolean enabled;
+
+	private FailureLevel failureLevel;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne(cascade=CascadeType.ALL)
@@ -141,6 +144,14 @@ public class ChainConfiguration {
 		this.setPriority(Integer.valueOf((int) priority));
 	}
 
+	public FailureLevel getFailureLevel() {
+		return failureLevel;
+	}
+
+	public void setFailureLevel(FailureLevel failureLevel) {
+		this.failureLevel = failureLevel;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sBuf = new StringBuilder();
@@ -161,6 +172,8 @@ public class ChainConfiguration {
 		sBuf.append(this.timeout);
 		sBuf.append(", Priority: ");
 		sBuf.append(this.priority);
+		sBuf.append(", FailureLevel: ");
+		sBuf.append(this.failureLevel);
 		sBuf.append("}");
 		return sBuf.toString();
 	}
