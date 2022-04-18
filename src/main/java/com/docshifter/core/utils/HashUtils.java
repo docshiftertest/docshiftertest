@@ -1,5 +1,6 @@
 package com.docshifter.core.utils;
 
+import com.docshifter.core.exceptions.UnableToProcesException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 
@@ -41,6 +42,19 @@ public final class HashUtils {
 	 */
 	public static String calculateHash(Path inFilePath, String digestMethod) {
 
+		String digestMethodToUse = null;
+
+		try {
+			digestMethodToUse = calculateHashOrThrow(inFilePath, digestMethod);
+		} catch (UnableToProcesException e) {
+			log.error("digestMethod {} could not be processed: {}", digestMethod, e.getClass().getSimpleName(), e);
+		}
+
+		return digestMethodToUse;
+	}
+	
+	public static String calculateHashOrThrow(Path inFilePath, String digestMethod) throws UnableToProcesException {
+
 		String digestMethodToUse;
 
 		if (StringUtils.isBlank(digestMethod)) {
@@ -60,10 +74,9 @@ public final class HashUtils {
 			return getFileChecksum(digest, inFilePath.toFile());
 		}
 		catch (IOException | NoSuchAlgorithmException e) {
-			log.error(e.getClass().getSimpleName() + ": " + digestMethod, e);
+			log.error("{}: {} ", e.getClass().getSimpleName(), digestMethod, e);
+			throw new UnableToProcesException("digest could not be processed: " + e);
 		}
-
-		return null;
 	}
 
 	private static String getFileChecksum(MessageDigest digest, File file) throws IOException {
