@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.availability.AvailabilityChangeEvent;
 import org.springframework.boot.availability.LivenessState;
 import org.springframework.context.ApplicationContext;
@@ -329,5 +331,9 @@ public class HealthManagementService {
 	 */
 	public synchronized boolean isAppReady() {
 		return earlyEvents == null;
+	}
+
+	public void getServicesStatus(){
+
 	}
 }

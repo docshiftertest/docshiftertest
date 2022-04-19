@@ -187,6 +187,12 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
+	public ActiveMQTopic serviceStatus() {
+		return new ActiveMQTopic(Constants.STATUS_QUEUE);
+	}
+
+	@Bean
 	@Conditional(IsInKubernetesCondition.class)
 	public KubernetesClient k8sClient() {
 		return new DefaultKubernetesClient();

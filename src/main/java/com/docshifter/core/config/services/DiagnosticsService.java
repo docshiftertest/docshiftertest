@@ -340,6 +340,76 @@ public class DiagnosticsService {
 		return sb.toString();
 	}
 
+	public Map<String, Long> getMemoryInfo(){
+		Map<String, Long> memory = new HashMap<>();
+		Runtime runtime = Runtime.getRuntime();
+
+		memory.put("JVM max", runtime.maxMemory());
+		memory.put("JVM free", runtime.freeMemory());
+		memory.put("JVM total", runtime.totalMemory());
+		memory.put("Memory pool(s)", (long) ManagementFactory.getMemoryPoolMXBeans().size());
+
+
+//		sb.appendln("JVM max = %dB, free = %dB, total = %dB", runtime.maxMemory(), runtime.freeMemory(), runtime.totalMemory());
+//		sb.appendln()
+//		sb.appendln("Found %d memory pool(s).", ManagementFactory.getMemoryPoolMXBeans().size());
+//		int memoryPoolNum = 1;
+//		for (MemoryPoolMXBean memoryPool : ManagementFactory.getMemoryPoolMXBeans()) {
+//			sb.appendln("Memory pool %d: %s", memoryPoolNum++, memoryPool.getName());
+//			sb.appendln("  It's a pool of type: %s", memoryPool.getType());
+//			sb.appendln("  Is it valid: %s", memoryPool.isValid());
+//			sb.appendln("  Is usage threshold supported: %s", memoryPool.isUsageThresholdSupported());
+//			sb.appendln("  Is collection usage threshold supported: %s", memoryPool.isCollectionUsageThresholdSupported());
+//			if (memoryPool.getMemoryManagerNames().length > 0) {
+//				sb.appendln("  It has %d memory manager(s):", memoryPool.getMemoryManagerNames().length);
+//				for (String memoryManager : memoryPool.getMemoryManagerNames()) {
+//					sb.appendln("    %s", memoryManager);
+//				}
+//			} else {
+//				sb.appendln("  It has no memory managers.");
+//			}
+//			if (memoryPool.isValid()) {
+//				MemoryUsage usage = memoryPool.getUsage();
+//				if (usage != null) {
+//					sb.appendln("  Usage: initial = %dB, used = %dB, committed = %dB, max = %dB", usage.getInit(),
+//							usage.getUsed(), usage.getCommitted(), usage.getMax());
+//				} else {
+//					sb.appendln("  Usage: NULL!");
+//				}
+//				MemoryUsage collUsage = memoryPool.getCollectionUsage();
+//				if (collUsage != null) {
+//					sb.appendln("  Collection usage: initial = %dB, used = %dB, committed = %dB, max = %dB",
+//							collUsage.getInit(), collUsage.getUsed(), collUsage.getCommitted(), collUsage.getMax());
+//				} else {
+//					sb.appendln("  Collection usage: NULL!");
+//				}
+//				MemoryUsage peakUsage = memoryPool.getPeakUsage();
+//				if (peakUsage != null) {
+//					sb.appendln("  Peak usage: initial = %dB, used = %dB, committed = %dB, max = %dB",
+//							peakUsage.getInit(), peakUsage.getUsed(), peakUsage.getCommitted(), peakUsage.getMax());
+//				} else {
+//					sb.appendln("  Peak usage: NULL!");
+//				}
+//			}
+//		}
+
+		return memory;
+	}
+
+	public Map<Integer, String> getFontsInfo(){
+		Map<Integer, String> fonts = new HashMap<>();
+		int fontFamilyNum = 1;
+		for (String fontFamily : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
+			fonts.put(fontFamilyNum++, fontFamily);
+		}
+		for (Font font : GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts()) {
+			fonts.put(fontFamilyNum++, font.getFontName());
+		}
+
+		return fonts;
+	}
+
+
 	/**
 	 * Generates a thread dump of the entire application, going down as deep as possible.
 	 * @return A thread dump in a friendly stringified format.
