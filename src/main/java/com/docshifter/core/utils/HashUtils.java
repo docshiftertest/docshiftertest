@@ -46,13 +46,14 @@ public final class HashUtils {
 
 		try {
 			digestMethodToUse = calculateHashOrThrow(inFilePath, digestMethod);
-		} catch (UnableToProcesException e) {
-			log.error("digestMethod {} could not be processed: {}", digestMethod, e.getClass().getSimpleName(), e);
+		} catch (UnableToProcesException unableToProcesException) {
+			log.error("digestMethod {} could not be processed: {}",
+					digestMethod, unableToProcesException.getClass().getSimpleName(), unableToProcesException);
 		}
 
 		return digestMethodToUse;
 	}
-	
+
 	public static String calculateHashOrThrow(Path inFilePath, String digestMethod) throws UnableToProcesException {
 
 		String digestMethodToUse;
@@ -75,7 +76,7 @@ public final class HashUtils {
 		}
 		catch (IOException | NoSuchAlgorithmException e) {
 			log.error("{}: {} ", e.getClass().getSimpleName(), digestMethod, e);
-			throw new UnableToProcesException("digest could not be processed: " + e);
+			throw new UnableToProcesException(e);
 		}
 	}
 
