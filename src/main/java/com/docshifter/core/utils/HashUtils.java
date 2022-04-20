@@ -41,10 +41,10 @@ public final class HashUtils {
 	 */
 	public static String calculateHash(Path inFilePath, String digestMethod) {
 
-		String digestMethodToUse = null;
+		String hash = null;
 
 		try {
-			digestMethodToUse = calculateHashOrThrow(inFilePath, digestMethod);
+			hash = calculateHashOrThrow(inFilePath, digestMethod);
 		} catch (IOException ioException) {
 			log.error("digestMethod {} could not be processed: {}",
 					digestMethod, ioException.getClass().getSimpleName(), ioException);
@@ -53,7 +53,7 @@ public final class HashUtils {
 					digestMethod, noSuchAlgorithmException.getClass().getSimpleName(), noSuchAlgorithmException);
 		}
 
-		return digestMethodToUse;
+		return hash;
 	}
 
 	public static String calculateHashOrThrow(Path inFilePath, String digestMethod) throws IOException, NoSuchAlgorithmException {
