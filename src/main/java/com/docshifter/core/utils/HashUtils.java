@@ -1,6 +1,5 @@
 package com.docshifter.core.utils;
 
-import com.docshifter.core.exceptions.UnableToProcesException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 
