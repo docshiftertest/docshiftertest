@@ -46,15 +46,18 @@ public final class HashUtils {
 
 		try {
 			digestMethodToUse = calculateHashOrThrow(inFilePath, digestMethod);
-		} catch (UnableToProcesException unableToProcesException) {
+		} catch (IOException ioException) {
 			log.error("digestMethod {} could not be processed: {}",
-					digestMethod, unableToProcesException.getClass().getSimpleName(), unableToProcesException);
+					digestMethod, ioException.getClass().getSimpleName(), ioException);
+		} catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+			log.error("digestMethod {} could not be processed: {}",
+					digestMethod, noSuchAlgorithmException.getClass().getSimpleName(), noSuchAlgorithmException);
 		}
 
 		return digestMethodToUse;
 	}
 
-	public static String calculateHashOrThrow(Path inFilePath, String digestMethod) throws UnableToProcesException {
+	public static String calculateHashOrThrow(Path inFilePath, String digestMethod) throws IOException, NoSuchAlgorithmException {
 
 		String digestMethodToUse;
 
@@ -74,9 +77,15 @@ public final class HashUtils {
 			MessageDigest digest = MessageDigest.getInstance(digestMethodToUse);
 			return getFileChecksum(digest, inFilePath.toFile());
 		}
-		catch (IOException | NoSuchAlgorithmException e) {
-			log.error("{}: {} ", e.getClass().getSimpleName(), digestMethod, e);
-			throw new UnableToProcesException(e);
+		catch (IOException ioException) {
+			log.error("{}: {}",
+					ioException.getClass().getSimpleName(), digestMethod, ioException);
+			throw ioException;
+		}
+		catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+			log.error("{}: {}",
+					noSuchAlgorithmException.getClass().getSimpleName(), digestMethod, noSuchAlgorithmException);
+			throw noSuchAlgorithmException;
 		}
 	}
 
