@@ -58,7 +58,7 @@ public final class HashUtils {
 
 	public static String calculateHashOrThrow(Path inFilePath, String digestMethod) throws IOException, NoSuchAlgorithmException {
 
-		String digestMethodToUse;
+		String hash;
 
 		if (StringUtils.isBlank(digestMethod)) {
 			log.error("digestMethod cannot be NULL or empty! Returning NULL hash...");
@@ -66,26 +66,14 @@ public final class HashUtils {
 		}
 
 		digestMethod = DIGEST_PATTERN.matcher(digestMethod).replaceAll("").toLowerCase();
-		digestMethodToUse = SUPPORTED_DIGEST_MAP.get(digestMethod);
-		if (digestMethodToUse == null) {
+		hash = SUPPORTED_DIGEST_MAP.get(digestMethod);
+		if (hash == null) {
 			log.error("digestMethod is not available: {}", digestMethod);
 			return null;
 		}
 
-		try {
-			MessageDigest digest = MessageDigest.getInstance(digestMethodToUse);
-			return getFileChecksum(digest, inFilePath.toFile());
-		}
-		catch (IOException ioException) {
-			log.error("{}: {}",
-					ioException.getClass().getSimpleName(), digestMethod, ioException);
-			throw ioException;
-		}
-		catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-			log.error("{}: {}",
-					noSuchAlgorithmException.getClass().getSimpleName(), digestMethod, noSuchAlgorithmException);
-			throw noSuchAlgorithmException;
-		}
+		MessageDigest digest = MessageDigest.getInstance(hash);
+		return getFileChecksum(digest, inFilePath.toFile());
 	}
 
 	private static String getFileChecksum(MessageDigest digest, File file) throws IOException {
