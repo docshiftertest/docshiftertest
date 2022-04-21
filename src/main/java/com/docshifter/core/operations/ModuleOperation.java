@@ -448,4 +448,31 @@ public abstract class ModuleOperation {
     	}
     	return result;
     }
+
+	public DirectoryHandling getDirectoryHandling() {
+		return DirectoryHandling.PARALLEL_FOREACH;
+	}
+
+	private final Set<AutoCloseable> closeables = new LinkedHashSet<>();
+
+	protected final <T extends AutoCloseable> T trackCloseable(T closeable) {
+		closeables.add(closeable);
+		return closeable;
+	}
+
+	protected final void cleanup() {
+		for (Iterator<AutoCloseable> it = closeables.iterator(); it.hasNext();) {
+			AutoCloseable closeable = it.next();
+			try {
+				closeable.close();
+			} catch (Exception ex) {
+				logger.warn("Could not properly close object of class " + closeable.getClass() + " during cleanup", ex);
+			} finally {
+				it.remove();
+			}
+		}
+	}
+
+	protected void onInterrupt() {
+	}
 }
