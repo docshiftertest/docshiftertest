@@ -112,14 +112,11 @@ public class ServicesStatusConfiguration {
                     .build());
         }
 
-
-        try (Writer writer = new FileWriter(message.getBody(String.class) + "\\" + NetworkUtils.getLocalHostName() + "-" + "font.json")) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            gson.toJson(this.diagnosticsService.getFontsInfo(), writer);
-        } catch (Exception e) {
+        try {
+            writeJsonFile(this.diagnosticsService.getFontsInfo(), message.getBody(String.class) + "\\" + NetworkUtils.getLocalHostName() + "-" + "font.json");
+        } catch (JMSException e) {
             log.error("An exception occurred when trying to get the message body");
         }
-
 
         try {
             Map<String, String> serviceHealth = new HashMap<>();
