@@ -24,9 +24,9 @@ import org.springframework.boot.actuate.management.ThreadDumpEndpoint;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.JmsListener;
-import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -39,7 +39,6 @@ import java.util.Optional;
 
 @Configuration
 @Log4j2
-@Component
 public class ServicesStatusConfiguration {
 
     private final HealthEndpoint healthEndpoint;
@@ -59,6 +58,9 @@ public class ServicesStatusConfiguration {
         this.diagnosticsService = diagnosticsService;
     }
 
+    /**
+     * Writes the service status into files located in the workFolder directory (the folder is located into the queue message)
+     */
     @JmsListener(destination = Constants.STATUS_QUEUE, containerFactory = Constants.TOPIC_LISTENER)
     public void serviceStatus(ActiveMQMessage message) {
         List<Object> serviceMetricsList = new ArrayList<>();
@@ -66,9 +68,23 @@ public class ServicesStatusConfiguration {
         SystemHealth healthComponent = (SystemHealth) this.healthEndpoint.health();
         Map<String, String> dbMap = new HashMap<>();
 
-        Map<String, Object> metricsMap = (Map<String, Object>) this.infoEndpoint.info().get("build");
+        Map<String, Object> infoEndpointMap = this.infoEndpoint.info();
+
+        if (infoEndpointMap == null) {
+            return;
+        }
+
+        Map<String, Object> metricsMap = (Map<String, Object>) infoEndpointMap.get("build");
         String serviceName = metricsMap.get("name").toString();
 
+        /*
+         *
+         * HealthComponent possible values:
+         * "db" -> {CompositeHealth@15672}
+         * "diskSpace" -> {Health@15674} "UP {total=107373101056, free=54983962624, threshold=10485760, exists=true}"
+         * "jms" -> {Health@15676} "UP {provider=ActiveMQ}"
+         * "ping" -> {Health@15678} "UP {}"
+         */
         for (Map.Entry<String, HealthComponent> healthComponentsMap : healthComponent.getComponents().entrySet()) {
             if (healthComponentsMap.getKey().equals("db")) {
                 ((CompositeHealth) ((Map.Entry) healthComponentsMap).getValue()).getComponents().forEach(
@@ -77,30 +93,39 @@ public class ServicesStatusConfiguration {
         }
 
         //health info
-        Map<String, Object> healthMap = new HashMap<>();
         ServiceHealthDTO healthDTO = ServiceHealthDTO.builder().
                 status(healthComponent.getStatus().toString()).
                 dbStatus(dbMap).
                 build();
 
         try {
-            writeJsonFile(healthDTO, message.getBody(String.class) + "\\" + "db.json");
+            writeJsonFile(healthDTO, message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-db-" + System.currentTimeMillis() + ".json");
         } catch (JMSException e) {
-            log.error("An exception occurred when trying to get the message body");
+            //Only shows the log because more data can be shown
+            log.error("An exception occurred when trying to get the message db body", e);
         }
-
-        //memory info
 
         try {
-            writeJsonFile(this.diagnosticsService.getMemoryInfo(), message.getBody(String.class) + "\\" + NetworkUtils.getLocalHostName() + "-" + "memory.json");
+            writeJsonFile(this.diagnosticsService.getMemoryInfo(), message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-" + "memory.json");
         } catch (JMSException e) {
-            log.error("An exception occurred when trying to get the message body");
+            //Only shows the log because more data can be shown
+            log.error("An exception occurred when trying to get the memory message body", e);
         }
 
+        /* Can have more than a hundred data
+         * 0 = "application.ready.time"
+         *   1 = "application.started.time"
+         *   2 = "disk.free"
+         *   3 = "disk.total"
+         *   4 = "hikaricp.connections"
+         */
+
+        // goes through all metrics endpoints names to only write the selected ones
         for (String name : this.metricsEndpoint.listNames().getNames()) {
             MetricsEndpoint.MetricResponse actuateMap = metricsEndpoint.metric(name, null);
             Optional<MetricsEndpoint.Sample> optSampleValue = actuateMap.getMeasurements().stream().filter(value -> value.getStatistic().name().equals("VALUE")).findAny();
 
+            // if it's not on the list, continue
             if (!SERVER_DATA_LIST.contains(name)) {
                 continue;
             }
@@ -113,19 +138,16 @@ public class ServicesStatusConfiguration {
         }
 
         try {
-            writeJsonFile(this.diagnosticsService.getFontsInfo(), message.getBody(String.class) + "\\" + NetworkUtils.getLocalHostName() + "-" + "font.json");
-        } catch (JMSException e) {
-            log.error("An exception occurred when trying to get the message body");
-        }
-
-        try {
+            // Adds the service status into the map of results.
             Map<String, String> serviceHealth = new HashMap<>();
             serviceHealth.put("name", "service.status");
             serviceHealth.put("value", this.healthEndpoint.health().getStatus().getCode());
             serviceMetricsList.add(serviceHealth);
-            writeJsonFile(serviceMetricsList, message.getBody(String.class) + "\\" + NetworkUtils.getLocalHostName() + "-" + serviceName + "-" + System.currentTimeMillis() + ".json");
+
+            writeJsonFile(serviceMetricsList, message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-" + serviceName + "-" + System.currentTimeMillis() + ".json");
         } catch (JMSException e) {
-            log.error("An exception occurred when trying to get the message body");
+            //Only shows the log because more data can be shown
+            log.error("An exception occurred when trying to get the services message body!", e);
         }
     }
 
@@ -135,7 +157,8 @@ public class ServicesStatusConfiguration {
             gson.toJson(objToBeWritten, writer);
 
         } catch (IOException ioe) {
-            log.error("Could not create the file", ioe);
+            //Only shows the log because more data can be shown
+            log.error("Could not create the file for the " + fileName, ioe);
         }
     }
 

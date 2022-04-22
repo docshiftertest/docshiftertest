@@ -189,7 +189,7 @@ public class DocShifterConfiguration {
 
 	@Bean
 	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
-	public ActiveMQTopic serviceStatus() {
+	public ActiveMQTopic servicesStatus() {
 		return new ActiveMQTopic(Constants.STATUS_QUEUE);
 	}
 

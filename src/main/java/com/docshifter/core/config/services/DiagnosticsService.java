@@ -1,5 +1,6 @@
 package com.docshifter.core.config.services;
 
+import com.ibm.lang.management.internal.ExtendedOperatingSystemMXBeanImpl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.TextStringBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -340,29 +341,24 @@ public class DiagnosticsService {
 		return sb.toString();
 	}
 
+	/**
+	 *
+	 * Retrieves useful information related to the JVM and the physical memory of the computer.
+	 * @return A map with the memory Info (Physical and JVM)
+	 */
 	public Map<String, Long> getMemoryInfo(){
 		Map<String, Long> memory = new HashMap<>();
 		Runtime runtime = Runtime.getRuntime();
+		ExtendedOperatingSystemMXBeanImpl operatingSystemMXBean = ((ExtendedOperatingSystemMXBeanImpl)ManagementFactory.getOperatingSystemMXBean());
 
 		memory.put("JVM max", runtime.maxMemory());
 		memory.put("JVM free", runtime.freeMemory());
 		memory.put("JVM total", runtime.totalMemory());
 		memory.put("Memory pool(s)", (long) ManagementFactory.getMemoryPoolMXBeans().size());
+		memory.put("Free physical memory", operatingSystemMXBean.getFreePhysicalMemorySize());
+		memory.put("Total physical memory", operatingSystemMXBean.getTotalPhysicalMemorySize());
 
 		return memory;
-	}
-
-	public Map<Integer, String> getFontsInfo(){
-		Map<Integer, String> fonts = new HashMap<>();
-		int fontFamilyNum = 1;
-		for (String fontFamily : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
-			fonts.put(fontFamilyNum++, fontFamily);
-		}
-		for (Font font : GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts()) {
-			fonts.put(fontFamilyNum++, font.getFontName());
-		}
-
-		return fonts;
 	}
 
 
