@@ -52,12 +52,12 @@ public class ChainConfiguration {
 	public ChainConfiguration() {}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-			  long timeout, long priority) {
-		this(name, description, enabled, rootNode, printerName, queueName, timeout, (int) priority);
+			  long timeout, long priority, FailureLevel failureLevel) {
+		this(name, description, enabled, rootNode, printerName, queueName, timeout, (int) priority, failureLevel);
 	}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-							  long timeout, int priority) {
+							  long timeout, int priority, FailureLevel failureLevel) {
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
@@ -66,6 +66,7 @@ public class ChainConfiguration {
 		this.rootNode = rootNode;
 		this.timeout = timeout;
 		this.priority = priority;
+		this.failureLevel = failureLevel;
 	}
 
 	public String getDescription() {
