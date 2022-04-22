@@ -62,6 +62,9 @@ public abstract class AbstractOperation extends ModuleOperation {
         this.task = task;
         this.operationParams = operationParams;
         LicenseHelper.getLicenseHelper();
+        if (StringUtils.isBlank(tempFolder)) {
+            tempFolder = TEMP_DIR;
+        }
         log.info("Executing operation: {}", operation);
         boolean valid = fillInParameters();
         if (valid) {
