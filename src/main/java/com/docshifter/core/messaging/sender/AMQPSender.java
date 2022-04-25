@@ -1,5 +1,6 @@
 package com.docshifter.core.messaging.sender;
 
+import com.docshifter.core.task.TaskStatus;
 import com.docshifter.core.utils.NetworkUtils;
 import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.services.IJmsTemplateFactory;
@@ -12,7 +13,6 @@ import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.VeevaTask;
 import lombok.extern.log4j.Log4j2;
-import org.apache.activemq.artemis.jms.client.ActiveMQMessage;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jms.core.JmsMessagingTemplate;
@@ -51,8 +51,9 @@ public class AMQPSender implements IMessageSender {
 		Object response = sendTask(DocshifterMessageType.SYNC, queue, chainConfiguration, task);
 
 		if (response == null) {
-			task.addMessage("Timeout exception: Your task has expired and has been removed from the queue." +
-					"You have defined a timeout of " + task.getData().getOrDefault("timeout",chainConfiguration.getTimeout()) + " seconds");
+			task.setStatus(TaskStatus.TIMED_OUT);
+			log.error("Timeout exception: Your task has expired and has been removed from the queue." +
+					"You have defined a timeout of {} seconds", task.getData().getOrDefault("timeout",chainConfiguration.getTimeout()));
 			return (SyncTask) task;
 		}
 		

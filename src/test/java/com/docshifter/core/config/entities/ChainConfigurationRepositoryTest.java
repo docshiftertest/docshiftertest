@@ -6,6 +6,7 @@ import com.docshifter.core.config.repositories.ModuleConfigurationRepository;
 import com.docshifter.core.config.repositories.ModuleRepository;
 import com.docshifter.core.config.repositories.NodeRepository;
 import com.docshifter.core.config.repositories.ParameterRepository;
+import com.docshifter.core.operations.FailureLevel;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -192,7 +193,7 @@ public class ChainConfigurationRepositoryTest extends AbstractSpringTest {
 		n7 = new Node(null, mc7);
 
 
-		chc1 = new ChainConfiguration("testchain", "desc", true, n1, null, null, 60, 2);
+		chc1 = new ChainConfiguration("testchain", "desc", true, n1, null, null, 60, 2, FailureLevel.FILE);
 
 		chainConfigurationRepository.save(chc1);
 
