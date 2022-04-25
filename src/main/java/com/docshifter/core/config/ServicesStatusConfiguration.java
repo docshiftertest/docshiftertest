@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
@@ -57,7 +58,7 @@ public class ServicesStatusConfiguration {
                 add("system.cpu.usage");
             }});
 
-    public ServicesStatusConfiguration(DiagnosticsService diagnosticsService, HealthEndpoint healthEndpoint, MetricsEndpoint metricsEndpoint, EnvironmentEndpoint environmentEndpoint, InfoEndpoint infoEndpoint, BeansEndpoint beansEndpoint, WorkFolderManager workFolderManager, ConditionsReportEndpoint conditionsReportEndpoint, ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint, HeapDumpWebEndpoint heapDumpWebEndpoint, LoggersEndpoint loggersEndpoint, ThreadDumpEndpoint threadDumpEndpoint) {
+    public ServicesStatusConfiguration(DiagnosticsService diagnosticsService, HealthEndpoint healthEndpoint, MetricsEndpoint metricsEndpoint, InfoEndpoint infoEndpoint) {
         this.healthEndpoint = healthEndpoint;
         this.metricsEndpoint = metricsEndpoint;
         this.infoEndpoint = infoEndpoint;
