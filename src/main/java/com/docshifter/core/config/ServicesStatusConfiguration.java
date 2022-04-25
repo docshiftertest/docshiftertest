@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +48,15 @@ public class ServicesStatusConfiguration {
 
     private final DiagnosticsService diagnosticsService;
 
-    private static final List<String> SERVER_DATA_LIST =
-            Arrays.asList("disk.free", "disk.total", "jvm.memory.max", "jvm.memory.used",
-                    "system.cpu.usage", "jvm.memory.committed");
+    public static final List<String> SERVER_DATA_LIST = Collections.unmodifiableList(
+            new ArrayList<String>() {{
+                add("disk.free");
+                add("disk.total");
+                add("jvm.memory.max");
+                add("jvm.memory.used");
+                add("jvm.memory.committed");
+                add("system.cpu.usage");
+            }});
 
     public ServicesStatusConfiguration(DiagnosticsService diagnosticsService, HealthEndpoint healthEndpoint, MetricsEndpoint metricsEndpoint, EnvironmentEndpoint environmentEndpoint, InfoEndpoint infoEndpoint, BeansEndpoint beansEndpoint, WorkFolderManager workFolderManager, ConditionsReportEndpoint conditionsReportEndpoint, ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint, HeapDumpWebEndpoint heapDumpWebEndpoint, LoggersEndpoint loggersEndpoint, ThreadDumpEndpoint threadDumpEndpoint) {
         this.healthEndpoint = healthEndpoint;
