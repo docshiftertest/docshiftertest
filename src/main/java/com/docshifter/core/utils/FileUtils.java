@@ -714,7 +714,6 @@ public final class FileUtils {
             return true;
 
         } catch (IOException ioe) {
-            //Only shows the log because more data can be shown
             log.error("Could not create the file for the " + filePathName, ioe);
             return false;
         }
