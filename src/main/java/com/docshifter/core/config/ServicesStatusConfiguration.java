@@ -54,6 +54,8 @@ public class ServicesStatusConfiguration {
 
     /**
      * Writes the service status into files located in the workFolder directory (the folder is located into the queue message)
+     * If got an exception writing a file or getting the body message, It would show the log and continue processing the rest.
+     * @param message : The workfolder path.
      */
     @JmsListener(destination = Constants.STATUS_QUEUE, containerFactory = Constants.TOPIC_LISTENER)
     public void serviceStatus(ActiveMQMessage message) {
@@ -100,6 +102,8 @@ public class ServicesStatusConfiguration {
                 dbStatus(dbMap).
                 build();
 
+        // message body = workfolder path
+        //  NetworkUtils.getLocalHostName() = machine's name
         try {
             FileUtils.writeJsonFile(healthDTO, message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-db-" + System.currentTimeMillis() + ".json");
         } catch (JMSException e) {
@@ -114,7 +118,7 @@ public class ServicesStatusConfiguration {
             log.error("An exception occurred when trying to get the memory message body", e);
         }
 
-        /* Can have more than a hundred data
+        /* The metricsEndpoint can have more than a hundred of keys and values, for example:
          * 0 = "application.ready.time"
          *   1 = "application.started.time"
          *   2 = "disk.free"
