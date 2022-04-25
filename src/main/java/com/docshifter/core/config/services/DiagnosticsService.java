@@ -1,6 +1,6 @@
 package com.docshifter.core.config.services;
 
-import com.ibm.lang.management.internal.ExtendedOperatingSystemMXBeanImpl;
+import com.sun.management.OperatingSystemMXBean;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.TextStringBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -349,14 +349,15 @@ public class DiagnosticsService {
 	public Map<String, Long> getMemoryInfo(){
 		Map<String, Long> memory = new HashMap<>();
 		Runtime runtime = Runtime.getRuntime();
-		ExtendedOperatingSystemMXBeanImpl operatingSystemMXBean = ((ExtendedOperatingSystemMXBeanImpl)ManagementFactory.getOperatingSystemMXBean());
+		OperatingSystemMXBean mbean = (com.sun.management.OperatingSystemMXBean)
+				ManagementFactory.getOperatingSystemMXBean();
 
 		memory.put("JVM max", runtime.maxMemory());
 		memory.put("JVM free", runtime.freeMemory());
 		memory.put("JVM total", runtime.totalMemory());
 		memory.put("Memory pool(s)", (long) ManagementFactory.getMemoryPoolMXBeans().size());
-		memory.put("Free physical memory", operatingSystemMXBean.getFreePhysicalMemorySize());
-		memory.put("Total physical memory", operatingSystemMXBean.getTotalPhysicalMemorySize());
+		memory.put("Free physical memory", mbean.getFreePhysicalMemorySize());
+		memory.put("Total physical memory", mbean.getTotalPhysicalMemorySize());
 
 		return memory;
 	}
