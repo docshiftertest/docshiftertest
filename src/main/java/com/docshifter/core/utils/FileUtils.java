@@ -1,8 +1,11 @@
 package com.docshifter.core.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.SystemUtils;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -12,11 +15,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.io.Writer;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.file.DirectoryNotEmptyException;
@@ -24,9 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -698,4 +700,23 @@ public final class FileUtils {
 		}
 		return false;
 	}
+
+    /**
+     * Writes a new json file using the object passed and the complete file path.
+     *
+     * @param objToBeWritten The object to be written into the json file
+     * @param filePathName   The file name with the path
+     */
+    public static boolean writeJsonFile(Object objToBeWritten, String filePathName) {
+        try (Writer writer = new FileWriter(filePathName)) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            gson.toJson(objToBeWritten, writer);
+            return true;
+
+        } catch (IOException ioe) {
+            //Only shows the log because more data can be shown
+            log.error("Could not create the file for the " + filePathName, ioe);
+            return false;
+        }
+    }
 }

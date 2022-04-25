@@ -3,34 +3,21 @@ package com.docshifter.core.config;
 import com.docshifter.core.config.services.DiagnosticsService;
 import com.docshifter.core.metrics.dtos.ServiceHealthDTO;
 import com.docshifter.core.metrics.dtos.ServiceMetrics;
+import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.utils.NetworkUtils;
-import com.docshifter.core.work.WorkFolderManager;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
-import org.springframework.boot.actuate.beans.BeansEndpoint;
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
-import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.actuate.health.CompositeHealth;
 import org.springframework.boot.actuate.health.HealthComponent;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.SystemHealth;
 import org.springframework.boot.actuate.info.InfoEndpoint;
-import org.springframework.boot.actuate.logging.LoggersEndpoint;
-import org.springframework.boot.actuate.management.HeapDumpWebEndpoint;
-import org.springframework.boot.actuate.management.ThreadDumpEndpoint;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.JmsListener;
 
 import javax.jms.JMSException;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -114,14 +101,14 @@ public class ServicesStatusConfiguration {
                 build();
 
         try {
-            writeJsonFile(healthDTO, message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-db-" + System.currentTimeMillis() + ".json");
+            FileUtils.writeJsonFile(healthDTO, message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-db-" + System.currentTimeMillis() + ".json");
         } catch (JMSException e) {
             //Only shows the log because more data can be shown
             log.error("An exception occurred when trying to get the message db body", e);
         }
 
         try {
-            writeJsonFile(this.diagnosticsService.getMemoryInfo(), message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-" + "memory.json");
+            FileUtils.writeJsonFile(this.diagnosticsService.getMemoryInfo(), message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-" + "memory.json");
         } catch (JMSException e) {
             //Only shows the log because more data can be shown
             log.error("An exception occurred when trying to get the memory message body", e);
@@ -159,28 +146,13 @@ public class ServicesStatusConfiguration {
             serviceHealth.put("value", this.healthEndpoint.health().getStatus().getCode());
             serviceMetricsList.add(serviceHealth);
 
-            writeJsonFile(serviceMetricsList, message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-" + serviceName + "-" + System.currentTimeMillis() + ".json");
+            FileUtils.writeJsonFile(serviceMetricsList, message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-" + serviceName + "-" + System.currentTimeMillis() + ".json");
         } catch (JMSException e) {
             //Only shows the log because more data can be shown
             log.error("An exception occurred when trying to get the services message body!", e);
         }
     }
 
-    /**
-     * Writes a new json file using the object passed and the complete file path.
-     *
-     * @param objToBeWritten The object to be written into the json file
-     * @param filePathName   The file name with the path
-     */
-    public void writeJsonFile(Object objToBeWritten, String filePathName) {
-        try (Writer writer = new FileWriter(filePathName)) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            gson.toJson(objToBeWritten, writer);
 
-        } catch (IOException ioe) {
-            //Only shows the log because more data can be shown
-            log.error("Could not create the file for the " + filePathName, ioe);
-        }
-    }
 
 }

@@ -3,16 +3,21 @@ package com.docshifter.core.dctm;
 import com.docshifter.core.utils.FileUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.junit.Test;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -86,5 +91,19 @@ public class FileUtilsTest {
 
 	private void testCreateFile(String filename) throws IOException {
 		Files.write(Paths.get("target/test-classes/" + filename), new byte[]{}, StandardOpenOption.CREATE, StandardOpenOption.DELETE_ON_CLOSE);
+	}
+
+	@Test
+	public void testCreateJsonFile() {
+		String path = "target/test-classes/";
+
+		Map<String, String> jsonMap = new HashMap<>();
+		jsonMap.put("key", "value");
+
+		assertTrue(FileUtils.writeJsonFile(jsonMap, path  + "/test-file.json"));
+
+		File newFile = new File(path + "/test-file.json");
+
+		assertTrue(newFile.exists());
 	}
 }
