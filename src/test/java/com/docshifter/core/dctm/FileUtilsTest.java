@@ -3,6 +3,7 @@ package com.docshifter.core.dctm;
 import com.docshifter.core.utils.FileUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.junit.Test;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;

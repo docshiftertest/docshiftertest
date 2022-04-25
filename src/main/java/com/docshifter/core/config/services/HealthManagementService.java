@@ -330,4 +330,5 @@ public class HealthManagementService {
 	public synchronized boolean isAppReady() {
 		return earlyEvents == null;
 	}
+
 }

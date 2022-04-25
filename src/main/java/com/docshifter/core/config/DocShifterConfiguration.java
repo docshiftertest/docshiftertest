@@ -27,6 +27,7 @@ import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
+
 import javax.jms.ConnectionFactory;
 
 /**
@@ -184,6 +185,11 @@ public class DocShifterConfiguration {
 	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public ActiveMQTopic reloadExchange() {
 		return new ActiveMQTopic(Constants.RELOAD_QUEUE);
+	}
+
+	@Bean
+	public ActiveMQTopic servicesStatus() {
+		return new ActiveMQTopic(Constants.STATUS_QUEUE);
 	}
 
 	@Bean
