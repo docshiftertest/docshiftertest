@@ -1,7 +1,6 @@
 package com.docshifter.core.operations;
 
 import com.docshifter.core.config.entities.Node;
-import com.docshifter.core.task.TaskStatus;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -43,28 +42,5 @@ public class OptionParams extends OperationParams {
 	@Override
 	public Object clone() {
 		return new OptionParams(this);
-	}
-
-	@Override
-	public OperationParams merge(TaskStatus other) {
-		OptionParams cloned = new OptionParams(this);
-		if (isSuccess() && !other.isSuccess()) {
-			cloned.setSuccess(other);
-		}
-		return cloned;
-	}
-
-	@Override
-	public OperationParams merge(OperationParams other) {
-		if (!(other instanceof OptionParams)) {
-			throw new IllegalArgumentException("Other instance to merge must derive from OptionParams");
-		}
-		OptionParams cloned = new OptionParams(this);
-		if (isSuccess() && !other.isSuccess()) {
-			cloned.setSuccess(other.getSuccess());
-		}
-		cloned.getParameters().putAll(other.getParameters());
-		cloned.selectedNodes.putAll(((OptionParams)other).selectedNodes);
-		return cloned;
 	}
 }

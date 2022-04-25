@@ -6,6 +6,10 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * {@link OperationParams} that wraps one or more other {@link OperationParams} and aggregates their results. Single
+ * params can also be queried individually.
+ */
 public class WrappedOperationParams extends OperationParams implements OperationsWrapper<OperationParams> {
 	private final OperationsWrapper<OperationParams> wrapper = new WrappedParams<>();
 
@@ -54,5 +58,25 @@ public class WrappedOperationParams extends OperationParams implements Operation
 	@Override
 	public void setSuccess(TaskStatus success) {
 		wrapper.setSuccess(success);
+	}
+
+	@Override
+	public Map<String, Object> getParameters() {
+		return wrapper.getParameters();
+	}
+
+	@Override
+	public Object getParameter(String name) {
+		return wrapper.getParameter(name);
+	}
+
+	@Override
+	public void addParameter(String name, Object o) {
+		wrapper.addParameter(name, o);
+	}
+
+	@Override
+	public void setParameters(Map parameters) {
+		wrapper.setParameters(parameters);
 	}
 }

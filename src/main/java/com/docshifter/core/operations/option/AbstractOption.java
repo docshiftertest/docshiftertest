@@ -10,7 +10,9 @@ import com.docshifter.core.logging.appenders.TaskMessageAppender;
 import com.docshifter.core.operations.DirectoryHandling;
 import com.docshifter.core.operations.FailureLevel;
 import com.docshifter.core.operations.ModuleOperation;
+import com.docshifter.core.operations.OperationParams;
 import com.docshifter.core.operations.OptionParams;
+import com.docshifter.core.operations.WrappedOptionParams;
 import com.docshifter.core.task.TaskStatus;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -32,7 +34,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,6 +41,8 @@ import java.util.stream.Stream;
 @Log4j2
 public abstract class AbstractOption<T> extends ModuleOperation {
 	protected String option="Abstract Option";
+
+	private boolean nestedOperation;
 
 	public String toString(){
 		return option;
@@ -139,6 +142,11 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 				cleanup();
 			}
 		} else {
+			// File groups are important to keep track of for the failure level that was set. Furthermore, groups
+			// help several modules in differentiating which input is similar to one another or originated from a
+			// single ancestor file (but was then split in multiple split files by the Splitter module for example).
+			// Here we walk through all files in the directory hierarchy but keep them grouped according to their
+			// parent path.
 			Map<Path, List<Path>> groupedPaths;
 			try (Stream<Path> stream = Files.walk(operationParams.getSourcePath())) {
 				groupedPaths = stream.filter(Files::isRegularFile)
@@ -159,29 +167,55 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 					directoryHandling == DirectoryHandling.PARALLEL_FOREACH ?
 							groupedPaths.entrySet().parallelStream() : groupedPaths.entrySet().stream();
 			Path folder = task.getWorkFolder().getNewFolderPath();
-			AtomicReference<OptionParams> mergedResult = new AtomicReference<>(parameters);
+			WrappedOptionParams mergedResult = new WrappedOptionParams(parameters);
 			String thisOperation = getClass().getName();
+			// Handle the results for all groups
 			OptionParams opResult = handleResult(groupedPathStream.map(groupedPath -> {
 				Stream<Path> fileStream = directoryHandling == DirectoryHandling.PARALLEL_FOREACH ?
 						groupedPath.getValue().parallelStream() : groupedPath.getValue().stream();
+				// ...And the results for each file in the group
 				return handleResult(fileStream.map(path -> {
 					if (directoryHandling == DirectoryHandling.PARALLEL_FOREACH) {
 						TaskMessageAppender.registerCurrentThread(task);
 					}
-					OptionParams fileOptionParams = (OptionParams) parameters.clone();
+					OptionParams fileOptionParams = new OptionParams(parameters);
 					fileOptionParams.setSourcePath(path);
-					OptionParams res;
+					OptionParams res = null;
 					try {
-						res = getOption(thisOperation).execute(nodes, fileOptionParams, failureLevel);
-						if (res.isSuccess()) {
-							Files.move(res.getResultPath(), folder.resolve(groupedPath.getKey()).resolve(res.getResultPath().getFileName()));
+						AbstractOption<?> op = getOption(thisOperation);
+						if (op == this) {
+							throw new IllegalStateException("A module should not be registered as a " +
+									"singleton scoped bean in order to use automatic directory handling, " +
+									"otherwise unintended behavior might happen.");
+						}
+						res = op.execute(nodes, fileOptionParams, failureLevel);
+						// Never move over the result paths if the current module is of type RELEASE. We
+						// never have any modules following such a module and moving over files might result
+						// in the output being moved to somewhere the user doesn't want it (e.g. in case of
+						// FSExport).
+						if (res.isSuccess() &&
+								(moduleWrapper == null
+										|| !moduleWrapper.getType().equalsIgnoreCase("release"))) {
+							Path newGroupedPath = folder.resolve(groupedPath.getKey());
+							Files.createDirectories(newGroupedPath);
+							Files.move(res.getResultPath(), newGroupedPath.resolve(res.getResultPath().getFileName()));
 						}
 					} catch (Exception ex) {
-						return mergedResult.updateAndGet(curr -> (OptionParams) curr.merge(TaskStatus.FAILURE));
+						log.error("Got an exception while trying to process a nested operation.", ex);
+						if (res == null) {
+							res = fileOptionParams;
+						} else {
+							log.error("...But the nested operation did appear to return a result. So we got " +
+									"an exception while trying to move over the result path?");
+						}
+						res.setSuccess(TaskStatus.FAILURE);
 					}
-					return mergedResult.updateAndGet(curr -> (OptionParams) curr.merge(res));
-				}), mergedResult, failureLevel != FailureLevel.FILE);
-			}), mergedResult, failureLevel != FailureLevel.FILE && failureLevel != FailureLevel.GROUP);
+					mergedResult.wrap(res);
+					return mergedResult;
+				}), mergedResult, failureLevel.isHigherThan(FailureLevel.FILE)); // No need to process other
+				// files if the failure level is higher.
+			}), mergedResult, failureLevel.isHigherThan(FailureLevel.GROUP)); // No need to process other
+			// groups if the failure level is higher.
 			if (opResult.isSuccess()) {
 				opResult.setResultPath(folder);
 			}
@@ -245,19 +279,30 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 		if (parameters.getResultPath() == null) {
 			parameters.setResultPath(parameters.getSourcePath());
 		}
+		// This is either the result of evaluating a single file or a module with AS_IS DirectoryHandling set. In
+		// case of directory input (and FOREACH DirectoryHandling), the parameters will be wrapped and this singleton
+		// Map will be combined with the results for other files.
 		parameters.setSelectedNodes(Collections.singletonMap(parameters.getResultPath(), returnNodes));
 		return parameters;
 	}
 
+	/**
+	 * Collects results of a {@link Stream<OperationParams>} into a single {@link OperationParams}, depending on
+	 * whether we need an early return (short-circuit) after failure or not.
+	 * @param resultStream The {@link Stream<OperationParams>} of results to handle.
+	 * @param mergedResult A
+	 * @param shortCircuitOnFailure Whether to return early after a failure.
+	 * @return
+	 */
 	private OptionParams handleResult(Stream<OptionParams> resultStream,
-										 AtomicReference<OptionParams> mergedResult, boolean shortCircuitOnFailure) {
+										 WrappedOptionParams mergedResult, boolean shortCircuitOnFailure) {
 		if (shortCircuitOnFailure) {
 			// TODO: interrupt running threads when we short-circuit?
 			return resultStream.filter(res -> !res.isSuccess())
 					.findAny()
-					.orElse(mergedResult.get());
+					.orElse(mergedResult);
 		}
-		return resultStream.reduce((first, second) -> second).orElse(mergedResult.get());
+		return resultStream.reduce((first, second) -> second).orElse(mergedResult);
 	}
 
 	protected boolean evaluateExpression(T result, String condition) {
@@ -287,5 +332,14 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 			log.error("Incorrect operation, please check your configuration");
 			throw new EmptyOperationException();
 		}
+	}
+
+	/**
+	 * Returns whether the operation being executed is a nested one (when handling directory input). This can be
+	 * useful to check if resulting files need to be named in a different way for example.
+	 * @return
+	 */
+	protected final boolean isNestedOperation() {
+		return nestedOperation;
 	}
 }

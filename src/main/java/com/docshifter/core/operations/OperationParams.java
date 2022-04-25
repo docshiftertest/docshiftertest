@@ -82,23 +82,6 @@ public class OperationParams implements Cloneable {
         return new OperationParams(this);
     }
 
-	public OperationParams merge(TaskStatus other) {
-		OperationParams cloned = new OperationParams(this);
-		if (isSuccess() && !other.isSuccess()) {
-			cloned.success = other;
-		}
-		return cloned;
-	}
-
-	public OperationParams merge(OperationParams other) {
-		OperationParams cloned = new OperationParams(this);
-		if (isSuccess() && !other.isSuccess()) {
-			cloned.success = other.success;
-		}
-		cloned.parameters.putAll(other.parameters);
-		return cloned;
-	}
-
     public boolean contains(String parameter) {
     	return this.parameters.containsKey(parameter);
     }

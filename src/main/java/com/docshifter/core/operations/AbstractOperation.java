@@ -149,7 +149,9 @@ public abstract class AbstractOperation extends ModuleOperation {
                                 if (res.isSuccess() &&
                                         (moduleWrapper == null
                                                 || !moduleWrapper.getType().equalsIgnoreCase("release"))) {
-                                    Files.move(res.getResultPath(), folder.resolve(groupedPath.getKey()).resolve(res.getResultPath().getFileName()));
+                                    Path newGroupedPath = folder.resolve(groupedPath.getKey());
+                                    Files.createDirectories(newGroupedPath);
+                                    Files.move(res.getResultPath(), newGroupedPath.resolve(res.getResultPath().getFileName()));
                                 }
                             } catch (Exception ex) {
                                 log.error("Got an exception while trying to process a nested operation.", ex);
