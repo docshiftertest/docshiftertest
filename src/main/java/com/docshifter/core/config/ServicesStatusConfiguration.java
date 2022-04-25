@@ -75,12 +75,20 @@ public class ServicesStatusConfiguration {
         }
 
         Map<String, Object> metricsMap = (Map<String, Object>) infoEndpointMap.get("build");
-        String serviceName = metricsMap.get("name").toString();
+        Object nameObj = metricsMap.get("name");
 
+        if (nameObj == null) {
+            log.error("Could not get the service name");
+            return;
+        }
+
+        String serviceName = nameObj.toString();
         /*
+         * The HealthComponent provides detailed information about the health of the application.
          *
          * HealthComponent possible values:
-         * "db" -> {CompositeHealth@15672}
+         * "db" ->  "metricsDataSource" -> {Health@18048} "UP {database=PostgreSQL, validationQuery=isValid()}"
+                     "docshifterDataSource" -> {Health@18046} "UP {database=PostgreSQL, validationQuery=isValid()}"
          * "diskSpace" -> {Health@15674} "UP {total=107373101056, free=54983962624, threshold=10485760, exists=true}"
          * "jms" -> {Health@15676} "UP {provider=ActiveMQ}"
          * "ping" -> {Health@15678} "UP {}"
@@ -120,7 +128,7 @@ public class ServicesStatusConfiguration {
          *   4 = "hikaricp.connections"
          */
 
-        // goes through all metrics endpoints names to only write the selected ones
+        // goes through all metric endpoint names to write only files that are inside SERVER_DATA_LIST
         for (String name : this.metricsEndpoint.listNames().getNames()) {
             MetricsEndpoint.MetricResponse actuateMap = metricsEndpoint.metric(name, null);
             Optional<MetricsEndpoint.Sample> optSampleValue = actuateMap.getMeasurements().stream().filter(value -> value.getStatistic().name().equals("VALUE")).findAny();
@@ -151,14 +159,20 @@ public class ServicesStatusConfiguration {
         }
     }
 
-    private void writeJsonFile(Object objToBeWritten, String fileName) {
-        try (Writer writer = new FileWriter(fileName)) {
+    /**
+     * Writes a new json file using the object passed and the complete file path.
+     *
+     * @param objToBeWritten The object to be written into the json file
+     * @param filePathName   The file name with the path
+     */
+    public void writeJsonFile(Object objToBeWritten, String filePathName) {
+        try (Writer writer = new FileWriter(filePathName)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(objToBeWritten, writer);
 
         } catch (IOException ioe) {
             //Only shows the log because more data can be shown
-            log.error("Could not create the file for the " + fileName, ioe);
+            log.error("Could not create the file for the " + filePathName, ioe);
         }
     }
 
