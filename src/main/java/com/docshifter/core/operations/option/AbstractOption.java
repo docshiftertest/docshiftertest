@@ -188,6 +188,7 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 									"singleton scoped bean in order to use automatic directory handling, " +
 									"otherwise unintended behavior might happen.");
 						}
+						op.nestedOperation = true;
 						res = op.execute(nodes, fileOptionParams, failureLevel);
 						// Never move over the result paths if the current module is of type RELEASE. We
 						// never have any modules following such a module and moving over files might result
