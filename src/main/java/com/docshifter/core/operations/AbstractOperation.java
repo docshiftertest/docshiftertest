@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,6 +33,8 @@ public abstract class AbstractOperation extends ModuleOperation {
 
 	@ModuleParam(required=false)
 	protected String tempFolder;
+
+    private boolean nestedOperation;
 
     protected Map<String, Object> moduleData = new HashMap<>();
 
@@ -93,6 +94,11 @@ public abstract class AbstractOperation extends ModuleOperation {
                 cleanup();
             }
         } else {
+            // File groups are important to keep track of for the failure level that was set. Furthermore, groups
+            // help several modules in differentiating which input is similar to one another or originated from a
+            // single ancestor file (but was then split in multiple split files by the Splitter module for example).
+            // Here we walk through all files in the directory hierarchy but keep them grouped according to their
+            // parent path.
             Map<Path, List<Path>> groupedPaths;
             try (Stream<Path> stream = Files.walk(operationParams.getSourcePath())) {
                 groupedPaths = stream.filter(Files::isRegularFile)
@@ -113,29 +119,54 @@ public abstract class AbstractOperation extends ModuleOperation {
                     directoryHandling == DirectoryHandling.PARALLEL_FOREACH ?
                             groupedPaths.entrySet().parallelStream() : groupedPaths.entrySet().stream();
             Path folder = task.getWorkFolder().getNewFolderPath();
-            AtomicReference<OperationParams> mergedResult = new AtomicReference<>(operationParams);
+            WrappedOperationParams mergedResult = new WrappedOperationParams(operationParams);
             String thisOperation = getClass().getName();
+            // Handle the results for all groups
             OperationParams result = handleResult(groupedPathStream.map(groupedPath -> {
                         Stream<Path> fileStream = directoryHandling == DirectoryHandling.PARALLEL_FOREACH ?
                                 groupedPath.getValue().parallelStream() : groupedPath.getValue().stream();
+                        // ...And the results for each file in the group
                         return handleResult(fileStream.map(path -> {
                             if (directoryHandling == DirectoryHandling.PARALLEL_FOREACH) {
                                 TaskMessageAppender.registerCurrentThread(task);
                             }
-                            OperationParams fileOperationParams = (OperationParams) operationParams.clone();
+                            OperationParams fileOperationParams = new OperationParams(operationParams);
                             fileOperationParams.setSourcePath(path);
-                            OperationParams res;
+                            OperationParams res = null;
                             try {
-                                res = getOperation(thisOperation).execute(task, fileOperationParams, failureLevel);
-                                if (res.isSuccess()) {
+                                AbstractOperation op = getOperation(thisOperation);
+                                if (op == this) {
+                                    throw new IllegalStateException("A module should not be registered as a " +
+                                            "singleton scoped bean in order to use automatic directory handling, " +
+                                            "otherwise unintended behavior might happen.");
+                                }
+                                op.nestedOperation = true;
+                                res = op.execute(task, fileOperationParams, failureLevel);
+                                // Never move over the result paths if the current module is of type RELEASE. We
+                                // never have any modules following such a module and moving over files might result
+                                // in the output being moved to somewhere the user doesn't want it (e.g. in case of
+                                // FSExport).
+                                if (res.isSuccess() &&
+                                        (moduleWrapper == null
+                                                || !moduleWrapper.getType().equalsIgnoreCase("release"))) {
                                     Files.move(res.getResultPath(), folder.resolve(groupedPath.getKey()).resolve(res.getResultPath().getFileName()));
                                 }
                             } catch (Exception ex) {
-                                return mergedResult.updateAndGet(curr -> curr.merge(TaskStatus.FAILURE));
+                                log.error("Got an exception while trying to process a nested operation.", ex);
+                                if (res == null) {
+                                    res = fileOperationParams;
+                                } else {
+                                    log.error("...But the nested operation did appear to return a result. So we got " +
+                                            "an exception while trying to move over the result path?");
+                                }
+                                res.setSuccess(TaskStatus.FAILURE);
                             }
-                            return mergedResult.updateAndGet(curr -> curr.merge(res));
-                        }), mergedResult, failureLevel != FailureLevel.FILE);
-                    }), mergedResult, failureLevel != FailureLevel.FILE && failureLevel != FailureLevel.GROUP);
+                            mergedResult.wrap(res);
+                            return mergedResult;
+                        }), mergedResult, failureLevel.isHigherThan(FailureLevel.FILE)); // No need to process other
+                // files if the failure level is higher.
+                    }), mergedResult, failureLevel.isHigherThan(FailureLevel.GROUP)); // No need to process other
+            // groups if the failure level is higher.
             if (result.isSuccess()) {
                 result.setResultPath(folder);
             }
@@ -143,15 +174,23 @@ public abstract class AbstractOperation extends ModuleOperation {
         }
     }
 
+    /**
+     * Collects results of a {@link Stream<OperationParams>} into a single {@link OperationParams}, depending on
+     * whether we need an early return (short-circuit) after failure or not.
+     * @param resultStream The {@link Stream<OperationParams>} of results to handle.
+     * @param mergedResult A
+     * @param shortCircuitOnFailure Whether to return early after a failure.
+     * @return
+     */
     private OperationParams handleResult(Stream<OperationParams> resultStream,
-                                         AtomicReference<OperationParams> mergedResult, boolean shortCircuitOnFailure) {
+                                         WrappedOperationParams mergedResult, boolean shortCircuitOnFailure) {
         if (shortCircuitOnFailure) {
             // TODO: interrupt running threads when we short-circuit?
             return resultStream.filter(res -> !res.isSuccess())
                     .findAny()
-                    .orElse(mergedResult.get());
+                    .orElse(mergedResult);
         }
-        return resultStream.reduce((first, second) -> second).orElse(mergedResult.get());
+        return resultStream.reduce((first, second) -> second).orElse(mergedResult);
     }
 
     protected abstract OperationParams execute() throws Exception;
@@ -227,5 +266,14 @@ public abstract class AbstractOperation extends ModuleOperation {
 
     public boolean cacheContext() {
         return true;
+    }
+
+    /**
+     * Returns whether the operation being executed is a nested one (when handling directory input). This can be
+     * useful to check if resulting files need to be named in a different way for example.
+     * @return
+     */
+    protected final boolean isNestedOperation() {
+        return nestedOperation;
     }
 }

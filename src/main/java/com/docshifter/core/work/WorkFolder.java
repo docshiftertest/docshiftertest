@@ -22,6 +22,8 @@ import java.util.UUID;
 @Log4j2
 public class WorkFolder implements Serializable {
 	private static final long serialVersionUID = 7938321829497848697L;
+	public static final String SPECIAL_DIRECTORY_PREFIX = "__DS__";
+	public static final String BRANCH_DIRECTORY_PREFIX = SPECIAL_DIRECTORY_PREFIX + "branch-";
 	private Path folder;
 	private WorkFolder parent;
 	private Path errorFolder;
