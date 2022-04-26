@@ -13,11 +13,8 @@ import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.SystemHealth;
 import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
-
 import javax.jms.JMSException;
 import java.io.File;
 import java.util.ArrayList;
@@ -59,7 +56,7 @@ public class StatusService {
      * If got an exception writing a file or getting the body message, It would show the log and continue processing the rest.
      * @param message : The workfolder path.
      */
-    @JmsListener(destination = Constants.STATUS_QUEUE, containerFactory = Constants.TOPIC_LISTENER)
+    @JmsListener(destination = Constants.STATUS_QUEUE)
     public void serviceStatus(ActiveMQMessage message) {
         List<Object> serviceMetricsList = new ArrayList<>();
 
