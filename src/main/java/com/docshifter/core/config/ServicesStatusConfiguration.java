@@ -13,6 +13,7 @@ import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.SystemHealth;
 import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.JmsListener;
 
@@ -27,6 +28,7 @@ import java.util.Optional;
 
 @Configuration
 @Log4j2
+@ComponentScan(basePackages = {"com.docshifter.core"})
 public class ServicesStatusConfiguration {
 
     private final HealthEndpoint healthEndpoint;
