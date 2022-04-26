@@ -8,6 +8,7 @@ import com.docshifter.core.config.services.IJmsTemplateFactory;
 import com.docshifter.core.config.services.JmsTemplateFactory;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
@@ -15,6 +16,9 @@ import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.info.InfoContributor;
+import org.springframework.boot.actuate.info.InfoEndpoint;
+import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +33,7 @@ import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
 import javax.jms.ConnectionFactory;
+import java.util.List;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 6/9/16.
@@ -196,5 +201,15 @@ public class DocShifterConfiguration {
 	@Conditional(IsInKubernetesCondition.class)
 	public KubernetesClient k8sClient() {
 		return new DefaultKubernetesClient();
+	}
+
+	@Bean
+	public MetricsEndpoint metricsEndpoint(MeterRegistry registry) {
+		return new MetricsEndpoint(registry);
+	}
+
+	@Bean
+	public InfoEndpoint infoEndpoint(List<InfoContributor> infoContributors) {
+		return new InfoEndpoint(infoContributors);
 	}
 }

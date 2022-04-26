@@ -1,6 +1,5 @@
 package com.docshifter.core;
 
-import com.docshifter.core.config.ServicesStatusConfiguration;
 import com.docshifter.core.config.services.ILicensingService;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,8 +16,5 @@ public abstract class AbstractSpringTest {
 
     @MockBean
     protected ILicensingService nalpeironService;
-
-    @MockBean
-    protected ServicesStatusConfiguration servicesStatusConfiguration;
 
 }
