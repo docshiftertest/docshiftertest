@@ -16,6 +16,7 @@ import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
 import java.io.File;
@@ -26,10 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Configuration
+@Service
 @Log4j2
-@ComponentScan(basePackages = {"com.docshifter.core"})
-public class ServicesStatusConfiguration {
+public class StatusService {
 
     private final HealthEndpoint healthEndpoint;
     private final MetricsEndpoint metricsEndpoint;
@@ -47,7 +47,7 @@ public class ServicesStatusConfiguration {
                 add("system.cpu.usage");
             }});
 
-    public ServicesStatusConfiguration(DiagnosticsService diagnosticsService, HealthEndpoint healthEndpoint, MetricsEndpoint metricsEndpoint, InfoEndpoint infoEndpoint) {
+    public StatusService(DiagnosticsService diagnosticsService, HealthEndpoint healthEndpoint, MetricsEndpoint metricsEndpoint, InfoEndpoint infoEndpoint) {
         this.healthEndpoint = healthEndpoint;
         this.metricsEndpoint = metricsEndpoint;
         this.infoEndpoint = infoEndpoint;
