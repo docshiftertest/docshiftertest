@@ -18,8 +18,9 @@
         <sha1/>
         <hsqldb.version>2.3.4</hsqldb.version>
 
-        <!-- Reverted to 21.4 after attempting to upgrade to 22.1 caused a freeze in some tests -->
-        <aspose.cad.version>21.4</aspose.cad.version>
+        <!-- Reverted to 21.8 after attempting to upgrade to 22.1 caused a freeze in some tests
+            21.8 is what we shipped in 7.1, according to Johnno -->
+        <aspose.cad.version>21.8</aspose.cad.version>
         <!-- Despite the fact Aspose show a classifier, it's apparently not needed -->
         <!-- SIGHS -->
         <!-- aspose.cad.classifier>jdk16</aspose.cad.classifier -->
