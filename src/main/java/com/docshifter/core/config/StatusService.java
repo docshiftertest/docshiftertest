@@ -13,8 +13,10 @@ import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.SystemHealth;
 import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.jms.annotation.JmsListener;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+
 import javax.jms.JMSException;
 import java.io.File;
 import java.util.ArrayList;
@@ -24,14 +26,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Service
+/**
+ * Extracts and write status service from actuator and DiagnosticsService.
+ * This class needs to be a component to be able to configure the JMS listener
+ */
+@Component
 @Log4j2
+@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 public class StatusService {
 
     private final HealthEndpoint healthEndpoint;
     private final MetricsEndpoint metricsEndpoint;
     private final InfoEndpoint infoEndpoint;
-
     private final DiagnosticsService diagnosticsService;
 
     public static final List<String> SERVER_DATA_LIST = Collections.unmodifiableList(
@@ -54,10 +60,13 @@ public class StatusService {
     /**
      * Writes the service status into files located in the workFolder directory (the folder is located into the queue message)
      * If got an exception writing a file or getting the body message, It would show the log and continue processing the rest.
+     * The containerFactory is needed otherwise it won't know the topic to listen to and will never pick up any request.
+     *
      * @param message : The workfolder path.
      */
-    @JmsListener(destination = Constants.STATUS_QUEUE)
+    @JmsListener(destination = Constants.STATUS_QUEUE, containerFactory = Constants.TOPIC_LISTENER)
     public void serviceStatus(ActiveMQMessage message) {
+        log.info("Into service status");
         List<Object> serviceMetricsList = new ArrayList<>();
 
         SystemHealth healthComponent = (SystemHealth) this.healthEndpoint.health();
@@ -69,8 +78,9 @@ public class StatusService {
             return;
         }
 
-        Map<String, Object> metricsMap = (Map<String, Object>) infoEndpointMap.get("build");
-        Object nameObj = metricsMap.get("name");
+        Map<String, Object> metricsMap = (Map<String, Object>) infoEndpointMap.getOrDefault("build", new HashMap<>());
+
+        Object nameObj = metricsMap.getOrDefault("name", null);
 
         if (nameObj == null) {
             log.error("Could not get the service name");
@@ -78,6 +88,7 @@ public class StatusService {
         }
 
         String serviceName = nameObj.toString();
+        log.info("Checking {} service status ", serviceName);
         /*
          * The HealthComponent provides detailed information about the health of the application.
          *
@@ -105,14 +116,16 @@ public class StatusService {
         //  NetworkUtils.getLocalHostName() = machine's name
         try {
             FileUtils.writeJsonFile(healthDTO, message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-db-" + System.currentTimeMillis() + ".json");
-        } catch (JMSException e) {
+        }
+        catch (JMSException e) {
             //Only shows the log because more data can be shown
             log.error("An exception occurred when trying to get the message db body", e);
         }
 
         try {
             FileUtils.writeJsonFile(this.diagnosticsService.getMemoryInfo(), message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-" + "memory.json");
-        } catch (JMSException e) {
+        }
+        catch (JMSException e) {
             //Only shows the log because more data can be shown
             log.error("An exception occurred when trying to get the memory message body", e);
         }
@@ -150,12 +163,11 @@ public class StatusService {
             serviceMetricsList.add(serviceHealth);
 
             FileUtils.writeJsonFile(serviceMetricsList, message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-" + serviceName + "-" + System.currentTimeMillis() + ".json");
-        } catch (JMSException e) {
+            log.info("returning service status map {}", serviceHealth);
+        }
+        catch (JMSException e) {
             //Only shows the log because more data can be shown
             log.error("An exception occurred when trying to get the services message body!", e);
         }
     }
-
-
-
 }
