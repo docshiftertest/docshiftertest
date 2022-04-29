@@ -5,7 +5,9 @@ import com.docshifter.core.config.wrapper.ModuleWrapper;
 import com.docshifter.core.exceptions.ConfigFileNotFoundException;
 import com.docshifter.core.exceptions.EmptyOperationException;
 import com.docshifter.core.exceptions.InputCorruptException;
+import com.docshifter.core.exceptions.InputRejectedException;
 import com.docshifter.core.exceptions.InvalidConfigException;
+import com.docshifter.core.exceptions.UnsupportedInputFormatException;
 import com.docshifter.core.logging.appenders.TaskMessageAppender;
 import com.docshifter.core.operations.DirectoryHandling;
 import com.docshifter.core.operations.FailureLevel;
@@ -34,6 +36,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -108,6 +111,13 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 			return parameters;
 		}
 
+		Path inFilePath = parameters.getSourcePath();
+		if (inFilePath != null && !Files.exists(inFilePath)) {
+			log.error("{} does not exist!", inFilePath);
+			parameters.setSuccess(TaskStatus.BAD_INPUT);
+			return parameters;
+		}
+
 		Map<String, String> conditions = processCondition(parameters);
 		if (conditions == null) {
 			if (parameters.isSuccess()) {
@@ -122,17 +132,38 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 
 		T result;
 		DirectoryHandling directoryHandling;
-		if (!Files.isDirectory(operationParams.getSourcePath()) || (directoryHandling = getDirectoryHandling()) == DirectoryHandling.AS_IS) {
+		if (inFilePath == null || !Files.isDirectory(inFilePath) || (directoryHandling = getDirectoryHandling()) == DirectoryHandling.AS_IS) {
 			try {
 				result = getResult();
 				log.info("The option module returned the result: {}", result);
-			} catch (InvalidConfigException | ConfigFileNotFoundException ex) {
+			} catch (InvalidConfigException ex) {
 				log.error("The module indicated an invalid configuration", ex);
 				parameters.setSuccess(TaskStatus.BAD_CONFIG);
 				return parameters;
-			} catch (InputCorruptException ex) {
-				log.error("The module indicated bad input", ex);
+			} catch (ConfigFileNotFoundException ex) {
+				log.error("The module indicated that it could not find a configuration file", ex);
+				parameters.setSuccess(TaskStatus.BAD_CONFIG);
+				return parameters;
+			} catch (UnsupportedInputFormatException ex) {
+				log.error("The module encountered an input format it cannot handle", ex);
 				parameters.setSuccess(TaskStatus.BAD_INPUT);
+				return parameters;
+			} catch (InputRejectedException ex) {
+				log.error("The module indicated that an input was rejected (possibly due to configuration)", ex);
+				parameters.setSuccess(TaskStatus.BAD_INPUT);
+				return parameters;
+			} catch (InputCorruptException ex) {
+				log.error("The module indicated bad/corrupt input", ex);
+				parameters.setSuccess(TaskStatus.BAD_INPUT);
+				return parameters;
+			} catch (InterruptedException ex) {
+				log.error("The task has reached its configured timeout value", ex);
+				parameters.setSuccess(TaskStatus.TIMED_OUT);
+				Thread.currentThread().interrupt();
+				return parameters;
+			} catch (TimeoutException ex) {
+				log.error("The module performed an operation that timed out", ex);
+				parameters.setSuccess(TaskStatus.TIMED_OUT);
 				return parameters;
 			} catch (Exception ex) {
 				log.error("The module indicated a failure", ex);
@@ -148,11 +179,11 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 			// Here we walk through all files in the directory hierarchy but keep them grouped according to their
 			// parent path.
 			Map<Path, List<Path>> groupedPaths;
-			try (Stream<Path> stream = Files.walk(operationParams.getSourcePath())) {
+			try (Stream<Path> stream = Files.walk(inFilePath)) {
 				groupedPaths = stream.filter(Files::isRegularFile)
-						.collect(Collectors.groupingBy(path -> operationParams.getSourcePath().relativize(path.getParent())));
+						.collect(Collectors.groupingBy(path -> inFilePath.relativize(path.getParent())));
 			} catch (Exception ex) {
-				log.error("Error while walking source path of operation: {}", operationParams.getSourcePath(), ex);
+				log.error("Error while walking source path of operation: {}", inFilePath, ex);
 				parameters.setSuccess(TaskStatus.FAILURE);
 				return parameters;
 			}
@@ -167,7 +198,7 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 					directoryHandling == DirectoryHandling.PARALLEL_FOREACH ?
 							groupedPaths.entrySet().parallelStream() : groupedPaths.entrySet().stream();
 			Path folder = task.getWorkFolder().getNewFolderPath();
-			WrappedOptionParams mergedResult = new WrappedOptionParams(parameters);
+			WrappedOptionParams mergedResult = WrappedOptionParams.fromOptionParams(parameters);
 			String thisOperation = getClass().getName();
 			// Handle the results for all groups
 			OptionParams opResult = handleResult(groupedPathStream.map(groupedPath -> {
@@ -278,7 +309,7 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 
 		parameters.setSuccess(TaskStatus.SUCCESS);
 		if (parameters.getResultPath() == null) {
-			parameters.setResultPath(parameters.getSourcePath());
+			parameters.setResultPath(inFilePath);
 		}
 		// This is either the result of evaluating a single file or a module with AS_IS DirectoryHandling set. In
 		// case of directory input (and FOREACH DirectoryHandling), the parameters will be wrapped and this singleton

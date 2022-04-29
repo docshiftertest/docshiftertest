@@ -18,7 +18,7 @@ public class OptionParams extends OperationParams {
 		super(sourcePath);
 	}
 
-	public OptionParams(OperationParams operationParams) {
+	private OptionParams(OperationParams operationParams) {
 		super(operationParams.getSourcePath(),
 				operationParams.getResultPath(),
 				operationParams.getParameters(),
@@ -29,6 +29,10 @@ public class OptionParams extends OperationParams {
 	public OptionParams(OptionParams optionParams) {
 		this((OperationParams) optionParams);
 		selectedNodes = optionParams.selectedNodes;
+	}
+
+	public static OptionParams fromOperationParams(OperationParams operationParams) {
+		return new OptionParams(operationParams);
 	}
 
 	public Map<Path, Set<Node>> getSelectedNodes() {

@@ -22,12 +22,20 @@ import java.util.UUID;
 @Log4j2
 public class WorkFolder implements Serializable {
 	private static final long serialVersionUID = 7938321829497848697L;
+	/**
+	 * Directories present in the work folder which names' are prefixed by this String hold a special meaning to
+	 * DocShifter, so users should not be allowed to specify a group name with this prefix and modules shouldn't create
+	 * subdirectories in the work folder with this prefix unless they know what they're doing...
+	 */
 	public static final String SPECIAL_DIRECTORY_PREFIX = "__DS__";
+	/**
+	 * Prefix denoting a special branching directory in a work folder. All files/subdirectories that need to follow a
+	 * specific branch path will be grouped together in such a directory.
+	 */
 	public static final String BRANCH_DIRECTORY_PREFIX = SPECIAL_DIRECTORY_PREFIX + "branch-";
 	private Path folder;
 	private WorkFolder parent;
 	private Path errorFolder;
-	private List<String> errormessageList;
 
 	public WorkFolder() {
 
