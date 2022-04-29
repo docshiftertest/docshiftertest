@@ -28,10 +28,10 @@ public class OperationParams implements Cloneable {
     }
     
     public OperationParams(OperationParams operationParams) {
-        this.sourcePath = operationParams.sourcePath;
-        this.resultPath = operationParams.resultPath;
-        this.parameters = (Map<String, Object>) ((HashMap<String, Object>)operationParams.parameters).clone();
-        this.success = operationParams.success;
+		this(operationParams.sourcePath,
+				operationParams.resultPath,
+				(Map<String, Object>) ((HashMap<String, Object>)operationParams.parameters).clone(),
+				operationParams.success);
     }
     
     public void setSourcePath(Path sourcePath) {

@@ -4,6 +4,7 @@ import com.docshifter.core.task.TaskStatus;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * An interface marking a class wrapping classes derived from {@link OperationParams}. Each wrapped instance can be
@@ -27,17 +28,17 @@ interface OperationsWrapper<T extends OperationParams> {
 	 * Get all wrapped params, traveling down as deep as possible in case of any nested wrappers.
 	 * @return The inidividual wrapped params in a completely flattened hierarchy.
 	 */
-	Set<T> getWrappedFlattened();
+	Stream<T> getWrappedFlattened();
 
 	/**
-	 * Finds the first non-success {@link TaskStatus} in the wrapped params, or returns {@link TaskStatus#SUCCESS}
-	 * otherwise.
+	 * If there are any successful {@link TaskStatus}es present in the wrapped params, returns that, otherwise will
+	 * return the most severe {@link TaskStatus}.
 	 * @return
 	 */
 	TaskStatus getSuccess();
 
 	/**
-	 * Checks if there are any non-success {@link TaskStatus} present in the wrapped params.
+	 * Checks if there are any success {@link TaskStatus}es present in the wrapped params.
 	 * @return
 	 */
 	boolean isSuccess();

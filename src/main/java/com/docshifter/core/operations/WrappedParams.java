@@ -1,13 +1,13 @@
 package com.docshifter.core.operations;
 
+import com.docshifter.core.exceptions.ShortCircuitException;
 import com.docshifter.core.task.TaskStatus;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -28,29 +28,52 @@ class WrappedParams<T extends OperationParams> implements OperationsWrapper<T> {
 	}
 
 	@Override
-	public Set<T> getWrappedFlattened() {
-		return Collections.unmodifiableSet(params.stream()
+	public Stream<T> getWrappedFlattened() {
+		return params.stream()
 				.flatMap(param -> {
 					if (param instanceof OperationsWrapper) {
-						return ((OperationsWrapper<T>) param).getWrappedFlattened().stream();
+						return ((OperationsWrapper<T>) param).getWrappedFlattened();
 					}
 					return Stream.of(param);
-				})
-				.collect(Collectors.toSet()));
+				});
 	}
 
 	@Override
 	public TaskStatus getSuccess() {
-		return getWrappedFlattened().stream()
-				.map(OperationParams::getSuccess)
-				.filter(status -> !status.isSuccess())
-				.findFirst()
-				.orElse(TaskStatus.SUCCESS);
+		try {
+			return getWrappedFlattened()
+					.map(OperationParams::getSuccess)
+					.reduce(this::getWorseOrShortCircuit)
+					.orElseThrow(() -> new IllegalStateException("No params have been wrapped yet, so cannot " +
+							"determine success status."));
+		} catch (ShortCircuitException ex) {
+			return (TaskStatus) ex.getData();
+		}
+	}
+
+	private TaskStatus getWorseOrShortCircuit(TaskStatus first, TaskStatus second) {
+		if (first.isSuccess() || first.isWorst()) {
+			throw new ShortCircuitException(first);
+		}
+		if (second.isSuccess()) {
+			return second;
+		}
+		return first.getWorse(second);
 	}
 
 	@Override
 	public boolean isSuccess() {
-		return getSuccess().isSuccess();
+		Iterator<T> it = getWrappedFlattened().iterator();
+		if (!it.hasNext()) {
+			throw new IllegalStateException("No params have been wrapped yet, so cannot " +
+					"determine success status.");
+		}
+		while (it.hasNext()) {
+			if (it.next().isSuccess()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -60,13 +83,14 @@ class WrappedParams<T extends OperationParams> implements OperationsWrapper<T> {
 
 	@Override
 	public Map<String, Object> getParameters() {
-		return getWrappedFlattened().stream()
+		return getWrappedFlattened()
 				.map(OperationParams::getParameters)
 				.reduce((first, second) -> {
 					first.putAll(second);
 					return first;
 				})
-				.orElse(new HashMap<>());
+				.orElseThrow(() -> new IllegalStateException("No params have been wrapped yet, so cannot combine " +
+						"parameters"));
 	}
 
 	@Override

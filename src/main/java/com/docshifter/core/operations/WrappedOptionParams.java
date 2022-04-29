@@ -4,9 +4,9 @@ import com.docshifter.core.config.entities.Node;
 import com.docshifter.core.task.TaskStatus;
 
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * {@link OptionParams} that wraps one or more other {@link OptionParams} and aggregates their results. Single
@@ -19,14 +19,16 @@ public class WrappedOptionParams extends OptionParams implements OperationsWrapp
 		super(sourcePath);
 	}
 
-	public WrappedOptionParams(OperationParams operationParams) {
-		super(operationParams);
+	private WrappedOptionParams(OptionParams optionParams) {
+		super(optionParams);
 	}
 
-	@Override
-	public Object clone() {
-		return new WrappedOptionParams(this);
+	public static WrappedOptionParams fromOptionParams(OptionParams optionParams) {
+		return new WrappedOptionParams(optionParams);
 	}
+
+	// We shouldn't have a WrappedOperationParams(WrappedOperationParams wrappedOperationParams) nor clone because for
+	// subsequent operations we don't want the old wrapped OperationParams to be cloned, we usually want a fresh start!
 
 	@Override
 	public void wrap(OptionParams param) {
@@ -39,7 +41,7 @@ public class WrappedOptionParams extends OptionParams implements OperationsWrapp
 	}
 
 	@Override
-	public Set<OptionParams> getWrappedFlattened() {
+	public Stream<OptionParams> getWrappedFlattened() {
 		return wrapper.getWrappedFlattened();
 	}
 
@@ -84,13 +86,15 @@ public class WrappedOptionParams extends OptionParams implements OperationsWrapp
 	 */
 	@Override
 	public Map<Path, Set<Node>> getSelectedNodes() {
-		return getWrappedFlattened().stream()
+		return getWrappedFlattened()
+				.filter(OptionParams::isSuccess)
 				.map(OptionParams::getSelectedNodes)
 				.reduce((first, second) -> {
 					first.putAll(second);
 					return first;
 				})
-				.orElse(new HashMap<>());
+				.orElseThrow(() -> new IllegalStateException("No params have been wrapped yet, so cannot combine " +
+						"selected nodes"));
 	}
 
 	/**

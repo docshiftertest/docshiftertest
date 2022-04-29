@@ -5,6 +5,7 @@ import com.docshifter.core.task.TaskStatus;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * {@link OperationParams} that wraps one or more other {@link OperationParams} and aggregates their results. Single
@@ -17,18 +18,16 @@ public class WrappedOperationParams extends OperationParams implements Operation
 		super(sourcePath);
 	}
 
-	public WrappedOperationParams(Path sourcePath, Path resultPath, Map<String, Object> parameters, TaskStatus success) {
-		super(sourcePath, resultPath, parameters, success);
-	}
-
-	public WrappedOperationParams(OperationParams operationParams) {
+	private WrappedOperationParams(OperationParams operationParams) {
 		super(operationParams);
 	}
 
-	@Override
-	public Object clone() {
-		return new WrappedOperationParams(this);
+	public static WrappedOperationParams fromOperationParams(OperationParams operationParams) {
+		return new WrappedOperationParams(operationParams);
 	}
+
+	// We shouldn't have a WrappedOperationParams(WrappedOperationParams wrappedOperationParams) nor clone because for
+	// subsequent operations we don't want the old wrapped OperationParams to be cloned, we usually want a fresh start!
 
 	@Override
 	public void wrap(OperationParams param) {
@@ -41,7 +40,7 @@ public class WrappedOperationParams extends OperationParams implements Operation
 	}
 
 	@Override
-	public Set<OperationParams> getWrappedFlattened() {
+	public Stream<OperationParams> getWrappedFlattened() {
 		return wrapper.getWrappedFlattened();
 	}
 

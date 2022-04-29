@@ -22,12 +22,20 @@ import java.util.UUID;
 @Log4j2
 public class WorkFolder implements Serializable {
 	private static final long serialVersionUID = 7938321829497848697L;
+	/**
+	 * Directories present in the work folder which names' are prefixed by this String hold a special meaning to
+	 * DocShifter, so users should not be allowed to specify a group name with this prefix and modules shouldn't create
+	 * subdirectories in the work folder with this prefix unless they know what they're doing...
+	 */
 	public static final String SPECIAL_DIRECTORY_PREFIX = "__DS__";
+	/**
+	 * Prefix denoting a special branching directory in a work folder. All files/subdirectories that need to follow a
+	 * specific branch path will be grouped together in such a directory.
+	 */
 	public static final String BRANCH_DIRECTORY_PREFIX = SPECIAL_DIRECTORY_PREFIX + "branch-";
 	private Path folder;
 	private WorkFolder parent;
 	private Path errorFolder;
-	private List<String> errormessageList;
 
 	public WorkFolder() {
 
@@ -35,8 +43,11 @@ public class WorkFolder implements Serializable {
 
 	public WorkFolder(Path workfolder, Path errorFolder, WorkFolder parent) {
 		this.parent = parent;
-		this.errorFolder = errorFolder;
-		this.folder = workfolder;
+		// Enforce the folders to an absolute path because relative paths might give us issues when modules get a new
+		// file/folder path in this WF and then call out to other modules with this generated path. Especially in
+		// tests, where each module has their own separate target/test-classes folder...
+		this.errorFolder = errorFolder.toAbsolutePath();
+		this.folder = workfolder.toAbsolutePath();
 	}
 
 	public WorkFolder(Path workfolder, Path errorFolder) {
@@ -54,7 +65,7 @@ public class WorkFolder implements Serializable {
 	}
 
 	public void setErrorFolder(Path errorFolder) {
-		this.errorFolder = errorFolder;
+		this.errorFolder = errorFolder.toAbsolutePath();
 	}
 
 	public WorkFolder getParent() {
@@ -70,7 +81,7 @@ public class WorkFolder implements Serializable {
 	}
 
 	public void setFolder(Path folder) {
-		this.folder = folder;
+		this.folder = folder.toAbsolutePath();
 	}
 
 	public String toString() {
@@ -94,15 +105,15 @@ public class WorkFolder implements Serializable {
 
 		Path newPath;
 		if (StringUtils.isNotBlank(extension)) {
-			newPath = Paths.get(folder.toString(), filename + "." + extension);
+			newPath = folder.resolve(filename + "." + extension);
 		}
 		else {
-			newPath = Paths.get(folder.toString(), filename);
+			newPath = folder.resolve(filename);
 		}
 		String now;
 		while (Files.exists(newPath)) {
 			now = Objects.toString(System.currentTimeMillis());
-			newPath = Paths.get(folder.toString(), now);
+			newPath = folder.resolve(now);
 			try {
 				Files.createDirectories(newPath);
 			} catch (IOException e) {
@@ -110,10 +121,10 @@ public class WorkFolder implements Serializable {
 				return null;
 			}
 			if (StringUtils.isNotBlank(extension)) {
-				newPath = Paths.get(newPath.toString(), filename + "." + extension);
+				newPath = newPath.resolve(filename + "." + extension);
 			}
 			else {
-				newPath = Paths.get(newPath.toString(), filename);
+				newPath = newPath.resolve(filename);
 			}
 		}
 		return newPath;
@@ -127,10 +138,10 @@ public class WorkFolder implements Serializable {
 		folderName = FileUtils.shortenFileName(folderName);
 		folderName = FileUtils.removeIllegalFilesystemCharacters(folderName);
 
-		Path newPath = Paths.get(folder.toString(), folderName);
+		Path newPath = folder.resolve(folderName);
 		while (Files.exists(newPath))
 		{
-			newPath = Paths.get(folder.toString(), folderName + "_" + Objects.toString(System.currentTimeMillis()));
+			newPath = folder.resolve(folderName + "_" + Objects.toString(System.currentTimeMillis()));
 		}
 
 		try {
