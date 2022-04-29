@@ -43,11 +43,8 @@ public class WorkFolder implements Serializable {
 
 	public WorkFolder(Path workfolder, Path errorFolder, WorkFolder parent) {
 		this.parent = parent;
-		// Enforce the folders to an absolute path because relative paths might give us issues when modules get a new
-		// file/folder path in this WF and then call out to other modules with this generated path. Especially in
-		// tests, where each module has their own separate target/test-classes folder...
-		this.errorFolder = errorFolder.toAbsolutePath();
-		this.folder = workfolder.toAbsolutePath();
+		this.errorFolder = errorFolder;
+		this.folder = workfolder;
 	}
 
 	public WorkFolder(Path workfolder, Path errorFolder) {
@@ -65,7 +62,7 @@ public class WorkFolder implements Serializable {
 	}
 
 	public void setErrorFolder(Path errorFolder) {
-		this.errorFolder = errorFolder.toAbsolutePath();
+		this.errorFolder = errorFolder;
 	}
 
 	public WorkFolder getParent() {
@@ -81,7 +78,7 @@ public class WorkFolder implements Serializable {
 	}
 
 	public void setFolder(Path folder) {
-		this.folder = folder.toAbsolutePath();
+		this.folder = folder;
 	}
 
 	public String toString() {
@@ -105,15 +102,15 @@ public class WorkFolder implements Serializable {
 
 		Path newPath;
 		if (StringUtils.isNotBlank(extension)) {
-			newPath = folder.resolve(filename + "." + extension);
+			newPath = Paths.get(folder.toString(), filename + "." + extension);
 		}
 		else {
-			newPath = folder.resolve(filename);
+			newPath = Paths.get(folder.toString(), filename);
 		}
 		String now;
 		while (Files.exists(newPath)) {
 			now = Objects.toString(System.currentTimeMillis());
-			newPath = folder.resolve(now);
+			newPath = Paths.get(folder.toString(), now);
 			try {
 				Files.createDirectories(newPath);
 			} catch (IOException e) {
@@ -121,10 +118,10 @@ public class WorkFolder implements Serializable {
 				return null;
 			}
 			if (StringUtils.isNotBlank(extension)) {
-				newPath = newPath.resolve(filename + "." + extension);
+				newPath = Paths.get(newPath.toString(), filename + "." + extension);
 			}
 			else {
-				newPath = newPath.resolve(filename);
+				newPath = Paths.get(newPath.toString(), filename);
 			}
 		}
 		return newPath;
@@ -138,10 +135,10 @@ public class WorkFolder implements Serializable {
 		folderName = FileUtils.shortenFileName(folderName);
 		folderName = FileUtils.removeIllegalFilesystemCharacters(folderName);
 
-		Path newPath = folder.resolve(folderName);
+		Path newPath = Paths.get(folder.toString(), folderName);
 		while (Files.exists(newPath))
 		{
-			newPath = folder.resolve(folderName + "_" + Objects.toString(System.currentTimeMillis()));
+			newPath = Paths.get(folder.toString(), folderName + "_" + Objects.toString(System.currentTimeMillis()));
 		}
 
 		try {
