@@ -8,6 +8,7 @@ import java.util.Map;
 import lombok.extern.log4j.Log4j2;
 import com.docshifter.core.config.repositories.ChainConfigurationRepository;
 import com.docshifter.core.config.entities.Node;
+import org.apache.logging.log4j.util.Strings;
 
 import static java.util.Objects.isNull;
 
@@ -71,11 +72,9 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 	 */
 	public String getStringParameterOrDefault(String name, String defaultValue) {
 
-		String parameter;
+		String parameter = this.getString(name, defaultValue);
 
-		parameter = this.getString(name, defaultValue);
-
-		if (isNull(parameter) || parameter.isEmpty()) {
+		if (Strings.isBlank(parameter)) {
 			parameter = defaultValue;
 		}
 
