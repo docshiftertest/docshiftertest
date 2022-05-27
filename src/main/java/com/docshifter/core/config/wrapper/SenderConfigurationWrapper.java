@@ -9,6 +9,8 @@ import lombok.extern.log4j.Log4j2;
 import com.docshifter.core.config.repositories.ChainConfigurationRepository;
 import com.docshifter.core.config.entities.Node;
 
+import static java.util.Objects.isNull;
+
 @Log4j2
 public class SenderConfigurationWrapper extends NodeWrapper {
 
@@ -59,6 +61,25 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 			return defaultValue;
 		}
 		
+	}
+
+	/**
+	 * Gets the string value for a parameter according to its name, in case it is an empty string returns the default value provided
+	 * @param name parameter's name
+	 * @param defaultValue default value for the parameter
+	 * @return the input value in case it is found, if the string is empty or null returns the default value
+	 */
+	public String getStringParameterOrDefault(String name, String defaultValue) {
+
+		String parameter;
+
+		parameter = this.getString(name, defaultValue);
+
+		if (isNull(parameter) || parameter.isEmpty()) {
+			parameter = defaultValue;
+		}
+
+		return parameter;
 	}
 	
 	public int getInt(String name) {
