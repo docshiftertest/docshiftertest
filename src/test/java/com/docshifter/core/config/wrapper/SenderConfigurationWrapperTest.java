@@ -1,5 +1,7 @@
 package com.docshifter.core.config.wrapper;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -140,6 +142,48 @@ public class SenderConfigurationWrapperTest {
 		// TODO: Is this correct behaviour?
 		assertTrue("DCTM User should be NULL", config.getString(DCTM_USER) == null);
 		assertTrue("DCTM User should be set to some other default", config.getString(DCTM_USER, "some other default").equals("some other default"));
+		reset();
+	}
+
+	/**
+	 * Test for NULL in a String param
+	 * @throws ConfigurationException
+	 */
+	@Test
+	public void testGetParameterOrDefaultForNullInput() throws ConfigurationException {
+		Map<Parameter, String> paramMap = new HashMap<>();
+		paramMap.put(new Parameter(DOCSHIFTER, ParameterTypes.STRING), null);
+		SenderConfigurationWrapper config = setupForConfigTest(paramMap);
+		assertNull("docshifter should be null", config.getString(DOCSHIFTER));
+		assertEquals("docshifter Should get default parameter", "docshifter", config.getStringParameterOrDefault(DOCSHIFTER, "docshifter"));
+		reset();
+	}
+
+	/**
+	 * Test for an empty String in a String param
+	 * @throws ConfigurationException
+	 */
+	@Test
+	public void testGetParameterOrDefaultForEmptyStringInput() throws ConfigurationException {
+		Map<Parameter, String> paramMap = new HashMap<>();
+		paramMap.put(new Parameter(DOCSHIFTER, ParameterTypes.STRING), "");
+		SenderConfigurationWrapper config = setupForConfigTest(paramMap);
+		assertEquals("docshifter should be empty", "", config.getString(DOCSHIFTER));
+		assertEquals("docshifter Should get default parameter", "docshifter", config.getStringParameterOrDefault(DOCSHIFTER, "docshifter"));
+		reset();
+	}
+
+	/**
+	 * Test for some String in a String param
+	 * @throws ConfigurationException
+	 */
+	@Test
+	public void testGetParameterOrDefaultForSomeStringInput() throws ConfigurationException {
+		Map<Parameter, String> paramMap = new HashMap<>();
+		paramMap.put(new Parameter(DOCSHIFTER, ParameterTypes.STRING), "someString");
+		SenderConfigurationWrapper config = setupForConfigTest(paramMap);
+		assertEquals("docshifter should be someString", "someString", config.getString(DOCSHIFTER));
+		assertEquals("docshifter Should get the input String parameter", "someString", config.getStringParameterOrDefault(DOCSHIFTER, "docshifter"));
 		reset();
 	}
 

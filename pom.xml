@@ -10,29 +10,30 @@
     <parent>
         <groupId>com.docshifter</groupId>
         <artifactId>parent</artifactId>
-        <version>1.0</version>
-		<relativePath/>
+        <version>7.3</version>
     </parent>
 
     <properties>
-        <revision>7.1</revision>
+        <revision>7.3</revision>
         <sha1/>
         <hsqldb.version>2.3.4</hsqldb.version>
 
+        <!-- Reverted to 21.8 after attempting to upgrade to 22.1 caused a freeze in some tests
+            21.8 is what we shipped in 7.1, according to Johnno -->
         <aspose.cad.version>21.8</aspose.cad.version>
         <!-- Despite the fact Aspose show a classifier, it's apparently not needed -->
         <!-- SIGHS -->
         <!-- aspose.cad.classifier>jdk16</aspose.cad.classifier -->
 
-        <aspose.cells.version>21.12</aspose.cells.version>
+        <aspose.cells.version>22.3</aspose.cells.version>
 
-        <aspose.diagram.version>21.8</aspose.diagram.version>
+        <aspose.diagram.version>22.4</aspose.diagram.version>
         <aspose.diagram.classifier>jdk16</aspose.diagram.classifier>
 
-        <aspose.email.version>21.9</aspose.email.version>
+        <aspose.email.version>22.3</aspose.email.version>
         <aspose.email.classifier>jdk16</aspose.email.classifier>
 
-        <aspose.imaging.version>21.10</aspose.imaging.version>
+        <aspose.imaging.version>22.4</aspose.imaging.version>
         <aspose.imaging.classifier>jdk16</aspose.imaging.classifier>
 
         <!-- This is not used at the moment but we try to keep it up-to-date
@@ -42,24 +43,25 @@
 
         <!--		<aspose.ocr.version>21.5</aspose.ocr.version>-->
 
-        <aspose.pdf.version>21.11</aspose.pdf.version>
+        <aspose.pdf.version>22.4</aspose.pdf.version>
         <aspose.pdf.classifier>jdk17</aspose.pdf.classifier>
 
-        <aspose.slides.version>21.10</aspose.slides.version>
+        <aspose.slides.version>22.3</aspose.slides.version>
         <aspose.slides.classifier>jdk16</aspose.slides.classifier>
 
         <!-- Kept back to 20.12 because of hideous spamming of tmp by awful borked Asspose lib -->
-        <aspose.tasks.version>20.12</aspose.tasks.version>
+        <aspose.tasks.version>22.3</aspose.tasks.version>
         <aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
 
-        <aspose.words.version>21.12</aspose.words.version>
+        <aspose.words.version>22.4</aspose.words.version>
         <aspose.words.classifier>jdk17</aspose.words.classifier>
 
-        <aspose.html.version>21.6</aspose.html.version>
+        <aspose.html.version>21.12</aspose.html.version>
         <!-- Despite fact Aspose claim a classifier is not needed, apparently it is -->
         <!-- SIGHS again -->
         <aspose.html.classifier>jdk1.8</aspose.html.classifier>
 
+        <artemis.version>2.19.0</artemis.version>
         <kubernetes-client.version>5.3.0</kubernetes-client.version>
 
     </properties>
@@ -97,6 +99,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-artemis</artifactId>
         </dependency>
+        <!-- Needed for Artemis beans setup -->
+        <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>javax.mail</groupId>
@@ -109,11 +116,9 @@
             <version>1.5.8</version>
             <scope>test</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
-            <version>2.4.1</version>
         </dependency>
         <!-- test -->
         <dependency>
@@ -211,7 +216,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.6</version>
+            <version>2.7</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
@@ -380,6 +385,12 @@
     <profiles>
         <profile>
             <id>test</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <changelist>-SNAPSHOT</changelist>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -406,6 +417,16 @@
         </profile>
         <profile>
             <id>release</id>
+            <activation>
+                <property>
+                    <name>env.PROFILE</name>
+                    <value>release</value>
+                </property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <changelist />
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -447,5 +468,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>

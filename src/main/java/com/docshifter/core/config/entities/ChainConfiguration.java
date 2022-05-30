@@ -1,5 +1,6 @@
 package com.docshifter.core.config.entities;
 
+import com.docshifter.core.operations.FailureLevel;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -7,6 +8,8 @@ import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,9 +37,12 @@ public class ChainConfiguration {
 
 	private long timeout;
 	@Column(columnDefinition = "int default 2")
-	private  Integer priority;
+	private Integer priority;
 
 	private boolean enabled;
+
+	@Enumerated(EnumType.STRING)
+	private FailureLevel failureLevel;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne(cascade=CascadeType.ALL)
@@ -46,12 +52,12 @@ public class ChainConfiguration {
 	public ChainConfiguration() {}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-			  long timeout, long priority) {
-		this(name, description, enabled, rootNode, printerName, queueName, timeout, (int) priority);
+			  long timeout, long priority, FailureLevel failureLevel) {
+		this(name, description, enabled, rootNode, printerName, queueName, timeout, (int) priority, failureLevel);
 	}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-							  long timeout, int priority) {
+							  long timeout, int priority, FailureLevel failureLevel) {
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
@@ -60,6 +66,7 @@ public class ChainConfiguration {
 		this.rootNode = rootNode;
 		this.timeout = timeout;
 		this.priority = priority;
+		this.failureLevel = failureLevel;
 	}
 
 	public String getDescription() {
@@ -141,6 +148,14 @@ public class ChainConfiguration {
 		this.setPriority(Integer.valueOf((int) priority));
 	}
 
+	public FailureLevel getFailureLevel() {
+		return failureLevel;
+	}
+
+	public void setFailureLevel(FailureLevel failureLevel) {
+		this.failureLevel = failureLevel;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sBuf = new StringBuilder();
@@ -161,6 +176,8 @@ public class ChainConfiguration {
 		sBuf.append(this.timeout);
 		sBuf.append(", Priority: ");
 		sBuf.append(this.priority);
+		sBuf.append(", FailureLevel: ");
+		sBuf.append(this.failureLevel);
 		sBuf.append("}");
 		return sBuf.toString();
 	}

@@ -1,13 +1,12 @@
 package com.docshifter.core.config;
 
+import lombok.extern.log4j.Log4j2;
 import net.sf.ehcache.CacheManager;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.JmsListener;
-
-
-import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Juan Marques created on 28/01/2021
@@ -18,6 +17,7 @@ import lombok.extern.log4j.Log4j2;
  * Central cache configuration responsible for cleaning sender configuration and 2nd level cache from hibernate - ehcache.
  */
 @Configuration
+@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 @EnableCaching
 @Log4j2
 public class CacheConfiguration {

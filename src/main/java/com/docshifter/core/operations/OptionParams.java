@@ -1,7 +1,9 @@
 package com.docshifter.core.operations;
 
 import com.docshifter.core.config.entities.Node;
+
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -10,25 +12,39 @@ import java.util.Set;
 public class OptionParams extends OperationParams {
 
 
-	private Set<Node> selectedNodes;
+	private Map<Path, Set<Node>> selectedNodes;
 
 	public OptionParams(Path sourcePath) {
 		super(sourcePath);
 	}
 
-	public OptionParams(OperationParams operationParams) {
+	private OptionParams(OperationParams operationParams) {
 		super(operationParams.getSourcePath(),
 				operationParams.getResultPath(),
 				operationParams.getParameters(),
-				operationParams.isSuccess()
+				operationParams.getSuccess()
 		);
 	}
 
-	public Set<Node> getSelectedNodes() {
+	public OptionParams(OptionParams optionParams) {
+		this((OperationParams) optionParams);
+		selectedNodes = optionParams.selectedNodes;
+	}
+
+	public static OptionParams fromOperationParams(OperationParams operationParams) {
+		return new OptionParams(operationParams);
+	}
+
+	public Map<Path, Set<Node>> getSelectedNodes() {
 		return selectedNodes;
 	}
 
-	public void setSelectedNodes(Set<Node> selectedNodes) {
+	public void setSelectedNodes(Map<Path, Set<Node>> selectedNodes) {
 		this.selectedNodes = selectedNodes;
+	}
+
+	@Override
+	public Object clone() {
+		return new OptionParams(this);
 	}
 }

@@ -448,4 +448,54 @@ public abstract class ModuleOperation {
     	}
     	return result;
     }
+
+	/**
+	 * The {@link DirectoryHandling} treatment this operation expects to receive. Defaults to
+	 * {@link DirectoryHandling#PARALLEL_FOREACH}, but can be overridden by operations to indicate they'd like to do
+	 * something different.
+	 * @return
+	 */
+	public DirectoryHandling getDirectoryHandling() {
+		return DirectoryHandling.PARALLEL_FOREACH;
+	}
+
+	private final Set<AutoCloseable> closeables = new LinkedHashSet<>();
+
+	/**
+	 * Add a {@link java.io.Closeable} to track. Any ones tracked here will be automatically closed and cleaned up
+	 * after the execution of this operation ends (whether it succeeded or failed). It is still recommended to use
+	 * try-with-resources and to close resources as early as possible, but this mechanism can be used if you're sure (or
+	 * unsure) that a specific resource needs to stay open for pretty much the rest of the operation's execution
+	 * lifetime.
+	 * @param closeable A {@link java.io.Closeable} to track.
+	 * @return The provided {@link java.io.Closeable}. Useful if you're creating it and want to immediately assign it
+	 * to a variable for further use.
+	 * @param <T> The specific type of the {@link java.io.Closeable}.
+	 */
+	protected final <T extends AutoCloseable> T trackCloseable(T closeable) {
+		closeables.add(closeable);
+		return closeable;
+	}
+
+	protected final void cleanup() {
+		for (Iterator<AutoCloseable> it = closeables.iterator(); it.hasNext();) {
+			AutoCloseable closeable = it.next();
+			try {
+				closeable.close();
+			} catch (Exception ex) {
+				logger.warn("Could not properly close object of class " + closeable.getClass() + " during cleanup", ex);
+			} finally {
+				it.remove();
+			}
+		}
+	}
+
+	/**
+	 * Override and add any code here to run if this operation receives an interrupt/timeout. It will be processed in a
+	 * different thread, so you can use this method to forcibly close I/O streams or set cancellation tokens for
+	 * example in order to force a long-running invocation to come to an abrupt stop.
+	 * TODO: this method is not yet called, but this will be done in a future release.
+	 */
+	protected void onInterrupt() {
+	}
 }
