@@ -6,6 +6,7 @@
 
 package com.nalpeiron.nalplibrary;
 
+import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.UnsupportedEncodingException;
@@ -13,7 +14,7 @@ import java.io.UnsupportedEncodingException;
 /**
  * Generic and initialization functions for Nalpeiron V10 library
  */
-@Log4j2
+@Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
 public class NALP {
 	//Library open function
 	private native int NalpLibOpen(byte[] xmlParams);
@@ -24,10 +25,15 @@ public class NALP {
 	//Turn NSA/NSL error returns into nalpative strings
 	private native String NalpGetErrorMsg(int nalpErrNo);
 
-	//Open the JNI wrapper library.  Use static initialization block
+	// Open the JNI wrapper library. Use static initialization block
 	// so that we only do this once no matter how many NALPs are created
 	static {
-		System.loadLibrary("ShaferFilechck");
+		try {
+			System.loadLibrary("ShaferFilechck");
+		} catch (Exception ex) {
+			log.warn("Tried to load ShaferFilechck native lib but it failed. Subsequent JNI calls will fail. Is it " +
+					"inaccessible?", ex);
+		}
 	}
 
 	/**

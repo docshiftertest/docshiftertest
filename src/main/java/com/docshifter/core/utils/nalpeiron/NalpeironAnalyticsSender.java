@@ -3,7 +3,7 @@ package com.docshifter.core.utils.nalpeiron;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import lombok.extern.log4j.Log4j2;
 
-@Log4j2
+@Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
 public class NalpeironAnalyticsSender implements Runnable {
 
     private final NalpeironHelper nalpeironHelper;

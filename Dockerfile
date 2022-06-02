@@ -16,4 +16,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN mkdir -p /opt/DocShifter/beans \
     && chown -R docshifter:docshifter /opt/DocShifter
 
-COPY --chown=docshifter:docshifter target/jars target/classes/license/libShaferFilechck.so target/${DEPENDENCY}-Beans-docker/lib-doc /opt/DocShifter/beans/lib/
+COPY --chown=docshifter:docshifter target/jars target/classes/license/libShaferFilechck.so target/classes/license/libPassiveFilechck.so target/${DEPENDENCY}-Beans-docker/lib-doc /opt/DocShifter/beans/lib/
