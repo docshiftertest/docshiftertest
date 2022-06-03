@@ -18,7 +18,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
@@ -573,12 +575,15 @@ public class NalpeironHelper {
         }
     }
 
-    public String getLeaseExpirationDate() throws DocShifterLicenseException {
+    public LocalDateTime getLeaseExpirationDate() throws DocShifterLicenseException {
         try {
+            String dateString;
             if (isPassiveActivation()) {
-                return psl.callPSLGetLeaseExpDate();
+                dateString = psl.callPSLGetLeaseExpDate();
+            } else {
+                dateString = nsl.callNSLGetLeaseExpDate();
             }
-            return nsl.callNSLGetLeaseExpDate();
+            return LocalDateTime.parse(dateString, NALP_DATE_FORMAT);
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
                     error.getErrorCode(), error.getErrorMessage(), error);
@@ -603,12 +608,15 @@ public class NalpeironHelper {
         }
     }
 
-    public String getMaintenanceExpirationDate() throws DocShifterLicenseException {
+    public LocalDateTime getMaintenanceExpirationDate() throws DocShifterLicenseException {
         try {
+            String dateString;
             if (isPassiveActivation()) {
-                return psl.callPSLGetMaintExpDate();
+                dateString = psl.callPSLGetMaintExpDate();
+            } else {
+                dateString = nsl.callNSLGetMaintExpDate();
             }
-            return nsl.callNSLGetMaintExpDate();
+            return LocalDateTime.parse(dateString, NALP_DATE_FORMAT);
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
                     error.getErrorCode(), error.getErrorMessage(), error);
@@ -646,7 +654,11 @@ public class NalpeironHelper {
                 if (StringUtils.isBlank(dateString)) {
                     return LocalDateTime.MAX;
                 }
-                return LocalDateTime.parse(dateString);
+                if (StringUtils.containsIgnoreCase(dateString, "T")) {
+                    return LocalDateTime.parse(dateString);
+                } else {
+                    return LocalDate.parse(dateString).atTime(LocalTime.MAX);
+                }
             }
             return LocalDateTime.parse(nsl.callNSLGetSubExpDate(), NALP_DATE_FORMAT);
         } catch (NalpError error) {
@@ -675,12 +687,12 @@ public class NalpeironHelper {
         }
     }
 
-    public String getTrialExpirationDate() throws DocShifterLicenseException {
+    public LocalDateTime getTrialExpirationDate() throws DocShifterLicenseException {
         if (isPassiveActivation()) {
             throw new UnsupportedOperationException("getTrialExpirationDate() is not supported in passive lib");
         }
         try {
-            return nsl.callNSLGetTrialExpDate();
+            return LocalDateTime.parse(nsl.callNSLGetTrialExpDate(), NALP_DATE_FORMAT);
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
                     error.getErrorCode(), error.getErrorMessage(), error);
