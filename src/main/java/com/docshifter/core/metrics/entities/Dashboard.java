@@ -35,4 +35,6 @@ public class Dashboard {
     private List<DashboardTaskMessage> taskMessages;
     @OneToMany(mappedBy = "dashboard", cascade = CascadeType.ALL)
     private List<DashboardFile> taskFiles;
+    @OneToMany(mappedBy = "dashboard", cascade = CascadeType.ALL)
+    private List<DocumentFonts> documentFonts;
 }

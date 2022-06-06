@@ -1,5 +1,6 @@
 package com.docshifter.core.metrics.repositories;
 
+import com.docshifter.core.metrics.Sample.DocumentFontsSample;
 import com.docshifter.core.metrics.Sample.ErrorLogDistributionSample;
 import com.docshifter.core.metrics.Sample.ProcessedTasksSample;
 import com.docshifter.core.metrics.Sample.TasksDistributionSample;
@@ -50,7 +51,23 @@ public interface DashboardRepository extends JpaRepository<Dashboard, String> {
             "from metrics.dashboard ds " +
             " where  ds.success = :success AND (ds.on_message_hit between :startDate and :endDate)) ds " +
             "left join metrics.dashboard_file dsf on ds.task_id = dsf.task_id " +
-            "left join metrics.dashboard_task_message dtm on ds.task_id = dtm.task_id", nativeQuery = true)
+            "inner join metrics.dashboard_task_message dtm on ds.task_id = dtm.task_id", nativeQuery = true)
     List<ErrorLogDistributionSample> findAllBySuccess(@Param("success") Boolean success, @Param("startDate") Long startDate, @Param("endDate") Long endDate);
+
+    @Query(value = "select coalesce(font_name, alt_font_name) AS fontName , " +
+            "count(coalesce(font_name, alt_font_name)) AS fontCount " +
+            "from metrics.document_fonts df " +
+            "inner join lateral ( " +
+            "select ds.task_id " +
+            "from metrics.dashboard ds " +
+            "where 1 = 1 " +
+            "AND ds.task_id = df.task_id " +
+            "AND ds.is_licensed = TRUE " +
+            "AND (:overall = true OR (ds.on_message_hit BETWEEN :startDate AND :endDate)) " +
+            "AND (ds.workflow_name in (:workflowNameList) or 'ALL' in (:workflowNameList)) " +
+            "AND 1 = 1) ds on 1 = 1 " +
+            "group by coalesce(font_name, alt_font_name) " +
+            "order by coalesce(font_name, alt_font_name) ", nativeQuery = true)
+    List<DocumentFontsSample> findAllDocumentFonts(@Param("startDate") Long startDate, @Param("endDate") Long endDate, @Param("overall") boolean overall, @Param("workflowNameList") List<String> workflowNameList);
 
 }

@@ -16,6 +16,7 @@ import java.io.Serializable;
 public abstract class DocShifterMetricsMessage implements Serializable {
     private String taskId;
     private String hostName;
+    private String documentPath;
 
     public abstract MessageSource getMessageSource();
 }
