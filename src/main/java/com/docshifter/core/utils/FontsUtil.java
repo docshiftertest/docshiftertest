@@ -61,6 +61,13 @@ public class FontsUtil {
         return null;
     }
 
+    /**
+     * Extracts the fonts from a ppt document
+     * @param documentPath the path to the file
+     * @param input if the file is input or output
+     * @param dashboard the dashboard to set the documentFont
+     * @return the list of DocumentFonts
+     */
     public static List<DocumentFonts> extractPptFonts(String documentPath, boolean input, Dashboard dashboard) {
         List<DocumentFonts> fontList = new ArrayList<>();
 
@@ -98,6 +105,13 @@ public class FontsUtil {
 
     }
 
+    /**
+     * Extracts the fonts from a word document
+     * @param documentPath the path to the file
+     * @param input if the file is input or output
+     * @param dashboard the dashboard to set the documentFont
+     * @return the list of DocumentFonts
+     */
     public static List<DocumentFonts> extractWordFonts(String documentPath, boolean input, Dashboard dashboard) {
 
         List<DocumentFonts> fontList = new ArrayList<>();
@@ -129,6 +143,13 @@ public class FontsUtil {
 
     }
 
+    /**
+     * Extracts the fonts from a pdf document
+     * @param documentPath the path to the file
+     * @param input if the file is input or output
+     * @param dashboard the dashboard to set the documentFont
+     * @return the list of DocumentFonts
+     */
     public static List<DocumentFonts> extractPDFFonts(String documentPath, boolean input, Dashboard dashboard) {
 
         List<DocumentFonts> fontList = new ArrayList<>();
@@ -169,6 +190,13 @@ public class FontsUtil {
         return fontList;
     }
 
+    /**
+     * Extracts the fonts from an excel document
+     * @param documentPath the path to the file
+     * @param input if the file is input or output
+     * @param dashboard the dashboard to set the documentFont
+     * @return the list of DocumentFonts
+     */
     public static List<DocumentFonts> extractExcelFonts(String documentPath, boolean input, Dashboard dashboard) {
 
         List<DocumentFonts> fontList = new ArrayList<>();
