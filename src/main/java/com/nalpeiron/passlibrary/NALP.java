@@ -18,15 +18,16 @@
  *  @brief  Generic and initialization functions for Nalpeiron Passive library
  */
 
-package com.nalpeiron.nalplibrary;
+package com.nalpeiron.passlibrary;
 
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
+import com.nalpeiron.NalpError;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.UnsupportedEncodingException;
 
 @Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
-public class NALPPassive
+public class NALP
 {
 	//Library open function
 	private native int PSLLibOpen(byte[] xmlParams);
@@ -69,7 +70,7 @@ public class NALPPassive
  * into the library to create a unique offset that is added to all returns.
  * The default is 0 (ie returns from the library will NOT be modified).
  *
- * @throws NalpError:   If there was a problem initializing the library
+ * @throws NalpError :   If there was a problem initializing the library
  *                      this error will be thrown
  * @return = 0 If the call succeeded
  * @return < 0 A negative error value is returned (\ref V10ERROR)

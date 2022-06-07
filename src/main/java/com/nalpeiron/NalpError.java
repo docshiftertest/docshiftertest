@@ -5,7 +5,7 @@
 // R. D. Ramey
 //
 
-package com.nalpeiron.nalplibrary;
+package com.nalpeiron;
 
 /**
  * Error handling routines for Nalpeiron V10 Java classes

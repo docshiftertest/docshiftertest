@@ -4,11 +4,10 @@ import com.docshifter.core.exceptions.DocShifterLicenseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nalpeiron.nalplibrary.NALP;
-import com.nalpeiron.nalplibrary.NALPPassive;
 import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
-import com.nalpeiron.nalplibrary.NalpError;
-import com.nalpeiron.nalplibrary.PSL;
+import com.nalpeiron.NalpError;
+import com.nalpeiron.passlibrary.PSL;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,23 +31,33 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * To update the JNI bindings of the Nalpeiron library from the samples they provide (e.g. for the passive classes):
- * - Make sure Linux .so variant is prefixed with "lib", otherwise the System.loadLibrary call will fail!
- * - Copy the sample classes to the com.nalpeiron.nalplibrary package (except the NalpError class which we customized
- * the most), for passive lib rename NALP to NALPPassive (and adjust all usages of it in PSL)
- * - Replace all occurrences of complete word nalpError with NalpError
- * - Add @Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER) to classes and replace all occurrences of System.out.println
- * with log.error
- * - Add the following static code block to NALP/NALPPassive class that loads in the appropriate native library:
+ * <ol>
+ * <li>Make sure Linux .so variant is prefixed with "lib", otherwise the {@code System.loadLibrary} call will fail!</li>
+ * <li>Copy the sample classes to the {@code com.nalpeiron.passlibrary} package (except the {@code NalpError} class
+ * which we customized the most)</li>
+ * <li>Replace all occurrences of <i>complete word</i> {@code nalpError} with {@code NalpError} in the sample
+ * classes</li>
+ * <li>Fix import of {@code NalpError} and constructor calls to it. E.g. {@code throw new NalpError(i, nalp
+ * .callNalpGetErrorMsg(i), "quiet");} should just become throw new {@code NalpError(i, nalp.callNalpGetErrorMsg(i));}
+ * as we got rid of that former constructor signature. To accomplish this you can do a global replace of {@code ,"quiet"}
+ * with an empty string.</li>
+ * <li>Add {@code @Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)} to classes and replace all occurrences of
+ * {@code System.out.println} with {@code log.error}</li>
+ * <li>Add the following static code block to the {@code NALP} class, which will load in the appropriate native library:
+ * <pre>
  * // Open the JNI wrapper library. Use static initialization block
  * // so that we only do this once no matter how many NALPs are created
  * static {
  *     try {
- * 	        System.loadLibrary("PassiveFilechck");
+ * 	       System.loadLibrary("PassiveFilechck");
  *     } catch (Exception ex) {
  *         log.warn("Tried to load PassiveFilechck native lib but it failed. Subsequent JNI calls will fail. Is it " +
  *             "inaccessible?", ex);
  *     }
- * }
+ * }</pre></li>
+ * <li>Make sure this class still compiles (e.g. if Nalpeiron has modified/deprecated/removed some bindings make sure
+ * to reflect it in here)</li>
+ * </ol>
  */
 @Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
 public class NalpeironHelper {
@@ -77,7 +86,7 @@ public class NalpeironHelper {
     private static final int CACHING_DURATION_MINUTES = 30;
     private static final int LICENSE_DURATION_MINUTES = 58;
 
-    private final NALPPassive nalpPassive;
+    private final com.nalpeiron.passlibrary.NALP nalpPassive;
     private final PSL psl;
     private final NALP nalp;
     private final NSA nsa;
@@ -108,7 +117,7 @@ public class NalpeironHelper {
                 && StringUtils.isNotBlank(this.licenseActivationAnswer)) {
             this.offlineActivation = true;
 
-            nalpPassive = new NALPPassive();
+            nalpPassive = new com.nalpeiron.passlibrary.NALP();
 
             log.debug("Opened NALPPassive()");
 

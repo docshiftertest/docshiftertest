@@ -18,9 +18,10 @@
  *  @brief  Generic and initialization functions for Nalpeiron Passive library
  */
 
-package com.nalpeiron.nalplibrary;
+package com.nalpeiron.passlibrary;
 
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
+import com.nalpeiron.NalpError;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.UnsupportedEncodingException;
@@ -28,7 +29,7 @@ import java.io.UnsupportedEncodingException;
 @Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
 public class PSL
 {
-	private NALPPassive nalpPassive;
+	private NALP nalp;
 
 	//Security offset. Set it in constructor so we can adjust
 	// returns from PSL functions
@@ -72,11 +73,11 @@ public class PSL
 
 	public
 	PSL(
-	NALPPassive nalpPassive,
+	NALP nalp,
 	int		oset
 	)
 	{
-		this.nalpPassive = nalpPassive;
+		this.nalp = nalp;
 		this.offset = oset;
 	}
 
@@ -105,7 +106,7 @@ public class PSL
  *
  * @return A String containing the version of the Nalpeiron Passive library
  *
- * @throws NalpError:   If there was a problem calling the PSL function,
+ * @throws NalpError :   If there was a problem calling the PSL function,
  *  this error will be thrown (\ref V10ERROR)
  */
 	public String
@@ -120,7 +121,7 @@ public class PSL
 
 		if (i < 0)
 		{
-			throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+			throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
 		}
 
 		//PSL library uses UTF-8 internally
@@ -156,7 +157,7 @@ public class PSL
 
         if (i < 0)
         {
-            throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+            throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
         }
 
         return libOptions[0];
@@ -183,7 +184,7 @@ public class PSL
 
 		if (i < 0)
 		{
-			throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+			throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
 		}
 
 		//PSL library uses UTF-8 internally
@@ -220,7 +221,7 @@ public class PSL
 
 		if (i < 0)
 		{
-			throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+			throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
 		}
 
 		return expSec[0];
@@ -248,7 +249,7 @@ public class PSL
 
 		if (i < 0)
 		{
-			throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+			throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
 		}
 
 		//PSL library uses UTF-8 internally
@@ -288,7 +289,7 @@ public class PSL
 
 		if (i < 0)
 		{
-			throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+			throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
 		}
 
 		return expSec[0];
@@ -316,7 +317,7 @@ public class PSL
 
 		if (i < 0)
 		{
-			throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+			throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
 		}
 
 		//PSL library uses UTF-8 internally
@@ -363,7 +364,7 @@ public class PSL
 
 		if (i < 0)
 		{
-			throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+			throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
 		}
 
 		return licStat[0];
@@ -430,7 +431,7 @@ public class PSL
 
 		if (i < 0)
 		{
-			throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+			throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
 		}
 
 		return licStat[0];
@@ -472,7 +473,7 @@ public class PSL
 
 		if (i < 0)
 		{
-			throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+			throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
 		}
 
 		return maxProc[0];
@@ -514,7 +515,7 @@ public class PSL
 
 		if (i < 0)
 		{
-			throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+			throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
 		}
 
 		return availProc[0];
@@ -541,7 +542,7 @@ public class PSL
 
 		if (i < 0)
 		{
-			throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+			throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
 		}
 
 		//PSL library uses UTF-8 internally
@@ -587,7 +588,7 @@ public class PSL
 
 		if (i < 0)
 		{
-			throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+			throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
 		}
 
 		return featureStatus[0];
@@ -624,7 +625,7 @@ public class PSL
 
 		if (i < 0)
 		{
-			throw new NalpError(i, nalpPassive.callPSLGetErrorMsg(i));
+			throw new NalpError(i, nalp.callPSLGetErrorMsg(i));
 		}
 
 		//PSL library uses UTF-8 internally

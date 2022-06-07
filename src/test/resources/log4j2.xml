@@ -30,7 +30,6 @@
         </TaskMessage>
     </Appenders>
     <Loggers>
-        <Logger name="org.apache.log4j.xml" level="info"/>
         <Logger name="com.docshifter" level="info">
             <AppenderRef ref="DOCSHIFTER_FILE_TRACE"/>
         </Logger>
