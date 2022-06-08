@@ -748,12 +748,7 @@ public class NalpeironHelper {
             } else {
                 i = nsl.callNSLImportCertificate(licenseNo, cert);
             }
-
-            if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLImportCertificate"), new NalpError(i, resolveNalpErrorMsg(i)));
-            }
-
-            return LicenseStatus.getLicenseStatus(i);
+            return postProcessLicenseStatus(i);
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
                     error.getErrorCode(), error.getErrorMessage(), error);
@@ -816,23 +811,33 @@ public class NalpeironHelper {
             } else {
                 i = nsl.callNSLGetLicenseStatus();
             }
-            LicenseStatus licStatus = LicenseStatus.getLicenseStatus(i);
-
-            if (!isPassiveActivation() || !licStatus.isValid()) {
-                return licStatus;
-            }
-
-            // Simulate expiration functionality in the passive library by using an Application Agility field
-            long remaining = getRemainingSubscriptionSeconds();
-            if (remaining <= 0) {
-                return LicenseStatus.PROD_EXPIRED;
-            }
-            return licStatus;
+            return postProcessLicenseStatus(i);
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
                     error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
+    }
+
+    /**
+     *
+     * @param i
+     * @return
+     * @throws DocShifterLicenseException
+     */
+    private LicenseStatus postProcessLicenseStatus(int i) throws DocShifterLicenseException {
+        LicenseStatus licStatus = LicenseStatus.getLicenseStatus(i);
+
+        if (!isPassiveActivation() || !licStatus.isValid()) {
+            return licStatus;
+        }
+
+        // Simulate expiration functionality in the passive library by using an Application Agility field
+        long remaining = getRemainingSubscriptionSeconds();
+        if (remaining <= 0) {
+            return LicenseStatus.PROD_EXPIRED;
+        }
+        return licStatus;
     }
 
     private String getLicenseCodeInternal() throws DocShifterLicenseException {

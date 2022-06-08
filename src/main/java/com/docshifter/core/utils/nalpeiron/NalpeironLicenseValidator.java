@@ -79,7 +79,8 @@ public class NalpeironLicenseValidator implements Runnable {
 				//if the license status ha s value below 0, then the current license could not validate, try getting a new one
 				if (licenseStatus.getValue() <= 0) {
 					// license import failed.
-					log.info("The license could not be activated offline, import of DSLicenseActivationAnswer.txt failed");
+					log.info("The license could not be activated offline, import of DSLicenseActivationAnswer.txt " +
+							"failed due to: " + licenseStatus);
 				} else {
 					log.info("The license has been activated offline, import of DSLicenseActivationAnswer.txt successful");
 					validLicense = true;
