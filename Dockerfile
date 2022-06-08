@@ -1,9 +1,6 @@
 # DocShifter-base
-#
-# VERSION       6.2.4.1
 
-# using the IBM Semeru openj9 image
-FROM ibm-semeru-runtimes:open-11-jre
+FROM eclipse-temurin:17-jre-focal
 
 LABEL maintainer="DocShifter, support@docshifter.com"
 
@@ -11,7 +8,7 @@ ARG DEPENDENCY
 
 RUN groupadd -r -g 999 docshifter && useradd -r -u 999 -g docshifter docshifter
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get autoremove && apt-get autoclean -y && apt-get update && apt-get install -y --no-install-recommends \
     libtcnative-1 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
