@@ -12,7 +12,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -92,7 +92,8 @@ public class NalpeironHelper {
     private final NSA nsa;
     private final NSL nsl;
 
-    private final String workDir;
+    private final Path workDir;
+    private final String workDirStr;
 
     private final String licenseCode;
     private final String licenseActivationRequest;
@@ -105,6 +106,9 @@ public class NalpeironHelper {
 
     public NalpeironHelper(int offset, String workDir, String licenseCode,
                            String activationRequest, String activationAnswer, boolean offlineActivation) {
+        this.workDirStr = workDir.endsWith("/") || workDir.endsWith("\\") ? workDir : workDir + File.separatorChar;
+        log.debug("Using nalpeiron workdir: {}", workDirStr);
+        this.workDir = Paths.get(workDirStr);
         this.licenseCode = resolveLicenseNo(licenseCode);
         this.licenseActivationRequest = resolveLicenseActivationRequest(activationRequest);
         this.licenseActivationAnswer = resolveLicenseActivationAnswer(activationAnswer);
@@ -148,8 +152,6 @@ public class NalpeironHelper {
             nalpPassive = null;
             psl = null;
         }
-
-        this.workDir = workDir;
     }
 
     public boolean isPassiveActivation() {
@@ -449,7 +451,7 @@ public class NalpeironHelper {
         }
     }
 
-    public void openNalpLibrary(boolean NSAEnable, boolean NSLEnable, int LogLevel, String WorkDir,
+    public void openNalpLibrary(boolean NSAEnable, boolean NSLEnable, int LogLevel,
                                 int LogQLen, int CacheQLen, int NetThMin, int NetThMax, int OfflineMode,
                                 String ProxyIP, String ProxyPort, String ProxyUsername, String ProxyPass,
                                 String DaemonIP, String DaemonPort, String DaemonUser, String DaemonPass, int security)
@@ -459,7 +461,7 @@ public class NalpeironHelper {
                     "activation!)");
         }
         try {
-            int i = nalp.callNalpLibOpen(NSAEnable, NSLEnable, LogLevel, WorkDir, "", LogQLen, CacheQLen, NetThMin,
+            int i = nalp.callNalpLibOpen(NSAEnable, NSLEnable, LogLevel, workDirStr, "", LogQLen, CacheQLen, NetThMin,
                     NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername,
                     ProxyPass, DaemonIP, DaemonPort, DaemonUser, DaemonPass, security);
 
@@ -473,13 +475,13 @@ public class NalpeironHelper {
         }
     }
 
-    public void openNalpLibrary(int LogLevel, String LicenseCode, String WorkDir, int LogQLen, int security) throws DocShifterLicenseException {
+    public void openNalpLibrary(int LogLevel, int LogQLen, int security) throws DocShifterLicenseException {
         if (!isPassiveActivation()) {
             throw new IllegalStateException("Wrong method call (called passive variant, but this is an active " +
                     "activation!)");
         }
         try {
-            int i = nalpPassive.callPSLLibOpen(LogLevel, LicenseCode, WorkDir, LogQLen, security);
+            int i = nalpPassive.callPSLLibOpen(LogLevel, licenseCode, workDirStr, LogQLen, security);
 
             if (i < 0) {
                 throw new DocShifterLicenseException("could not open nalp passive library" + nalpPassive.callPSLGetErrorMsg(i),
@@ -1317,9 +1319,10 @@ public class NalpeironHelper {
     private String resolveLicenseNo(String licenseCode) {
         if (StringUtils.isBlank(licenseCode)) {
             log.debug("DS_LICENSE_CODE environment variable is not set or empty, will try to read DSLicenseCode.txt.");
+            Path licenseCodePath = workDir.resolve("DSLicenseCode.txt");
             try {
-                byte[] bytes = Files.readAllBytes(Paths.get(workDir + "DSLicenseCode.txt"));
-                licenseCode = new String(bytes, Charset.defaultCharset());
+                byte[] bytes = Files.readAllBytes(licenseCodePath);
+                licenseCode = new String(bytes, StandardCharsets.UTF_8);
             } catch (Exception e) {
                 log.error("Error while reading DSLicenseCode.txt! Will try resolving license code internally.", e);
                 try {
@@ -1334,19 +1337,25 @@ public class NalpeironHelper {
     }
 
     private String resolveLicenseActivationRequest(String activationRequest) {
-        if (StringUtils.isBlank(activationRequest)) {
-            log.debug("DS_LICENSE_ACTIVATION_REQUEST environment variable is not set or empty, will try to read" +
-                    "DSLicenseActivationRequest.txt.");
-            try {
-                byte[] bytes = Files.readAllBytes(Paths.get(workDir + "DSLicenseActivationRequest.txt"));
-                activationRequest = new String(bytes, Charset.defaultCharset());
-            } catch (Exception e) {
-                log.error("Error while reading DSLicenseActivationRequest.txt!", e);
-                activationRequest = "";
-            }
+        if (StringUtils.isNotBlank(activationRequest)) {
+            log.debug("Final license activation request is {}", activationRequest);
+            return activationRequest;
         }
-        log.debug("Final license activation request is {}", activationRequest);
-        return activationRequest;
+
+        log.debug("DS_LICENSE_ACTIVATION_REQUEST environment variable is not set or empty, will try to read" +
+                "DSLicenseActivationRequest.txt.");
+        Path activationRequestPath = workDir.resolve("DSLicenseActivationRequest.txt");
+        try {
+            if (!Files.exists(activationRequestPath)) {
+                log.debug("...But {} does not exist! Returning empty string.", activationRequestPath);
+                return "";
+            }
+            byte[] bytes = Files.readAllBytes(activationRequestPath);
+            return new String(bytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            log.error("Error while reading DSLicenseActivationRequest.txt!", e);
+            return "";
+        }
     }
 
     public String getLicenseActivationRequest() {
@@ -1354,19 +1363,25 @@ public class NalpeironHelper {
     }
 
     private String resolveLicenseActivationAnswer(String activationAnswer) {
-        if (StringUtils.isBlank(activationAnswer)) {
-            log.debug("DS_LICENSE_ACTIVATION_ANSWER environment variable is not set or empty, will try to read" +
-                    "DSLicenseActivationAnswer.txt.");
-            try {
-                byte[] bytes = Files.readAllBytes(Paths.get(workDir + "DSLicenseActivationAnswer.txt"));
-                activationAnswer = new String(bytes, Charset.defaultCharset());
-            } catch (Exception e) {
-                log.error("Error while reading DSLicenseActivationAnswer.txt!", e);
-                activationAnswer = "";
-            }
+        if (StringUtils.isNotBlank(activationAnswer)) {
+            log.debug("Final license activation answer is {}", activationAnswer);
+            return activationAnswer;
         }
-        log.debug("Final license activation answer is {}", activationAnswer);
-        return activationAnswer;
+
+        log.debug("DS_LICENSE_ACTIVATION_ANSWER environment variable is not set or empty, will try to read" +
+                "DSLicenseActivationAnswer.txt.");
+        Path activationAnswerPath = workDir.resolve("DSLicenseActivationAnswer.txt");
+        try {
+            if (!Files.exists(activationAnswerPath)) {
+                log.debug("...But {} does not exist! Returning empty string.", activationAnswerPath);
+                return "";
+            }
+            byte[] bytes = Files.readAllBytes(activationAnswerPath);
+            return new String(bytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            log.error("Error while reading DSLicenseActivationAnswer.txt!", e);
+            return "";
+        }
     }
 
     public String getLicenseActivationAnswer() {
@@ -1374,10 +1389,9 @@ public class NalpeironHelper {
     }
 
     public void writeLicenseActivationRequest(String licenseActivationRequest) throws DocShifterLicenseException {
-
         try {
-            Path outputFilePath = new File(workDir + "DSLicenseActivationRequest.txt").toPath();
-            byte[] bytes = licenseActivationRequest.getBytes(Charset.defaultCharset());
+            Path outputFilePath = workDir.resolve("DSLicenseActivationRequest.txt");
+            byte[] bytes = licenseActivationRequest.getBytes(StandardCharsets.UTF_8);
             Files.write(outputFilePath, bytes, StandardOpenOption.CREATE);
         } catch (Exception e) {
             throw new DocShifterLicenseException("Could not write the licenseActivationRequest code to file", e);

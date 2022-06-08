@@ -95,11 +95,6 @@ public class NalpeironService implements ILicensingService {
     private void init() {
         log.info("|===========================| LICENSING SERVICE INIT START |===========================|");
 
-        if (!(WorkDir.endsWith("/") || WorkDir.endsWith("\\"))) {
-            WorkDir += "/";
-        }
-
-        log.debug("Using nalpeiron workdir: {}", WorkDir);
         log.debug("Opening nalpeiron library");
 
         openValidateNalpeironLibrary();
@@ -122,9 +117,9 @@ public class NalpeironService implements ILicensingService {
             log.debug("initialized NalpeironHelper");
 
             if (helper.isPassiveActivation()) {
-                helper.openNalpLibrary(LogLevel, licenseCode, WorkDir, LogQLen, security);
+                helper.openNalpLibrary(LogLevel, LogQLen, security);
             } else {
-                helper.openNalpLibrary(NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin,
+                helper.openNalpLibrary(NSAEnable, NSLEnable, LogLevel, LogQLen, CacheQLen, NetThMin,
                         NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort,
                         DaemonUser, DaemonPass, security);
 
