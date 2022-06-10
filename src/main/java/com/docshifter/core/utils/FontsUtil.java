@@ -242,17 +242,8 @@ public class FontsUtil {
         try {
             document = new Workbook(documentPath);
 
-            // Gets the font used by the theme
-            com.aspose.cells.Font themeFont = document.getDefaultStyle().getFont();
-//            List<com.aspose.cells.Font> fonts = new ArrayList<>(Arrays.asList(document.getFonts()));
-            List<com.aspose.cells.Font> fonts = new ArrayList<>();
-
             document.getWorksheets().forEach(sheet -> {
                 ((Worksheet) sheet).getCells().forEach(cell -> {
-                    if (((Cell) cell).getName().equals("A6")) {
-                        System.out.println();
-                    }
-
                     // getCharacters can be null.
                     FontSetting[] fontSettings = ((Cell) cell).getCharacters();
 
