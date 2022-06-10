@@ -22,8 +22,11 @@ public interface DocumentFontsRepository extends JpaRepository<DocumentFonts, St
             "AND (:overall = true OR (ds.on_message_hit BETWEEN :startDate AND :endDate)) " +
             "AND (ds.workflow_name in (:workflowNameList) or 'ALL' in (:workflowNameList)) " +
             "AND 1 = 1) ds on 1 = 1 " +
+            " where 1 = 1 " +
+            "AND (cast (cast (:isInput as text) as boolean) is null) OR (cast (cast (:isInput as text) as boolean) is not null AND cast (cast (:isInput as text) as boolean) = df.input) " +
+            "AND 1 = 1 " +
             "group by coalesce(font_name, alt_font_name) " +
             "order by coalesce(font_name, alt_font_name) ", nativeQuery = true)
-    List<DocumentFontsSample> findAllDocumentFonts(@Param("startDate") Long startDate, @Param("endDate") Long endDate, @Param("overall") boolean overall, @Param("workflowNameList") List<String> workflowNameList);
+    List<DocumentFontsSample> findAllDocumentFonts(@Param("startDate") Long startDate, @Param("endDate") Long endDate, @Param("overall") boolean overall, @Param("workflowNameList") List<String> workflowNameList, @Param("isInput") Boolean isInput);
 
 }

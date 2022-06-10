@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 @Log4j2
@@ -84,7 +83,6 @@ public class FontsUtil {
         List<DocumentFonts> fontList = new ArrayList<>();
 
         Presentation ppt = null;
-
         try {
             ppt = new Presentation(documentPath);
             Map<String, IFontData> foundFonts = new HashMap<>();
@@ -127,7 +125,9 @@ public class FontsUtil {
         } catch (Exception ex) {
             log.error("An exception occurred when trying to extract the presentation fonts", ex);
         } finally {
-            Objects.requireNonNull(ppt).dispose();
+            if (ppt != null) {
+                ppt.dispose();
+            }
         }
         return fontList;
     }
@@ -170,7 +170,9 @@ public class FontsUtil {
         } catch (Exception e) {
             log.error("An exception occurred when creating the word document", e);
         } //finally {
-//            Objects.requireNonNull(doc).; close document??
+//            if (ppt != null) {
+//                ppt.dispose();
+//            } close document??
        // }
 
         return fontList;
@@ -187,10 +189,8 @@ public class FontsUtil {
     public static List<DocumentFonts> extractPDFFonts(String documentPath, boolean input, Dashboard dashboard) {
 
         List<DocumentFonts> fontList = new ArrayList<>();
-        com.aspose.pdf.Document document = null;
 
-        try {
-            document = new com.aspose.pdf.Document(documentPath);
+        try (final com.aspose.pdf.Document document = new com.aspose.pdf.Document(documentPath)) {
             Font[] allFc = document.getFontUtilities().getAllFonts();
 
             for (Font fontInfo : allFc) {
@@ -220,8 +220,6 @@ public class FontsUtil {
             }
         } catch (Exception ex) {
             log.error("An exception occurred when trying to extract the pdf document fonts", ex);
-        } finally {
-            Objects.requireNonNull(document).close();
         }
 
         return fontList;
@@ -239,8 +237,10 @@ public class FontsUtil {
         List<DocumentFonts> fontList = new ArrayList<>();
         Map<String, com.aspose.cells.Font> foundFonts = new HashMap<>();
 
+        Workbook document = null;
+
         try {
-            Workbook document = new Workbook(documentPath);
+            document = new Workbook(documentPath);
 
             // Gets the font used by the theme
             com.aspose.cells.Font themeFont = document.getDefaultStyle().getFont();
@@ -285,8 +285,11 @@ public class FontsUtil {
 
         } catch (Exception e) {
             log.error("An exception occurred when trying to extract the execl document fonts", e);
+        } finally {
+            if (document != null) {
+                document.dispose();
+            }
         }
-
         return fontList;
     }
 

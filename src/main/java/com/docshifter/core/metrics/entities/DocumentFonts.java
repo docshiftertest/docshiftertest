@@ -1,9 +1,6 @@
 package com.docshifter.core.metrics.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,10 +9,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Getter
-@Setter // these do Gets and Sets automatically
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 @Table(name = "document_fonts")
 public class DocumentFonts {
 
