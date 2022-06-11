@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 
@@ -92,7 +93,7 @@ public class AMQPSender implements IMessageSender {
 					.hostName(NetworkUtils.getLocalHostName())
 					.senderPickedUp(System.currentTimeMillis())
 					.workflowName(chainConfiguration.getName())
-					.documentPath(task.getSourceFilePath())
+					.documentPath(Arrays.asList(task.getSourceFilePath()))
 					.build();
 			log.debug("...about to send it...");
 			sendMetrics(metricsMessage);

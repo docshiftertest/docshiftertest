@@ -11,7 +11,7 @@ import java.util.List;
 public interface DocumentFontsRepository extends JpaRepository<DocumentFonts, String> {
 
     @Query(value = "select coalesce(font_name, alt_font_name) AS fontName , " +
-            "count(coalesce(font_name, alt_font_name)) AS fontCount " +
+            "count(coalesce(font_name, alt_font_name)) AS documentFontCount " +
             "from metrics.document_fonts df " +
             "inner join lateral ( " +
             "select ds.task_id " +

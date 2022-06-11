@@ -30,45 +30,50 @@ import java.util.UUID;
 @Log4j2
 public class FontsUtil {
 
-    public static List<DocumentFonts> extractDocumentFonts(String documentPath, boolean input, Dashboard dashboard) {
+    public static List<DocumentFonts> extractDocumentFonts(List<String> documentPathList, boolean input, Dashboard dashboard) {
 
-        String extension = FileUtils.getExtension(documentPath);
 
-        switch (extension.toLowerCase()) {
-            case "doc":
-            case "docm":
-            case "docx":
-            case "dot":
-            case "dotm":
-            case "dotx":
-            case "odt":
-                log.debug("Identified a word document");
-                return extractWordFonts(documentPath, input, dashboard);
-            case "xls":
-            case "xlsb":
-            case "xlsm":
-            case "xlsx":
-            case "xlt":
-            case "xltm":
-            case "xltx":
-            case "csv":
-            case "ods":
-                log.debug("Identified an excel document");
-                return extractExcelFonts(documentPath, input, dashboard);
-            case "ppt":
-            case "pptm":
-            case "pptx":
-            case "pot":
-            case "potm":
-            case "potx":
-                log.debug("Identified a presentation document");
-                return extractPptFonts(documentPath, input, dashboard);
-            case "pdf":
-                log.debug("Identified a pdf document");
-                return extractPDFFonts(documentPath, input, dashboard);
-        }
+        List<DocumentFonts> totalDocumentFontsList = new ArrayList<>();
 
-        return null;
+        documentPathList.forEach(documentPath -> {
+            String extension = FileUtils.getExtension(documentPath);
+
+            switch (extension.toLowerCase()) {
+                case "doc":
+                case "docm":
+                case "docx":
+                case "dot":
+                case "dotm":
+                case "dotx":
+                case "odt":
+                    log.debug("Identified a word document");
+                    totalDocumentFontsList.addAll(extractWordFonts(documentPath, input, dashboard));
+                case "xls":
+                case "xlsb":
+                case "xlsm":
+                case "xlsx":
+                case "xlt":
+                case "xltm":
+                case "xltx":
+                case "csv":
+                case "ods":
+                    log.debug("Identified an excel document");
+                    totalDocumentFontsList.addAll(extractExcelFonts(documentPath, input, dashboard));
+                case "ppt":
+                case "pptm":
+                case "pptx":
+                case "pot":
+                case "potm":
+                case "potx":
+                    log.debug("Identified a presentation document");
+                    totalDocumentFontsList.addAll(extractPptFonts(documentPath, input, dashboard));
+                case "pdf":
+                    log.debug("Identified a pdf document");
+                    totalDocumentFontsList.addAll(extractPDFFonts(documentPath, input, dashboard));
+            }
+        });
+
+        return totalDocumentFontsList;
     }
 
     /**
