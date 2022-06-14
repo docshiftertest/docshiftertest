@@ -198,20 +198,7 @@ public class FontsUtil {
                 DocumentFonts dto = new DocumentFonts();
 
                 dto.setFontName(fontInfo.getFontName());
-
-                String decodedName;
-                try {
-                    decodedName = fontInfo.getDecodedFontName();
-                    if (!fontInfo.getFontName().equals(decodedName)) {
-                        decodedName = decodedName.replace((char) 0x0, '.');
-                    }
-                } catch (StringIndexOutOfBoundsException sxe) {
-                    log.error("An exception occurred when trying to get the decoded font name", sxe);
-                    continue;
-                }
-
                 dto.setDocumentName(Paths.get(documentPath).getFileName().toString());
-                dto.setFontName(decodedName);
                 dto.setInput(input);
                 dto.setDashboard(dashboard);
                 dto.setId(UUID.randomUUID().toString());
