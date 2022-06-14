@@ -93,7 +93,7 @@ public class AMQPSender implements IMessageSender {
 					.hostName(NetworkUtils.getLocalHostName())
 					.senderPickedUp(System.currentTimeMillis())
 					.workflowName(chainConfiguration.getName())
-					.documentPath(Arrays.asList(task.getSourceFilePath()))
+					.documentPathList(Arrays.asList(task.getSourceFilePath()))
 					.build();
 			log.debug("...about to send it...");
 			sendMetrics(metricsMessage);
