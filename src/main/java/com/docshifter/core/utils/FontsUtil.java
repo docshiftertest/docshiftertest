@@ -174,11 +174,7 @@ public class FontsUtil {
             });
         } catch (Exception e) {
             log.error("An exception occurred when creating the word document", e);
-        } //finally {
-//            if (ppt != null) {
-//                ppt.dispose();
-//            } close document??
-       // }
+        }
 
         return fontList;
     }
