@@ -18,8 +18,6 @@ public class TestWorkfolder extends AbstractServiceTest {
 	WorkFolderManager manager;
 	WorkFolder workfolder;
 
-
-
 	@Test
 	public void testCreateWorkfolder() {
 		try {
