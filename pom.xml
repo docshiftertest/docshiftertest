@@ -14,8 +14,6 @@
     </parent>
 
     <properties>
-        <revision>7.3</revision>
-        <sha1/>
         <hsqldb.version>2.3.4</hsqldb.version>
 
         <!-- Reverted to 21.8 after attempting to upgrade to 22.1 caused a freeze in some tests
@@ -218,7 +216,7 @@
         <dependency>
             <groupId>com.google.jimfs</groupId>
             <artifactId>jimfs</artifactId>
-            <version>1.1</version>
+            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>org.hsqldb</groupId>
@@ -232,7 +230,7 @@
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.el</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1-b12</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
