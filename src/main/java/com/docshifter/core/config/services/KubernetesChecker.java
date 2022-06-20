@@ -29,9 +29,13 @@ public class KubernetesChecker implements IContainerChecker {
 			return;
 		}
 
+		// The current pod name (which matches the HOSTNAME), e.g. receiver-596c884f74-775pr
 		String currPod = System.getenv("HOSTNAME");
+		// The current name of the underlying ReplicaSet managing pods for the Deployment, e.g. receiver-596c884f74
 		String currRs = currPod.substring(0, currPod.lastIndexOf('-'));
+		// The current Deployment controller, e.g. receiver
 		String currDeploy = currRs.substring(0, currRs.lastIndexOf('-'));
+		// The current namespace, e.g. docshifter
 		String currNs = k8sClient.getConfiguration().getNamespace();
 		Integer replicas;
 		try {

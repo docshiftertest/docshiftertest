@@ -159,12 +159,18 @@ public class NalpeironService implements ILicensingService {
             }
         } catch (Exception e) {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            log.fatal("Error in DocShifter license processing. Could not complete opening and validating Nalpeiron Library.", e);
+            log.fatal("Error in DocShifter license processing, exiting application.", e);
 
             System.exit(errorCode);
         }
     }
 
+    /**
+     * Fetches the maxReceivers Total Application Agility (TAA) field on the license and uses a containerChecker (if
+     * any available for the environment) to make sure the number of active receivers doesn't exceed this value.
+     * @throws DocShifterLicenseException Something went wrong while fetching the value of the TAA field or while
+     * performing the check.
+     */
     private void doContainerCheck() throws DocShifterLicenseException {
         if (containerChecker == null) {
             return;
@@ -180,18 +186,12 @@ public class NalpeironService implements ILicensingService {
             try {
                 maxReceivers = Integer.parseInt(maxReceiversUDF);
             } catch (NumberFormatException nfex) {
-                log.fatal("Could not parse field value \"" + maxReceiversUDF + "\" as an " +
+                throw new DocShifterLicenseException("Could not parse field value \"" + maxReceiversUDF + "\" as an " +
                         "integer. Please contact DocShifter for support.", nfex);
-                System.exit(0);
             }
         }
 
-        try {
-            containerChecker.checkReplicas(maxReceivers);
-        } catch (Exception ex) {
-            log.fatal("Container licensing check failed, exiting application.", ex);
-            System.exit(0);
-        }
+        containerChecker.checkReplicas(maxReceivers);
 
         log.debug("Container licensing check succeeded.");
     }

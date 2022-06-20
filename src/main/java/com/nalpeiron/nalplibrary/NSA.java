@@ -762,7 +762,7 @@ public class NSA
 	}
 }
 
-/** @} */ //end of NALPJAVA
+/** @} */ //end of NSA
 
 /*
  * vim:tabstop=4

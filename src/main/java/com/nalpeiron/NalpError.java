@@ -14,15 +14,16 @@ public class NalpError extends Error {
 	static final long serialVersionUID = 999L;
 
 	//	This will store the error code returned by the NALP function
-	private final int NalpErrorCode;
-	private String NalpErrorMsg;
+	private final int nalpErrorCode;
+	private final String nalpErrorMsg;
 
 	/**
 	 * Default constructor
 	 */
 	public NalpError() {
-		super("Undefined Error");
-		NalpErrorCode = 0;
+		super("Undefined License Error");
+		nalpErrorCode = 0;
+		nalpErrorMsg = null;
 	}
 
 	/**
@@ -33,13 +34,25 @@ public class NalpError extends Error {
 	 */
 	public NalpError(int i, String msg) {
 		super("License error code " + i + ": " + msg);
-		NalpErrorCode = i;
-		NalpErrorMsg = msg;
+		nalpErrorCode = i;
+		nalpErrorMsg = msg;
+	}
+
+	/**
+	 * Regular constructor with {@link Throwable} cause
+	 * @param i   The error code that was returned by the Nalp function (\ref V10ERROR)
+	 * @param msg A descriptive error message
+	 * @param cause The {@link Throwable} that caused the error
+	 */
+	public NalpError(int i, String msg, Throwable cause) {
+		super("License error code " + i + ": " + msg, cause);
+		nalpErrorCode = i;
+		nalpErrorMsg = msg;
 	}
 
 
 	public String getErrorMessage() {
-		return NalpErrorMsg;
+		return nalpErrorMsg;
 	}
 
 	/**
@@ -49,7 +62,7 @@ public class NalpError extends Error {
 	 * Should always be negative (\ref V10ERROR)
 	 */
 	public int getErrorCode() {
-		return NalpErrorCode;
+		return nalpErrorCode;
 	}
 }
 

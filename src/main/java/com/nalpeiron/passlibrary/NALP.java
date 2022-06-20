@@ -128,7 +128,7 @@ public class NALP
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw new NalpError(-9006, "Invalid Encoding");
+			throw new NalpError(-9006, "Invalid Encoding", e);
 		}
 
 		if (i < 0)
@@ -193,7 +193,7 @@ public class NALP
 }
 
 
-/** @} */ //end of PASSIVEJAVA
+/** @} */ //end of NALP
 
 /*
  * vim:tabstop=4

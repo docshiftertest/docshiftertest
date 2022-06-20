@@ -822,10 +822,14 @@ public class NalpeironHelper {
     }
 
     /**
-     *
-     * @param i
-     * @return
-     * @throws DocShifterLicenseException
+     * Performs some extra processing on a returned license status integer. Mainly convert it to a
+     * {@link LicenseStatus} enum and properly simulate license expiration functionality if we're using passive
+     * licensing.
+     * @param i The license status integer as provided by the Nalpeiron lib
+     * @return The appropriate {@link LicenseStatus} for the provided integer. Will simulate license expiration when
+     * working with a passive activation.
+     * @throws DocShifterLicenseException Something went wrong while converting the integer to a proper
+     * {@link LicenseStatus} value or while invoking the Nalpeiron lib for a passive license.
      */
     private LicenseStatus postProcessLicenseStatus(int i) throws DocShifterLicenseException {
         LicenseStatus licStatus = LicenseStatus.getLicenseStatus(i);
