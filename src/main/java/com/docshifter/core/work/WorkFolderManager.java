@@ -189,17 +189,20 @@ public class WorkFolderManager {
 
 	/**
 	 * Create a WorkFolder and copy the files inside another WorkFolder
-	 * @param newWorkFolder The new workFolder to have all files copied
-	 * @param oldWorkFolder The old workFolder
-	 * @return the new workFolder's path
+	 *
+	 * @param sourceWorkFolder The source workFolder
+	 * @param targetWorkFolder The new workFolder to copy the source WorkFolder and all its files to
+	 * @return Path the path to the new WorkFolder
 	 */
-	public String copyWorkFolder(WorkFolder newWorkFolder, WorkFolder oldWorkFolder){
+	public Path copyWorkFolder(WorkFolder sourceWorkFolder, WorkFolder targetWorkFolder){
 		try {
-			String newPath = newWorkFolder.getFolder().toString();
-			org.apache.commons.io.FileUtils.copyDirectory(oldWorkFolder.getFolder().toFile(), new File(newPath));
+			Path newPath = targetWorkFolder.getFolder();
+			org.apache.commons.io.FileUtils.copyDirectory(sourceWorkFolder.getFolder().toFile(),
+					newPath.toFile());
 			return newPath;
-		} catch (IOException e) {
-			log.error("Wasn't possible to copy the WorkFolder");
+		}
+		catch (IOException ioe) {
+			log.error("Wasn't possible to copy the WorkFolder", ioe);
 			return null;
 		}
 	}

@@ -5,9 +5,10 @@ import com.docshifter.core.monitoring.services.AbstractServiceTest;
 import com.google.common.io.Files;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
@@ -52,11 +53,14 @@ public class TestWorkfolder extends AbstractServiceTest {
 	 */
 	@Test
 	public void testCopyWorkFolder() {
-		String newPath = null;
+		Path sourcePath = null;
+		Path targetPath = null;
 		File file = null;
+		WorkFolder folder = null;
 		try {
-			WorkFolder folder = manager.getNewWorkfolder("test");
-			file = new File(folder.getFolder().toString() + File.separator + "test.docx");
+			folder = manager.getNewWorkfolder("test");
+			sourcePath = folder.getFolder();
+			file = new File(Paths.get(folder.getFolder().toString(), "test.docx").toString());
 
 			// the file can't be null
 			assertNotNull(file);
@@ -66,15 +70,22 @@ public class TestWorkfolder extends AbstractServiceTest {
 			// the file must exist
 			assertTrue(file.exists());
 
-			newPath = manager.copyWorkFolder(manager.getNewWorkfolder("temp-" + "test"), folder);
-		} catch (IOException e) {
+			targetPath = manager.copyWorkFolder(folder, manager.getNewWorkfolder("temp-" + "test"));
+		}
+		catch (IOException e) {
 			fail("Exception: " + e);
 		}
-		File folder = new File(newPath);
-
-		assertNotNull(folder);
-		assertTrue(folder.exists());
-		assertTrue(Objects.requireNonNull(folder.listFiles()).length > 0);
-		assertEquals(Objects.requireNonNull(folder.listFiles()).length, Objects.requireNonNull(file.listFiles()).length);
+		assertNotNull(sourcePath);
+		File sourceFolder = sourcePath.toFile();
+		assertTrue(sourceFolder.exists());
+		assertTrue(sourceFolder.isDirectory());
+		assertTrue(Objects.requireNonNull(sourceFolder.listFiles()).length > 0);
+		assertNotNull(targetPath);
+		File targetFolder = targetPath.toFile();
+		assertTrue(targetFolder.exists());
+		assertTrue(targetFolder.isDirectory());
+		assertTrue(Objects.requireNonNull(targetFolder.listFiles()).length > 0);
+		assertEquals(Objects.requireNonNull(sourceFolder.listFiles()).length,
+				Objects.requireNonNull(targetFolder.listFiles()).length);
 	}
 }
