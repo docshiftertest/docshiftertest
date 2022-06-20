@@ -1,16 +1,32 @@
 package com.docshifter.core.config.services;
 
 import com.docshifter.core.exceptions.DocShifterLicenseException;
+import com.docshifter.core.licensing.dtos.LicensingDto;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.AbstractMap;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 @Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
 @Service
@@ -18,6 +34,8 @@ import java.util.Map;
 public class NalpeironService implements ILicensingService {
 
     private static final long[] ANALYTICS_TRANSACTION_ID = {0L};
+    private static final Path persistentLicDirPath = Paths.get("/opt/DocShifter/data/licensing");
+    private static final Path persistentLicPath = persistentLicDirPath.resolve(System.getenv("HOSTNAME"));
 
     @Value("${docshifter.applang:}")
     private String appLanguage;
@@ -81,14 +99,17 @@ public class NalpeironService implements ILicensingService {
     private static final boolean NSLEnable = true; // Enable Licensing
 
     private final IContainerChecker containerChecker;
+    private final WebClient licensingApiClient;
 
     @Autowired(required = false)
-    public NalpeironService(IContainerChecker containerChecker) {
+    public NalpeironService(@Qualifier("licensingApiClient") WebClient licensingApiClient,
+                            IContainerChecker containerChecker) {
+        this.licensingApiClient = licensingApiClient;
         this.containerChecker = containerChecker;
     }
 
-    public NalpeironService() {
-        this(null);
+    public NalpeironService(@Qualifier("licensingApiClient") WebClient licensingApiClient) {
+        this(licensingApiClient, null);
     }
 
     @PostConstruct
@@ -191,7 +212,63 @@ public class NalpeironService implements ILicensingService {
             }
         }
 
-        containerChecker.checkReplicas(maxReceivers);
+        Set<String> replicas = containerChecker.checkReplicas(maxReceivers);
+
+        if (Files.exists(persistentLicDirPath)) {
+            try (Stream<Path> stream = Files.walk(persistentLicDirPath)) {
+                final Map<String, String> licenseCodeMap = Collections.singletonMap("licenseCode", helper.getLicenseCode());
+                Flux.fromStream(stream)
+                        // Current replica is already excluded by the checkReplicas method so no need to take that scenario
+                        // into account (otherwise we'd have to exclude/ignore it manually from the replicas set as
+                        // it's not normal that a file corresponding to the current instance already exists)
+                        .filter(path -> !replicas.contains(path.getFileName().toString()))
+                        // Need to switch scheduler here because Files.readAllBytes is a blocking I/O call and could
+                        // cause thread starvation else
+                        // For the truly dedicated: you could look into changing this to truly async I/O
+                        .publishOn(Schedulers.boundedElastic())
+                        .map(path -> {
+                                    try {
+                                        return new AbstractMap.SimpleImmutableEntry<>(path.getFileName().toString(),
+                                                new String(Files.readAllBytes(path), StandardCharsets.UTF_8));
+                                    } catch (IOException ioe) {
+                                        throw new RuntimeException(ioe);
+                                    }
+                        }).onErrorContinue((ex, path) -> log.warn("Exception occurred while trying to read {}, a " +
+                                "licensing error might occur later down the line!", path, ex)).onErrorStop()
+                        // And back to the parallel scheduler, so we can send our async requests to the licensing API...
+                        .publishOn(Schedulers.parallel())
+                        .map(entry -> {
+                            Map<String, String> uriVariables = new HashMap<>(licenseCodeMap);
+                            if (StringUtils.isEmpty(entry.getValue())) {
+                                uriVariables.put("hostname", entry.getKey());
+                            } else {
+                                uriVariables.put("computerId", entry.getValue());
+                            }
+                            return uriVariables;
+                        })
+                        .flatMap(uriVariables -> licensingApiClient.delete()
+                                .uri("/activation", uriVariables)
+                                .retrieve()
+                                .bodyToMono(LicensingDto.class)
+                        ).onErrorContinue((ex, entry) -> log.warn("Exception while sending request to licensing API, " +
+                                "a licensing error might occur later down the line!", ex)).onErrorStop()
+                        .blockLast();
+            } catch (IOException ex) {
+                throw new DocShifterLicenseException("Could not walk through " + persistentLicDirPath, ex);
+            }
+        } else {
+            try {
+                Files.createDirectories(persistentLicDirPath);
+            } catch (IOException ioe) {
+                throw new DocShifterLicenseException("Unable to create" + persistentLicDirPath, ioe);
+            }
+        }
+
+        try {
+            Files.write(persistentLicPath, helper.getComputerID().getBytes(StandardCharsets.UTF_8));
+        } catch (IOException ioe) {
+            throw new DocShifterLicenseException("Could not create persistent licensing file: " + persistentLicPath, ioe);
+        }
 
         log.debug("Container licensing check succeeded.");
     }
@@ -243,6 +320,12 @@ public class NalpeironService implements ILicensingService {
 
             //Flush the cache in case anything is queued up
             helper.sendAnalyticsCache(NalpeironHelper.NALPEIRON_USERNAME);
+
+            // Need to return license in a container environment because each instance counts as a new activation
+            if (containerChecker != null) {
+                helper.returnLicense(licenseCode);
+                Files.deleteIfExists(persistentLicPath);
+            }
         }
 
         //Cleanup and shutdown library

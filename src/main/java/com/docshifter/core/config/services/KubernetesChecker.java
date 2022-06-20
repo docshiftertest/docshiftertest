@@ -3,17 +3,25 @@ package com.docshifter.core.config.services;
 import com.docshifter.core.config.conditions.IsInKubernetesCondition;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Checks cluster size in a Kubernetes environment.
  */
 @Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
 @Service
+@Primary
 @Conditional(IsInKubernetesCondition.class)
 @Profile(NalpeironHelper.LICENSING_IDENTIFIER)
 public class KubernetesChecker implements IContainerChecker {
@@ -24,11 +32,8 @@ public class KubernetesChecker implements IContainerChecker {
 		this.k8sClient = k8sClient;
 	}
 
-	public void checkReplicas(int maxReplicas) throws DocShifterLicenseException {
-		if (maxReplicas <= 0) {
-			return;
-		}
-
+	@Override
+	public Set<String> checkReplicas(int maxReplicas) throws DocShifterLicenseException {
 		// The current pod name (which matches the HOSTNAME), e.g. receiver-596c884f74-775pr
 		String currPod = System.getenv("HOSTNAME");
 		// The current name of the underlying ReplicaSet managing pods for the Deployment, e.g. receiver-596c884f74
@@ -37,26 +42,29 @@ public class KubernetesChecker implements IContainerChecker {
 		String currDeploy = currRs.substring(0, currRs.lastIndexOf('-'));
 		// The current namespace, e.g. docshifter
 		String currNs = k8sClient.getConfiguration().getNamespace();
-		Integer replicas;
+		List<Pod> pods;
 		try {
-			replicas = k8sClient.apps()
-					.deployments()
+			pods = k8sClient.pods()
 					.inNamespace(currNs)
-					.withName(currDeploy)
-					.get()
-					.getSpec()
-					.getReplicas();
-			if (replicas == null) {
+					.withLabel("app", currDeploy)
+					.list()
+					.getItems();
+			if (pods == null) {
 				throw new DocShifterLicenseException("Kubernetes API request returned a NULL value!");
 			}
 		} catch (Exception ex) {
 			throw new DocShifterLicenseException("Unable to query the Kubernetes API correctly. Did you provide the service account with the" +
 					" appropriate credentials to GET a Deployment?", ex);
 		}
-		if (replicas > maxReplicas) {
-			throw new DocShifterLicenseException("You have " + replicas + " receivers running. This is more than " +
+		if (maxReplicas > 0 && pods.size() > maxReplicas) {
+			throw new DocShifterLicenseException("You have " + pods.size() + " receivers running. This is more than " +
 					"allotted for your current license (" + maxReplicas + "). Please downscale the number of pods or " +
 					"upgrade your license to continue.");
 		}
+		return pods.stream()
+				.map(Pod::getMetadata)
+				.map(ObjectMeta::getName)
+				.filter(name -> !currPod.equals(name))
+				.collect(Collectors.toSet());
 	}
 }
