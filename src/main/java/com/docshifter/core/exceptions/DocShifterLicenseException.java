@@ -1,6 +1,6 @@
 package com.docshifter.core.exceptions;
 
-import com.nalpeiron.nalplibrary.NalpError;
+import com.nalpeiron.NalpError;
 
 
 public class DocShifterLicenseException extends Exception {

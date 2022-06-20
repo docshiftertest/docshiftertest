@@ -1,59 +1,34 @@
 package com.docshifter.core.config.services;
 
-import com.docshifter.core.config.conditions.IsNotInAnyContainerCondition;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
-import com.nalpeiron.nalplibrary.NALP;
-import com.nalpeiron.nalplibrary.NSA;
-import com.nalpeiron.nalplibrary.NSL;
-import com.nalpeiron.nalplibrary.NalpError;
-import org.apache.commons.lang.SystemUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
+@Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
 @Service
-@Profile("licensing")
-@Conditional(IsNotInAnyContainerCondition.class)
+@Profile(NalpeironHelper.LICENSING_IDENTIFIER)
 public class NalpeironService implements ILicensingService {
 
-    private static final Logger log = LogManager.getLogger(ILicensingService.class);
-
-    //These private ints are unique to your product and must
-    // be set here to the values corresponding to your product.
-    private static final int customerID = 4863;
-    private static final int productID = 100; // last 5 digits of 6561300100
-    private static final int AUTH_X = 375; // N{5...499}
-    private static final int AUTH_Y = 648; // N{501...999}
-    private static final int AUTH_Z = 263; // N{233...499}
-    private static final String CLIENT_DATA = "";
-
-    //TODO: fill in some sensible values
-    public static final String NALPEIRON_USERNAME = "";
+    private static final long[] ANALYTICS_TRANSACTION_ID = {0L};
 
     @Value("${docshifter.applang:}")
-    private String APP_LANGUAGE;
+    private String appLanguage;
     @Value("${docshifter.version:DEV")
-    private String VERSION;
+    private String version;
     @Value("${docshifter.edition:DEV}")
-    private String EDITION;
+    private String edition;
     @Value("${docshifter.build:DEV}")
-    private String BUILD;
+    private String build;
 
-    //TODO: asses what this does and add sensible data
-    private static final String LICENSE_STAT = "???";
-
-    private static NalpeironHelper helper;
-
-    private static final long[] aid = {0L};
+    private NalpeironHelper helper;
 
     // Advanced settings, for normal operation leave as defaults
     @Value("${nalpeiron.loglevel:6}")
@@ -89,28 +64,36 @@ public class NalpeironService implements ILicensingService {
     @Value("${nalpeiron.workdir:./license/}")
     private String WorkDir;// Workfolder for nalpeiron license and cache files
 
+    @Value("${ds.license.code:}")
+    private String licenseCode;
+
     @Value("${nalpeiron.offlineactivation:false}")
-    private boolean offlineActivation;// will force to do the activation in oofline mode, will forgo all connection attempts to the server
+    private boolean offlineActivation;// will force to do the activation in offline mode, will forgo all connection
+    // attempts to the server
 
-    private final boolean NSAEnable = true; // Enable Analytics
-    private final boolean NSLEnable = true; // Enable Licensing
+    @Value("${ds.license.activation.request:}")
+    private String licenseActivationRequest;
 
-    public static final List<NalpeironHelper.FeatureStatus> VALID_FEATURE_STATUS = Arrays.asList(NalpeironHelper.FeatureStatus.AUTHORIZED);
-    public static final List<NalpeironHelper.LicenseStatus> VALID_LICENSE_STATUS = Arrays.asList(NalpeironHelper.LicenseStatus.PROD_AUTHORIZED, NalpeironHelper.LicenseStatus.PROD_INTRIAL, NalpeironHelper.LicenseStatus.PROD_NETWORK, NalpeironHelper.LicenseStatus.PROD_NETWORK_LTCO);
+    @Value("${ds.license.activation.answer:}")
+    private String licenseActivationAnswer;
 
-    //TODO: LOGGING
+    private static final boolean NSAEnable = true; // Enable Analytics
+    private static final boolean NSLEnable = true; // Enable Licensing
+
+    private final IContainerChecker containerChecker;
+
+    @Autowired(required = false)
+    public NalpeironService(IContainerChecker containerChecker) {
+        this.containerChecker = containerChecker;
+    }
+
+    public NalpeironService() {
+        this(null);
+    }
+
     @PostConstruct
     private void init() {
         log.info("|===========================| LICENSING SERVICE INIT START |===========================|");
-
-        if (!(WorkDir.endsWith("/") || WorkDir.endsWith("\\"))) {
-            WorkDir += "/";
-        }
-
-        log.debug("Using nalpeiron workdir: {}", WorkDir);
-
-        //Test if the DLL is present
-        NalpeironHelper.dllTest();
 
         log.debug("Opening nalpeiron library");
 
@@ -124,102 +107,122 @@ public class NalpeironService implements ILicensingService {
         try {
             //generate a random number between 1 and 500 and use it to calculate the security offset
             int security = 1 + (int) (Math.random() * (501));
-            int offset = AUTH_X + ((security * AUTH_Y) % AUTH_Z);
+            int offset = NalpeironHelper.AUTH_X + ((security * NalpeironHelper.AUTH_Y) % NalpeironHelper.AUTH_Z);
 
             log.debug("Generated security params for nalpeiron");
 
-            //Library open, close and error handling
-            NALP nalp = new NALP();
-
-            log.debug("opened NALP()");
-
-            //Analytics functions
-            NSA nsa = new NSA(nalp);
-
-            log.debug("opened NSA()");
-
-            //Licensing functions
-            NSL nsl = new NSL(nalp, offset);
-
-            log.debug("opened NSL()");
-
-            helper = new NalpeironHelper(nalp, nsa, nsl, WorkDir, offlineActivation);
+            helper = new NalpeironHelper(offset, WorkDir, licenseCode, licenseActivationRequest,
+                    licenseActivationAnswer, offlineActivation);
 
             log.debug("initialized NalpeironHelper");
 
-            String dllPath = libDir + "/docShifterFileCheck.";
-            if (SystemUtils.IS_OS_UNIX) {
-                dllPath += "so";
-            } else if (SystemUtils.IS_OS_WINDOWS) {
-                dllPath += "dll";
+            if (helper.isPassiveActivation()) {
+                helper.openNalpLibrary(LogLevel, LogQLen, security);
             } else {
-                int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-                log.fatal("The operating system you are using is not recognized asn a UNIX or WINDOWS operating system. This is not supported. Stopping Application");
+                helper.openNalpLibrary(NSAEnable, NSLEnable, LogLevel, LogQLen, CacheQLen, NetThMin,
+                        NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort,
+                        DaemonUser, DaemonPass, security);
 
-                System.exit(errorCode);
+                //Turn end user privacy off
+                helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
             }
 
-            log.debug("using '{}' as the nalpeiron connection dll", dllPath);
-
-            helper.openNalpLibrary(dllPath, NSAEnable, NSLEnable, LogLevel, WorkDir, LogQLen, CacheQLen, NetThMin,
-                    NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort,
-                    DaemonUser, DaemonPass, security);
-
-            //Turn end user privacy off
-            helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
-
-            helper.validateLibrary(customerID, productID);
+            helper.validateLibrary(NalpeironHelper.CUSTOMER_ID, NalpeironHelper.PRODUCT_ID);
 
             log.debug("validateLibrary finished, starting periodic license checking");
 
             helper.validateLicenseAndInitiatePeriodicChecking();
 
-            log.debug("Periodic license checking thread started, staring analytics");
+            doContainerCheck();
 
-            //At this point we have a license, so start analytics
-            //Turn end user privacy off
-            helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
+            if (!helper.isPassiveActivation()) {
+                log.debug("Periodic license checking thread started, staring analytics");
 
-            log.debug("privacy turned off, calling startAnalyticsApp");
-            helper.startAnalyticsApp(NALPEIRON_USERNAME, CLIENT_DATA, aid);
-            log.debug("sending analytics SystemInfo");
+                //At this point we have a license, so start analytics
+                //Turn end user privacy off
+                helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
 
-            helper.sendAnalyticsSystemInfo(NALPEIRON_USERNAME, APP_LANGUAGE, VERSION, EDITION, BUILD, LICENSE_STAT, CLIENT_DATA);
+                log.debug("privacy turned off, calling startAnalyticsApp");
+                helper.startAnalyticsApp(NalpeironHelper.NALPEIRON_USERNAME, NalpeironHelper.CLIENT_DATA, ANALYTICS_TRANSACTION_ID);
+                log.debug("sending analytics SystemInfo");
 
-            helper.sendAnalyticsAndInitiatePeriodicReporting();
-            log.debug("sending analytics SystemInfo, starting periodic analytics sender");
+                helper.sendAnalyticsSystemInfo(NalpeironHelper.NALPEIRON_USERNAME, appLanguage, version, edition,
+                        build, NalpeironHelper.LICENSE_STAT, NalpeironHelper.CLIENT_DATA);
 
-            //start periodic sending of analytics
-            helper.sendAnalyticsAndInitiatePeriodicReporting();
+                helper.sendAnalyticsAndInitiatePeriodicReporting();
+                log.debug("sending analytics SystemInfo, starting periodic analytics sender");
 
-            log.debug("Periodic analytics sending thread started");
-        } catch (DocShifterLicenseException | NalpError e) {
+                //start periodic sending of analytics
+                helper.sendAnalyticsAndInitiatePeriodicReporting();
+
+                log.debug("Periodic analytics sending thread started");
+            }
+        } catch (Exception e) {
             int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            log.fatal("Error in docshifter license processing. Could not complete opening and validating Nalpeiron Library.", e);
+            log.fatal("Error in DocShifter license processing, exiting application.", e);
 
             System.exit(errorCode);
         }
     }
 
+    /**
+     * Fetches the maxReceivers Total Application Agility (TAA) field on the license and uses a containerChecker (if
+     * any available for the environment) to make sure the number of active receivers doesn't exceed this value.
+     * @throws DocShifterLicenseException Something went wrong while fetching the value of the TAA field or while
+     * performing the check.
+     */
+    private void doContainerCheck() throws DocShifterLicenseException {
+        if (containerChecker == null) {
+            return;
+        }
+
+        log.debug("Container environment detected.");
+
+        String maxReceiversUDF = helper.getUDFValue(NalpeironHelper.MAX_RECEIVERS_UDF_KEY);
+        int maxReceivers = 0;
+
+        if (StringUtils.isNotBlank(maxReceiversUDF)) {
+            log.debug("Got maximum allotted receivers: {}", maxReceiversUDF);
+            try {
+                maxReceivers = Integer.parseInt(maxReceiversUDF);
+            } catch (NumberFormatException nfex) {
+                throw new DocShifterLicenseException("Could not parse field value \"" + maxReceiversUDF + "\" as an " +
+                        "integer. Please contact DocShifter for support.", nfex);
+            }
+        }
+
+        containerChecker.checkReplicas(maxReceivers);
+
+        log.debug("Container licensing check succeeded.");
+    }
+
     public long[] validateAndStartModule(String moduleId, long[] fid) throws DocShifterLicenseException {
         NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(moduleId);
 
-        if (!VALID_FEATURE_STATUS.contains(featureStatus)) {
+        if (!featureStatus.isValid()) {
             String errorMessage = "feature could not be activated. The feature status is: " + featureStatus.name() + ". Blocking acces to module: " + moduleId;
             DocShifterLicenseException ex = new DocShifterLicenseException(errorMessage);
             log.info(errorMessage, ex);
             throw ex;
         }
 
-        //At this point we have access to the feature.  do some analytics
-        helper.startFeature(NALPEIRON_USERNAME, moduleId, CLIENT_DATA, fid);
+        if (!helper.isPassiveActivation()) {
+            //At this point we have access to the feature.  do some analytics
+            helper.startFeature(NalpeironHelper.NALPEIRON_USERNAME, moduleId, NalpeironHelper.CLIENT_DATA, fid);
+        }
 
         return fid;
     }
 
     public void endModule(String moduleId, Map<String, Object> clientData, long[] fid) throws DocShifterLicenseException {
-        //call end feature
-        helper.stopFeature(NALPEIRON_USERNAME, moduleId, clientData, fid);
+        if (!helper.isPassiveActivation()) {
+            //call end feature
+            helper.stopFeature(NalpeironHelper.NALPEIRON_USERNAME, moduleId, clientData, fid);
+        }
+    }
+
+    public boolean hasModuleAccess(String moduleId) throws DocShifterLicenseException {
+        return helper.getFeatureStatus(moduleId) == NalpeironHelper.FeatureStatus.AUTHORIZED;
     }
 
     @PreDestroy
@@ -231,14 +234,16 @@ public class NalpeironService implements ILicensingService {
         //Stop the licenseValidationScheduler
         helper.stopLicenseValidationScheduler();
 
-        //Stop the analyticsSenderScheduler
-        helper.stopAnalyticsSenderScheduler();
+        if (!helper.isPassiveActivation()) {
+            //Stop the analyticsSenderScheduler
+            helper.stopAnalyticsSenderScheduler();
 
-        //End analytics
-        helper.stopAnalyticsApp(NALPEIRON_USERNAME, CLIENT_DATA, aid);
+            //End analytics
+            helper.stopAnalyticsApp(NalpeironHelper.NALPEIRON_USERNAME, NalpeironHelper.CLIENT_DATA, ANALYTICS_TRANSACTION_ID);
 
-        //Flush the cache in case anything is queued up
-        helper.sendAnalyticsCache(NALPEIRON_USERNAME);
+            //Flush the cache in case anything is queued up
+            helper.sendAnalyticsCache(NalpeironHelper.NALPEIRON_USERNAME);
+        }
 
         //Cleanup and shutdown library
         helper.closeNalpLibrary();
