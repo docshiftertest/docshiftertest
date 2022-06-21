@@ -52,7 +52,6 @@ public class LicenseHelper {
 	private final com.aspose.pdf.License pdfLicense;
 	private final com.aspose.imaging.License imgLicense;
 	private final com.aspose.tasks.License tasksLicense;
-	//private final com.aspose.ocr.License ocrLicense;
 	private final com.aspose.diagram.License diagramLicense;
 	private final com.aspose.cad.License cadLicense;
 	private final com.aspose.html.License htmlLicense;
@@ -79,7 +78,7 @@ public class LicenseHelper {
 			com.aspose.slides.CurrentThreadSettings.setLocale(workingLocale);
 			com.aspose.pdf.LocaleOptions.setLocale(workingLocale);
 			com.aspose.words.CurrentThreadSettings.setLocale(workingLocale);
-			com.aspose.imaging.CurrentThreadSettings.setLocale(workingLocale);
+			com.aspose.imaging.LocaleOptions.setLocale(workingLocale);
 			com.aspose.cad.CurrentThreadSettings.setLocale(workingLocale);
 			log.debug("Finished setting up thread-specific Locales");
 		}
@@ -96,8 +95,6 @@ public class LicenseHelper {
 		pdfLicense = new com.aspose.pdf.License();
 		imgLicense = new com.aspose.imaging.License();
 		tasksLicense = new com.aspose.tasks.License();
-		// Not yet using the Aspose OCR lib as it adds 200Mb to the Installer
-		//ocrLicense = new com.aspose.ocr.License();
 		diagramLicense = new com.aspose.diagram.License();
 		cadLicense = new com.aspose.cad.License();
 		htmlLicense = new com.aspose.html.License();
@@ -110,9 +107,9 @@ public class LicenseHelper {
 			pdfLicense.setLicense(tmpFileFullPathStr);
 			imgLicense.setLicense(tmpFileFullPathStr);
 			tasksLicense.setLicense(tmpFileFullPathStr);
-			//log.debug("About to do OCR licence");
-			//ocrLicense.setLicense(tmpFileFullPathStr);
-			//log.debug("OCR licence valid is: " + ocrLicense.isValid());
+			log.debug("About to do OCR licence");
+			com.aspose.ocr.License.setLicense(tmpFileFullPathStr);
+			log.debug("OCR licence valid is: " + com.aspose.ocr.License.isValid());
 			cadLicense.setLicense(tmpFileFullPathStr);
 			diagramLicense.setLicense(tmpFileFullPathStr);
 			htmlLicense.setLicense(tmpFileFullPathStr);

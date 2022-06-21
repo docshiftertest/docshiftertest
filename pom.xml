@@ -27,18 +27,17 @@
         <aspose.diagram.classifier>jdk16</aspose.diagram.classifier>
         <aspose.email.version>22.3</aspose.email.version>
         <aspose.email.classifier>jdk16</aspose.email.classifier>
-        <aspose.imaging.version>22.4</aspose.imaging.version>
+        <aspose.imaging.version>22.6</aspose.imaging.version>
         <aspose.imaging.classifier>jdk16</aspose.imaging.classifier>
         <!-- This is not used at the moment but we try to keep it up-to-date
         <aspose.note.version>21.5</aspose.note.version>
         <aspose.note.classifier>jdk17</aspose.note.classifier>
         -->
-        <!--		<aspose.ocr.version>21.5</aspose.ocr.version>-->
+        <aspose.ocr.version>22.5</aspose.ocr.version>
         <aspose.pdf.version>22.4</aspose.pdf.version>
         <aspose.pdf.classifier>jdk17</aspose.pdf.classifier>
         <aspose.slides.version>22.3</aspose.slides.version>
         <aspose.slides.classifier>jdk16</aspose.slides.classifier>
-        <!-- Kept back to 20.12 because of hideous spamming of tmp by awful borked Asspose lib -->
         <aspose.tasks.version>22.3</aspose.tasks.version>
         <aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
         <aspose.words.version>22.4</aspose.words.version>
@@ -168,11 +167,11 @@
             <version>${aspose.tasks.version}</version>
             <classifier>${aspose.tasks.classifier}</classifier>
         </dependency>
-        <!--		<dependency>
-                    <groupId>com.aspose</groupId>
-                    <artifactId>aspose-ocr</artifactId>
-                    <version>${aspose.ocr.version}</version>
-                </dependency>-->
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-ocr</artifactId>
+            <version>${aspose.ocr.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.aspose</groupId>
             <artifactId>aspose-html</artifactId>
