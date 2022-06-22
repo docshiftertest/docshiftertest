@@ -123,6 +123,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+            <exclusions>
+                <!-- WebFlux ships with Netty by default, but we're using Tomcat -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-reactor-netty</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- test -->
         <dependency>
