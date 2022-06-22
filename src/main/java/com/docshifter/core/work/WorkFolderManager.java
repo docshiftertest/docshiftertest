@@ -1,12 +1,12 @@
 package com.docshifter.core.work;
 
-import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.services.GeneralConfigService;
-
+import com.docshifter.core.utils.FileUtils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.IOException;
@@ -186,6 +186,27 @@ public class WorkFolderManager {
 	public void copyToErrorFolder(WorkFolder folder) throws Exception{
 		FileUtils.copyFolder(folder.getFolder(), folder.getErrorFolder());
 	}
+
+	/**
+	 * Create a WorkFolder and copy the files inside another WorkFolder
+	 *
+	 * @param sourceWorkFolder The source workFolder
+	 * @param targetWorkFolder The new workFolder to copy the source WorkFolder and all its files to
+	 * @return Path the path to the new WorkFolder
+	 */
+	public Path copyWorkFolder(WorkFolder sourceWorkFolder, WorkFolder targetWorkFolder){
+		try {
+			Path newPath = targetWorkFolder.getFolder();
+			org.apache.commons.io.FileUtils.copyDirectory(sourceWorkFolder.getFolder().toFile(),
+					newPath.toFile());
+			return newPath;
+		}
+		catch (IOException ioe) {
+			log.error("Wasn't possible to copy the WorkFolder", ioe);
+			return null;
+		}
+	}
+
 
 	@Override
 	public String toString() {
