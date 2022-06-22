@@ -31,7 +31,14 @@ public enum TaskDataKey {
 
 	// Used in FileSystem export module and Document hash generation (Hash Snapshot module)
 	GENERATED_HASH,
-	GENERATED_DIGEST_METHOD;
+	GENERATED_DIGEST_METHOD,
+
+	// Used in Email sender and Email Release
+	EMAIL_SENDER,
+	EMAIL_RECEIVERS,
+	EMAIL_CC,
+	EMAIL_BCC,
+	EMAIL_SUBJECT;
 
 	private final String alias;
 
