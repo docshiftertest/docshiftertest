@@ -95,9 +95,11 @@ public class WorkFolder implements Serializable {
 		if (StringUtils.isBlank(filename)) {
 			filename = UUID.randomUUID().toString();
 		}
+
 		if (shortenFileName) {
 			filename = FileUtils.shortenFileName(filename);
 		}
+
 		filename = FileUtils.removeIllegalFilesystemCharacters(filename);
 
 		Path newPath;
@@ -107,16 +109,18 @@ public class WorkFolder implements Serializable {
 		else {
 			newPath = Paths.get(folder.toString(), filename);
 		}
-		String now;
+
 		while (Files.exists(newPath)) {
-			now = Objects.toString(System.currentTimeMillis());
-			newPath = Paths.get(folder.toString(), now);
+
+			newPath = getNewFolderPath();
+
 			try {
 				Files.createDirectories(newPath);
 			} catch (IOException e) {
 				log.error("Could not create directory: {}", newPath);
 				return null;
 			}
+
 			if (StringUtils.isNotBlank(extension)) {
 				newPath = Paths.get(newPath.toString(), filename + "." + extension);
 			}
@@ -124,6 +128,7 @@ public class WorkFolder implements Serializable {
 				newPath = Paths.get(newPath.toString(), filename);
 			}
 		}
+
 		return newPath;
 	}
 
