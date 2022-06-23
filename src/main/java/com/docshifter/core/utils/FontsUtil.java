@@ -48,6 +48,7 @@ public class FontsUtil {
                 case "odt":
                     log.debug("Identified a word document");
                     totalDocumentFontsList.addAll(extractWordFonts(documentPath, input, dashboard));
+                    break;
                 case "xls":
                 case "xlsb":
                 case "xlsm":
@@ -59,6 +60,7 @@ public class FontsUtil {
                 case "ods":
                     log.debug("Identified an excel document");
                     totalDocumentFontsList.addAll(extractExcelFonts(documentPath, input, dashboard));
+                    break;
                 case "ppt":
                 case "pptm":
                 case "pptx":
@@ -67,9 +69,11 @@ public class FontsUtil {
                 case "potx":
                     log.debug("Identified a presentation document");
                     totalDocumentFontsList.addAll(extractPptFonts(documentPath, input, dashboard));
+                    break;
                 case "pdf":
                     log.debug("Identified a pdf document");
                     totalDocumentFontsList.addAll(extractPDFFonts(documentPath, input, dashboard));
+                    break;
             }
         });
 
