@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashMap;
@@ -414,6 +415,30 @@ public class NalpeironService implements ILicensingService {
      */
     public boolean hasModuleAccess(String moduleId) throws DocShifterLicenseException {
         return helper.getFeatureStatus(moduleId) == NalpeironHelper.FeatureStatus.AUTHORIZED;
+    }
+
+    /**
+     * Gets the expiration date of the current license.
+     * @return An expiration date relative to the local time of the machine.
+     * @throws DocShifterLicenseException Something went wrong while trying to fetch this information.
+     */
+    public LocalDateTime getLicenseExpirationDate() throws DocShifterLicenseException {
+        return helper.getSubscriptionExpirationDate();
+    }
+
+    /**
+     * Gets the lease date of the current license. For an online active activation, the lease date signifies the date
+     * when the component will report back to the Nalpeiron licensing server. For an offline active activation, this
+     * date means that the offline activation will be invalidated then (regardless of expiration date set) so the
+     * customer will have to run through the offline activation procedure again to check in with the Nalpeiron
+     * licensing server.
+     * TODO: verify what this date means for an offline passive license. Does that mean the certificate has expired
+     *  and a new one needs to be provided?
+     * @return A lease date relative to the local time of the machine.
+     * @throws DocShifterLicenseException Something went wrong while trying to fetch this information.
+     */
+    public LocalDateTime getLeaseExpirationDate() throws DocShifterLicenseException {
+        return helper.getLeaseExpirationDate();
     }
 
     @PreDestroy

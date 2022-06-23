@@ -6,6 +6,9 @@ LABEL maintainer="DocShifter, support@docshifter.com"
 
 ARG DEPENDENCY
 
+# Changing the default shell for subsequent instructions in exec form to run with bash (instead of sh when not specified)
+SHELL ["/bin/bash", "-c"]
+
 RUN groupadd -r -g 999 docshifter && useradd -r -u 999 -g docshifter docshifter
 
 RUN apt-get autoremove && apt-get autoclean -y && apt-get update && apt-get install -y --no-install-recommends \
