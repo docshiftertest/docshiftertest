@@ -36,7 +36,16 @@ import java.util.stream.Stream;
 public class NalpeironService implements ILicensingService {
 
     private static final long[] ANALYTICS_TRANSACTION_ID = {0L};
+    /**
+     * The directory pointing to the persistent licensing files managed by DocShifter itself for the purposes of
+     * ghost activation cleanup (after a previous instance crashed). Only used in a containerized environment.
+     */
     private static final Path persistentLicDirPath = Paths.get("/opt/DocShifter/data/licensing");
+    /**
+     * The current license file (named after the hostname of the instance) in the persistent directory, which is managed
+     * by DocShifter itself for the purposes of ghost activation cleanup (after a previous instance crashed). Only
+     * used in a containerized environment.
+     */
     private static final Path persistentLicPath = persistentLicDirPath.resolve(NetworkUtils.getLocalHostName());
 
     @Value("${docshifter.applang:}")
@@ -139,10 +148,10 @@ public class NalpeironService implements ILicensingService {
                 log.debug("Performing container check");
                 doContainerCheck();
             }
-        } catch (Exception e) {
-            int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            log.fatal("Error in DocShifter license processing, exiting application.", e);
-            System.exit(errorCode);
+        } catch (Exception ex) {
+            log.fatal("Error in DocShifter license processing, exiting application.", ex);
+            // We need to exit with zero or yajsw will restart the service
+            System.exit(0);
         }
 
         log.info("|===========================| LICENSING SERVICE INIT FINISHED |===========================|");
@@ -192,7 +201,7 @@ public class NalpeironService implements ILicensingService {
                         })
                         // Need to switch scheduler here because Files.readAllBytes is a blocking I/O call and could
                         // cause thread starvation else
-                        // For the truly dedicated: you could look into changing this to truly async I/O
+                        // TODO: For the truly dedicated: you could look into changing this to truly async I/O
                         .publishOn(Schedulers.boundedElastic())
                         .map(path -> {
                             String computerId;
@@ -234,15 +243,15 @@ public class NalpeironService implements ILicensingService {
                         .doOnNext(entry -> {
                             try {
                                 Files.deleteIfExists(entry.getKey());
-                            } catch (IOException e) {
+                            } catch (IOException ioe) {
                                 log.warn("Exception while trying to delete licensing file {}, perhaps it has been " +
-                                        "deleted already?", entry.getKey(), e);
+                                        "deleted already?", entry.getKey(), ioe);
                             }
                         })
                         .blockLast();
-            } catch (IOException ex) {
+            } catch (IOException ioe) {
                 throw new DocShifterLicenseException("Could not walk through " + persistentLicDirPath + " but it " +
-                        "seems to exist, is it somehow a file instead of a directory?", ex);
+                        "seems to exist, is it somehow a file instead of a directory?", ioe);
             }
         } else {
             try {
@@ -307,7 +316,7 @@ public class NalpeironService implements ILicensingService {
             return;
         }
 
-        log.debug("Staring analytics");
+        log.debug("Starting analytics");
 
         //At this point we have a license, so start analytics
         //Turn end user privacy off

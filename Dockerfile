@@ -13,7 +13,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libtcnative-1 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /opt/DocShifter/beans /opt/DocShifter/licensing \
+# licensing is NOT the persistent licensing folder, rather a "temporary” licensing path where Nalpeiron stores its
+# .cache, .lic,... stuff (i.e. the Nalpeiron workdir which is set to that path in all the components), as we cannot
+# get 2 separate container instances to act under the same computer ID (especially in Kubernetes, where an instance
+# might be scheduled to node X one time and to node Y another time and where sharing the Nalpeiron workdir over an
+# NFS is not supported). Therefore we try to return the license each time the container terminates or clean up a
+# ghost activation at application startup if the previous instance crashed.
+RUN mkdir -p /opt/DocShifter/{beans,licensing} \
     && chown -R docshifter:docshifter /opt/DocShifter
 
 COPY --chown=docshifter:docshifter target/jars target/classes/license/libShaferFilechck.so target/classes/license/libPassiveFilechck.so target/${DEPENDENCY}-Beans-docker/lib-doc /opt/DocShifter/beans/lib/
