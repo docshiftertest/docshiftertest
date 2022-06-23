@@ -1,16 +1,35 @@
 package com.docshifter.core.config.services;
 
 import com.docshifter.core.exceptions.DocShifterLicenseException;
+import com.docshifter.core.licensing.dtos.LicensingDto;
+import com.docshifter.core.utils.NetworkUtils;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.AbstractMap;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 @Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
 @Service
@@ -18,6 +37,17 @@ import java.util.Map;
 public class NalpeironService implements ILicensingService {
 
     private static final long[] ANALYTICS_TRANSACTION_ID = {0L};
+    /**
+     * The directory pointing to the persistent licensing files managed by DocShifter itself for the purposes of
+     * ghost activation cleanup (after a previous instance crashed). Only used in a containerized environment.
+     */
+    private static final Path persistentLicDirPath = Paths.get("/opt/DocShifter/data/licensing");
+    /**
+     * The current license file (named after the hostname of the instance) in the persistent directory, which is managed
+     * by DocShifter itself for the purposes of ghost activation cleanup (after a previous instance crashed). Only
+     * used in a containerized environment.
+     */
+    private static final Path persistentLicPath = persistentLicDirPath.resolve(NetworkUtils.getLocalHostName());
 
     @Value("${docshifter.applang:}")
     private String appLanguage;
@@ -80,104 +110,242 @@ public class NalpeironService implements ILicensingService {
     private static final boolean NSAEnable = true; // Enable Analytics
     private static final boolean NSLEnable = true; // Enable Licensing
 
+    private final IContainerClusterer containerClusterer;
     private final IContainerChecker containerChecker;
+    private final WebClient licensingApiClient;
 
     @Autowired(required = false)
-    public NalpeironService(IContainerChecker containerChecker) {
+    public NalpeironService(@Qualifier("licensingApiClient") WebClient licensingApiClient,
+                            IContainerClusterer containerClusterer,
+                            IContainerChecker containerChecker) {
+        this.licensingApiClient = licensingApiClient;
+        this.containerClusterer = containerClusterer;
         this.containerChecker = containerChecker;
     }
 
-    public NalpeironService() {
-        this(null);
+    public NalpeironService(@Qualifier("licensingApiClient") WebClient licensingApiClient) {
+        this(licensingApiClient, null, null);
     }
 
     @PostConstruct
     private void init() {
         log.info("|===========================| LICENSING SERVICE INIT START |===========================|");
 
-        log.debug("Opening nalpeiron library");
+        try {
+            log.debug("Opening nalpeiron library");
+            openValidateNalpeironLibrary();
 
-        openValidateNalpeironLibrary();
+            if (containerClusterer != null) {
+                log.debug("Container environment detected.");
+                if (!helper.isPassiveActivation()) {
+                    log.debug("Checking for previous container crashes");
+                    checkLicenseCleanup();
+                }
+            }
+
+            validateLicenseAndStartAnalytics();
+
+            if (containerChecker != null) {
+                log.debug("Performing container check");
+                doContainerCheck();
+            }
+        } catch (Exception ex) {
+            log.fatal("Error in DocShifter license processing, exiting application.", ex);
+            // We need to exit with zero or yajsw will restart the service
+            System.exit(0);
+        }
 
         log.info("|===========================| LICENSING SERVICE INIT FINISHED |===========================|");
 
     }
 
-    private void openValidateNalpeironLibrary() {
-        try {
-            //generate a random number between 1 and 500 and use it to calculate the security offset
-            int security = 1 + (int) (Math.random() * (501));
-            int offset = NalpeironHelper.AUTH_X + ((security * NalpeironHelper.AUTH_Y) % NalpeironHelper.AUTH_Z);
-
-            log.debug("Generated security params for nalpeiron");
-
-            helper = new NalpeironHelper(offset, WorkDir, licenseCode, licenseActivationRequest,
-                    licenseActivationAnswer, offlineActivation);
-
-            log.debug("initialized NalpeironHelper");
-
-            if (helper.isPassiveActivation()) {
-                helper.openNalpLibrary(LogLevel, LogQLen, security);
-            } else {
-                helper.openNalpLibrary(NSAEnable, NSLEnable, LogLevel, LogQLen, CacheQLen, NetThMin,
-                        NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort,
-                        DaemonUser, DaemonPass, security);
-
-                //Turn end user privacy off
-                helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
+    /**
+     * Checks if any previous container instances have exited abnormally, therefore requiring a license cleanup. It
+     * does this by keeping track of some persistent files in {@link #persistentLicDirPath}, the names of the files
+     * will refer to the hostnames/container names of all instances that are/were running, the content of the files
+     * will refer to the computerIDs of the instances as provided by Nalpeiron. On normal application shutdown, these
+     * files will normally be cleaned up and the license will be returned properly. However, after an application
+     * crash, the license will not have been returned as usual. So whenever another licensed instance starts up,
+     * there will be a "ghost activation" remaining. To prevent this, we check which licensed components are
+     * currently still running on the cluster and compare this to the list of files in the
+     * {@link #persistentLicDirPath}. If there are any extraneous files present there, that means we found such a
+     * ghost activation, and thus we can make a call to the DocShifter License Management API (Lambda) to clear up the
+     * activation for the offending hostname/computerID.
+     * @throws DocShifterLicenseException If the path pointing to our persistent licensing files is somehow
+     * inaccessible, or we could not manage any of the persistent licensing files or create a new one. It's safer to
+     * just crash and burn than to continue with a potentially inconsistent licensing state in that case...
+     */
+    private void checkLicenseCleanup() throws DocShifterLicenseException {
+        if (Files.exists(persistentLicDirPath)) {
+            try (Stream<Path> stream = Files.walk(persistentLicDirPath)) {
+                final Map<String, String> licenseCodeMap = Collections.singletonMap("licenseCode", helper.getLicenseCode());
+                Flux.fromStream(stream)
+                        // Current replica is already excluded by the listOtherReplicas method so no need to take that
+                        // scenario into account (otherwise we'd have to exclude/ignore it manually from the replicas
+                        // set as it's not normal that a file corresponding to the current instance already exists)
+                        // Run this on the main thread as it's a blocking operation using the cluster API, and we
+                        // preferably don't want to run multiple calls at once as the results are most likely
+                        // being cached so subsequent calls should go a lot faster.
+                        .publishOn(Schedulers.immediate())
+                        .filter(path -> {
+                            String fileName = path.getFileName().toString();
+                            Set<String> replicas;
+                            try {
+                                replicas = containerClusterer.listOtherReplicas(fileName);
+                            } catch (DocShifterLicenseException ex) {
+                                log.warn("Exception occurred while trying to list all replicas for component backed " +
+                                        "by instance file {}, a licensing error might occur later down the line!",
+                                        fileName, ex);
+                                return false;
+                            }
+                            return !replicas.contains(fileName);
+                        })
+                        // Need to switch scheduler here because Files.readAllBytes is a blocking I/O call and could
+                        // cause thread starvation else
+                        // TODO: For the truly dedicated: you could look into changing this to truly async I/O
+                        .publishOn(Schedulers.boundedElastic())
+                        .map(path -> {
+                            String computerId;
+                            try {
+                                computerId = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+                            } catch (IOException ioe) {
+                                throw new RuntimeException(ioe);
+                            }
+                            Map<String, String> uriVariables = new HashMap<>(licenseCodeMap);
+                            if (StringUtils.isEmpty(computerId)) {
+                                uriVariables.put("hostname", path.getFileName().toString());
+                            } else {
+                                uriVariables.put("computerId", computerId);
+                            }
+                            return new AbstractMap.SimpleImmutableEntry<>(path, uriVariables);
+                        }).onErrorContinue((ex, path) -> log.warn("Exception occurred while trying to read {}, a " +
+                                "licensing error might occur later down the line!", path, ex)).onErrorStop()
+                        // And back to the parallel scheduler, so we can send our async requests to the licensing API...
+                        .publishOn(Schedulers.parallel())
+                        .flatMap(entry -> licensingApiClient.delete()
+                                .uri("/activation", entry.getValue())
+                                .retrieve()
+                                // Treat HTTP 404 as success if no mention was made about the licenseCode because
+                                // that means the API then returned that because no matching hostname/computerID was
+                                // found on Nalpeiron. In that case we want to continue and clean up the file to
+                                // prevent it from being processed again at startup by a different instance.
+                                .onStatus(HttpStatus.NOT_FOUND::equals,
+                                        resp -> resp.bodyToMono(LicensingDto.class)
+                                                .filter(dto -> dto.getMessage() != null && dto.getMessage().contains("licenseCode"))
+                                                .flatMap(dto -> resp.createException()))
+                                .bodyToMono(LicensingDto.class)
+                                .map(dto -> new AbstractMap.SimpleImmutableEntry<>(entry.getKey(), dto))
+                        ).onErrorContinue((ex, entry) -> log.warn(
+                                "Exception while sending request to licensing API, a licensing error might occur " +
+                                        "later down the line!", ex)).onErrorStop()
+                        // And finally delete the file so other instances don't pick it up anymore, do that on the
+                        // boundedElastic scheduler again as it's a blocking I/O operation
+                        .publishOn(Schedulers.boundedElastic())
+                        .doOnNext(entry -> {
+                            try {
+                                Files.deleteIfExists(entry.getKey());
+                            } catch (IOException ioe) {
+                                log.warn("Exception while trying to delete licensing file {}, perhaps it has been " +
+                                        "deleted already?", entry.getKey(), ioe);
+                            }
+                        })
+                        .blockLast();
+            } catch (IOException ioe) {
+                throw new DocShifterLicenseException("Could not walk through " + persistentLicDirPath + " but it " +
+                        "seems to exist, is it somehow a file instead of a directory?", ioe);
             }
-
-            helper.validateLibrary(NalpeironHelper.CUSTOMER_ID, NalpeironHelper.PRODUCT_ID);
-
-            log.debug("validateLibrary finished, starting periodic license checking");
-
-            helper.validateLicenseAndInitiatePeriodicChecking();
-
-            doContainerCheck();
-
-            if (!helper.isPassiveActivation()) {
-                log.debug("Periodic license checking thread started, staring analytics");
-
-                //At this point we have a license, so start analytics
-                //Turn end user privacy off
-                helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
-
-                log.debug("privacy turned off, calling startAnalyticsApp");
-                helper.startAnalyticsApp(NalpeironHelper.NALPEIRON_USERNAME, NalpeironHelper.CLIENT_DATA, ANALYTICS_TRANSACTION_ID);
-                log.debug("sending analytics SystemInfo");
-
-                helper.sendAnalyticsSystemInfo(NalpeironHelper.NALPEIRON_USERNAME, appLanguage, version, edition,
-                        build, NalpeironHelper.LICENSE_STAT, NalpeironHelper.CLIENT_DATA);
-
-                helper.sendAnalyticsAndInitiatePeriodicReporting();
-                log.debug("sending analytics SystemInfo, starting periodic analytics sender");
-
-                //start periodic sending of analytics
-                helper.sendAnalyticsAndInitiatePeriodicReporting();
-
-                log.debug("Periodic analytics sending thread started");
+        } else {
+            try {
+                Files.createDirectories(persistentLicDirPath);
+            } catch (IOException ioe) {
+                throw new DocShifterLicenseException("Unable to create" + persistentLicDirPath, ioe);
             }
-        } catch (Exception e) {
-            int errorCode = 0;//TODO: we need to exit with zero or yajsw will restart the service
-            log.fatal("Error in DocShifter license processing, exiting application.", e);
-
-            System.exit(errorCode);
         }
+
+        try {
+            Files.write(persistentLicPath, helper.getComputerID().getBytes(StandardCharsets.UTF_8));
+        } catch (IOException ioe) {
+            throw new DocShifterLicenseException("Could not create persistent licensing file: " + persistentLicPath, ioe);
+        }
+    }
+
+    /**
+     * Opens the Nalpeiron library and checks if it hasn't been tampered with.
+     * @throws DocShifterLicenseException Could not properly open or validate the Nalpeiron library, so you should
+     * probably kill the application...
+     */
+    private void openValidateNalpeironLibrary() throws DocShifterLicenseException {
+        //generate a random number between 1 and 500 and use it to calculate the security offset
+        int security = 1 + (int) (Math.random() * (501));
+        int offset = NalpeironHelper.AUTH_X + ((security * NalpeironHelper.AUTH_Y) % NalpeironHelper.AUTH_Z);
+
+        log.debug("Generated security params for nalpeiron");
+
+        helper = new NalpeironHelper(offset, WorkDir, licenseCode, licenseActivationRequest,
+                licenseActivationAnswer, offlineActivation);
+
+        log.debug("initialized NalpeironHelper");
+
+        if (helper.isPassiveActivation()) {
+            helper.openNalpLibrary(LogLevel, LogQLen, security);
+        } else {
+            helper.openNalpLibrary(NSAEnable, NSLEnable, LogLevel, LogQLen, CacheQLen, NetThMin,
+                    NetThMax, OfflineMode, ProxyIP, ProxyPort, ProxyUsername, ProxyPass, DaemonIP, DaemonPort,
+                    DaemonUser, DaemonPass, security);
+
+            //Turn end user privacy off
+            helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
+        }
+
+        helper.validateLibrary(NalpeironHelper.CUSTOMER_ID, NalpeironHelper.PRODUCT_ID);
+
+        log.debug("validateLibrary finished");
+    }
+
+    /**
+     * Attempts to load in the license, checks if it is valid, fires off a recurring license checker and starts the
+     * entire analytics ceremony.
+     * @throws DocShifterLicenseException Potentially something horrible went wrong during some licensing check, so you
+     * should probably kill the application...
+     */
+    private void validateLicenseAndStartAnalytics() throws DocShifterLicenseException {
+        log.debug("Starting periodic license checking");
+        helper.validateLicenseAndInitiatePeriodicChecking();
+        log.debug("Periodic license checking thread started");
+
+        if (helper.isPassiveActivation()) {
+            return;
+        }
+
+        log.debug("Starting analytics");
+
+        //At this point we have a license, so start analytics
+        //Turn end user privacy off
+        helper.setAnalyticsPrivacy(NalpeironHelper.PrivacyValue.OFF.getValue());
+
+        log.debug("privacy turned off, calling startAnalyticsApp");
+        helper.startAnalyticsApp(NalpeironHelper.NALPEIRON_USERNAME, NalpeironHelper.CLIENT_DATA, ANALYTICS_TRANSACTION_ID);
+        log.debug("sending analytics SystemInfo");
+
+        helper.sendAnalyticsSystemInfo(NalpeironHelper.NALPEIRON_USERNAME, appLanguage, version, edition,
+                build, NalpeironHelper.LICENSE_STAT, NalpeironHelper.CLIENT_DATA);
+
+        helper.sendAnalyticsAndInitiatePeriodicReporting();
+        log.debug("sending analytics SystemInfo, starting periodic analytics sender");
+
+        //start periodic sending of analytics
+        helper.sendAnalyticsAndInitiatePeriodicReporting();
+
+        log.debug("Periodic analytics sending thread started");
     }
 
     /**
      * Fetches the maxReceivers Total Application Agility (TAA) field on the license and uses a containerChecker (if
      * any available for the environment) to make sure the number of active receivers doesn't exceed this value.
      * @throws DocShifterLicenseException Something went wrong while fetching the value of the TAA field or while
-     * performing the check.
+     * performing the check. You should probably kill the application if this happens...
      */
     private void doContainerCheck() throws DocShifterLicenseException {
-        if (containerChecker == null) {
-            return;
-        }
-
-        log.debug("Container environment detected.");
-
         String maxReceiversUDF = helper.getUDFValue(NalpeironHelper.MAX_RECEIVERS_UDF_KEY);
         int maxReceivers = 0;
 
@@ -191,11 +359,20 @@ public class NalpeironService implements ILicensingService {
             }
         }
 
-        containerChecker.checkReplicas(maxReceivers);
-
-        log.debug("Container licensing check succeeded.");
+        containerChecker.performCheck(maxReceivers);
     }
 
+    /**
+     * Attempts to start a module and registers its usage with the analytics server.
+     * @param moduleId The module/feature to start.
+     * @param fid Identifier for the transaction. The same one should be passed whenever you call
+     * {@link #endModule(String, Map, long[])} later on. The array should only contain a single element. If this
+     * element is set to 0 then the Nalpeiron server will swap it with a random value. If {@code null} is passed, the
+     * transactions will not be grouped.
+     * @return The {@code fid} array that you passed and that the Nalpeiron server optionally transformed.
+     * @throws DocShifterLicenseException Could not start the module, as it's very likely not licensed.
+     * Alternatively, something went wrong while recording analytics.
+     */
     public long[] validateAndStartModule(String moduleId, long[] fid) throws DocShifterLicenseException {
         NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(moduleId);
 
@@ -214,6 +391,15 @@ public class NalpeironService implements ILicensingService {
         return fid;
     }
 
+    /**
+     * Attempts to record an end of the module usage with the analytics server.
+     * @param moduleId The module/feature to end.
+     * @param clientData a string containing a valid XML fragment with whatever data you care to pass to the Nalpeiron
+     * server or daemon with your call.
+     * @param fid Identifier for the transaction. Should match the {@code fid} that you passed to
+     * {@link #validateAndStartModule(String, long[])} (or {@code null} if you passed that).
+     * @throws DocShifterLicenseException Something went wrong while trying to reach the Nalpeiron analytics server.
+     */
     public void endModule(String moduleId, Map<String, Object> clientData, long[] fid) throws DocShifterLicenseException {
         if (!helper.isPassiveActivation()) {
             //call end feature
@@ -221,8 +407,38 @@ public class NalpeironService implements ILicensingService {
         }
     }
 
+    /**
+     * Checks if the current license is entitled to a specific module, without registering a usage of it.
+     * @param moduleId The module/feature to check.
+     * @return {@code true} if the license has access, {@code false} otherwise.
+     * @throws DocShifterLicenseException Something horrible went wrong internally in Nalpeiron.
+     */
     public boolean hasModuleAccess(String moduleId) throws DocShifterLicenseException {
         return helper.getFeatureStatus(moduleId) == NalpeironHelper.FeatureStatus.AUTHORIZED;
+    }
+
+    /**
+     * Gets the expiration date of the current license.
+     * @return An expiration date relative to the local time of the machine.
+     * @throws DocShifterLicenseException Something went wrong while trying to fetch this information.
+     */
+    public LocalDateTime getLicenseExpirationDate() throws DocShifterLicenseException {
+        return helper.getSubscriptionExpirationDate();
+    }
+
+    /**
+     * Gets the lease date of the current license. For an online active activation, the lease date signifies the date
+     * when the component will report back to the Nalpeiron licensing server. For an offline active activation, this
+     * date means that the offline activation will be invalidated then (regardless of expiration date set) so the
+     * customer will have to run through the offline activation procedure again to check in with the Nalpeiron
+     * licensing server.
+     * TODO: verify what this date means for an offline passive license. Does that mean the certificate has expired
+     *  and a new one needs to be provided?
+     * @return A lease date relative to the local time of the machine.
+     * @throws DocShifterLicenseException Something went wrong while trying to fetch this information.
+     */
+    public LocalDateTime getLeaseExpirationDate() throws DocShifterLicenseException {
+        return helper.getLeaseExpirationDate();
     }
 
     @PreDestroy
@@ -243,6 +459,12 @@ public class NalpeironService implements ILicensingService {
 
             //Flush the cache in case anything is queued up
             helper.sendAnalyticsCache(NalpeironHelper.NALPEIRON_USERNAME);
+
+            // Need to return license in a container environment because each instance counts as a new activation
+            if (containerChecker != null) {
+                helper.returnLicense(licenseCode);
+                Files.deleteIfExists(persistentLicPath);
+            }
         }
 
         //Cleanup and shutdown library

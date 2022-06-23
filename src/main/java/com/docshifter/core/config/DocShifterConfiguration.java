@@ -31,6 +31,7 @@ import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.jms.ConnectionFactory;
 import java.util.List;
@@ -211,5 +212,10 @@ public class DocShifterConfiguration {
 	@Bean
 	public InfoEndpoint infoEndpoint(List<InfoContributor> infoContributors) {
 		return new InfoEndpoint(infoContributors);
+	}
+
+	@Bean
+	public WebClient licensingApiClient() {
+		return WebClient.create("https://api.licensing.docshifter.com");
 	}
 }

@@ -5,12 +5,12 @@ import com.docshifter.core.exceptions.DocShifterLicenseException;
 /**
  * Checks cluster size in a containerized environment.
  */
+@FunctionalInterface
 public interface IContainerChecker {
 	/**
-	 * Checks the number of replicas in a cluster according to a specified maximum.
-	 * @param maxReplicas The maximum number of replicas to allow. Zero or a negative value to allow unlimited replicas.
-	 * @throws DocShifterLicenseException If the number of replicas exceeds {@code maxReplicas}, or if an error
-	 * occurred while fetching the number of replicas.
+	 * Enforces that there aren't more instances running in the environment than the current license has allotted.
+	 * @param maxReplicas The maximum number of replicas to allow.
+	 * @throws DocShifterLicenseException The check didn't pass or something went wrong while checking.
 	 */
-	void checkReplicas(int maxReplicas) throws DocShifterLicenseException;
+	void performCheck(int maxReplicas) throws DocShifterLicenseException;
 }
