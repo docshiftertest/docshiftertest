@@ -4,55 +4,63 @@
 // Created Jan 19 2012
 // R. D. Ramey
 
+/**
+ *  @defgroup NSAJava Nalpeiron V10 Java classes
+ *  @ingroup V10
+ *  @ingroup V10Java
+ *  @{
+ */
+
+/**
+ *  @file   NSA.java
+ *  @brief  Generic and initialization functions for Nalpeiron V10 library
+ */
+
 package com.nalpeiron.nalplibrary;
+
+import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
+import com.nalpeiron.NalpError;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.UnsupportedEncodingException;
 
+@Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
 public class NSA
 {
 	private NALP nalp;
 
-	private native int NSAGetVersion(long libHandle, byte[] nsaVersion);
+	private native int NSAGetVersion(byte[] nsaVersion);
 
-	private native int NSAGetHostName(long libHandle, byte[] nsaHostName);
+	private native int NSAGetHostName(byte[] nsaHostName);
 
-	private native int NSALogin(long LibHandle,
-			byte[] Username, byte[] clientData, long[] transID);
+	private native int NSALogin(byte[] Username, byte[] clientData, long[] transID);
 
-	private native int NSALogout(long LibHandle,
-			byte[] Username, byte[] clientData, long[] transID);
+	private native int NSALogout(byte[] Username, byte[] clientData, long[] transID);
 
-	private native int NSAFeatureStart(long LibHandle, byte[] Username,
+	private native int NSAFeatureStart(byte[] Username,
 			byte[] FeatureCode, byte[] clientData, long[] transID);
 
-	private native int NSAFeatureStop(long LibHandle, byte[] Username,
+	private native int NSAFeatureStop(byte[] Username,
 			byte[] FeatureCode, byte[] clientData, long[] transID);
 
-	private native int NSAException(long LibHandle,
-			byte[] Username, byte[] ExceptionCode,
+	private native int NSAException(byte[] Username, byte[] ExceptionCode,
 			byte[] Description, byte[] clientData, long[] transID);
 
-	private native int NSASysInfo(long LibHandle,
-			byte[] Username, byte[] Applang, byte[] Version,
+	private native int NSASysInfo(byte[] Username, byte[] Applang, byte[] Version,
 			byte[] Edition, byte[] Build, byte[] LicenseStat,
 			byte[] clientData, long[] transID);
 
-	private native int NSASendCache(long LibHandle,
-			byte[] Username, long[] transID);
+	private native int NSASendCache(byte[] Username, long[] transID);
 
-	private native int NSAApStart(long LibHandle,
-			byte[] Username, byte[] clientData, long[] transID);
+	private native int NSAApStart(byte[] Username, byte[] clientData, long[] transID);
 
-	private native int NSAApStop(long LibHandle,
-			byte[] Username, byte[] clientData, long[] transID);
+	private native int NSAApStop(byte[] Username, byte[] clientData, long[] transID);
 
-	private native int NSAGetLocation(long LibHandle);
+	private native int NSAGetPrivacy();
 
-	private native int NSAGetPrivacy(long LibHandle);
+	private native int NSASetPrivacy(int Privacy);
 
-	private native int NSASetPrivacy(long LibHandle, int Privacy);
-
-	private native int NSAGetStats(long LibHandle, byte[] nsaStats);
+	private native int NSAGetStats(byte[] nsaStats);
 
 
 	public
@@ -64,10 +72,12 @@ public class NSA
 	}
 
 /**
- * Call NSAGetVersion()
- * @return:	0 on success, negative value on error, nsaVersion
+ * @brief Gets the version of the NSA library being accessed.  See NSAGetVersion().
+ *
+ * @return A string containing the library version.
+ *
  * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public String
 	callNSAGetVersion()
@@ -77,7 +87,7 @@ public class NSA
 		int		i;
 
 
-		i = NSAGetVersion(nalp.LibHandle, nsaVersion);
+		i = NSAGetVersion(nsaVersion);
 
 		if (i < 0)
 		{
@@ -97,10 +107,14 @@ public class NSA
 
 
 /**
- * Call NSAGetHostName()
- * @return:	0 on success, negative value on error, hostname
+ * @brief Gets the name of the SOAP server the library contacts for
+ * licensing information. See NSAGetHostName().
+ *
+ * @return A string containing the hostname of the Nalpeiron server or
+ * daemon.
+ *
  * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public String
 	callNSAGetHostName()
@@ -110,12 +124,12 @@ public class NSA
 		int		i;
 
 
-		i = NSAGetHostName(nalp.LibHandle, nsaHostName);
+		i = NSAGetHostName(nsaHostName);
 
 		if (i < 0)
 		{
-			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i), "quiet");
+			log.error("Error {}: {}", i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp's library uses UTF-8 internally
@@ -131,10 +145,29 @@ public class NSA
 
 
 /**
- * Call NSALogin()
- * @return:	0 on success, negative value on error
+ * @brief Records login of username.  See NSALogin().
+ *
+ * @param Username a string containing the username that
+ * will be passed to the Nalpeiron server or daemon with your call.
+ *
+ * @param clientData a string containing a valid XML fragment
+ * with whatever data you care to pass to the Nalpeiron
+ * server or daemon with your call.
+ *
+ * @param lid transID allows a series of transactions to be grouped
+ * together with a transaction ID.  To retrieve a transaction ID from any
+ * function, set transID = 0 and call the function. Upon return, transID
+ * will be set with a random number that will be passed to the Nalpeiron
+ * server to identify the transaction.  Send this value into any functions
+ * that are to be grouped together.  This is particularly useful for
+ * function pairs such as NSALogin/NSALogout, NSAAppStart/NSAAppStop,
+ * NSAFeatureStart/NSAFeatureEnd, etc.  If you do not wish to use the
+ * transaction ID a NULL pointer will disable it.
+ *
+ * @return 0 If the call succeeded
+ *
  * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public int
 	callNSALogin(String Username, String clientData, long[] lid)
@@ -145,8 +178,7 @@ public class NSA
 
 		try
 		{
-			i = NSALogin(nalp.LibHandle,
-					(Username + '\000').getBytes("UTF-8"),
+			i = NSALogin((Username + '\000').getBytes("UTF-8"),
 					(clientData + '\000').getBytes("UTF-8"), lid);
 		}
 		catch (UnsupportedEncodingException e)
@@ -156,18 +188,37 @@ public class NSA
 
 		if (i < 0)
 		{
-			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i), "quiet");
+			log.error("Error {}: {}", i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
 	}
 
 /**
- * Call NSALogout()
- * @return:	0 on success, negative value on error
+ * @brief Records login of username.  See NSALogout().
+ *
+ * @param Username a string containing the username that
+ * will be passed to the Nalpeiron server or daemon with your call.
+ *
+ * @param clientData a string containing a valid XML fragment
+ * with whatever data you care to pass to the Nalpeiron
+ * server or daemon with your call.
+ *
+ * @param lid transID allows a series of transactions to be grouped
+ * together with a transaction ID.  To retrieve a transaction ID from any
+ * function, set transID = 0 and call the function. Upon return, transID
+ * will be set with a random number that will be passed to the Nalpeiron
+ * server to identify the transaction.  Send this value into any functions
+ * that are to be grouped together.  This is particularly useful for
+ * function pairs such as NSALogin/NSALogout, NSAAppStart/NSAAppStop,
+ * NSAFeatureStart/NSAFeatureEnd, etc.  If you do not wish to use the
+ * transaction ID a NULL pointer will disable it.
+ *
+ * @return 0 If the call succeeded
+ *
  * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public int
 	callNSALogout(String Username, String clientData, long[] lid)
@@ -178,8 +229,7 @@ public class NSA
 
 		try
 		{
-			i = NSALogout(nalp.LibHandle,
-					(Username + '\000').getBytes("UTF-8"),
+			i = NSALogout((Username + '\000').getBytes("UTF-8"),
 					(clientData + '\000').getBytes("UTF-8"), lid);
 		}
 		catch (UnsupportedEncodingException e)
@@ -189,18 +239,40 @@ public class NSA
 
 		if (i < 0)
 		{
-			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i), "quiet");
+			log.error("Error {}: {}", i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
 	}
 
 /**
- * Call NSAFeatureStart()
- * @return:	0 on success, negative value on error
+ * @brief Records start of feature access.  See NSAFeatureStart().
+ *
+ * @param Username a string containing the username that
+ * will be passed to the Nalpeiron server or daemon with your call.
+ *
+ * @param FeatureCode a string containing the the five(5) character
+ * feature code of the feature to be accessed
+ *
+ * @param clientData a string containing a valid XML fragment
+ * with whatever data you care to pass to the Nalpeiron
+ * server or daemon with your call.
+ *
+ * @param fid transID allows a series of transactions to be grouped
+ * together with a transaction ID.  To retrieve a transaction ID from any
+ * function, set transID = 0 and call the function. Upon return, transID
+ * will be set with a random number that will be passed to the Nalpeiron
+ * server to identify the transaction.  Send this value into any functions
+ * that are to be grouped together.  This is particularly useful for
+ * function pairs such as NSALogin/NSALogout, NSAAppStart/NSAAppStop,
+ * NSAFeatureStart/NSAFeatureEnd, etc.  If you do not wish to use the
+ * transaction ID a NULL pointer will disable it.
+ *
+ * @return 0 If the call succeeded
+ *
  * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public int
 	callNSAFeatureStart(String Username,
@@ -212,8 +284,7 @@ public class NSA
 
 		try
 		{
-			i = NSAFeatureStart(nalp.LibHandle,
-				(Username + '\000').getBytes("UTF-8"),
+			i = NSAFeatureStart((Username + '\000').getBytes("UTF-8"),
 				(FeatureCode + '\000').getBytes("UTF-8"),
 				(clientData + '\000').getBytes("UTF-8"), fid);
 		}
@@ -224,18 +295,40 @@ public class NSA
 
 		if (i < 0)
 		{
-			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i), "quiet");
+			log.error("Error {}: {}", i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
 	}
 
 /**
- * Call NSAFeatureStop()
- * @return:	0 on success, negative value on error
+ * @brief Records end of feature access.  See NSAFeatureEnd().
+ *
+ * @param Username a string containing the username that
+ * will be passed to the Nalpeiron server or daemon with your call.
+ *
+ * @param FeatureCode a string containing the the five(5) character
+ * feature code of the feature to be accessed
+ *
+ * @param clientData a string containing a valid XML fragment
+ * with whatever data you care to pass to the Nalpeiron
+ * server or daemon with your call.
+ *
+ * @param fid transID allows a series of transactions to be grouped
+ * together with a transaction ID.  To retrieve a transaction ID from any
+ * function, set transID = 0 and call the function. Upon return, transID
+ * will be set with a random number that will be passed to the Nalpeiron
+ * server to identify the transaction.  Send this value into any functions
+ * that are to be grouped together.  This is particularly useful for
+ * function pairs such as NSALogin/NSALogout, NSAAppStart/NSAAppStop,
+ * NSAFeatureStart/NSAFeatureEnd, etc.  If you do not wish to use the
+ * transaction ID a NULL pointer will disable it.
+ *
+ * @return 0 If the call succeeded
+ *
  * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public int
 	callNSAFeatureStop(String Username,
@@ -247,8 +340,7 @@ public class NSA
 
 		try
 		{
-			i = NSAFeatureStop(nalp.LibHandle,
-				(Username + '\000').getBytes("UTF-8"),
+			i = NSAFeatureStop((Username + '\000').getBytes("UTF-8"),
 				(FeatureCode + '\000').getBytes("UTF-8"),
 				(clientData + '\000').getBytes("UTF-8"), fid);
 		}
@@ -259,18 +351,33 @@ public class NSA
 
 		if (i < 0)
 		{
-			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i), "quiet");
+			log.error("Error {}: {}", i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
 	}
 
 /**
- * Call NSAException
- * @return:	0 on success, negative value on error
+ * @brief Records an error of type exceptionCode by username
+ * with details in description.  See NSAException().
+ *
+ * @param Username a string containing the username that
+ * will be passed to the Nalpeiron server or daemon with your call.
+ *
+ * @param ExceptionCode a string that will be passed to the Nalpeiron
+ * server or daemon with your call.
+ *
+ * @param Description A string that will be passed to the Nalpeiron
+ * server or daemon with your call.
+ *
+ * @param clientData a XML fragment containing whatever data you
+ * would like to pass to the Nalpeiron server or daemon with your call.
+ *
+ * @return 0 If the call succeeded
+ *
  * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public int
 	callNSAException(String Username,
@@ -286,8 +393,7 @@ public class NSA
 
 		try
 		{
-			i = NSAException(nalp.LibHandle,
-				(Username + '\000').getBytes("UTF-8"),
+			i = NSAException((Username + '\000').getBytes("UTF-8"),
 				(ExceptionCode + '\000').getBytes("UTF-8"),
 				(Description + '\000').getBytes("UTF-8"),
 				(clientData + '\000').getBytes("UTF-8"), transID);
@@ -299,18 +405,70 @@ public class NSA
 
 		if (i < 0)
 		{
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
-			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
+			log.error("Error {}: {}", i, nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i), "quiet");
 		}
 
 		return i;
 	}
 
 /**
- * Call NSASysInfo() - Collect and send system nalpation to Napeiron
- * @return:	0 on success, negative value on error
+ * @brief Sends information about the end user's system to Nalpeiron.
+ * See NSASysInfo(). In addtion to the parameters the function will send
+ * the following information
+ *
+ * @verbatim
+
+    date            date and time
+    username        username as passed into NSASysInfo
+    productid       your product ID
+    customerid      your customer ID
+    computerid      the end user's computer ID
+    NSA version     version number of the NSA Library
+    location        countryid- Two character country code
+    country         country name
+    region          state, territory, region as appropriate
+    city            city
+    zipcode         zipcode as appropriate
+    operatingsystem OS (Linux, Windows, OSX, etc)
+    bitage          32 or 64
+    screenresx      screen width
+    screenresy      screen heigth
+    proc            processor information
+    cores           number of processors or cores
+    memory          amount of memory in Meg.
+    oslanguage      default OS language
+    applanguage     passed in app language
+    productstatus   passed in License Status
+    profile         type of system(laptop or desktop)
+  @endverbatim
+ *
+ * @param Username a username that will be passed to the Nalpeiron
+ * server or daemon with your call.
+ *
+ * @param Applang a string that will be passed to the Nalpeiron server
+ * or daemon with your call.
+ *
+ * @param Version a string that will be passed to the Nalpeiron server
+ * or daemon with your call.
+ *
+ * @param Edition a string that will be passed to the Nalpeiron server
+ * or daemon with your call.
+ *
+ * @param Build a string that will be passed to the Nalpeiron server or
+ * daemon with your call.
+ *
+ * @param LicenseStat a string that will be passed to the Nalpeiron
+ * server or daemon with your call.
+ *
+ * @param clientData a string containing a valid XML fragment
+ * containing whatever data you would like to pass to the Nalpeiron
+ * server or daemon with your call.
+ *
+ * @return 0 on success, negative value on error
+ *
  * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public int
 	callNSASysInfo(String Username, String Applang, String Version,
@@ -326,8 +484,7 @@ public class NSA
 
 		try
 		{
-			i = NSASysInfo(nalp.LibHandle,
-				(Username + '\000').getBytes("UTF-8"),
+			i = NSASysInfo((Username + '\000').getBytes("UTF-8"),
 				(Applang + '\000').getBytes("UTF-8"),
 				(Version + '\000').getBytes("UTF-8"),
 				(Edition + '\000').getBytes("UTF-8"),
@@ -341,18 +498,25 @@ public class NSA
 		}
 		if (i < 0)
 		{
-			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i), "quiet");
+			log.error("Error {}: {}", i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
 	}
 
 /**
- * Call NSASendCache() -- Send any cache file to Nalp server
- * @return:	0 on success, negative value on error
+ * @brief If a cache file of analytics data exists on the end user's
+ * system send it to Nalpeiron.  Cache files are created when a
+ * system is offline or has been placed in offline mode. See NSASendCache().
+ *
+ * @param Username a username that will be passed to the Nalpeiron
+ * server or daemon with your call.
+ *
+ * @return 0 If the call succeeded
+ *
  * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public int
 	callNSASendCache(String Username)
@@ -367,8 +531,7 @@ public class NSA
 
 		try
 		{
-			i = NSASendCache(nalp.LibHandle,
-				(Username + '\000').getBytes("UTF-8"), transID);
+			i = NSASendCache((Username + '\000').getBytes("UTF-8"), transID);
 		}
 		catch (UnsupportedEncodingException e)
 		{
@@ -377,18 +540,37 @@ public class NSA
 
 		if (i < 0)
 		{
-			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i), "quiet");
+			log.error("Error {}: {}", i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
 	}
 
 /**
- * Call NSAApStart()
- * @return:	0 on success, negative value on error
+ * @brief Records start of application.  See NSAAppStart().
+ *
+ * @param Username a string containing the username that
+ * will be passed to the Nalpeiron server or daemon with your call.
+ *
+ * @param clientData a string containing a valid XML fragment
+ * with whatever data you care to pass to the Nalpeiron
+ * server or daemon with your call.
+ *
+ * @param aid transID allows a series of transactions to be grouped
+ * together with a transaction ID.  To retrieve a transaction ID from any
+ * function, set transID = 0 and call the function. Upon return, transID
+ * will be set with a random number that will be passed to the Nalpeiron
+ * server to identify the transaction.  Send this value into any functions
+ * that are to be grouped together.  This is particularly useful for
+ * function pairs such as NSALogin/NSALogout, NSAAppStart/NSAAppStop,
+ * NSAFeatureStart/NSAFeatureEnd, etc.  If you do not wish to use the
+ * transaction ID a NULL pointer will disable it.
+ *
+ * @return 0 If the call succeeded
+ *
  * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public int
 	callNSAApStart(String Username, String clientData, long[] aid)
@@ -399,8 +581,7 @@ public class NSA
 
 		try
 		{
-			i = NSAApStart(nalp.LibHandle,
-					(Username + '\000').getBytes("UTF-8"),
+			i = NSAApStart((Username + '\000').getBytes("UTF-8"),
 					(clientData + '\000').getBytes("UTF-8"), aid);
 		}
 		catch (UnsupportedEncodingException e)
@@ -410,18 +591,37 @@ public class NSA
 
 		if (i < 0)
 		{
-			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i), "quiet");
+			log.error("Error {}: {}", i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
 	}
 
 /**
- * Call NSAApStop()
- * @return:	0 on success, negative value on error
+ * @brief Records end of application.  See NSAAppStop().
+ *
+ * @param Username a string containing the username that
+ * will be passed to the Nalpeiron server or daemon with your call.
+ *
+ * @param clientData a string containing a valid XML fragment
+ * with whatever data you care to pass to the Nalpeiron
+ * server or daemon with your call.
+ *
+ * @param aid transID allows a series of transactions to be grouped
+ * together with a transaction ID.  To retrieve a transaction ID from any
+ * function, set transID = 0 and call the function. Upon return, transID
+ * will be set with a random number that will be passed to the Nalpeiron
+ * server to identify the transaction.  Send this value into any functions
+ * that are to be grouped together.  This is particularly useful for
+ * function pairs such as NSALogin/NSALogout, NSAAppStart/NSAAppStop,
+ * NSAFeatureStart/NSAFeatureEnd, etc.  If you do not wish to use the
+ * transaction ID a NULL pointer will disable it.
+ *
+ * @return 0 If the call succeeded
+ *
  * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public int
 	callNSAApStop(String Username, String clientData, long[] aid)
@@ -432,8 +632,7 @@ public class NSA
 
 		try
 		{
-			i = NSAApStop(nalp.LibHandle,
-					(Username + '\000').getBytes("UTF-8"),
+			i = NSAApStop((Username + '\000').getBytes("UTF-8"),
 					(clientData + '\000').getBytes("UTF-8"), aid);
 		}
 		catch (UnsupportedEncodingException e)
@@ -443,42 +642,23 @@ public class NSA
 
 		if (i < 0)
 		{
-			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i), "quiet");
+			log.error("Error {}: {}", i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
 	}
 
 /**
- * Call NSAGetLocation() -- Get location data from Nalp server
- * @return:	0 on success, negative value on error
+ * @brief Checks the current privacy setting.  If privacy is unset, the
+ * privacy setting used by the library will be the one stamped into it.
+ * See NSAGetPrivacy().
+ *
+ * @return 0 No privacy
+ * @return 1 Privacy Enabled
+ *
  * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
- */
-	public int
-	callNSAGetLocation()
-	throws NalpError
-	{
-		int	i;
-
-
-		i = NSAGetLocation(nalp.LibHandle);
-
-		if (i < 0)
-		{
-			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
-		}
-
-		return i;
-	}
-
-/**
- * Call NSAGetPrivacy() Get the privacy setting
- * @return:	0 on success, negative value on error
- * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public int
 	callNSAGetPrivacy()
@@ -486,21 +666,26 @@ public class NSA
 	{
 		int	i;
 
-		i = NSAGetPrivacy(nalp.LibHandle);
+		i = NSAGetPrivacy();
 
 		if (i < 0)
 		{
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
+			log.error("Error {}: {}", i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
 	}
 
 /**
- * Call NSASetPrivacy() set privacy value (0 off or 1 on)
- * @return:	0 on success, negative value on error
+ * @brief Sets the library's privacy setting to nsaPriv.  See NSASetPrivacy().
+ *
+ * @param Privacy privacy value for the library. Possible values for setting
+ * are 0 "no privacy" or 1 "privacy enabled".
+ *
+ * @return 0 If the call succeeded
+ *
  * @throws NalpError:	If there was a problem calling the NSA function,
- * 	this error will be thrown
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public int
 	callNSASetPrivacy(int Privacy)
@@ -509,20 +694,45 @@ public class NSA
 		int	i;
 
 
-		i = NSASetPrivacy(nalp.LibHandle, Privacy);
+		i = NSASetPrivacy(Privacy);
 
 		if (i < 0)
 		{
-			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i), "quiet");
+			log.error("Error {}: {}", i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		return i;
 	}
 
 /**
- * Call NSAGetStats(), return performance nalpation from NSA library
- * @return: utf8 xml string containing nalpation
+ * @brief Returns status information from the NSA library. See NSAGetStats().
+ *
+ * @return a string containing statistics from the NSA library as a XML string.
+ * The format of the return is:
+ *@verbatim
+    <?xml version="1.0" encoding="UTF-8"?>
+        <NSA Current Statistics>
+            <OfflineMode>0</OfflineMode>
+            <LocationInfo>1</LocationInfo>
+            <Cache Thread>
+                <Max Cache Que Len>25</Max Cache Que Len>
+                <Current Cache Que Len>0</Current Cache Que Len>
+                <Cache writes>1</Cache writes>
+                <Cache fails>0</Cache fails>
+            </Cache Thread>
+            <Soap Pool>
+                <Min Soap Threads>10</Min Soap Threads>
+                <Max Soap Threads>10</Max Soap Threads>
+                <Queued Jobs>0</Queued Jobs>
+                <Running Jobs>0</Running Jobs>
+                <Finished Jobs>145</Finished Jobs>
+            </Soap Pool>
+        </NSA Current Statistics>
+ @endverbatim
+ *
+ * @throws NalpError:	If there was a problem calling the NSA function,
+ * 	this error will be thrown (\ref V10ERROR)
  */
 	public String
 	callNSAGetStats()
@@ -532,12 +742,12 @@ public class NSA
 		int		i;
 
 
-		i = NSAGetStats(nalp.LibHandle, nsaStats);
+		i = NSAGetStats(nsaStats);
 
 		if (i < 0)
 		{
-			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-			System.out.println("Error " + i + ": " + nalp.callNalpGetErrorMsg(i));
+			//throw new NalpError(i, nalp.callNalpGetErrorMsg(i), "quiet");
+			log.error("Error {}: {}", i, nalp.callNalpGetErrorMsg(i));
 		}
 
 		//Nalp's library uses UTF-8 internally
@@ -552,6 +762,7 @@ public class NSA
 	}
 }
 
+/** @} */ //end of NSA
 
 /*
  * vim:tabstop=4

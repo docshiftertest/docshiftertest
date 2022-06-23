@@ -1,6 +1,7 @@
 package com.docshifter.core.config.services;
 
 import com.docshifter.core.exceptions.DocShifterLicenseException;
+import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -8,9 +9,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
 
-@Log4j2
+@Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
 @Service
-@Profile("licensing")
+@Profile(NalpeironHelper.LICENSING_IDENTIFIER)
 public class MetricsLicenceCheckingService {
 
     private static ILicensingService nalpeironService;
