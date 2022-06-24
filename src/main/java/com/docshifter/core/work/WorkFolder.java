@@ -90,7 +90,7 @@ public class WorkFolder implements Serializable {
 		return getNewFilePath(filename,extension, true);
 	}
 
-	public Path getNewFilePath(String filename, String extension, boolean shortenFileName) {
+	public synchronized Path getNewFilePath(String filename, String extension, boolean shortenFileName) {
 
 		if (StringUtils.isBlank(filename)) {
 			filename = UUID.randomUUID().toString();
@@ -132,7 +132,7 @@ public class WorkFolder implements Serializable {
 		return newPath;
 	}
 
-	public Path getNewFolderPath(String folderName) {
+	public synchronized Path getNewFolderPath(String folderName) {
 
 		if (StringUtils.isBlank(folderName)) {
 			folderName = UUID.randomUUID().toString();

@@ -140,7 +140,7 @@ public class WorkFolderManager {
 	}
 
 
-	private Path getNewPath(Path root, String name)  throws IOException {
+	private synchronized Path getNewPath(Path root, String name)  throws IOException {
 
 		name = FileUtils.removeIllegalFilesystemCharacters(name);
 
