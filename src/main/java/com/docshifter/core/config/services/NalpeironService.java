@@ -6,7 +6,6 @@ import com.docshifter.core.utils.NetworkUtils;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -16,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
@@ -114,17 +114,12 @@ public class NalpeironService implements ILicensingService {
     private final IContainerChecker containerChecker;
     private final WebClient licensingApiClient;
 
-    @Autowired(required = false)
     public NalpeironService(@Qualifier("licensingApiClient") WebClient licensingApiClient,
-                            IContainerClusterer containerClusterer,
-                            IContainerChecker containerChecker) {
+                            @Nullable IContainerClusterer containerClusterer,
+                            @Nullable IContainerChecker containerChecker) {
         this.licensingApiClient = licensingApiClient;
         this.containerClusterer = containerClusterer;
         this.containerChecker = containerChecker;
-    }
-
-    public NalpeironService(@Qualifier("licensingApiClient") WebClient licensingApiClient) {
-        this(licensingApiClient, null, null);
     }
 
     @PostConstruct
