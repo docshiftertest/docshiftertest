@@ -496,6 +496,6 @@ public abstract class ModuleOperation {
 	 * example in order to force a long-running invocation to come to an abrupt stop.
 	 * TODO: this method is not yet called, but this will be done in a future release.
 	 */
-	protected void onInterrupt() {
+	public void onInterrupt() {
 	}
 }
