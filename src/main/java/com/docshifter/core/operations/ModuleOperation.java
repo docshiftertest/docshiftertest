@@ -494,7 +494,6 @@ public abstract class ModuleOperation {
 	 * Override and add any code here to run if this operation receives an interrupt/timeout. It will be processed in a
 	 * different thread, so you can use this method to forcibly close I/O streams or set cancellation tokens for
 	 * example in order to force a long-running invocation to come to an abrupt stop.
-	 * TODO: this method is not yet called, but this will be done in a future release.
 	 */
 	public void onInterrupt() {
 	}
