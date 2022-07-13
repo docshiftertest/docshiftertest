@@ -100,7 +100,7 @@ public final class PdfVersionUtils {
     /**
      * Convenience method to figure out the PdfFormat we need to set, based on the postPdfOutput
      * param and the (optional) pdfAComplianceLevel param
-     * @param postPdfOutput Choose 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 2.0 or PDFA
+     * @param postPdfOutput Choose 1.3, 1.4, 1.5, 1.6, 1.7, 2.0 or PDFA
      * @param pdfAComplianceLevel Choose 1A, 1B, 2A, 2B, 2U, 3A, 3B, or 3U
      * @return PdfFormat representing the appropriate format
      */
@@ -118,14 +118,13 @@ public final class PdfVersionUtils {
 
     /**
      * Convenience method to figure out the PdfFormat we need to set, based on the postPdfOutput
-     * @param postPdfOutput Choose 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 2.0
+     * @param postPdfOutput Choose 1.3, 1.4, 1.5, 1.6, 1.7, 2.0
      * @return PdfFormat representing the appropriate format
      */
     private static PdfFormat parsePdfOutputType(String postPdfOutput) {
         PdfFormat  result = PdfFormat.v_1_7;
 
         switch (postPdfOutput.trim()) {
-            case "1.2" -> result = PdfFormat.v_1_2;
             case "1.3" -> result = PdfFormat.v_1_3;
             case "1.4" -> result = PdfFormat.v_1_4;
             case "1.5" -> result = PdfFormat.v_1_5;
