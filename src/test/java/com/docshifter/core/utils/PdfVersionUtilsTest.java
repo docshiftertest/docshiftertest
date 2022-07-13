@@ -31,7 +31,7 @@ class PdfVersionUtilsTest {
      * @param version output pdf version expected
      */
     @ParameterizedTest
-    @ValueSource(strings = {"1.3", "1.4", "1.5", "1.6", "1.7", "2.0", ""})
+    @ValueSource(strings = {"1.4", "1.5", "1.6", "1.7", "2.0", ""})
     public void testPdfOutputVersion(String version) {
 
         Path outFilePath = workFolder.getNewFilePath("test", "pdf");
@@ -52,7 +52,7 @@ class PdfVersionUtilsTest {
      * @param version output pdf version expected
      */
     @ParameterizedTest
-    @ValueSource(strings = {"1.3", "1.4", "1.5", "1.6", "1.7", "2.0", ""})
+    @ValueSource(strings = {"1.4", "1.5", "1.6", "1.7", "2.0", ""})
     public void testPdfOutputVersionWithDocument(String version) {
 
         Path outFilePath = workFolder.getNewFilePath("test", "pdf");
@@ -85,7 +85,6 @@ class PdfVersionUtilsTest {
 
     private static Stream<Arguments> argumentsParsePdfOutputTypeWithComplianceLevel() {
         return Stream.of(
-                arguments("1.3",        "" ,         PdfFormat.v_1_3),
                 arguments("1.4",        "",          PdfFormat.v_1_4),
                 arguments("1.5",        "",          PdfFormat.v_1_5),
                 arguments("1.6",        "",          PdfFormat.v_1_6),
