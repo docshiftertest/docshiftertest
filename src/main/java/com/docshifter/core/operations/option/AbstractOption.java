@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
@@ -45,7 +46,7 @@ import java.util.stream.Stream;
 public abstract class AbstractOption<T> extends ModuleOperation {
 	protected String option="Abstract Option";
 
-	private boolean nestedOperation;
+	private Path rootSourcePath;
 
 	public String toString(){
 		return option;
@@ -134,6 +135,7 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 		T result;
 		DirectoryHandling directoryHandling;
 		if (inFilePath == null || !Files.isDirectory(inFilePath) || (directoryHandling = getDirectoryHandling()) == DirectoryHandling.AS_IS) {
+			rootSourcePath = inFilePath;
 			try {
 				result = getResult();
 				log.info("The option module returned the result: {}", result);
@@ -171,6 +173,7 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 				parameters.setSuccess(TaskStatus.FAILURE);
 				return parameters;
 			} finally {
+				rootSourcePath = null;
 				cleanup();
 			}
 		} else {
@@ -220,7 +223,7 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 									"singleton scoped bean in order to use automatic directory handling, " +
 									"otherwise unintended behavior might happen.");
 						}
-						op.nestedOperation = true;
+						op.rootSourcePath = inFilePath;
 						res = op.execute(nodes, fileOptionParams, failureLevel);
 						// Never move over the result paths if the current module is of type RELEASE. We
 						// never have any modules following such a module and moving over files might result
@@ -379,6 +382,16 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 	 * @return
 	 */
 	protected final boolean isNestedOperation() {
-		return nestedOperation;
+		return !Objects.equals(rootSourcePath, operationParams.getSourcePath());
+	}
+
+	/**
+	 * If we're in a nested operation, returns the source path (i.e. a directory) that the main operation received.
+	 * Otherwise, this always equals the path returned by {@link OperationParams#getSourcePath()} of this instance's
+	 * {@code operationParams}.
+	 * @return The source path as received by the main operation.
+	 */
+	protected final Path getRootSourcePath() {
+		return rootSourcePath;
 	}
 }

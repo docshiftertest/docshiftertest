@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,7 +38,7 @@ public abstract class AbstractOperation extends ModuleOperation {
 	@ModuleParam(required=false)
 	protected String tempFolder;
 
-    private boolean nestedOperation;
+    private Path rootSourcePath;
 
     protected Map<String, Object> moduleData = new HashMap<>();
 
@@ -87,6 +88,9 @@ public abstract class AbstractOperation extends ModuleOperation {
 
         DirectoryHandling directoryHandling;
         if (inFilePath == null || !Files.isDirectory(inFilePath) || (directoryHandling = getDirectoryHandling()) == DirectoryHandling.AS_IS) {
+            if (rootSourcePath == null) {
+                rootSourcePath = inFilePath;
+            }
             try {
                 return execute();
             } catch (InvalidConfigException ex) {
@@ -123,6 +127,7 @@ public abstract class AbstractOperation extends ModuleOperation {
                 operationParams.setSuccess(TaskStatus.FAILURE);
                 return operationParams;
             } finally {
+                rootSourcePath = null;
                 cleanup();
             }
         } else {
@@ -172,7 +177,7 @@ public abstract class AbstractOperation extends ModuleOperation {
                                             "singleton scoped bean in order to use automatic directory handling, " +
                                             "otherwise unintended behavior might happen.");
                                 }
-                                op.nestedOperation = true;
+                                op.rootSourcePath = inFilePath;
                                 res = op.execute(task, fileOperationParams, failureLevel);
                                 // Never move over the result paths if the current module is of type RELEASE. We
                                 // never have any modules following such a module and moving over files might result
@@ -308,6 +313,16 @@ public abstract class AbstractOperation extends ModuleOperation {
      * @return
      */
     protected final boolean isNestedOperation() {
-        return nestedOperation;
+        return !Objects.equals(rootSourcePath, operationParams.getSourcePath());
+    }
+
+    /**
+     * If we're in a nested operation, returns the source path (i.e. a directory) that the main operation received.
+     * Otherwise, this always equals the path returned by {@link OperationParams#getSourcePath()} of this instance's
+     * {@code operationParams}.
+     * @return The source path as received by the main operation.
+     */
+    protected final Path getRootSourcePath() {
+        return rootSourcePath;
     }
 }
