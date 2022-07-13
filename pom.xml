@@ -34,7 +34,7 @@
         <aspose.note.classifier>jdk17</aspose.note.classifier>
         -->
         <!--		<aspose.ocr.version>21.5</aspose.ocr.version>-->
-        <aspose.pdf.version>22.5</aspose.pdf.version>
+        <aspose.pdf.version>22.6</aspose.pdf.version>
         <aspose.pdf.classifier>jdk17</aspose.pdf.classifier>
         <aspose.slides.version>22.3</aspose.slides.version>
         <aspose.slides.classifier>jdk16</aspose.slides.classifier>
