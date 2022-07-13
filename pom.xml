@@ -117,6 +117,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- Spring Boot Web is added to all Java components so Spring Boot Actuator can expose health info over HTTP -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
@@ -152,6 +157,12 @@
             <artifactId>aspose-pdf</artifactId>
             <version>${aspose.pdf.version}</version>
             <classifier>${aspose.pdf.classifier}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-words</artifactId>
+            <version>${aspose.words.version}</version>
+            <classifier>shaping-harfbuzz-plugin</classifier>
         </dependency>
         <dependency>
             <groupId>com.aspose</groupId>
