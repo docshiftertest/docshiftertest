@@ -5,6 +5,7 @@ import com.aspose.pdf.Document;
 import com.aspose.pdf.PdfFormat;
 import com.docshifter.core.work.WorkFolder;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang.StringUtils;
 
 import java.nio.file.Path;
 
@@ -20,50 +21,30 @@ public final class PdfVersionUtils {
      * @param wf folder for the task
      */
     public static void checkVersionAndConvertPdf(Path outFilePath, String postPdfOutput, WorkFolder wf) {
-
         try (Document doc = new Document(outFilePath.toString())) {
-
-            String version = doc.getVersion();
-
-            if (version.equalsIgnoreCase(postPdfOutput)) {
-                log.info("The postPdfOutput [{}] choice is equal to the doc version [{}].",
-                        postPdfOutput, version);
-            }
-            else {
-
-                PdfFormat pdfOutputType = parsePdfOutputType(postPdfOutput);
-
-                log.info("Trying to convert for different PDF version from {} to {}",
-                        version, postPdfOutput);
-
-                String conversionLogPath = wf.getNewFilePath("Conversion_log", "xml").toString();
-
-                boolean converted = doc.convert(conversionLogPath, pdfOutputType, ConvertErrorAction.Delete);
-
-                if (!converted) {
-
-                    String conversionMessage = FileUtils.fileToString(
-                            conversionLogPath,
-                            "Transformation failed doing Conversion for version [" + pdfOutputType + "]: ",
-                            MAX_LOG_SIZE);
-
-                    log.warn(conversionMessage);
-                }
-                else {
-                    log.info("The pdf was converted.");
-                    doc.save(outFilePath.toString());
-                }
-            }
+            checkVersionAndConvertPdf(doc, postPdfOutput, wf);
+            doc.save(outFilePath.toString());
         }
     }
 
     /**
      * Checks and converts a pdf file to another version according to the input
      * @param doc pdf file to be checked
-     * @param postPdfOutput pdf version expected
+     * @param postPdfOutput version expected
      * @param wf folder for the task
      */
     public static void checkVersionAndConvertPdf(Document doc, String postPdfOutput, WorkFolder wf) {
+        checkVersionAndConvertPdf(doc, postPdfOutput, "", wf);
+    }
+
+    /**
+     * Checks and converts a pdf file to another version according to the input
+     * @param doc pdf file to be checked
+     * @param postPdfOutput pdf version expected
+     * @param pdfAComplianceLevel pdf compliance level
+     * @param wf folder for the task
+     */
+    public static void checkVersionAndConvertPdf(Document doc, String postPdfOutput, String pdfAComplianceLevel, WorkFolder wf) {
 
         String version = doc.getVersion();
 
@@ -73,10 +54,16 @@ public final class PdfVersionUtils {
         }
         else {
 
-            PdfFormat pdfOutputType = parsePdfOutputType(postPdfOutput);
+            PdfFormat pdfOutputType = parsePdfOutputType(postPdfOutput, pdfAComplianceLevel);
 
-            log.info("Trying to convert for different PDF version from {} to {}",
-                    version, postPdfOutput);
+            if (StringUtils.isNotBlank(pdfAComplianceLevel)) {
+                log.info("Trying to convert for different PDF version from version {} to {} with pdfAComplianceLevel: {}",
+                        version, postPdfOutput, pdfAComplianceLevel);
+            }
+            else {
+                log.info("Trying to convert for different PDF version from version {} to {}",
+                        version, postPdfOutput);
+            }
 
             String conversionLogPath = wf.getNewFilePath("Conversion_log", "xml").toString();
 
@@ -100,7 +87,7 @@ public final class PdfVersionUtils {
     /**
      * Convenience method to figure out the PdfFormat we need to set, based on the postPdfOutput
      * param and the (optional) pdfAComplianceLevel param
-     * @param postPdfOutput Choose 1.4, 1.5, 1.6, 1.7, 2.0 or PDFA
+     * @param postPdfOutput Choose 1.3, 1.4, 1.5, 1.6, 1.7, 2.0 or PDFA
      * @param pdfAComplianceLevel Choose 1A, 1B, 2A, 2B, 2U, 3A, 3B, or 3U
      * @return PdfFormat representing the appropriate format
      */
@@ -118,13 +105,14 @@ public final class PdfVersionUtils {
 
     /**
      * Convenience method to figure out the PdfFormat we need to set, based on the postPdfOutput
-     * @param postPdfOutput Choose 1.4, 1.5, 1.6, 1.7, 2.0
+     * @param postPdfOutput Choose 1.3, 1.4, 1.5, 1.6, 1.7, 2.0
      * @return PdfFormat representing the appropriate format
      */
     private static PdfFormat parsePdfOutputType(String postPdfOutput) {
         PdfFormat  result = PdfFormat.v_1_7;
 
         switch (postPdfOutput.trim()) {
+            case "1.3" -> result = PdfFormat.v_1_3;
             case "1.4" -> result = PdfFormat.v_1_4;
             case "1.5" -> result = PdfFormat.v_1_5;
             case "1.6" -> result = PdfFormat.v_1_6;
@@ -136,24 +124,27 @@ public final class PdfVersionUtils {
 
     /**
      * Convenience method to get a PdfFormat based a given Compliance Level String
-     * @param complianceLevel Choose 1A, 1B, 2A, 2B, 2U, 3A, 3B, or 3U
+     * @param complianceLevel Choose 1A, 1B, 2A, 2B, 2U, 3A, 3B, or 3U, UA1, X1A, X3
      * @return PdfFormat, default PDF/A-3b
      */
     private static PdfFormat parsePdfAComplianceLevel(String complianceLevel) {
         PdfFormat result = PdfFormat.PDF_A_3B;
-        if (complianceLevel != null) {
+
+        if (StringUtils.isNotBlank(complianceLevel)) {
             switch (complianceLevel.trim().toUpperCase().replaceAll("[/ _-]", "")) {
-                case "PDFA1A", "1A" -> result = PdfFormat.PDF_A_1A;
-                case "PDFA1B", "1B" -> result = PdfFormat.PDF_A_1B;
-                case "PDFA2A", "2A" -> result = PdfFormat.PDF_A_2A;
-                case "PDFA2B", "2B" -> result = PdfFormat.PDF_A_2B;
-                case "PDFA2U", "2U" -> result = PdfFormat.PDF_A_2U;
-                case "PDFA3A", "3A" -> result = PdfFormat.PDF_A_3A;
-                case "PDFA3U", "3U" -> result = PdfFormat.PDF_A_3U;
-                case "PDFAUA1", "UA1" -> result = PdfFormat.PDF_UA_1;
-                case "PDFAX1A", "X1A" -> result = PdfFormat.PDF_X_1A;
-                case "PDFAX3", "X3" -> result = PdfFormat.PDF_X_3;
-                case "PDFA3B", "3B" -> {}
+                case "PDFA1A", "1A"     -> result = PdfFormat.PDF_A_1A;
+                case "PDFA1B", "1B"     -> result = PdfFormat.PDF_A_1B;
+                case "PDFA2A", "2A"     -> result = PdfFormat.PDF_A_2A;
+                case "PDFA2B", "2B"     -> result = PdfFormat.PDF_A_2B;
+                case "PDFA2U", "2U"     -> result = PdfFormat.PDF_A_2U;
+                case "PDFA3A", "3A"     -> result = PdfFormat.PDF_A_3A;
+                case "PDFA3U", "3U"     -> result = PdfFormat.PDF_A_3U;
+                case "PDFAUA1", "UA1"   -> result = PdfFormat.PDF_UA_1;
+                case "PDFAX1A", "X1A"   -> result = PdfFormat.PDF_X_1A;
+                case "PDFAX3", "X3"     -> result = PdfFormat.PDF_X_3;
+                case "PDFA3B", "3B"     -> {
+                    // Default value is already PdfFormat.PDF_A_3B
+                }
                 default -> throw new UnsupportedOperationException("The following PDF compliance level is not supported: " + complianceLevel);
             }
         }
