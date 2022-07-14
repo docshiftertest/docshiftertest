@@ -110,20 +110,22 @@ public class WorkFolder implements Serializable {
 		}
 
 		synchronized (WorkFolder.class) {
-			while (Files.exists(newPath)) {
+			if (Files.exists(newPath)) {
 
 				newPath = getNewFolderPath();
 
 				try {
 					Files.createDirectories(newPath);
-				} catch (IOException e) {
+				}
+				catch (IOException e) {
 					log.error("Could not create directory: {}", newPath);
 					return null;
 				}
 
 				if (StringUtils.isNotBlank(extension)) {
 					newPath = Paths.get(newPath.toString(), filename + "." + extension);
-				} else {
+				}
+				else {
 					newPath = Paths.get(newPath.toString(), filename);
 				}
 			}
@@ -141,6 +143,8 @@ public class WorkFolder implements Serializable {
 		folderName = FileUtils.removeIllegalFilesystemCharacters(folderName);
 
 		Path newPath = Paths.get(folder.toString(), folderName);
+		// Pre-emptively prevent a race condition if creating folders/files in parallel
+		// using the directory handling in Modules (they run multiple threads)
 		synchronized (WorkFolder.class) {
 			if (Files.exists(newPath)) {
 				newPath = Paths.get(folder.toString(), folderName + "_" + UUID.randomUUID());
@@ -148,7 +152,8 @@ public class WorkFolder implements Serializable {
 
 			try {
 				Files.createDirectories(newPath);
-			} catch (IOException ioe) {
+			}
+			catch (IOException ioe) {
 				log.error("Could not create directory: {}", newPath, ioe);
 				return null;
 			}
