@@ -1,6 +1,5 @@
 package com.docshifter.core.metrics.repositories;
 
-import com.docshifter.core.metrics.Sample.ErrorLogDistributionSample;
 import com.docshifter.core.metrics.Sample.ProcessedTasksSample;
 import com.docshifter.core.metrics.Sample.TasksDistributionSample;
 import com.docshifter.core.metrics.Sample.TasksStatisticsSample;
@@ -34,23 +33,7 @@ public interface DashboardRepository extends JpaRepository<Dashboard, String> {
     @Query("select distinct dash.workflowName as workflowName from Dashboard dash where dash.isLicensed = TRUE")
     List<String> findAllDistinctDashboardWorkflowName();
 
-    @Query(value = "select (REGEXP_REPLACE(dsf.file_name, '^.+([/\\\\])', '')) AS fileName, " +
-            "ds.task_id            AS taskId, " +
-            "ds.receiver_host_name AS receiverHostName, " +
-            "ds.sender_host_name AS senderHostName, " +
-            "ds.workflow_name      AS workflowName, " +
-            "to_char(to_timestamp(ds.on_message_hit/1000), 'dd-MM-yyyy HH:mm') AS processDate, " +
-            "ds.on_message_hit AS processDateEpoch, " +
-            "coalesce(trim(substring(dtm.task_message, position(':' in dtm.task_message) + 1)), 'Unexpected error, please check the logs') AS taskMessage " +
-            "from (select ds.task_id, " +
-            "ds.receiver_host_name, " +
-            "ds.sender_host_name, " +
-            "ds.workflow_name, " +
-            "ds.on_message_hit AS on_message_hit " +
-            "from metrics.dashboard ds " +
-            " where  ds.success = :success AND (ds.on_message_hit between :startDate and :endDate)) ds " +
-            "left join metrics.dashboard_file dsf on ds.task_id = dsf.task_id " +
-            "left join metrics.dashboard_task_message dtm on ds.task_id = dtm.task_id", nativeQuery = true)
-    List<ErrorLogDistributionSample> findAllBySuccess(@Param("success") Boolean success, @Param("startDate") Long startDate, @Param("endDate") Long endDate);
+    @Query(value="select * from getErrorLogData(:success, :startDate, :endDate)",nativeQuery = true)
+    List<String> findAllBySuccess(@Param("success") Boolean success, @Param("startDate") Long startDate, @Param("endDate") Long endDate);
 
 }
