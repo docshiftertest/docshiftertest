@@ -41,10 +41,12 @@ public class TaskMessageAppenderTest {
 		TaskMessageAppender.trackTask(task);
 
 		log.error("Oh no, we got an error!");
+		log.error("==> FAILED to fully finish processing task (status: HORRIBLE FAILURE, took 11 ms, with Configuration " +
+				"Id: 1) for file: some-kind-of-file.docx");
 		log.warn("This is a warning with {} formatted parameter", 1);
 
 		assertEquals("00590175-a659-4da0-91eb-8b5a7412eea1", ThreadContext.get("taskId"));
-		assertThat(task.getMessages(), containsInAnyOrder("ERROR: Oh no, we got an error!",
+		assertThat(task.getMessages(), containsInAnyOrder("ERROR: Oh no, we got an error!; (status: HORRIBLE FAILURE, took 11 ms, with Configuration Id: 1) for file: some-kind-of-file.docx",
 				"WARNING: This is a warning with 1 formatted parameter"));
 	}
 
