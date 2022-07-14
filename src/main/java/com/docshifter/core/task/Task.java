@@ -81,6 +81,10 @@ public class Task implements Serializable {
 		return results;
 	}
 
+	public Map<TaskMessageSeverity, List<String>> getMessagesMap() {
+		return messages;
+	}
+
 	public String addMessage(TaskMessageSeverity severity, String message) {
 		List<String> messagesForSeverity = messages.get(severity);
 		if (messagesForSeverity == null) {
