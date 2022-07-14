@@ -13,12 +13,9 @@ import com.microsoft.graph.serializer.AdditionalDataManager;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,17 +26,16 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * @author Juan Marques created on 07/08/2020
  */
-@RunWith(JUnit4.class)
 @Log4j2
 public class SharePointGraphIntegrationTest {
 
@@ -47,7 +43,7 @@ public class SharePointGraphIntegrationTest {
 	
 	private static final String site = "demo";
 
-	@BeforeClass
+	@BeforeAll
 	public static void before() throws ExecutionException, InterruptedException {
 
 		graphClient = new GraphClient(MSGraphAuthenticationBuilder.createGraphClient(
@@ -56,7 +52,7 @@ public class SharePointGraphIntegrationTest {
 	}
 
 	@Test
-	public void processFullList() throws ExecutionException, InterruptedException {
+	void processFullList() throws ExecutionException, InterruptedException {
 
 		String siteId = graphClient.getSharepoint().getSiteId(site);
 
@@ -75,6 +71,7 @@ public class SharePointGraphIntegrationTest {
 		Map<Boolean, List<DriveItem>> folderOrFiles = driveItemList.parallelStream().collect(Collectors.partitioningBy(driveItem -> driveItem.folder != null));
 
 		for (DriveItem driveItem : folderOrFiles.get(false)) {
+			assert driveItem.parentReference != null;
 			getAllFiles(listId, driveItem, driveItem.parentReference.name , siteId);
 		}
 
@@ -84,15 +81,17 @@ public class SharePointGraphIntegrationTest {
 	}
 
 	@Test
-	public void getSiteId() throws ExecutionException, InterruptedException {
+	void getSiteId() throws ExecutionException, InterruptedException {
 		String siteId = graphClient.getSharepoint().getSiteId(site);
 		log.info(siteId);
-		assertEquals(siteId,"docshifter.sharepoint.com,8eb0793b-bd2c-4c55-9f89-c50344d812a6,074d4c88-f1e2-4815-9664-f250b3660685");
+		assertEquals("docshifter.sharepoint.com,8eb0793b-bd2c-4c55-9f89-c50344d812a6,074d4c88-f1e2-4815-9664-f250b3660685",
+				siteId,
+				"Site Id should match expected");
 	}
 
 	@Test
-	@Ignore("Per Juan: it's taking longer and longer to run this test, and it's not proving anything useful!")
-	public void badCredentialsTest() {
+	@Disabled("Per Juan: it's taking longer and longer to run this test, and it's not proving anything useful!")
+	void badCredentialsTest() {
 
 		GraphClient badGraphClient = new GraphClient(MSGraphAuthenticationBuilder.createGraphClient("b081-42d7-a8e1-4c93452d9a3c",
 				"3O1p8_T2XatR-PCRd18ywH~DU_tEx.m433", "a545304d-99b4-4706-8c12-f626a2d2a3cb"));
@@ -107,11 +106,11 @@ public class SharePointGraphIntegrationTest {
 		catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
-		assertNull(siteId);
+		assertNull(siteId, "Site Id should be NULL");
 	}
 
 	@Test
-	public void processesSpecificFolder() throws ExecutionException, InterruptedException {
+	void processesSpecificFolder() throws ExecutionException, InterruptedException {
 
 		String folderName = "Input/2ndLevel";
 		String listName = "Test Input";
@@ -153,7 +152,9 @@ public class SharePointGraphIntegrationTest {
 			if (driveItem.file != null) {
 
 				ListItem listItem = driveItem.listItem;
+				assert listItem != null;
 				FieldValueSet itemFieldValueSet = listItem.fields;
+				assert itemFieldValueSet != null;
 				AdditionalDataManager itemFields = itemFieldValueSet.additionalDataManager();
 				boolean processedByDS =	itemFields.get("ProcessedByDS").getAsBoolean();
 
@@ -163,47 +164,52 @@ public class SharePointGraphIntegrationTest {
 
 					log.info("DOWNLOADING FILE {}", driveItem.name);
 
+					assert driveItem.parentReference != null;
 					InputStream fileInputStream = graphClient.getSharepoint().downloadFile(driveItem.parentReference.driveId,driveItem.id,siteId);
 
-					log.info("SAVING FILE PROPERTY {}", processedByDS);
+					log.info("Downloading file for driveItem.name: {}", driveItem.name);
 					downloadFile(fileInputStream, driveItem.name);
 
-					log.info("UPDATING FILE PROPERTY {} TO TRUE", processedByDS);
-					updateFields(listId, driveItem.listItem.id, graphClient,true,siteId);
+					log.info("Updating ProcessedByDS to true for listId: {} and driveItem.listItem.id: {}", listId, driveItem.listItem.id);
+					updateFields(listId, driveItem.listItem.id, graphClient,true, siteId);
 
-					log.info("UPDATING FILE PROPERTY {} TO FALSE", processedByDS);
-					updateFields(listId, driveItem.listItem.id, graphClient,false,siteId);
+					log.info("Updating ProcessedByDS to false for listId: {} and driveItem.listItem.id: {}", listId, driveItem.listItem.id);
+					updateFields(listId, driveItem.listItem.id, graphClient,false, siteId);
 				}
 			}
 
-			else if (driveItem.folder.childCount > 0) {
+			else {
+				assert driveItem.folder != null;
+				assert driveItem.folder.childCount != null;
+				if (driveItem.folder.childCount > 0) {
 
-				String childFolderName = folderName;
+					String childFolderName = folderName;
 
-				if(!StringUtils.equals(folderName,driveItem.name)){
-					childFolderName = Paths.get(folderName,driveItem.name).toString();
+					if(!StringUtils.equals(folderName,driveItem.name)){
+						childFolderName = Paths.get(folderName,driveItem.name).toString();
+					}
+
+					DriveItem folder = graphClient.getSharepoint()
+							.getDriveItemByPath(listId, siteId,childFolderName);
+
+
+					// Getting Item by parent drive id
+					DriveItemCollectionPage itemCollection = graphClient.getSharepoint().listAllItemsFromListById(listId,siteId,folder.id);
+
+					List<DriveItem> lsItems = new ArrayList<>();
+
+					graphClient.getSharepoint().getAllItemDriveCollectionPage(lsItems,itemCollection,StringUtils.EMPTY);
+
+					for (DriveItem driveItem1 : lsItems) {
+						getAllFiles(listId, driveItem1, childFolderName , siteId );
+					}
+
 				}
-
-				DriveItem folder = graphClient.getSharepoint()
-						.getDriveItemByPath(listId, siteId,childFolderName);
-
-
-				// Getting Item by parent drive id
-				DriveItemCollectionPage itemCollection = graphClient.getSharepoint().listAllItemsFromListById(listId,siteId,folder.id);
-
-				List<DriveItem> lsItems = new ArrayList<>();
-
-				graphClient.getSharepoint().getAllItemDriveCollectionPage(lsItems,itemCollection,StringUtils.EMPTY);
-
-				for (DriveItem driveItem1 : lsItems) {
-					getAllFiles(listId, driveItem1, childFolderName , siteId );
-				}
-
 			}
 		}
 
 
-	public void updateFields(String listId, String itemId, GraphClient graphClient,boolean processed , String siteId) throws ExecutionException, InterruptedException {
+	public void updateFields(String listId, String itemId, GraphClient graphClient, boolean processed, String siteId) throws ExecutionException, InterruptedException {
 		FieldValueSet fieldValueSet = new FieldValueSet();
 		fieldValueSet.additionalDataManager().put("ProcessedByDS", new JsonPrimitive(processed));
 
@@ -213,17 +219,22 @@ public class SharePointGraphIntegrationTest {
 
 	public void downloadFile(InputStream in, String fileName) {
 
-		File file = new File("./target/test-classes/ds/work/" + fileName);
+		File folder = new File("./target/test-classes/" + UUID.randomUUID() + "/work");
+		if (!folder.mkdirs()) {
+			log.warn("Hmmm... we did not successfully do the mkdirs call on folder: {}", folder);
+		}
+		File file = new File(Paths.get(folder.getAbsolutePath(), fileName).toString());
 
 		try (FileOutputStream outputStream = new FileOutputStream(file)) {
 			IOUtils.copy(in, outputStream);
-		} catch (IOException e) {
-			e.printStackTrace();
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
 		}
 	}
 
 	@Test
-	public void getCurrentPathTest() {
+	void getCurrentPathTest() {
 		String webUrl = "https://docshifterdev.sharepoint.com/Shared%20Documents/Output/watermark/26_Nonclinical_Summary.pdf";
 
 		log.info("Actual url..." + webUrl);
