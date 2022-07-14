@@ -109,7 +109,7 @@ public class WorkFolder implements Serializable {
 			newPath = Paths.get(folder.toString(), filename);
 		}
 
-		synchronized (this) {
+		synchronized (WorkFolder.class) {
 			while (Files.exists(newPath)) {
 
 				newPath = getNewFolderPath();
@@ -141,7 +141,7 @@ public class WorkFolder implements Serializable {
 		folderName = FileUtils.removeIllegalFilesystemCharacters(folderName);
 
 		Path newPath = Paths.get(folder.toString(), folderName);
-		synchronized (this) {
+		synchronized (WorkFolder.class) {
 			if (Files.exists(newPath)) {
 				newPath = Paths.get(folder.toString(), folderName + "_" + UUID.randomUUID());
 			}
