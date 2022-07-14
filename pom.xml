@@ -160,6 +160,12 @@
         </dependency>
         <dependency>
             <groupId>com.aspose</groupId>
+            <artifactId>aspose-words</artifactId>
+            <version>${aspose.words.version}</version>
+            <classifier>shaping-harfbuzz-plugin</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
             <artifactId>aspose-email</artifactId>
             <version>${aspose.email.version}</version>
             <classifier>${aspose.email.classifier}</classifier>
