@@ -1,9 +1,8 @@
 package com.docshifter.core.monitoring.mappings;
 
 import com.docshifter.core.monitoring.dtos.SnmpConfigurationItemDto;
+import com.docshifter.core.monitoring.entities.MonitoringFilter;
 import com.docshifter.core.monitoring.entities.SnmpConfigurationItem;
-import com.docshifter.core.monitoring.mappings.CommonConverter;
-import com.docshifter.core.monitoring.mappings.ConfigurationItemConverter;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,6 +23,11 @@ public class SnmpConfigurationItemConverter implements ConfigurationItemConverte
         dto.setPort(entity.getPort());
         dto.setCommunity(entity.getCommunity());
         dto.setTrapOid(entity.getTrapOid());
+        if(entity.getMonitoringFilter() != null){
+            dto.setOperator(entity.getMonitoringFilter().getOperator());
+            dto.setSnippets(entity.getMonitoringFilter().getSnippets());
+            dto.setSnippetsCombination(entity.getMonitoringFilter().getSnippetsCombination());
+        }
     }
 
     public SnmpConfigurationItem convertToEntity(SnmpConfigurationItemDto dto) {
@@ -42,5 +46,7 @@ public class SnmpConfigurationItemConverter implements ConfigurationItemConverte
         entity.setPort(dto.getPort());
         entity.setCommunity(dto.getCommunity());
         entity.setTrapOid(dto.getTrapOid());
+
+        CommonConverter.convertFilterToEntity(dto,entity);
     }
 }

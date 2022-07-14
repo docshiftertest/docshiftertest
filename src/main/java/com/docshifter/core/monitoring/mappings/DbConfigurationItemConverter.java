@@ -2,8 +2,7 @@ package com.docshifter.core.monitoring.mappings;
 
 import com.docshifter.core.monitoring.dtos.DbConfigurationItemDto;
 import com.docshifter.core.monitoring.entities.DbConfigurationItem;
-import com.docshifter.core.monitoring.mappings.CommonConverter;
-import com.docshifter.core.monitoring.mappings.ConfigurationItemConverter;
+import com.docshifter.core.monitoring.entities.MonitoringFilter;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,6 +24,11 @@ public class DbConfigurationItemConverter implements ConfigurationItemConverter<
         dto.setDbUser(entity.getDbUser());
         dto.setPassword(entity.getPassword());
         dto.setTableName(entity.getTableName());
+        if(entity.getMonitoringFilter() != null){
+            dto.setOperator(entity.getMonitoringFilter().getOperator());
+            dto.setSnippets(entity.getMonitoringFilter().getSnippets());
+            dto.setSnippetsCombination(entity.getMonitoringFilter().getSnippetsCombination());
+        }
     }
 
     public DbConfigurationItem convertToEntity(DbConfigurationItemDto dto) {
@@ -44,5 +48,7 @@ public class DbConfigurationItemConverter implements ConfigurationItemConverter<
         entity.setDbUser(dto.getDbUser());
         entity.setPassword(dto.getPassword());
         entity.setTableName(dto.getTableName());
+
+        CommonConverter.convertFilterToEntity(dto,entity);
     }
 }

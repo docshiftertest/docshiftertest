@@ -1,8 +1,19 @@
 package com.docshifter.core.monitoring.mappings;
 
+import com.aspose.slides.internal.og.add;
+import com.docshifter.core.monitoring.dtos.AbstractConfigurationItemDto;
 import com.docshifter.core.monitoring.dtos.KeyValuePair;
+import com.docshifter.core.monitoring.dtos.MailConfigurationItemDto;
+import com.docshifter.core.monitoring.entities.AbstractConfigurationItem;
+import com.docshifter.core.monitoring.entities.MailConfigurationItem;
+import com.docshifter.core.monitoring.entities.MonitoringFilter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class CommonConverter {
@@ -38,7 +49,27 @@ public abstract class CommonConverter {
         return pairs
                 .stream()
                 .filter(p -> p.getKey() != null)
-                .sorted()
-                .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+                .collect(Collectors.toMap(KeyValuePair::getKey, KeyValuePair::getValue));
+    }
+
+    public static void convertFilterToEntity(AbstractConfigurationItemDto dto, AbstractConfigurationItem entity) {
+        if (!dto.getSnippets().isBlank()) {
+            if (entity.getMonitoringFilter() == null) {
+                entity.setMonitoringFilter(MonitoringFilter.builder()
+                        .operator(dto.getOperator())
+                        .snippets(dto.getSnippets())
+                        .snippetsCombination(dto.getSnippetsCombination())
+                        .configurationItem(entity)
+                        .build());
+            } else {
+                entity.setMonitoringFilter(MonitoringFilter.builder()
+                        .operator(dto.getOperator())
+                        .snippets(dto.getSnippets())
+                        .id(entity.getMonitoringFilter().getId())
+                        .snippetsCombination(dto.getSnippetsCombination())
+                        .configurationItem(entity)
+                        .build());
+            }
+        }
     }
 }

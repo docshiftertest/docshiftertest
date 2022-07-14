@@ -3,6 +3,7 @@ package com.docshifter.core.monitoring.mappings;
 import com.docshifter.core.monitoring.dtos.MailConfigurationItemDto;
 import com.docshifter.core.monitoring.entities.MailConfigurationItem;
 import com.docshifter.core.monitoring.entities.MailTemplate;
+import com.docshifter.core.monitoring.entities.MonitoringFilter;
 import com.docshifter.core.monitoring.entities.SmtpConfiguration;
 import com.docshifter.core.monitoring.mappings.CommonConverter;
 import com.docshifter.core.monitoring.mappings.ConfigurationItemConverter;
@@ -34,6 +35,12 @@ public class MailConfigurationItemConverter implements ConfigurationItemConverte
             dto.setPassword(entity.getSmtpConfiguration().getPassword());
             dto.setFromAddress(entity.getSmtpConfiguration().getFromAddress());
             dto.setSsl(entity.getSmtpConfiguration().isSsl());
+        }
+
+        if(entity.getMonitoringFilter() != null){
+            dto.setOperator(entity.getMonitoringFilter().getOperator());
+            dto.setSnippets(entity.getMonitoringFilter().getSnippets());
+            dto.setSnippetsCombination(entity.getMonitoringFilter().getSnippetsCombination());
         }
 
         dto.setToAddresses(convertToString(entity.getMailAddresses()));
@@ -72,6 +79,8 @@ public class MailConfigurationItemConverter implements ConfigurationItemConverte
         entity.getSmtpConfiguration().setFromAddress(dto.getFromAddress());
         entity.getSmtpConfiguration().setSsl(dto.isSsl());
 
+        CommonConverter.convertFilterToEntity(dto,entity);
+
         if (entity.getMailAddresses() == null) entity.setMailAddresses(new ArrayList<>());
         convertMailAddresses(dto.getToAddressList(), entity.getMailAddresses());
 
@@ -94,12 +103,7 @@ public class MailConfigurationItemConverter implements ConfigurationItemConverte
                 toList.add(from);
             }
         }
-        for(Iterator<String> i = toList.iterator(); i.hasNext();) {
-            String to = i.next();
-            if (!fromList.contains(to)) {
-                i.remove();
-            }
-        }
+        toList.removeIf(to -> !fromList.contains(to));
     }
 
 }
