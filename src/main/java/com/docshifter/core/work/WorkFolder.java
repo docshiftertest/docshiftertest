@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -90,7 +89,7 @@ public class WorkFolder implements Serializable {
 		return getNewFilePath(filename,extension, true);
 	}
 
-	public synchronized Path getNewFilePath(String filename, String extension, boolean shortenFileName) {
+	public Path getNewFilePath(String filename, String extension, boolean shortenFileName) {
 
 		if (StringUtils.isBlank(filename)) {
 			filename = UUID.randomUUID().toString();
@@ -110,29 +109,30 @@ public class WorkFolder implements Serializable {
 			newPath = Paths.get(folder.toString(), filename);
 		}
 
-		while (Files.exists(newPath)) {
+		synchronized (this) {
+			while (Files.exists(newPath)) {
 
-			newPath = getNewFolderPath();
+				newPath = getNewFolderPath();
 
-			try {
-				Files.createDirectories(newPath);
-			} catch (IOException e) {
-				log.error("Could not create directory: {}", newPath);
-				return null;
-			}
+				try {
+					Files.createDirectories(newPath);
+				} catch (IOException e) {
+					log.error("Could not create directory: {}", newPath);
+					return null;
+				}
 
-			if (StringUtils.isNotBlank(extension)) {
-				newPath = Paths.get(newPath.toString(), filename + "." + extension);
-			}
-			else {
-				newPath = Paths.get(newPath.toString(), filename);
+				if (StringUtils.isNotBlank(extension)) {
+					newPath = Paths.get(newPath.toString(), filename + "." + extension);
+				} else {
+					newPath = Paths.get(newPath.toString(), filename);
+				}
 			}
 		}
-
+		log.debug("Returning newPath: {}", newPath);
 		return newPath;
 	}
 
-	public synchronized Path getNewFolderPath(String folderName) {
+	public Path getNewFolderPath(String folderName) {
 
 		if (StringUtils.isBlank(folderName)) {
 			folderName = UUID.randomUUID().toString();
@@ -141,18 +141,19 @@ public class WorkFolder implements Serializable {
 		folderName = FileUtils.removeIllegalFilesystemCharacters(folderName);
 
 		Path newPath = Paths.get(folder.toString(), folderName);
-		while (Files.exists(newPath))
-		{
-			newPath = Paths.get(folder.toString(), folderName + "_" + Objects.toString(System.currentTimeMillis()));
-		}
+		synchronized (this) {
+			if (Files.exists(newPath)) {
+				newPath = Paths.get(folder.toString(), folderName + "_" + UUID.randomUUID());
+			}
 
-		try {
-			Files.createDirectories(newPath);
-		} catch (IOException e) {
-			log.error("Could not create directory: {}", newPath);
-			return null;
+			try {
+				Files.createDirectories(newPath);
+			} catch (IOException ioe) {
+				log.error("Could not create directory: {}", newPath, ioe);
+				return null;
+			}
 		}
-
+		log.debug("Returning newPath: {}", newPath);
 		return newPath;
 	}
 
@@ -162,9 +163,6 @@ public class WorkFolder implements Serializable {
 
 	private void writeObject(ObjectOutputStream oos)
 			throws IOException {
-		// default serialization
-//		oos.defaultWriteObject();
-		// write the object
 		List<Serializable> ser = new ArrayList<>();
 		ser.add(this.folder.toString());
 		ser.add(this.parent);
@@ -174,8 +172,6 @@ public class WorkFolder implements Serializable {
 
 	private void readObject(ObjectInputStream ois)
 			throws ClassNotFoundException, IOException {
-		// default deserialization
-		//	ois.defaultReadObject();
 		List ser = (List) ois.readObject();
 		this.parent = (WorkFolder) ser.get(1);
 		this.folder = Paths.get((String) ser.get(0));
