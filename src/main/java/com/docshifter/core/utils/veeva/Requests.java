@@ -28,8 +28,6 @@ public class Requests {
 	private static final String AUTHORIZATION = "Authorization";
 	private static final String GET = "GET";
 
-	private static final String HTTP = "http://";
-
 	private static final String HTTPS = "https://";
 	private static final String POST = "POST";
 	private static final String PUT = "PUT";
@@ -265,11 +263,7 @@ public class Requests {
 	}
 
 	public static HttpURLConnection postSessionRequest(String host, String apiVersion, String user, String pass) throws Exception {
-		String protocol = HTTPS;
-		if ("dummy-host".equalsIgnoreCase(host)) {
-			protocol = HTTP;
-		}
-		String urlStr = protocol + host + API + apiVersion + "/auth";
+		String urlStr = HTTPS + host + API + apiVersion + "/auth";
 		URL url = new URL(urlStr);
 
 		Map<String, Object> params = new LinkedHashMap<>();
