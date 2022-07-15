@@ -74,11 +74,25 @@ public class Task implements Serializable {
 	public List<String> getMessages(TaskMessageSeverity severity) {
 		List<String> results = new ArrayList<>();
 		if (messages.containsKey(severity)) {
-			for (String message : messages.get(severity)) {
-				results.add(severity.name() + ": " + message);
+			// For errors, we're in a Highlander situation
+			if (severity == TaskMessageSeverity.ERROR) {
+				results.add(severity.name() + ": " + String.join("; ",
+					messages.get(severity)
+						.stream()
+						.map(msg -> msg.replace("==> FAILED to fully finish processing task ", ""))
+						.toList()));
+			}
+			else {
+				for (String message : messages.get(severity)) {
+					results.add(severity.name() + ": " + message);
+				}
 			}
 		}
 		return results;
+	}
+
+	public Map<TaskMessageSeverity, List<String>> getMessagesMap() {
+		return messages;
 	}
 
 	public String addMessage(TaskMessageSeverity severity, String message) {
