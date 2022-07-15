@@ -50,7 +50,7 @@ public interface DashboardRepository extends JpaRepository<Dashboard, String> {
             "from metrics.dashboard ds " +
             " where  ds.success = :success AND (ds.on_message_hit between :startDate and :endDate)) ds " +
             "left join metrics.dashboard_file dsf on ds.task_id = dsf.task_id " +
-            "left join metrics.dashboard_task_message dtm on ds.task_id = dtm.task_id", nativeQuery = true)
+            "inner join metrics.dashboard_task_message dtm on ds.task_id = dtm.task_id where dtm.task_message like 'ERROR%'", nativeQuery = true)
     List<ErrorLogDistributionSample> findAllBySuccess(@Param("success") Boolean success, @Param("startDate") Long startDate, @Param("endDate") Long endDate);
 
 }
