@@ -67,7 +67,8 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 		log.debug("processing options json: {}", conditionsString);
 
 		try {
-			conditions = new ObjectMapper().readValue(conditionsString,  new TypeReference<Map<String,String>>() {} );
+			conditions = new ObjectMapper().readValue(conditionsString, new TypeReference<>() {
+			} );
 		} catch (JsonParseException | JsonMappingException e) {
 			log.error("Invalid JSON specified in optionJson while processing conditions", e);
 			parameters.setSuccess(TaskStatus.BAD_CONFIG);
@@ -344,9 +345,15 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 		}
 
 		StandardEvaluationContext context = new StandardEvaluationContext();
-		context.setVariable("RESULT", result);
 
-		condition = condition.toUpperCase();
+		// If the operator is contains we don't cast to upperCase the context value ,
+		// due to the condition is #result.contains('value') and we can't cast the entire condition otherwise it would fail
+		if(condition.contains("contains")) {
+			context.setVariable("result", result);
+		} else {
+			context.setVariable("RESULT", result);
+			condition = condition.toUpperCase();
+		}
 
 		ExpressionParser parser = new SpelExpressionParser();
 		Expression exp = parser.parseExpression(condition);
