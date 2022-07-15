@@ -6,7 +6,6 @@ import com.docshifter.core.utils.FileUtils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.IOException;
@@ -140,17 +139,18 @@ public class WorkFolderManager {
 	}
 
 
-	private Path getNewPath(Path root, String name)  throws IOException {
+	private synchronized Path getNewPath(Path root, String name)  throws IOException {
 
 		name = FileUtils.removeIllegalFilesystemCharacters(name);
 
 		Path specificWorkFolder = root.resolve(name);
 
-		while (Files.exists(specificWorkFolder)) {
-			specificWorkFolder = root.resolve(name + System.currentTimeMillis());
+		if (Files.exists(specificWorkFolder)) {
+			specificWorkFolder = root.resolve(name + UUID.randomUUID());
 		}
 
 		Files.createDirectory(specificWorkFolder);
+		log.debug("Returning specificWorkFolder: {}", specificWorkFolder);
 		return specificWorkFolder;
 	}
 
