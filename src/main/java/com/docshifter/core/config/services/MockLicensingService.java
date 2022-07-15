@@ -121,10 +121,15 @@ public class MockLicensingService implements ILicensingService {
 				new GregorianCalendar(2025, Calendar.APRIL, 21, 23, 59, 59).getTime(),
 				4, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
 
-		// === Preyer ===
+		// === Preyer 2022 expiry ===
 		keys.put("b1656ce3-6c9b-4382-895c-429378c37632", new License(
-				new GregorianCalendar(2023, Calendar.MARCH, 31, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
+				new GregorianCalendar(2022, Calendar.OCTOBER, 31, 23, 59, 59).getTime(),
+				1, MockLicensingModuleSet.DocShifterBase.getLicensableModules(), LicensableModule.Transformation_Diagram, LicensableModule.Release_Sharepoint_Cloud));
+
+		// === Preyer 2023 expiry ===
+		keys.put("48f3f33d-3c61-46c9-897e-55e35e305ea4", new License(
+				new GregorianCalendar(2023, Calendar.OCTOBER, 31, 23, 59, 59).getTime(),
+				1, MockLicensingModuleSet.DocShifterBase.getLicensableModules(), LicensableModule.Transformation_Diagram, LicensableModule.Release_Sharepoint_Cloud));
 
 		// === Bayer ===
 		keys.put("2ad776f1-d715-4f39-a74b-c007f62228f1", new License(
