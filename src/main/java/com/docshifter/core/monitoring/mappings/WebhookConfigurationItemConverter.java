@@ -1,10 +1,9 @@
 package com.docshifter.core.monitoring.mappings;
 
 import com.docshifter.core.monitoring.dtos.WebhookConfigurationItemDto;
+import com.docshifter.core.monitoring.entities.MonitoringFilter;
 import com.docshifter.core.monitoring.entities.WebhookConfigurationItem;
 import com.docshifter.core.monitoring.entities.WebhookTemplate;
-import com.docshifter.core.monitoring.mappings.CommonConverter;
-import com.docshifter.core.monitoring.mappings.ConfigurationItemConverter;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -34,6 +33,12 @@ public class WebhookConfigurationItemConverter implements ConfigurationItemConve
             dto.setHeaderParams(
                     CommonConverter.convertToKeyValuePairs(template.getHeaderParams()));
         }
+
+        if(entity.getMonitoringFilter() != null){
+            dto.setOperator(entity.getMonitoringFilter().getOperator());
+            dto.setSnippets(entity.getMonitoringFilter().getSnippets());
+            dto.setSnippetsCombination(entity.getMonitoringFilter().getSnippetsCombination());
+        }
     }
 
     public WebhookConfigurationItem convertToEntity(WebhookConfigurationItemDto dto) {
@@ -54,11 +59,15 @@ public class WebhookConfigurationItemConverter implements ConfigurationItemConve
         if (entity.getWebhookTemplates() == null) {
             entity.setWebhookTemplates(new ArrayList<>());
         }
+
         if (entity.getWebhookTemplates().isEmpty()) {
             WebhookTemplate template = new WebhookTemplate();
             template.setWebhookConfigurationItem(entity);
             entity.getWebhookTemplates().add(template);
         }
+
+        CommonConverter.convertFilterToEntity(dto,entity);
+
         entity.getWebhookTemplates().get(0).setBody(dto.getBody());
         entity.getWebhookTemplates().get(0).setUrlParams(
                 CommonConverter.convertToMap(dto.getUrlParams()));

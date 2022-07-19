@@ -3,6 +3,7 @@ package com.docshifter.core.monitoring.services;
 import com.docshifter.core.monitoring.utils.EmailPlaceHolderConsts;
 import com.docshifter.core.monitoring.dtos.*;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
+import com.docshifter.core.monitoring.utils.FilteringUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,6 +100,13 @@ public class NotificationServiceImpl implements Serializable, NotificationServic
     }
 
     private void sendNotificationInternal(AbstractConfigurationItemDto item, NotificationDto notification) {
+
+		if (!FilteringUtils.checkIfShouldSendNotificationByFilter(notification.getTaskId(), notification.getMessage(), item)) {
+			log.debug("The notification for the taskId [{}] will not be sent according to the filters set.",
+					notification.getTaskId());
+			return;
+		}
+
         if (item instanceof MailConfigurationItemDto) {
         	log.debug("Sending email notification(s)... item Id: {} Item Type: {}",
 					item.getId(), item.getType());

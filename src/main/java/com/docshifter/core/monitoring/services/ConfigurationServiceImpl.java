@@ -35,7 +35,7 @@ public class ConfigurationServiceImpl implements Serializable, ConfigurationServ
         log.info("getById: {}", id);
 
         Optional<Configuration> entityOptional = configurationRepository.findById(id);
-        if (!entityOptional.isPresent()) {
+        if (entityOptional.isEmpty()) {
         	log.info("Could not find (a Monitoring) Configuration for ID: {}", id);
         	return null;
         }
@@ -64,7 +64,7 @@ public class ConfigurationServiceImpl implements Serializable, ConfigurationServ
         log.info("updateConfiguration for id: {}", id);
 
         Optional<Configuration> entityOptional = configurationRepository.findById(id);
-        if (!entityOptional.isPresent()) {
+        if (entityOptional.isEmpty()) {
             return null;
         }
         Configuration entity = entityOptional.get();

@@ -13,6 +13,7 @@ import com.docshifter.core.monitoring.entities.DbConfigurationItem;
 import com.docshifter.core.monitoring.entities.MailConfigurationItem;
 import com.docshifter.core.monitoring.entities.SnmpConfigurationItem;
 import com.docshifter.core.monitoring.entities.WebhookConfigurationItem;
+import com.docshifter.core.monitoring.enums.NotificationLevels;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.io.Serializable;
@@ -39,7 +40,7 @@ public class ConfigurationConverter implements Serializable {
 
     public List<ConfigurationDto> convertToDtos(Iterable<Configuration> configurations) {
         return StreamSupport.stream(configurations.spliterator(), false)
-                .map(c -> convertToDto(c))
+                .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
@@ -89,7 +90,7 @@ public class ConfigurationConverter implements Serializable {
 
     public List<AbstractConfigurationItemDto> convertItemsToDtos(Iterable<AbstractConfigurationItem> configurationItems) {
         return StreamSupport.stream(configurationItems.spliterator(), false)
-                .map(ci -> convertItemToDto(ci))
+                .map(this::convertItemToDto)
                 .collect(Collectors.toList());
     }
 
@@ -133,7 +134,6 @@ public class ConfigurationConverter implements Serializable {
         if (entity.getConfigurationItems() == null) entity.setConfigurationItems(new ArrayList<>());
         convertItemsToEntities(dto.getConfigurationItems(), entity.getConfigurationItems());
         entity.getConfigurationItems()
-                .stream()
                 .forEach(ci -> ci.setConfiguration(entity));
     }
 
@@ -165,7 +165,7 @@ public class ConfigurationConverter implements Serializable {
 
     public List<AbstractConfigurationItem> convertItemsToEntities(List<AbstractConfigurationItemDto> configurationItems) {
         return configurationItems.stream()
-                .map(ci -> convertItemToEntity(ci))
+                .map(this::convertItemToEntity)
                 .collect(Collectors.toList());
     }
 
@@ -220,7 +220,7 @@ public class ConfigurationConverter implements Serializable {
         }
         return configItem.getNotificationLevels()
                 .stream()
-                .map(nl -> nl.toString())
+                .map(NotificationLevels::toString)
                 .collect(Collectors.joining(", "));
     }
 }

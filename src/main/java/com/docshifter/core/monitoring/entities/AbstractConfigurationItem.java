@@ -3,6 +3,7 @@ package com.docshifter.core.monitoring.entities;
 import java.util.Set;
 
 import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.ElementCollection;
@@ -18,6 +19,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -41,6 +44,11 @@ public abstract class AbstractConfigurationItem {
     @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="configurationId", nullable = false)
     private Configuration configuration;
+
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @OneToOne(mappedBy = "configurationItem", cascade = CascadeType.ALL)
+    @JoinColumn(name="monitoring_config_item_id", nullable = false)
+    private MonitoringFilter monitoringFilter;
 
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @ElementCollection(targetClass = NotificationLevels.class)
@@ -71,6 +79,14 @@ public abstract class AbstractConfigurationItem {
 
     public void setNotificationLevels(Set<NotificationLevels> notificationLevels) {
         this.notificationLevels = notificationLevels;
+    }
+
+    public MonitoringFilter getMonitoringFilter() {
+        return monitoringFilter;
+    }
+
+    public void setMonitoringFilter(MonitoringFilter monitoringFilter) {
+        this.monitoringFilter = monitoringFilter;
     }
 
     @Override
