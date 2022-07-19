@@ -14,6 +14,8 @@ import java.util.regex.Pattern;
 @Log4j2
 public class FilteringUtils {
 
+    private static final Pattern pattern = Pattern.compile("[.!?\\s]$");
+
     /**
      * Checks if the notifications should be sent according to the filtering options
      * @param taskId id of the task
@@ -74,7 +76,6 @@ public class FilteringUtils {
 
             case "matches" -> {
 
-                message = removeNotificationLevelFromBeginning(message, notificationLevels);
                 message = removePunctuationFromTheEnd(message);
 
                 finalMessage = message;
@@ -132,13 +133,13 @@ public class FilteringUtils {
     }
 
     /**
-     * Check and remove punctuation or blank space from the end of a message
+     * Checks and removes all the punctuation or blank space from the end of a message
      * @param message message to be checked
-     * @return the string without blank spaces or punctuations
+     * @return the string without blank spaces or punctuations at the end
      */
     private static String removePunctuationFromTheEnd(String message) {
 
-        while (Pattern.compile("[.!?\\s]$").matcher(message).find()) {
+        while (pattern.matcher(message).find()) {
             message = message.substring(0, message.length() - 1);
         }
 

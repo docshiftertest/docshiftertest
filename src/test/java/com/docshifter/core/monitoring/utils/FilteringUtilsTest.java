@@ -17,7 +17,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class FilteringUtilsTest {
 
-    private static final String ERROR_MESSAGE = "ERROR: the font is not valid for some reason that is really important for Docshifter.";
+    private static final String ERROR_MESSAGE = "ERROR: the font is not valid for some reason that is really important for Docshifter!?   ";
     private static final String WARN_MESSAGE = "WARNING: the font is not valid for some reason that is really important for Docshifter.";
     private static final String SUCCESS_MESSAGE = "SUCCESS: the font is valid for some reason that is really important for Docshifter.";
 
@@ -87,11 +87,17 @@ public class FilteringUtilsTest {
 
                 // MATCHES
                 arguments("matches",
-                        "the font is not valid for some reason that is really important for Docshifter",
+                        "error: the font is not valid for some reason that is really important for Docshifter",
                         "or", ERROR_MESSAGE, NotificationLevels.ERROR, true),
                 arguments("matches",
-                        "the Font is not valid for some reason that is REALLY important for docshifter",
+                        "error: the Font is not valid for some reason that is REALLY important for docshifter",
                         "and", ERROR_MESSAGE, NotificationLevels.ERROR, true),
+                arguments("matches",
+                        "warning: the font is not valid for some reason that is really important for Docshifter",
+                        "or", WARN_MESSAGE, NotificationLevels.WARN, true),
+                arguments("matches",
+                        "warn: the Font is not valid for some reason that is REALLY important for docshifter",
+                        "and", WARN_MESSAGE, NotificationLevels.WARN, false),
                 arguments("matches", "docshifter;the font",     "or", ERROR_MESSAGE, NotificationLevels.ERROR, false),
                 arguments("matches", "error;docshifter",        "and", ERROR_MESSAGE, NotificationLevels.ERROR, false),
                 arguments("matches", "font",                    "or", ERROR_MESSAGE, NotificationLevels.ERROR, false),
