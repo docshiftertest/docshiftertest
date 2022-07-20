@@ -22,7 +22,7 @@
         <!-- Despite the fact Aspose show a classifier, it's apparently not needed -->
         <!-- SIGHS -->
         <!-- aspose.cad.classifier>jdk16</aspose.cad.classifier -->
-        <aspose.cells.version>22.3</aspose.cells.version>
+        <aspose.cells.version>22.7</aspose.cells.version>
         <aspose.diagram.version>22.4</aspose.diagram.version>
         <aspose.diagram.classifier>jdk16</aspose.diagram.classifier>
         <aspose.email.version>22.3</aspose.email.version>
@@ -41,13 +41,13 @@
         <!-- Kept back to 20.12 because of hideous spamming of tmp by awful borked Asspose lib -->
         <aspose.tasks.version>22.3</aspose.tasks.version>
         <aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
-        <aspose.words.version>22.4</aspose.words.version>
+        <aspose.words.version>22.7</aspose.words.version>
         <aspose.words.classifier>jdk17</aspose.words.classifier>
         <aspose.html.version>21.12</aspose.html.version>
         <!-- Despite the fact Aspose claim a classifier is not needed, apparently it is -->
         <!-- SIGHS again -->
         <aspose.html.classifier>jdk1.8</aspose.html.classifier>
-        <artemis.version>2.19.0</artemis.version>
+        <artemis.version>2.23.1</artemis.version>
         <kubernetes-client.version>5.3.0</kubernetes-client.version>
         <failBuildOnCVSS>8</failBuildOnCVSS>
     </properties>
