@@ -208,6 +208,13 @@ public class ExplicitDestinationTransformer {
 		return toCustomZoom(0);
 	}
 
+	/**
+	 * Changes the page number of the {@link ExplicitDestination} that was passed to this transformer.
+	 * @param newPageNum The new page number.
+	 * @return An {@link ExplicitDestination} of the same type and with the same values, but that has a different page.
+	 * @throws IllegalStateException The {@link ExplicitDestination} is of type {@code Custom}, which does not support
+	 * page numbers.
+	 */
 	public ExplicitDestination changePage(int newPageNum) {
 		if (type == null) {
 			throw new IllegalStateException("Cannot change page of a Custom explicit destination type.");
