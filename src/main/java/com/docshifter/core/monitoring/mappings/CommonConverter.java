@@ -1,12 +1,10 @@
 package com.docshifter.core.monitoring.mappings;
 
-import com.aspose.slides.internal.og.add;
 import com.docshifter.core.monitoring.dtos.AbstractConfigurationItemDto;
 import com.docshifter.core.monitoring.dtos.KeyValuePair;
-import com.docshifter.core.monitoring.dtos.MailConfigurationItemDto;
 import com.docshifter.core.monitoring.entities.AbstractConfigurationItem;
-import com.docshifter.core.monitoring.entities.MailConfigurationItem;
 import com.docshifter.core.monitoring.entities.MonitoringFilter;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,7 +51,7 @@ public abstract class CommonConverter {
     }
 
     public static void convertFilterToEntity(AbstractConfigurationItemDto dto, AbstractConfigurationItem entity) {
-        if (!dto.getSnippets().isBlank()) {
+        if (!StringUtils.isBlank(dto.getSnippets())) {
             if (entity.getMonitoringFilter() == null) {
                 entity.setMonitoringFilter(MonitoringFilter.builder()
                         .operator(dto.getOperator())
