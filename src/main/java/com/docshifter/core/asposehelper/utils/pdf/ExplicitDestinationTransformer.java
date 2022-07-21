@@ -2,6 +2,7 @@ package com.docshifter.core.asposehelper.utils.pdf;
 
 import com.aspose.pdf.CustomExplicitDestination;
 import com.aspose.pdf.ExplicitDestination;
+import com.aspose.pdf.ExplicitDestinationType;
 import com.aspose.pdf.FitBExplicitDestination;
 import com.aspose.pdf.FitBHExplicitDestination;
 import com.aspose.pdf.FitBVExplicitDestination;
@@ -12,6 +13,9 @@ import com.aspose.pdf.FitVExplicitDestination;
 import com.aspose.pdf.Page;
 import com.aspose.pdf.XYZExplicitDestination;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
 public class ExplicitDestinationTransformer {
 	private final Page page;
 	private Double left;
@@ -19,6 +23,7 @@ public class ExplicitDestinationTransformer {
 	private Double bottom;
 	private Double right;
 	private Double zoom;
+	private final Integer type;
 
 	public static ExplicitDestinationTransformer create(ExplicitDestination dest) {
 		if (dest == null) {
@@ -51,30 +56,35 @@ public class ExplicitDestinationTransformer {
 
 	public ExplicitDestinationTransformer(CustomExplicitDestination dest) {
 		page = dest.getPage();
+		type = null;
 	}
 
 	public ExplicitDestinationTransformer(FitBExplicitDestination dest) {
 		page = dest.getPage();
+		type = ExplicitDestinationType.FitB;
 	}
 
 	public ExplicitDestinationTransformer(FitBHExplicitDestination dest) {
 		page = dest.getPage();
 		top = dest.getTop();
+		type = ExplicitDestinationType.FitBH;
 	}
 
 	public ExplicitDestinationTransformer(FitBVExplicitDestination dest) {
 		page = dest.getPage();
 		left = dest.getLeft();
-
+		type = ExplicitDestinationType.FitBV;
 	}
 
 	public ExplicitDestinationTransformer(FitExplicitDestination dest) {
 		page = dest.getPage();
+		type = ExplicitDestinationType.Fit;
 	}
 
 	public ExplicitDestinationTransformer(FitHExplicitDestination dest) {
 		page = dest.getPage();
 		top = dest.getTop();
+		type = ExplicitDestinationType.FitH;
 	}
 
 	public ExplicitDestinationTransformer(FitRExplicitDestination dest) {
@@ -83,11 +93,13 @@ public class ExplicitDestinationTransformer {
 		top = dest.getTop();
 		bottom = dest.getBottom();
 		right = dest.getRight();
+		type = ExplicitDestinationType.FitR;
 	}
 
 	public ExplicitDestinationTransformer(FitVExplicitDestination dest) {
 		page = dest.getPage();
 		left = dest.getLeft();
+		type = ExplicitDestinationType.FitV;
 	}
 
 	public ExplicitDestinationTransformer(XYZExplicitDestination dest) {
@@ -95,6 +107,7 @@ public class ExplicitDestinationTransformer {
 		left = dest.getLeft();
 		top = dest.getTop();
 		zoom = dest.getZoom();
+		type = ExplicitDestinationType.XYZ;
 	}
 
 	/**
@@ -157,7 +170,8 @@ public class ExplicitDestinationTransformer {
 		return new FitVExplicitDestination(page, left);
 	}
 
-	/**Coordinates (left, top) positioned at the upper-left corner of the window and the contents of the page
+	/**
+	 * Coordinates (left, top) positioned at the upper-left corner of the window and the contents of the page
 	 * magnified by the factor zoom.
 	 */
 	public XYZExplicitDestination toXYZ() {
@@ -192,5 +206,23 @@ public class ExplicitDestinationTransformer {
 
 	public XYZExplicitDestination toInheritZoom() {
 		return toCustomZoom(0);
+	}
+
+	/**
+	 * Changes the page number of the {@link ExplicitDestination} that was passed to this transformer.
+	 * @param newPageNum The new page number.
+	 * @return An {@link ExplicitDestination} of the same type and with the same values, but that has a different page.
+	 * @throws IllegalStateException The {@link ExplicitDestination} is of type {@code Custom}, which does not support
+	 * page numbers.
+	 */
+	public ExplicitDestination changePage(int newPageNum) {
+		if (type == null) {
+			throw new IllegalStateException("Cannot change page of a Custom explicit destination type.");
+		}
+		double[] values = Stream.of(left, top, bottom, right, zoom)
+				.filter(Objects::nonNull)
+				.mapToDouble(d -> d)
+				.toArray();
+		return ExplicitDestination.createDestination(newPageNum, type, values);
 	}
 }
