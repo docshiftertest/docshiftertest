@@ -22,7 +22,7 @@
         <!-- Despite the fact Aspose show a classifier, it's apparently not needed -->
         <!-- SIGHS -->
         <!-- aspose.cad.classifier>jdk16</aspose.cad.classifier -->
-        <aspose.cells.version>22.7</aspose.cells.version>
+        <aspose.cells.version>22.6</aspose.cells.version>
         <aspose.diagram.version>22.4</aspose.diagram.version>
         <aspose.diagram.classifier>jdk16</aspose.diagram.classifier>
         <aspose.email.version>22.3</aspose.email.version>
