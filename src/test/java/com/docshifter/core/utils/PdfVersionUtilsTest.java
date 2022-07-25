@@ -109,6 +109,10 @@ class PdfVersionUtilsTest {
     @ParameterizedTest
     @MethodSource("argumentsParsePdfOutputTypeWithComplianceLevel")
     public void testParsePdfOutputTypeWithComplianceLevel(String postPdfOutput, String pdfAComplianceLevel, PdfFormat expectedPdfFormat) {
+        // Old-style PdfFormat where it was a simple int
+        //int pdfFormat = PdfVersionUtils.parsePdfOutputType(postPdfOutput, pdfAComplianceLevel);
+        //assertEquals(expectedPdfFormat, pdfFormat,"The PdfFormat values should match");
+        // New-style PdfFormat where it's now an enum
         PdfFormat pdfFormat = PdfVersionUtils.parsePdfOutputType(postPdfOutput, pdfAComplianceLevel);
         assertEquals(expectedPdfFormat.getValue(), pdfFormat.getValue(),"The value should match");
     }
@@ -172,5 +176,4 @@ class PdfVersionUtilsTest {
             return doc.validate(validationLog, expectedFormat);
         }
     }
-
 }
