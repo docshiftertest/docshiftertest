@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class FlatOutlineIteratorTest {
 	@Test
-	void iterateOverBookmarks() {
+	void iterateOverRoot() {
 		try (Document doc = new Document("target/test-classes/5.4-LASTNAME-FIRSTNAMEYINITIALYYYY-000001763.pdf")) {
 			String[] bookmarks = StreamSupport.stream(FlatOutlineIterator.createIterable(doc.getOutlines()).spliterator(),
 							false)
@@ -35,6 +35,25 @@ class FlatOutlineIteratorTest {
 					"1.4.1 Not without risk",
 					"1.4.1.1 Intellectual property",
 					"2 References"
+			}, bookmarks);
+		}
+	}
+
+	@Test
+	void iterateOverChild() {
+		try (Document doc = new Document("target/test-classes/5.4-LASTNAME-FIRSTNAMEYINITIALYYYY-000001763.pdf")) {
+			OutlineItemCollection child = doc.getOutlines().get_Item(1).get_Item(2).get_Item(1);
+			String[] bookmarks = StreamSupport.stream(FlatOutlineIterator.createIterable(child).spliterator(),
+							false)
+					.map(OutlineItemCollection::getTitle)
+					.toArray(String[]::new);
+			assertArrayEquals(new String[] {
+					"1.2.1 Not without risk",
+					"1.2.1.1 Intellectual property",
+					"1.2.1.2 Another level 4",
+					"1.2.1.3 And another level 4",
+					"1.2.1.3.1 A new level 5",
+					"1.2.1.3.2 And another level 5"
 			}, bookmarks);
 		}
 	}

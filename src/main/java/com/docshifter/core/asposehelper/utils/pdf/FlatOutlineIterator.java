@@ -12,10 +12,16 @@ import java.util.NoSuchElementException;
  */
 public class FlatOutlineIterator implements Iterator<OutlineItemCollection> {
 	private final Outlines root;
+	private final int rootLevel;
 	private OutlineItemCollection currItem;
 
 	public FlatOutlineIterator(Outlines outlines) {
 		root = outlines;
+		if (root instanceof OutlineItemCollection oic) {
+			rootLevel = oic.getLevel();
+		} else {
+			rootLevel = 0;
+		}
 	}
 
 	public static Iterable<OutlineItemCollection> createIterable(Outlines outlines) {
@@ -51,7 +57,8 @@ public class FlatOutlineIterator implements Iterator<OutlineItemCollection> {
 		}
 
 		Outlines parent = currItem.getParent();
-		if (parent instanceof OutlineItemCollection oic) {
+		// Make sure we don't traverse at or any higher than the level we started at
+		if (parent instanceof OutlineItemCollection oic && oic.getLevel() > rootLevel) {
 			return hasNext(oic, false);
 		}
 
@@ -91,14 +98,17 @@ public class FlatOutlineIterator implements Iterator<OutlineItemCollection> {
 			currItem = currItem.next();
 		} else {
 			Outlines parent = currItem.getParent();
-			if (parent instanceof OutlineItemCollection oic) {
+			// Make sure we don't traverse at or any higher than the level we started at
+			if (parent instanceof OutlineItemCollection oic && oic.getLevel() > rootLevel) {
 				currItem = oic;
 				return next(false);
+			} else {
+				currItem = null;
 			}
 		}
 
 		if (currItem == null) {
-			throw new NoSuchElementException();
+			throw new NoSuchElementException("There is no next outline.");
 		}
 		return currItem;
 	}
