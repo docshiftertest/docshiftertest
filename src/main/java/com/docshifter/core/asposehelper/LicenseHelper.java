@@ -56,6 +56,7 @@ public class LicenseHelper {
 	private final com.aspose.diagram.License diagramLicense;
 	private final com.aspose.cad.License cadLicense;
 	private final com.aspose.html.License htmlLicense;
+	private final com.aspose.barcode.License barcodeLicense;
 
 	private static final LicenseHelper licenseHelper = new LicenseHelper(Executors.newSingleThreadScheduledExecutor());
 
@@ -101,6 +102,7 @@ public class LicenseHelper {
 		diagramLicense = new com.aspose.diagram.License();
 		cadLicense = new com.aspose.cad.License();
 		htmlLicense = new com.aspose.html.License();
+		barcodeLicense = new com.aspose.barcode.License();
 		try {
 			log.debug("Setting the licences");
 			emailLicense.setLicense(tmpFileFullPathStr);
@@ -116,6 +118,7 @@ public class LicenseHelper {
 			cadLicense.setLicense(tmpFileFullPathStr);
 			diagramLicense.setLicense(tmpFileFullPathStr);
 			htmlLicense.setLicense(tmpFileFullPathStr);
+			barcodeLicense.setLicense(tmpFileFullPathStr);
 		}
 		catch (Exception ex) {
 			log.error("An error occurred while loading in an Aspose license.", ex);
