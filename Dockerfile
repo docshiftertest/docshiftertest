@@ -3,7 +3,7 @@
 # VERSION       6.2.4.1
 
 # using the IBM Semeru openj9 image
-FROM ibm-semeru-runtimes:open-11-jre
+FROM ibm-semeru-runtimes:open-11.0.14.1_1-jre-focal
 
 LABEL maintainer="DocShifter, support@docshifter.com"
 
