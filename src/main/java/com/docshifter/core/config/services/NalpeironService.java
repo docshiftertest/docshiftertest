@@ -182,6 +182,7 @@ public class NalpeironService implements ILicensingService {
                         // preferably don't want to run multiple calls at once as the results are most likely
                         // being cached so subsequent calls should go a lot faster.
                         .publishOn(Schedulers.immediate())
+                        .filter(Files::isRegularFile)
                         .filter(path -> {
                             String fileName = path.getFileName().toString();
                             Set<String> replicas;
