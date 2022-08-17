@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -173,7 +175,7 @@ public class NalpeironService implements ILicensingService {
     private void checkLicenseCleanup() throws DocShifterLicenseException {
         if (Files.exists(persistentLicDirPath)) {
             try (Stream<Path> stream = Files.walk(persistentLicDirPath)) {
-                final Map<String, String> licenseCodeMap = Collections.singletonMap("licenseCode", helper.getLicenseCode());
+                final String licenseCode = helper.getLicenseCode();
                 Flux.fromStream(stream)
                         // Current replica is already excluded by the listOtherReplicas method so no need to take that
                         // scenario into account (otherwise we'd have to exclude/ignore it manually from the replicas
@@ -207,19 +209,24 @@ public class NalpeironService implements ILicensingService {
                             } catch (IOException ioe) {
                                 throw new RuntimeException(ioe);
                             }
-                            Map<String, String> uriVariables = new HashMap<>(licenseCodeMap);
+
+                            MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+                            queryParams.add("licenseCode", licenseCode);
                             if (StringUtils.isEmpty(computerId)) {
-                                uriVariables.put("hostname", path.getFileName().toString());
+                                queryParams.add("hostname", path.getFileName().toString());
                             } else {
-                                uriVariables.put("computerId", computerId);
+                                queryParams.add("computerId", computerId);
                             }
-                            return new AbstractMap.SimpleImmutableEntry<>(path, uriVariables);
+                            return new AbstractMap.SimpleImmutableEntry<>(path, queryParams);
                         }).onErrorContinue((ex, path) -> log.warn("Exception occurred while trying to read {}, a " +
                                 "licensing error might occur later down the line!", path, ex)).onErrorStop()
                         // And back to the parallel scheduler, so we can send our async requests to the licensing API...
                         .publishOn(Schedulers.parallel())
                         .flatMap(entry -> licensingApiClient.delete()
-                                .uri("/activation", entry.getValue())
+                                .uri(uriBuilder -> uriBuilder
+                                        .path("/activation")
+                                        .queryParams(entry.getValue())
+                                        .build())
                                 .retrieve()
                                 // Treat HTTP 404 as success if no mention was made about the licenseCode because
                                 // that means the API then returned that because no matching hostname/computerID was
