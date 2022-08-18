@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -35,7 +37,7 @@ import java.util.stream.Stream;
 @Service
 @Profile(NalpeironHelper.LICENSING_IDENTIFIER)
 public class NalpeironService implements ILicensingService {
-
+    private static final String LICENSE_MANAGEMENT_API_KEY = "3626307e-3592-4180-b9df-1b5ceb663e90";
     private static final long[] ANALYTICS_TRANSACTION_ID = {0L};
     /**
      * The directory pointing to the persistent licensing files managed by DocShifter itself for the purposes of
@@ -173,7 +175,7 @@ public class NalpeironService implements ILicensingService {
     private void checkLicenseCleanup() throws DocShifterLicenseException {
         if (Files.exists(persistentLicDirPath)) {
             try (Stream<Path> stream = Files.walk(persistentLicDirPath)) {
-                final Map<String, String> licenseCodeMap = Collections.singletonMap("licenseCode", helper.getLicenseCode());
+                final String licenseCode = helper.getLicenseCode();
                 Flux.fromStream(stream)
                         // Current replica is already excluded by the listOtherReplicas method so no need to take that
                         // scenario into account (otherwise we'd have to exclude/ignore it manually from the replicas
@@ -182,6 +184,7 @@ public class NalpeironService implements ILicensingService {
                         // preferably don't want to run multiple calls at once as the results are most likely
                         // being cached so subsequent calls should go a lot faster.
                         .publishOn(Schedulers.immediate())
+                        .filter(Files::isRegularFile)
                         .filter(path -> {
                             String fileName = path.getFileName().toString();
                             Set<String> replicas;
@@ -206,19 +209,25 @@ public class NalpeironService implements ILicensingService {
                             } catch (IOException ioe) {
                                 throw new RuntimeException(ioe);
                             }
-                            Map<String, String> uriVariables = new HashMap<>(licenseCodeMap);
+
+                            MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+                            queryParams.add("licenseCode", licenseCode);
                             if (StringUtils.isEmpty(computerId)) {
-                                uriVariables.put("hostname", path.getFileName().toString());
+                                queryParams.add("hostname", path.getFileName().toString());
                             } else {
-                                uriVariables.put("computerId", computerId);
+                                queryParams.add("computerId", computerId);
                             }
-                            return new AbstractMap.SimpleImmutableEntry<>(path, uriVariables);
+                            return new AbstractMap.SimpleImmutableEntry<>(path, queryParams);
                         }).onErrorContinue((ex, path) -> log.warn("Exception occurred while trying to read {}, a " +
                                 "licensing error might occur later down the line!", path, ex)).onErrorStop()
                         // And back to the parallel scheduler, so we can send our async requests to the licensing API...
                         .publishOn(Schedulers.parallel())
                         .flatMap(entry -> licensingApiClient.delete()
-                                .uri("/activation", entry.getValue())
+                                .uri(uriBuilder -> uriBuilder
+                                        .path("/activation")
+                                        .queryParams(entry.getValue())
+                                        .build())
+                                .header("x-api-key", LICENSE_MANAGEMENT_API_KEY)
                                 .retrieve()
                                 // Treat HTTP 404 as success if no mention was made about the licenseCode because
                                 // that means the API then returned that because no matching hostname/computerID was
@@ -226,7 +235,30 @@ public class NalpeironService implements ILicensingService {
                                 // prevent it from being processed again at startup by a different instance.
                                 .onStatus(HttpStatus.NOT_FOUND::equals,
                                         resp -> resp.bodyToMono(LicensingDto.class)
-                                                .filter(dto -> dto.getMessage() != null && dto.getMessage().contains("licenseCode"))
+                                                .filter(dto -> {
+                                                    if (dto.getMessage() != null && dto.getMessage().contains("licenseCode")) {
+                                                        return true;
+                                                    }
+                                                    // In our query params: we either sent the hostname or the
+                                                    // computerId to identify the activation we want to delete...
+                                                    // Assume by default we sent the computerId
+                                                    String queryKeySent = "computerId";
+                                                    String queryValueSent = entry.getValue().getFirst(queryKeySent);
+                                                    // But if the value matching the computerId in the query params map
+                                                    // is null, i.e. we didn't pass it to the API, then we must have
+                                                    // sent the hostname through instead, so log that one instead then
+                                                    if (queryValueSent == null) {
+                                                        queryKeySent = "hostname";
+                                                        queryValueSent = entry.getValue().getFirst(queryKeySent);
+                                                    }
+                                                    log.warn("Trying to delete an activation for {} with value {} " +
+                                                                    "returned an HTTP 404 error! Has the activation " +
+                                                                    "already been cleared? Will delete persistent " +
+                                                                    "licensing file at {}, so we won't retry this " +
+                                                                    "in the future.",
+                                                            queryKeySent, queryValueSent, entry.getKey());
+                                                    return false;
+                                                })
                                                 .flatMap(dto -> resp.createException()))
                                 .bodyToMono(LicensingDto.class)
                                 .map(dto -> new AbstractMap.SimpleImmutableEntry<>(entry.getKey(), dto))
