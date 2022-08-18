@@ -1,6 +1,6 @@
 # DocShifter-base
 
-FROM eclipse-temurin:17.0.3_7-jre-focal
+FROM eclipse-temurin:17.0.4_8-jre-focal
 
 LABEL maintainer="DocShifter, support@docshifter.com"
 
