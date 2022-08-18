@@ -15,8 +15,10 @@ import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,6 +52,11 @@ public class TaskMessageAppender extends AbstractAppender {
 													 @PluginAttribute("ignoreExceptions") boolean ignoreExceptions,
 													 @PluginElement("Properties") Property[] properties
 	) {
+		if (layout == null) {
+			layout = PatternLayout.newBuilder()
+					.withCharset(StandardCharsets.UTF_8)
+					.withPattern("%m%ex{short.message}").build();
+		}
 		return new TaskMessageAppender(name, filter, layout, ignoreExceptions, properties);
 	}
 
@@ -106,6 +113,6 @@ public class TaskMessageAppender extends AbstractAppender {
 			error("Task was not found, so could not add a task message! Please contact DocShifter for support.");
 			return;
 		}
-		task.addMessage(severity, logEvent.getMessage().getFormattedMessage());
+		task.addMessage(severity, getLayout().toSerializable(logEvent).toString());
 	}
 }

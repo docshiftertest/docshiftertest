@@ -2,31 +2,31 @@
 <Configuration packages="com.docshifter.core.logging.appenders" status="WARN">
     <Appenders>
         <Console name="STDOUT" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{DATE} %5p [%t] (%F:%L) - %m%n"/>
+            <PatternLayout charset="UTF-8" pattern="%d{DATE} %5p [%t] (%F:%L) - %m%n"/>
         </Console>
         <RollingFile name="DOCSHIFTER_FILE_TRACE" fileName="logs/docshifter-beans.log"
                      filePattern="logs/$${date:yyyy-MM}/docshifter-beans-%d{MM-dd-yyyy}-%i.log.gz">
-            <PatternLayout pattern="%d{DATE} %5p [%t] (%F:%L) - %m%n"/>
+            <PatternLayout charset="UTF-8" pattern="%d{DATE} %5p [%t] (%F:%L) - %m%n"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
         </RollingFile>
         <RollingFile name="SPRING" fileName="logs/spring.log"
                      filePattern="logs/$${date:yyyy-MM}/spring-%d{MM-dd-yyyy}-%i.log.gz">
-            <PatternLayout pattern="%d{DATE} %5p [%t] (%F:%L) - %m%n"/>
+            <PatternLayout charset="UTF-8" pattern="%d{DATE} %5p [%t] (%F:%L) - %m%n"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
         </RollingFile>
         <RollingFile name="LICENSING" fileName="logs/licensing.log"
                      filePattern="logs/$${date:yyyy-MM}/licensing-%d{MM-dd-yyyy}-%i.log.gz">
-            <PatternLayout pattern="%d{DATE} %5p [%t] (%F:%L) - %m%n"/>
+            <PatternLayout charset="UTF-8" pattern="%d{DATE} %5p [%t] (%F:%L) - %m%n"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
         </RollingFile>
         <TaskMessage name="TASK_MESSAGE">
-            <PatternLayout alwaysWriteExceptions="false"/>
+            <PatternLayout charset="UTF-8" pattern="%m%equalsIgnoreCase{%ex{short.message}}{null}{NO MESSAGE}"/>
         </TaskMessage>
     </Appenders>
     <Loggers>
