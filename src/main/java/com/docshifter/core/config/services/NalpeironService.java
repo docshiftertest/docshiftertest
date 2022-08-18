@@ -239,18 +239,24 @@ public class NalpeironService implements ILicensingService {
                                                     if (dto.getMessage() != null && dto.getMessage().contains("licenseCode")) {
                                                         return true;
                                                     }
-                                                    String keySent = "hostname";
-                                                    String valueSent = entry.getValue().getFirst(keySent);
-                                                    if (valueSent == null) {
-                                                        keySent = "computerId";
-                                                        valueSent = entry.getValue().getFirst(keySent);
+                                                    // In our query params: we either sent the hostname or the
+                                                    // computerId to identify the activation we want to delete...
+                                                    // Assume by default we sent the computerId
+                                                    String queryKeySent = "computerId";
+                                                    String queryValueSent = entry.getValue().getFirst(queryKeySent);
+                                                    // But if the value matching the computerId in the query params map
+                                                    // is null, i.e. we didn't pass it to the API, then we must have
+                                                    // sent the hostname through instead, so log that one instead then
+                                                    if (queryValueSent == null) {
+                                                        queryKeySent = "hostname";
+                                                        queryValueSent = entry.getValue().getFirst(queryKeySent);
                                                     }
                                                     log.warn("Trying to delete an activation for {} with value {} " +
                                                                     "returned an HTTP 404 error! Has the activation " +
                                                                     "already been cleared? Will delete persistent " +
                                                                     "licensing file at {}, so we won't retry this " +
                                                                     "in the future.",
-                                                            keySent, valueSent, entry.getKey());
+                                                            queryKeySent, queryValueSent, entry.getKey());
                                                     return false;
                                                 })
                                                 .flatMap(dto -> resp.createException()))
