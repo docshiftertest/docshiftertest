@@ -37,7 +37,7 @@ import java.util.stream.Stream;
 @Service
 @Profile(NalpeironHelper.LICENSING_IDENTIFIER)
 public class NalpeironService implements ILicensingService {
-
+    private static final String LICENSE_MANAGEMENT_API_KEY = "3626307e-3592-4180-b9df-1b5ceb663e90";
     private static final long[] ANALYTICS_TRANSACTION_ID = {0L};
     /**
      * The directory pointing to the persistent licensing files managed by DocShifter itself for the purposes of
@@ -227,6 +227,7 @@ public class NalpeironService implements ILicensingService {
                                         .path("/activation")
                                         .queryParams(entry.getValue())
                                         .build())
+                                .header("x-api-key", LICENSE_MANAGEMENT_API_KEY)
                                 .retrieve()
                                 // Treat HTTP 404 as success if no mention was made about the licenseCode because
                                 // that means the API then returned that because no matching hostname/computerID was
@@ -234,7 +235,24 @@ public class NalpeironService implements ILicensingService {
                                 // prevent it from being processed again at startup by a different instance.
                                 .onStatus(HttpStatus.NOT_FOUND::equals,
                                         resp -> resp.bodyToMono(LicensingDto.class)
-                                                .filter(dto -> dto.getMessage() != null && dto.getMessage().contains("licenseCode"))
+                                                .filter(dto -> {
+                                                    if (dto.getMessage() != null && dto.getMessage().contains("licenseCode")) {
+                                                        return true;
+                                                    }
+                                                    String keySent = "hostname";
+                                                    String valueSent = entry.getValue().getFirst(keySent);
+                                                    if (valueSent == null) {
+                                                        keySent = "computerId";
+                                                        valueSent = entry.getValue().getFirst(keySent);
+                                                    }
+                                                    log.warn("Trying to delete an activation for {} with value {} " +
+                                                                    "returned an HTTP 404 error! Has the activation " +
+                                                                    "already been cleared? Will delete persistent " +
+                                                                    "licensing file at {}, so we won't retry this " +
+                                                                    "in the future.",
+                                                            keySent, valueSent, entry.getKey());
+                                                    return false;
+                                                })
                                                 .flatMap(dto -> resp.createException()))
                                 .bodyToMono(LicensingDto.class)
                                 .map(dto -> new AbstractMap.SimpleImmutableEntry<>(entry.getKey(), dto))
