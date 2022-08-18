@@ -26,7 +26,7 @@
             </Policies>
         </RollingFile>
         <TaskMessage name="TASK_MESSAGE">
-            <PatternLayout charset="UTF-8" pattern="%m%equalsIgnoreCase{%ex{short.message}}{null}{NO MESSAGE}"/>
+            <PatternLayout charset="UTF-8" pattern="%m%ex{short.message}"/>
         </TaskMessage>
     </Appenders>
     <Loggers>
