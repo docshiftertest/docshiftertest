@@ -23,6 +23,7 @@ import java.io.RandomAccessFile;
 import java.io.Writer;
 import java.net.URL;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
@@ -708,7 +709,7 @@ public final class FileUtils {
      * @param filePathName   The file name with the path
      */
     public static boolean writeJsonFile(Object objToBeWritten, String filePathName) {
-        try (Writer writer = new FileWriter(filePathName)) {
+        try (Writer writer = new FileWriter(filePathName, StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(objToBeWritten, writer);
             return true;
