@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -29,12 +30,16 @@ import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -719,4 +724,38 @@ public final class FileUtils {
             return false;
         }
     }
+
+	/**
+	 * Deletes one or more lines in a file matching some content exactly. If the resulting file would be empty
+	 * (ignoring empty lines) after deleting the offending content, then the entire file is deleted altogether.
+	 * @param file The {@link Path} to the file to work with.
+	 * @param lineToDelete The content to delete in the file.
+	 * @return {@code true} if any of the specified content was found (and therefore appropriate action was taken),
+	 * {@code false} otherwise. Note that even if {@code false} was returned, it could also mean that the file has
+	 * now been deleted (in case the file was already empty before)!
+	 * @throws IOException The file does not exist, is not a file (but likely a directory) or could not be opened for
+	 * reading.
+	 */
+	public static boolean deleteLineOrFileIfEmpty(Path file, String lineToDelete) throws IOException {
+		if (!Files.isRegularFile(file)) {
+			throw new IOException(file + " does not exist or is not a file.");
+		}
+
+		Map<Boolean, List<String>> partitionedLines;
+		try (Stream<String> lineStream = Files.lines(file)) {
+				partitionedLines = lineStream.filter(StringUtils::isNotEmpty)
+					.collect(Collectors.partitioningBy(line -> line.equals(lineToDelete)));
+		}
+		List<String> matchingLines = partitionedLines.get(true);
+		List<String> nonMatchingLines = partitionedLines.get(false);
+
+		if (nonMatchingLines.isEmpty()) {
+			Files.deleteIfExists(file);
+		} else if (!matchingLines.isEmpty()) {
+			Files.write(file, nonMatchingLines, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+		}
+		// Nothing to do if no lines had to be deleted and the file wasn't already empty
+
+		return !matchingLines.isEmpty();
+	}
 }
