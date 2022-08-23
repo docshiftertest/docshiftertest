@@ -32,6 +32,20 @@ public class Unzipper {
 		return unzip(zipFile, directory, Charset.forName("CP437"));
 	}
 
+	/**
+	 *
+	 * @see #unzip(File, File, Charset) Charset 'CP437' will be used
+	 *
+	 * @param zipFile the file to unzip
+	 * @param directory the directory to unzip in
+	 * @param retainZipFolderStructure whether to keep the folder structure as we unzip
+	 * @return list of unzipped files
+	 * @throws IOException
+	 */
+	public static List<File> unzip(File zipFile, File directory, boolean retainZipFolderStructure) throws IOException {
+		return unzip(zipFile, directory, Charset.forName("CP437"), retainZipFolderStructure);
+	}
+
 
 	/**
 	 *
@@ -42,6 +56,19 @@ public class Unzipper {
 	 * @throws IOException
 	 */
 	public static List<File> unzip(File zipFile, File directory, Charset charset) throws IOException {
+		return unzip(zipFile, directory, charset, false);
+	}
+
+	/**
+	 *
+	 * @param zipFile the file to unzip
+	 * @param directory the directory to unzip in
+	 * @param charset the charset to use for the entry file names
+	 * @param retainZipFolderStructure whether to keep the folder structure as we unzip
+	 * @return list of unzipped files
+	 * @throws IOException
+	 */
+	public static List<File> unzip(File zipFile, File directory, Charset charset, boolean retainZipFolderStructure) throws IOException {
 		byte[] buffer = new byte[1024];
 		List<File> unzippedFiles = new ArrayList<>();
 
@@ -67,8 +94,47 @@ public class Unzipper {
 				Path newFile;
 				if (entry.isDirectory()) {
 					newFile = Files.createDirectories(Paths.get(directory.getAbsolutePath(), File.separator, entry.getName()));
-				} else {
-					newFile = Files.createFile(Paths.get(directory.getAbsolutePath(), File.separator, FileUtils.removeIllegalFilesystemCharacters(entry.getName())));
+				}
+				else {
+					if (retainZipFolderStructure) {
+						String name = entry.getName();
+						String[] entryParts;
+						String filePath = "";
+						String fileName = name;
+						/*
+						4.4.17.1 The name of the file, with optional relative path.
+						The path stored MUST not contain a drive or device letter, or a leading slash.
+						All slashes MUST be forward slashes '/' as opposed to backwards slashes '\'
+						for compatibility with Amiga and UNIX file systems etc.
+						If input came from standard input, there is no file name field.
+						 */
+						// In other words, this code is only dealing with COMPLIANT zips!
+						if (name.contains("/")) {
+							entryParts = name.split("/");
+							for (int idx = 0; idx < entryParts.length; idx++) {
+								// File path is all entryParts except the last one, which is the file name
+								if (idx < entryParts.length - 1) {
+									filePath += FileUtils.removeIllegalFilesystemCharacters(entryParts[idx]);
+								}
+								// Add a file separator between but stop when we reach the last entryPart
+								// which is part of the file path
+								if (idx < entryParts.length - 2) {
+									filePath += File.separator;
+								}
+								// The last entryParts entry is (hopefully) the file name
+								if (idx == entryParts.length - 1) {
+									fileName = FileUtils.removeIllegalFilesystemCharacters(entryParts[idx]);
+								}
+							}
+						}
+						Files.createDirectories(Paths.get(directory.getAbsolutePath(), filePath));
+						newFile = Files.createFile(
+								Paths.get(directory.getAbsolutePath(), filePath, fileName));
+					}
+					else {
+						newFile = Files.createFile(
+								Paths.get(directory.getAbsolutePath(), FileUtils.removeIllegalFilesystemCharacters(entry.getName())));
+					}
 					unzippedFiles.add(newFile.toFile());
 				}
 
@@ -83,17 +149,19 @@ public class Unzipper {
 						output.close();
 						// Drop the reference to newFile?
 						newFile = null;
-					} catch (IOException e) {
-						log.info("Unzip failed", e);
+					}
+					catch (IOException ioe) {
+						log.info("Unzip failed", ioe);
 					}
 				}
 			}
-		} catch (IOException e) {
-			log.info("Unzip failed", e);
-		} catch (IllegalArgumentException e) {
-			log.info("Unzip failed, most likely due to character encoding", e);
 		}
-
+		catch (IOException ioe) {
+			log.info("Unzip failed", ioe);
+		}
+		catch (IllegalArgumentException illy) {
+			log.info("Unzip failed, most likely due to character encoding", illy);
+		}
 		return unzippedFiles;
 	}
 }
