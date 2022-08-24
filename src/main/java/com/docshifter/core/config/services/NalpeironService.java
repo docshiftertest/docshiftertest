@@ -32,9 +32,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 @Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
@@ -54,7 +51,6 @@ public class NalpeironService implements ILicensingService {
      * used in a containerized environment.
      */
     private static final Path persistentLicPath = persistentLicDirPath.resolve(NetworkUtils.getLocalHostName());
-    private static final int COMPUTER_ID_CHECK_MINUTES = 30;
 
     @Value("${docshifter.applang:}")
     private String appLanguage;
@@ -120,15 +116,11 @@ public class NalpeironService implements ILicensingService {
     private final IContainerClusterer containerClusterer;
     private final IContainerChecker containerChecker;
     private final WebClient licensingApiClient;
-    private final ScheduledExecutorService scheduler;
-    private ScheduledFuture<?> computerIdChecker;
 
     public NalpeironService(@Qualifier("licensingApiClient") WebClient licensingApiClient,
-                            ScheduledExecutorService scheduler,
                             @Nullable IContainerClusterer containerClusterer,
                             @Nullable IContainerChecker containerChecker) {
         this.licensingApiClient = licensingApiClient;
-        this.scheduler = scheduler;
         this.containerClusterer = containerClusterer;
         this.containerChecker = containerChecker;
     }
@@ -317,8 +309,6 @@ public class NalpeironService implements ILicensingService {
         } catch (IOException ioe) {
             throw new DocShifterLicenseException("Could not create or write to persistent licensing file: " + persistentLicPath, ioe);
         }
-        computerIdChecker = scheduler.scheduleAtFixedRate(this::checkComputerId, 1, COMPUTER_ID_CHECK_MINUTES,
-                TimeUnit.MINUTES);
     }
 
     /**
@@ -344,8 +334,8 @@ public class NalpeironService implements ILicensingService {
             String lastComputerId = helper.getCachedComputerId();
             String computerId = helper.getComputerID();
             if (!computerId.equals(lastComputerId)) {
-                log.warn("The computerId has seemingly changed since last time! Will update {} to {} in {} so it can " +
-                        "be cleaned on next startup", lastComputerId, computerId, persistentLicPath);
+                log.debug("The computerId has seemingly changed since last time! Will update {} to {} in {} so it can" +
+                        " be cleaned on next startup", lastComputerId, computerId, persistentLicPath);
                 persistComputerId(computerId);
                 FileUtils.deleteLineOrFileIfEmpty(persistentLicPath, lastComputerId);
                 return true;
@@ -419,8 +409,14 @@ public class NalpeironService implements ILicensingService {
 
         log.debug("sending analytics SystemInfo, starting periodic analytics sender");
 
-        //start periodic sending of analytics
-        helper.sendAnalyticsAndInitiatePeriodicReporting();
+        // Start periodic sending of analytics
+        // Make sure to verify our persisted computer ID in containers afterwards because that tends to change each time
+        // we check in with the Nalpeiron servers
+        Runnable postCheckAction = null;
+        if (containerChecker != null) {
+            postCheckAction = this::checkComputerId;
+        }
+        helper.sendAnalyticsAndInitiatePeriodicReporting(postCheckAction);
 
         log.debug("Periodic analytics sending thread started");
     }
@@ -552,9 +548,6 @@ public class NalpeironService implements ILicensingService {
 
             // Need to return license in a container environment because each instance counts as a new activation
             if (containerChecker != null) {
-                if (computerIdChecker != null) {
-                    computerIdChecker.cancel(true);
-                }
                 String lastComputerId = helper.getCachedComputerId();
                 try {
                     helper.returnLicense(licenseCode);
