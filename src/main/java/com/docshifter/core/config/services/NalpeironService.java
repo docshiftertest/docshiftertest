@@ -386,8 +386,15 @@ public class NalpeironService implements ILicensingService {
      * should probably kill the application...
      */
     private void validateLicenseAndStartAnalytics() throws DocShifterLicenseException {
+        // Make sure to verify our persisted computer ID in containers after checking into the Nalpeiron servers
+        // because the actual computer ID tends to change each time we do that
+        Runnable postCheckAction = null;
+        if (containerChecker != null) {
+            postCheckAction = this::checkComputerId;
+        }
+
         log.debug("Starting periodic license checking");
-        helper.validateLicenseAndInitiatePeriodicChecking();
+        helper.validateLicenseAndInitiatePeriodicChecking(postCheckAction);
         log.debug("Periodic license checking thread started");
 
         if (helper.isPassiveActivation()) {
@@ -410,12 +417,6 @@ public class NalpeironService implements ILicensingService {
         log.debug("sending analytics SystemInfo, starting periodic analytics sender");
 
         // Start periodic sending of analytics
-        // Make sure to verify our persisted computer ID in containers afterwards because that tends to change each time
-        // we check in with the Nalpeiron servers
-        Runnable postCheckAction = null;
-        if (containerChecker != null) {
-            postCheckAction = this::checkComputerId;
-        }
         helper.sendAnalyticsAndInitiatePeriodicReporting(postCheckAction);
 
         log.debug("Periodic analytics sending thread started");

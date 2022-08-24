@@ -165,11 +165,21 @@ public class NalpeironHelper {
         }
     }
 
-    public void validateLicenseAndInitiatePeriodicChecking() {
+    public void validateLicenseAndInitiatePeriodicChecking(Runnable postCheckAction) {
         //validate the license and start the periodic checking
         NalpeironLicenseValidator validator = new NalpeironLicenseValidator(this);
-        validator.validateLicenseStatus();
-        licenseValidationScheduler.scheduleAtFixedRate(validator, 1, LICENSE_DURATION_MINUTES, TimeUnit.MINUTES);
+        Runnable runnable = validator;
+        if (postCheckAction != null) {
+            runnable = () -> {
+                validator.run();
+                postCheckAction.run();
+            };
+        }
+        licenseValidationScheduler.scheduleAtFixedRate(runnable, 0, LICENSE_DURATION_MINUTES, TimeUnit.MINUTES);
+    }
+
+    public void validateLicenseAndInitiatePeriodicChecking() {
+        validateLicenseAndInitiatePeriodicChecking(null);
     }
 
     public void stopAnalyticsSenderScheduler() {
