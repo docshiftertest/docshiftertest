@@ -32,6 +32,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 @Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
@@ -51,6 +54,7 @@ public class NalpeironService implements ILicensingService {
      * used in a containerized environment.
      */
     private static final Path persistentLicPath = persistentLicDirPath.resolve(NetworkUtils.getLocalHostName());
+    private static final int COMPUTER_ID_CHECK_MINUTES = 30;
 
     @Value("${docshifter.applang:}")
     private String appLanguage;
@@ -116,11 +120,15 @@ public class NalpeironService implements ILicensingService {
     private final IContainerClusterer containerClusterer;
     private final IContainerChecker containerChecker;
     private final WebClient licensingApiClient;
+    private final ScheduledExecutorService scheduler;
+    private ScheduledFuture<?> computerIdChecker;
 
     public NalpeironService(@Qualifier("licensingApiClient") WebClient licensingApiClient,
+                            ScheduledExecutorService scheduler,
                             @Nullable IContainerClusterer containerClusterer,
                             @Nullable IContainerChecker containerChecker) {
         this.licensingApiClient = licensingApiClient;
+        this.scheduler = scheduler;
         this.containerClusterer = containerClusterer;
         this.containerChecker = containerChecker;
     }
@@ -143,10 +151,7 @@ public class NalpeironService implements ILicensingService {
 
             validateLicenseAndStartAnalytics();
 
-            if (containerChecker != null) {
-                log.debug("Performing container check");
-                doContainerCheck();
-            }
+            doContainerCheck();
         } catch (Exception ex) {
             log.fatal("Error in DocShifter license processing, exiting application.", ex);
             // We need to exit with zero or yajsw will restart the service
@@ -212,16 +217,14 @@ public class NalpeironService implements ILicensingService {
                                 computerIds = null;
                             }
 
-                            MultiValueMap<String, String> baseQueryParams = new LinkedMultiValueMap<>();
-                            baseQueryParams.add("licenseCode", licenseCode);
+                            MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+                            queryParams.add("licenseCode", licenseCode);
+                            queryParams.add("hostname", path.getFileName().toString());
                             if (computerIds == null || computerIds.length == 0) {
-                                MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>(baseQueryParams);
-                                queryParams.add("hostname", path.getFileName().toString());
                                 return List.of(new AbstractMap.SimpleImmutableEntry<>(path, queryParams));
                             }
 
                             return Arrays.stream(computerIds).map(computerId -> {
-                                MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>(baseQueryParams);
                                 queryParams.add("computerId", computerId);
                                 return new AbstractMap.SimpleImmutableEntry<>(path, queryParams);
                             }).toList();
@@ -310,11 +313,47 @@ public class NalpeironService implements ILicensingService {
         }
 
         try {
-            Files.writeString(persistentLicPath, helper.getComputerID() + System.lineSeparator(),
-                    StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+            persistComputerId(helper.getComputerID());
         } catch (IOException ioe) {
             throw new DocShifterLicenseException("Could not create or write to persistent licensing file: " + persistentLicPath, ioe);
         }
+        computerIdChecker = scheduler.scheduleAtFixedRate(this::checkComputerId, 1, COMPUTER_ID_CHECK_MINUTES,
+                TimeUnit.MINUTES);
+    }
+
+    /**
+     * Saves a computerId entry to the persistent licensing path.
+     * @param computerId The computerId to save.
+     * @throws IOException Something went wrong while trying to write to the persistent licensing file.
+     */
+    private void persistComputerId(String computerId) throws IOException {
+        Files.writeString(persistentLicPath, computerId + System.lineSeparator(),
+                StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+    }
+
+    /**
+     * Validates that the computerId of the current machine hasn't changed since last time it was checked and cached
+     * into memory. If a change has occurred, then this will also replace the previously persisted computerId with its
+     * new value.
+     * @return {@code true} if the computerId has changed since last time and the new one has been persisted, {@code false}
+     * if nothing in particular has happened or if an error occurred while replacing the computerId in the persistent
+     * file.
+     */
+    private boolean checkComputerId() {
+        try {
+            String lastComputerId = helper.getCachedComputerId();
+            String computerId = helper.getComputerID();
+            if (!computerId.equals(lastComputerId)) {
+                log.warn("The computerId has seemingly changed since last time! Will update {} to {} in {} so it can " +
+                        "be cleaned on next startup", lastComputerId, computerId, persistentLicPath);
+                persistComputerId(computerId);
+                FileUtils.deleteLineOrFileIfEmpty(persistentLicPath, lastComputerId);
+                return true;
+            }
+        } catch (Exception ex) {
+            log.error("Unable to check or persist computerId to {}", persistentLicPath, ex);
+        }
+        return false;
     }
 
     /**
@@ -378,7 +417,6 @@ public class NalpeironService implements ILicensingService {
         helper.sendAnalyticsSystemInfo(NalpeironHelper.NALPEIRON_USERNAME, appLanguage, version, edition,
                 build, NalpeironHelper.LICENSE_STAT, NalpeironHelper.CLIENT_DATA);
 
-        helper.sendAnalyticsAndInitiatePeriodicReporting();
         log.debug("sending analytics SystemInfo, starting periodic analytics sender");
 
         //start periodic sending of analytics
@@ -394,6 +432,10 @@ public class NalpeironService implements ILicensingService {
      * performing the check. You should probably kill the application if this happens...
      */
     private void doContainerCheck() throws DocShifterLicenseException {
+        if (containerChecker == null) {
+            return;
+        }
+        log.debug("Performing container check");
         String maxReceiversUDF = helper.getUDFValue(NalpeironHelper.MAX_RECEIVERS_UDF_KEY);
         int maxReceivers = 0;
 
@@ -510,9 +552,19 @@ public class NalpeironService implements ILicensingService {
 
             // Need to return license in a container environment because each instance counts as a new activation
             if (containerChecker != null) {
-                String computerId = helper.getComputerID();
-                helper.returnLicense(licenseCode);
-                FileUtils.deleteLineOrFileIfEmpty(persistentLicPath, computerId);
+                if (computerIdChecker != null) {
+                    computerIdChecker.cancel(true);
+                }
+                String lastComputerId = helper.getCachedComputerId();
+                try {
+                    helper.returnLicense(licenseCode);
+                    FileUtils.deleteLineOrFileIfEmpty(persistentLicPath, lastComputerId);
+                } catch (Exception ex) {
+                    log.warn("Could not return license {} correctly!", licenseCode);
+                    if (!checkComputerId()) {
+                        log.info("Will keep {} in {} so it can be cleaned on next startup", lastComputerId, persistentLicPath);
+                    }
+                }
             }
         }
 
