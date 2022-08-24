@@ -3,14 +3,9 @@ package com.docshifter.core.config.entities;
 import com.docshifter.core.security.Encrypted;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -24,10 +19,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyClass;
 import javax.persistence.Transient;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
+@TypeName("ModuleConfiguration")
 public class ModuleConfiguration {
 
 	@Id

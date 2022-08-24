@@ -1,6 +1,8 @@
 package com.docshifter.core.monitoring.entities;
 
 
+import org.javers.core.metamodel.annotation.TypeName;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,6 +16,7 @@ import javax.persistence.ManyToOne;
  * Created by blazejm on 17.05.2017.
  */
 @Entity(name = "MonitoringMailTemplate")
+@TypeName("MonitoringMailTemplate")
 public class MailTemplate {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

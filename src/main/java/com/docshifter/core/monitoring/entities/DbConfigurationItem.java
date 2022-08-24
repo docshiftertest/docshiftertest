@@ -2,6 +2,7 @@ package com.docshifter.core.monitoring.entities;
 
 import com.docshifter.core.security.Encrypted;
 import com.docshifter.core.monitoring.enums.ConfigurationTypes;
+import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -11,6 +12,7 @@ import javax.persistence.Entity;
  */
 @Entity(name = "MonitoringDbConfigItem")
 @DiscriminatorValue(ConfigurationTypes.DB)
+@TypeName("MonitoringDbConfigItem")
 public class DbConfigurationItem extends AbstractConfigurationItem {
     private String driver;
     private String connection;

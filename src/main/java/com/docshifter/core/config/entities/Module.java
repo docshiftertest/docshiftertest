@@ -2,15 +2,9 @@ package com.docshifter.core.config.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.extern.log4j.Log4j2;
-
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -24,11 +18,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Log4j2
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
+@TypeName("Module")
 public class Module {
 
 	@Id

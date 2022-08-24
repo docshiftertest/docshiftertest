@@ -1,6 +1,7 @@
 package com.docshifter.core.monitoring.entities;
 
 import com.docshifter.core.monitoring.enums.ConfigurationTypes;
+import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
@@ -14,6 +15,7 @@ import java.util.List;
  */
 @Entity(name = "MonitoringWebhookConfigItem")
 @DiscriminatorValue(ConfigurationTypes.WEBHOOK)
+@TypeName("MonitoringSnmpConfigItem")
 public class WebhookConfigurationItem extends AbstractConfigurationItem {
     private String url;
 

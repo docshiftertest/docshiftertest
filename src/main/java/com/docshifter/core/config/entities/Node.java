@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -24,6 +25,7 @@ import java.util.function.Consumer;
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
+@TypeName("Node")
 public class Node {
 	@Id
 	@Column(name = "ID")

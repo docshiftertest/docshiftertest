@@ -2,6 +2,7 @@ package com.docshifter.core.config.entities;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
+@TypeName("Parameter")
 public class Parameter implements Comparable<Parameter>
 {
 

@@ -1,6 +1,7 @@
 package com.docshifter.core.config.repositories;
 
 import com.docshifter.core.config.entities.Node;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
  */
 //@Repository
 //@RepositoryRestResource
+@JaversSpringDataAuditable
 public interface NodeRepository extends JpaRepository<Node, Long> {
 
 

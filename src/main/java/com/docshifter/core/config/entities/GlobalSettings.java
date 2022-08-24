@@ -1,13 +1,15 @@
 package com.docshifter.core.config.entities;
 
+import com.docshifter.core.security.Encrypted;
+import org.javers.core.metamodel.annotation.TypeName;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import com.docshifter.core.security.Encrypted;
-
 @Entity
+@TypeName("GlobalSettings")
 public class GlobalSettings
 {
 	@Id

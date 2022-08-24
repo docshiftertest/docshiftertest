@@ -3,6 +3,7 @@ package com.docshifter.core.config.repositories;
 import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.services.ChainConfigurationSample;
 import com.docshifter.core.config.entities.Node;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -15,6 +16,7 @@ import java.util.Set;
  * Created by michiel.vandriessche@docbyte.com on 8/19/16.
  */
 
+@JaversSpringDataAuditable
 public interface ChainConfigurationRepository extends CrudRepository<ChainConfiguration, Long> {
 
 	List<ChainConfiguration> findByEnabled(boolean enabled);

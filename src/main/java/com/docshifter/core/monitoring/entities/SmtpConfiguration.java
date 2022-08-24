@@ -1,6 +1,7 @@
 package com.docshifter.core.monitoring.entities;
 
 import com.docshifter.core.security.Encrypted;
+import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import javax.persistence.Id;
  * Created by blazejm on 12.05.2017.
  */
 @Entity(name = "MonitoringSmtpConfig")
+@TypeName("MonitoringSmtpConfig")
 public class SmtpConfiguration {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
