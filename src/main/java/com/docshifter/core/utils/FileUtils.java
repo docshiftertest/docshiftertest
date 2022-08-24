@@ -733,8 +733,8 @@ public final class FileUtils {
 	 * @return {@code true} if any of the specified content was found (and therefore appropriate action was taken),
 	 * {@code false} otherwise. Note that even if {@code false} was returned, it could also mean that the file has
 	 * now been deleted (in case the file was already empty before)!
-	 * @throws IOException The file does not exist, is not a file (but likely a directory) or could not be opened for
-	 * reading.
+	 * @throws IOException The file does not exist, is not a file (but likely a directory), it could not be opened for
+	 * reading, or it could not be deleted (if applicable).
 	 */
 	public static boolean deleteLineOrFileIfEmpty(Path file, String lineToDelete) throws IOException {
 		if (!Files.isRegularFile(file)) {

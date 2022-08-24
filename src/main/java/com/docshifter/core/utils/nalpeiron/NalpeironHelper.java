@@ -96,6 +96,7 @@ public class NalpeironHelper {
     private final String workDirStr;
 
     private final String licenseCode;
+    private String cachedComputerId;
     private final String licenseActivationRequest;
     private final String licenseActivationAnswer;
     private final boolean offlineActivation;
@@ -543,14 +544,20 @@ public class NalpeironHelper {
     public String getComputerID() throws DocShifterLicenseException {
         try {
             if (isPassiveActivation()) {
-                return psl.callPSLGetComputerID();
+                cachedComputerId = psl.callPSLGetComputerID();
+            } else {
+                cachedComputerId = nsl.callNSLGetComputerID();
             }
-            return nsl.callNSLGetComputerID();
+            return cachedComputerId;
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
                     error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
+    }
+
+    public String getCachedComputerId() {
+        return cachedComputerId;
     }
 
     public String getLicenseHostName() throws DocShifterLicenseException {
