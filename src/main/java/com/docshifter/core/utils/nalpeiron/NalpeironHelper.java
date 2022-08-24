@@ -178,10 +178,20 @@ public class NalpeironHelper {
         }
     }
 
-    public void sendAnalyticsAndInitiatePeriodicReporting() {
+    public void sendAnalyticsAndInitiatePeriodicReporting(Runnable postCheckAction) {
         NalpeironAnalyticsSender sender = new NalpeironAnalyticsSender(this, NALPEIRON_USERNAME);
-        sender.run();
-        analyticsSenderScheduler.scheduleAtFixedRate(sender, 1, CACHING_DURATION_MINUTES, TimeUnit.MINUTES);
+        Runnable runnable = sender;
+        if (postCheckAction != null) {
+            runnable = () -> {
+                sender.run();
+                postCheckAction.run();
+            };
+        }
+        analyticsSenderScheduler.scheduleAtFixedRate(runnable, 0, CACHING_DURATION_MINUTES, TimeUnit.MINUTES);
+    }
+
+    public void sendAnalyticsAndInitiatePeriodicReporting() {
+       sendAnalyticsAndInitiatePeriodicReporting(null);
     }
 
 
