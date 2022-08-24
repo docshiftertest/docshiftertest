@@ -22,7 +22,7 @@ import java.util.Random;
 
 @Log4j2
 public class Requests {
-	private static final String ACCEPT = "Authorization";
+	private static final String ACCEPT = "accept";
 
 	private static final String API = "/api/";
 	private static final String AUTHORIZATION = "Authorization";
