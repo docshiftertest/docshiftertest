@@ -175,7 +175,9 @@ public class NalpeironHelper {
                 postCheckAction.run();
             };
         }
-        licenseValidationScheduler.scheduleAtFixedRate(runnable, 0, LICENSE_DURATION_MINUTES, TimeUnit.MINUTES);
+        // Need to run this on the main thread first to make sure we're good to go and all checked in before continuing
+        runnable.run();
+        licenseValidationScheduler.scheduleAtFixedRate(runnable, LICENSE_DURATION_MINUTES, LICENSE_DURATION_MINUTES, TimeUnit.MINUTES);
     }
 
     public void validateLicenseAndInitiatePeriodicChecking() {
