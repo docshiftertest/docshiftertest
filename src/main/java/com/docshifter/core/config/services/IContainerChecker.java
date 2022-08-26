@@ -3,7 +3,7 @@ package com.docshifter.core.config.services;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 
 /**
- * Checks cluster size in a containerized environment.
+ * Checks and enforces cluster size in a containerized environment.
  */
 @FunctionalInterface
 public interface IContainerChecker {
