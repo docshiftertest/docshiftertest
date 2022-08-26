@@ -113,7 +113,17 @@ public class NalpeironService implements ILicensingService {
     private static final boolean NSAEnable = true; // Enable Analytics
     private static final boolean NSLEnable = true; // Enable Licensing
 
+    /**
+     * An instance that can be used to find other components in the cluster. Should be autowired in any container
+     * environment and for every component.
+     */
     private final IContainerClusterer containerClusterer;
+    /**
+     * An instance that can be used to verify no license constraints are being violated in a container cluster.
+     * Typically, we only set restrictions on the total number of Receivers a customer may run in their cluster (for
+     * now), so this instance should be autowired in any container environment but only when we're running the Receiver
+     * component.
+     */
     private final IContainerChecker containerChecker;
     private final WebClient licensingApiClient;
 
@@ -389,7 +399,7 @@ public class NalpeironService implements ILicensingService {
         // Make sure to verify our persisted computer ID in containers after checking into the Nalpeiron servers
         // because the actual computer ID tends to change each time we do that
         Runnable postCheckAction = null;
-        if (containerChecker != null && !helper.isPassiveActivation()) {
+        if (containerClusterer != null && !helper.isPassiveActivation()) {
             postCheckAction = this::checkComputerId;
         }
 
@@ -548,7 +558,7 @@ public class NalpeironService implements ILicensingService {
             helper.sendAnalyticsCache(NalpeironHelper.NALPEIRON_USERNAME);
 
             // Need to return license in a container environment because each instance counts as a new activation
-            if (containerChecker != null) {
+            if (containerClusterer != null) {
                 String lastComputerId = helper.getCachedComputerId();
                 try {
                     helper.returnLicense(licenseCode);
