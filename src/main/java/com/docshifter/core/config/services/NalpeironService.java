@@ -389,7 +389,7 @@ public class NalpeironService implements ILicensingService {
         // Make sure to verify our persisted computer ID in containers after checking into the Nalpeiron servers
         // because the actual computer ID tends to change each time we do that
         Runnable postCheckAction = null;
-        if (containerChecker != null) {
+        if (containerChecker != null && !helper.isPassiveActivation()) {
             postCheckAction = this::checkComputerId;
         }
 
