@@ -96,6 +96,7 @@ public class NalpeironHelper {
     private final String workDirStr;
 
     private final String licenseCode;
+    private String cachedComputerId;
     private final String licenseActivationRequest;
     private final String licenseActivationAnswer;
     private final boolean offlineActivation;
@@ -164,11 +165,23 @@ public class NalpeironHelper {
         }
     }
 
-    public void validateLicenseAndInitiatePeriodicChecking() {
+    public void validateLicenseAndInitiatePeriodicChecking(Runnable postCheckAction) {
         //validate the license and start the periodic checking
         NalpeironLicenseValidator validator = new NalpeironLicenseValidator(this);
-        validator.validateLicenseStatus();
-        licenseValidationScheduler.scheduleAtFixedRate(validator, 1, LICENSE_DURATION_MINUTES, TimeUnit.MINUTES);
+        Runnable runnable = validator;
+        if (postCheckAction != null) {
+            runnable = () -> {
+                validator.run();
+                postCheckAction.run();
+            };
+        }
+        // Need to run this on the main thread first to make sure we're good to go and all checked in before continuing
+        runnable.run();
+        licenseValidationScheduler.scheduleAtFixedRate(runnable, LICENSE_DURATION_MINUTES, LICENSE_DURATION_MINUTES, TimeUnit.MINUTES);
+    }
+
+    public void validateLicenseAndInitiatePeriodicChecking() {
+        validateLicenseAndInitiatePeriodicChecking(null);
     }
 
     public void stopAnalyticsSenderScheduler() {
@@ -177,10 +190,20 @@ public class NalpeironHelper {
         }
     }
 
-    public void sendAnalyticsAndInitiatePeriodicReporting() {
+    public void sendAnalyticsAndInitiatePeriodicReporting(Runnable postCheckAction) {
         NalpeironAnalyticsSender sender = new NalpeironAnalyticsSender(this, NALPEIRON_USERNAME);
-        sender.run();
-        analyticsSenderScheduler.scheduleAtFixedRate(sender, 1, CACHING_DURATION_MINUTES, TimeUnit.MINUTES);
+        Runnable runnable = sender;
+        if (postCheckAction != null) {
+            runnable = () -> {
+                sender.run();
+                postCheckAction.run();
+            };
+        }
+        analyticsSenderScheduler.scheduleAtFixedRate(runnable, 0, CACHING_DURATION_MINUTES, TimeUnit.MINUTES);
+    }
+
+    public void sendAnalyticsAndInitiatePeriodicReporting() {
+       sendAnalyticsAndInitiatePeriodicReporting(null);
     }
 
 
@@ -543,14 +566,20 @@ public class NalpeironHelper {
     public String getComputerID() throws DocShifterLicenseException {
         try {
             if (isPassiveActivation()) {
-                return psl.callPSLGetComputerID();
+                cachedComputerId = psl.callPSLGetComputerID();
+            } else {
+                cachedComputerId = nsl.callNSLGetComputerID();
             }
-            return nsl.callNSLGetComputerID();
+            return cachedComputerId;
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
                     error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
+    }
+
+    public String getCachedComputerId() {
+        return cachedComputerId;
     }
 
     public String getLicenseHostName() throws DocShifterLicenseException {

@@ -42,8 +42,15 @@ public class KubernetesClusterer implements IContainerClusterer {
 		// Hostname matches the current pod name, e.g. receiver-596c884f74-775pr
 		// The current name of the underlying ReplicaSet managing pods for the Deployment, e.g. receiver-596c884f74
 		String currRs = hostname.substring(0, hostname.lastIndexOf('-'));
-		// The current Deployment controller, e.g. receiver
-		String currDeploy = currRs.substring(0, currRs.lastIndexOf('-'));
+		String currDeploy;
+		int lastIndexOfDash;
+		if ((lastIndexOfDash = currRs.lastIndexOf('-')) >= 0){
+			// The current Deployment controller, e.g. receiver
+			currDeploy = currRs.substring(0, lastIndexOfDash);
+		} else {
+			// If the hostname contained only one hyphen, then it's probably a StatefulSet
+			currDeploy = currRs;
+		}
 		if (cachedReplicasPerComponent.containsKey(currDeploy)) {
 			return cachedReplicasPerComponent.get(currDeploy);
 		}

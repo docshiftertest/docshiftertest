@@ -2,6 +2,7 @@ package com.docshifter.core.config.services;
 
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import com.docshifter.core.licensing.dtos.LicensingDto;
+import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.utils.NetworkUtils;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import lombok.extern.log4j.Log4j2;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -19,14 +22,14 @@ import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -35,7 +38,7 @@ import java.util.stream.Stream;
 @Service
 @Profile(NalpeironHelper.LICENSING_IDENTIFIER)
 public class NalpeironService implements ILicensingService {
-
+    private static final String LICENSE_MANAGEMENT_API_KEY = "3626307e-3592-4180-b9df-1b5ceb663e90";
     private static final long[] ANALYTICS_TRANSACTION_ID = {0L};
     /**
      * The directory pointing to the persistent licensing files managed by DocShifter itself for the purposes of
@@ -110,7 +113,17 @@ public class NalpeironService implements ILicensingService {
     private static final boolean NSAEnable = true; // Enable Analytics
     private static final boolean NSLEnable = true; // Enable Licensing
 
+    /**
+     * An instance that can be used to find other components in the cluster. Should be autowired in any container
+     * environment and for every component.
+     */
     private final IContainerClusterer containerClusterer;
+    /**
+     * An instance that can be used to verify no license constraints are being violated in a container cluster.
+     * Typically, we only set restrictions on the total number of Receivers a customer may run in their cluster (for
+     * now), so this instance should be autowired in any container environment but only when we're running the Receiver
+     * component.
+     */
     private final IContainerChecker containerChecker;
     private final WebClient licensingApiClient;
 
@@ -140,10 +153,7 @@ public class NalpeironService implements ILicensingService {
 
             validateLicenseAndStartAnalytics();
 
-            if (containerChecker != null) {
-                log.debug("Performing container check");
-                doContainerCheck();
-            }
+            doContainerCheck();
         } catch (Exception ex) {
             log.fatal("Error in DocShifter license processing, exiting application.", ex);
             // We need to exit with zero or yajsw will restart the service
@@ -173,7 +183,7 @@ public class NalpeironService implements ILicensingService {
     private void checkLicenseCleanup() throws DocShifterLicenseException {
         if (Files.exists(persistentLicDirPath)) {
             try (Stream<Path> stream = Files.walk(persistentLicDirPath)) {
-                final Map<String, String> licenseCodeMap = Collections.singletonMap("licenseCode", helper.getLicenseCode());
+                final String licenseCode = helper.getLicenseCode();
                 Flux.fromStream(stream)
                         // Current replica is already excluded by the listOtherReplicas method so no need to take that
                         // scenario into account (otherwise we'd have to exclude/ignore it manually from the replicas
@@ -182,6 +192,7 @@ public class NalpeironService implements ILicensingService {
                         // preferably don't want to run multiple calls at once as the results are most likely
                         // being cached so subsequent calls should go a lot faster.
                         .publishOn(Schedulers.immediate())
+                        .filter(Files::isRegularFile)
                         .filter(path -> {
                             String fileName = path.getFileName().toString();
                             Set<String> replicas;
@@ -199,26 +210,36 @@ public class NalpeironService implements ILicensingService {
                         // cause thread starvation else
                         // TODO: For the truly dedicated: you could look into changing this to truly async I/O
                         .publishOn(Schedulers.boundedElastic())
-                        .map(path -> {
-                            String computerId;
-                            try {
-                                computerId = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+                        .flatMapIterable(path -> {
+                            String[] computerIds;
+                            try (Stream<String> lineStream = Files.lines(path)) {
+                                computerIds = lineStream.filter(StringUtils::isNotEmpty).toArray(String[]::new);
                             } catch (IOException ioe) {
-                                throw new RuntimeException(ioe);
+                                log.warn("Failed to read contents of {}, will try to use hostname instead.", path);
+                                computerIds = null;
                             }
-                            Map<String, String> uriVariables = new HashMap<>(licenseCodeMap);
-                            if (StringUtils.isEmpty(computerId)) {
-                                uriVariables.put("hostname", path.getFileName().toString());
-                            } else {
-                                uriVariables.put("computerId", computerId);
+
+                            MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+                            queryParams.add("licenseCode", licenseCode);
+                            queryParams.add("hostname", path.getFileName().toString());
+                            if (computerIds == null || computerIds.length == 0) {
+                                return List.of(new AbstractMap.SimpleImmutableEntry<>(path, queryParams));
                             }
-                            return new AbstractMap.SimpleImmutableEntry<>(path, uriVariables);
+
+                            return Arrays.stream(computerIds).map(computerId -> {
+                                queryParams.add("computerId", computerId);
+                                return new AbstractMap.SimpleImmutableEntry<>(path, queryParams);
+                            }).toList();
                         }).onErrorContinue((ex, path) -> log.warn("Exception occurred while trying to read {}, a " +
                                 "licensing error might occur later down the line!", path, ex)).onErrorStop()
                         // And back to the parallel scheduler, so we can send our async requests to the licensing API...
                         .publishOn(Schedulers.parallel())
                         .flatMap(entry -> licensingApiClient.delete()
-                                .uri("/activation", entry.getValue())
+                                .uri(uriBuilder -> uriBuilder
+                                        .path("/activation")
+                                        .queryParams(entry.getValue())
+                                        .build())
+                                .header("x-api-key", LICENSE_MANAGEMENT_API_KEY)
                                 .retrieve()
                                 // Treat HTTP 404 as success if no mention was made about the licenseCode because
                                 // that means the API then returned that because no matching hostname/computerID was
@@ -226,23 +247,59 @@ public class NalpeironService implements ILicensingService {
                                 // prevent it from being processed again at startup by a different instance.
                                 .onStatus(HttpStatus.NOT_FOUND::equals,
                                         resp -> resp.bodyToMono(LicensingDto.class)
-                                                .filter(dto -> dto.getMessage() != null && dto.getMessage().contains("licenseCode"))
+                                                // If there happens to be no body present in the response, continue
+                                                // with an empty LicensingDto instead of aborting the chain with an
+                                                // empty Mono
+                                                .defaultIfEmpty(new LicensingDto())
+                                                .filter(dto -> {
+                                                    if (dto.getMessage() != null && dto.getMessage().contains("licenseCode")) {
+                                                        return true;
+                                                    }
+                                                    // In our query params: we either sent the hostname or the
+                                                    // computerId to identify the activation we want to delete...
+                                                    // Assume by default we sent the computerId
+                                                    String queryKeySent = "computerId";
+                                                    String queryValueSent = entry.getValue().getFirst(queryKeySent);
+                                                    // But if the value matching the computerId in the query params map
+                                                    // is null, i.e. we didn't pass it to the API, then we must have
+                                                    // sent the hostname through instead, so log that one instead then
+                                                    if (queryValueSent == null) {
+                                                        queryKeySent = "hostname";
+                                                        queryValueSent = entry.getValue().getFirst(queryKeySent);
+                                                    }
+                                                    log.warn("Trying to delete an activation for {} with value {} " +
+                                                                    "returned an HTTP 404 error! Has the activation " +
+                                                                    "already been cleared? Will delete persistent " +
+                                                                    "licensing file at {}, so we won't retry this " +
+                                                                    "in the future.",
+                                                            queryKeySent, queryValueSent, entry.getKey());
+                                                    return false;
+                                                })
                                                 .flatMap(dto -> resp.createException()))
                                 .bodyToMono(LicensingDto.class)
-                                .map(dto -> new AbstractMap.SimpleImmutableEntry<>(entry.getKey(), dto))
+                                .defaultIfEmpty(new LicensingDto())
+                                .map(dto -> entry)
                         ).onErrorContinue((ex, entry) -> log.warn(
                                 "Exception while sending request to licensing API, a licensing error might occur " +
                                         "later down the line!", ex)).onErrorStop()
                         // And finally delete the file so other instances don't pick it up anymore, do that on the
                         // boundedElastic scheduler again as it's a blocking I/O operation
                         .publishOn(Schedulers.boundedElastic())
-                        .doOnNext(entry -> {
+                        .map(entry -> {
                             try {
-                                Files.deleteIfExists(entry.getKey());
+                                // If we used the hostname, simply delete the entire file, otherwise delete the line
+                                // matching the computerId in the file (or just the entire file if it was the only
+                                // entry in there)
+                                if (entry.getValue().containsKey("hostname")) {
+                                    Files.deleteIfExists(entry.getKey());
+                                } else {
+                                    FileUtils.deleteLineOrFileIfEmpty(entry.getKey(), entry.getValue().getFirst("computerId"));
+                                }
                             } catch (IOException ioe) {
                                 log.warn("Exception while trying to delete licensing file {}, perhaps it has been " +
                                         "deleted already?", entry.getKey(), ioe);
                             }
+                            return entry;
                         })
                         .blockLast();
             } catch (IOException ioe) {
@@ -258,10 +315,45 @@ public class NalpeironService implements ILicensingService {
         }
 
         try {
-            Files.write(persistentLicPath, helper.getComputerID().getBytes(StandardCharsets.UTF_8));
+            persistComputerId(helper.getComputerID());
         } catch (IOException ioe) {
-            throw new DocShifterLicenseException("Could not create persistent licensing file: " + persistentLicPath, ioe);
+            throw new DocShifterLicenseException("Could not create or write to persistent licensing file: " + persistentLicPath, ioe);
         }
+    }
+
+    /**
+     * Saves a computerId entry to the persistent licensing path.
+     * @param computerId The computerId to save.
+     * @throws IOException Something went wrong while trying to write to the persistent licensing file.
+     */
+    private void persistComputerId(String computerId) throws IOException {
+        Files.writeString(persistentLicPath, computerId + System.lineSeparator(),
+                StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+    }
+
+    /**
+     * Validates that the computerId of the current machine hasn't changed since last time it was checked and cached
+     * into memory. If a change has occurred, then this will also replace the previously persisted computerId with its
+     * new value.
+     * @return {@code true} if the computerId has changed since last time and the new one has been persisted, {@code false}
+     * if nothing in particular has happened or if an error occurred while replacing the computerId in the persistent
+     * file.
+     */
+    private boolean checkComputerId() {
+        try {
+            String lastComputerId = helper.getCachedComputerId();
+            String computerId = helper.getComputerID();
+            if (!computerId.equals(lastComputerId)) {
+                log.debug("The computerId has seemingly changed since last time! Will update {} to {} in {} so it can" +
+                        " be cleaned on next startup", lastComputerId, computerId, persistentLicPath);
+                persistComputerId(computerId);
+                FileUtils.deleteLineOrFileIfEmpty(persistentLicPath, lastComputerId);
+                return true;
+            }
+        } catch (Exception ex) {
+            log.error("Unable to check or persist computerId to {}", persistentLicPath, ex);
+        }
+        return false;
     }
 
     /**
@@ -304,8 +396,15 @@ public class NalpeironService implements ILicensingService {
      * should probably kill the application...
      */
     private void validateLicenseAndStartAnalytics() throws DocShifterLicenseException {
+        // Make sure to verify our persisted computer ID in containers after checking into the Nalpeiron servers
+        // because the actual computer ID tends to change each time we do that
+        Runnable postCheckAction = null;
+        if (containerClusterer != null && !helper.isPassiveActivation()) {
+            postCheckAction = this::checkComputerId;
+        }
+
         log.debug("Starting periodic license checking");
-        helper.validateLicenseAndInitiatePeriodicChecking();
+        helper.validateLicenseAndInitiatePeriodicChecking(postCheckAction);
         log.debug("Periodic license checking thread started");
 
         if (helper.isPassiveActivation()) {
@@ -325,11 +424,10 @@ public class NalpeironService implements ILicensingService {
         helper.sendAnalyticsSystemInfo(NalpeironHelper.NALPEIRON_USERNAME, appLanguage, version, edition,
                 build, NalpeironHelper.LICENSE_STAT, NalpeironHelper.CLIENT_DATA);
 
-        helper.sendAnalyticsAndInitiatePeriodicReporting();
         log.debug("sending analytics SystemInfo, starting periodic analytics sender");
 
-        //start periodic sending of analytics
-        helper.sendAnalyticsAndInitiatePeriodicReporting();
+        // Start periodic sending of analytics
+        helper.sendAnalyticsAndInitiatePeriodicReporting(postCheckAction);
 
         log.debug("Periodic analytics sending thread started");
     }
@@ -341,6 +439,10 @@ public class NalpeironService implements ILicensingService {
      * performing the check. You should probably kill the application if this happens...
      */
     private void doContainerCheck() throws DocShifterLicenseException {
+        if (containerChecker == null) {
+            return;
+        }
+        log.debug("Performing container check");
         String maxReceiversUDF = helper.getUDFValue(NalpeironHelper.MAX_RECEIVERS_UDF_KEY);
         int maxReceivers = 0;
 
@@ -456,9 +558,17 @@ public class NalpeironService implements ILicensingService {
             helper.sendAnalyticsCache(NalpeironHelper.NALPEIRON_USERNAME);
 
             // Need to return license in a container environment because each instance counts as a new activation
-            if (containerChecker != null) {
-                helper.returnLicense(licenseCode);
-                Files.deleteIfExists(persistentLicPath);
+            if (containerClusterer != null) {
+                String lastComputerId = helper.getCachedComputerId();
+                try {
+                    helper.returnLicense(licenseCode);
+                    FileUtils.deleteLineOrFileIfEmpty(persistentLicPath, lastComputerId);
+                } catch (Exception ex) {
+                    log.warn("Could not return license {} correctly!", licenseCode);
+                    if (!checkComputerId()) {
+                        log.info("Will keep {} in {} so it can be cleaned on next startup", lastComputerId, persistentLicPath);
+                    }
+                }
             }
         }
 

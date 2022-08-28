@@ -115,7 +115,7 @@ public class StatusService {
         // message body = workfolder path
         //  NetworkUtils.getLocalHostName() = machine's name
         try {
-            FileUtils.writeJsonFile(healthDTO, message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-db-" + System.currentTimeMillis() + ".json");
+            FileUtils.writeJsonFile(healthDTO, message.getBody(String.class) + File.separator + NetworkUtils.getLocalHostName() + "-DocShifterDB-" + System.currentTimeMillis() + ".json");
         }
         catch (JMSException e) {
             //Only shows the log because more data can be shown

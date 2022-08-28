@@ -51,6 +51,16 @@ public class TaskMessageAppenderTest {
 	}
 
 	@Test
+	public void trackTask_appendsException() {
+		TaskMessageAppender.trackTask(task);
+
+		log.error("Oh no, we got the following error:", new IllegalArgumentException("Sorocaba"));
+
+		assertEquals("00590175-a659-4da0-91eb-8b5a7412eea1", ThreadContext.get("taskId"));
+		assertThat(task.getMessages(), containsInAnyOrder("ERROR: Oh no, we got the following error: Sorocaba"));
+	}
+
+	@Test
 	public void untrackTask_doesNotappendTaskMessage() {
 		TaskMessageAppender.trackTask(task);
 		TaskMessageAppender.untrackTask();
