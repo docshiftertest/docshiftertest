@@ -25,6 +25,18 @@ public class GlobalSettings
 	private String defaultTempFolder;
 	private String defaultErrorFolder;
 
+	private String notificationEmailFrom;
+	private String notificationEmailTo;
+	private String notificationEmailUsername;
+	@Encrypted
+	private String notificationEmailPassword;
+	private String notificationHost;
+	private String notificationPort;
+	private String notificationSecurityOption;
+
+	private String licenseNotificationDaysBeforeExpire;
+	private String licenseTimeInterval;
+
 	public GlobalSettings() {}
 	
 	public GlobalSettings(String defaultTempFolder)
@@ -141,5 +153,77 @@ public class GlobalSettings
 
 	public String getDefaultErrorFolder() {
 		return defaultErrorFolder;
+	}
+
+	public String getNotificationEmailFrom() {
+		return notificationEmailFrom;
+	}
+
+	public void setNotificationEmailFrom(String notificationEmailFrom) {
+		this.notificationEmailFrom = notificationEmailFrom;
+	}
+
+	public String getNotificationEmailTo() {
+		return notificationEmailTo;
+	}
+
+	public void setNotificationEmailTo(String notificationEmailTo) {
+		this.notificationEmailTo = notificationEmailTo;
+	}
+
+	public String getNotificationEmailUsername() {
+		return notificationEmailUsername;
+	}
+
+	public void setNotificationEmailUsername(String notificationEmailUsername) {
+		this.notificationEmailUsername = notificationEmailUsername;
+	}
+
+	public String getNotificationEmailPassword() {
+		return notificationEmailPassword;
+	}
+
+	public void setNotificationEmailPassword(String notificationEmailPassword) {
+		this.notificationEmailPassword = notificationEmailPassword;
+	}
+
+	public String getNotificationHost() {
+		return notificationHost;
+	}
+
+	public void setNotificationHost(String notificationHost) {
+		this.notificationHost = notificationHost;
+	}
+
+	public String getNotificationPort() {
+		return notificationPort;
+	}
+
+	public void setNotificationPort(String notificationPort) {
+		this.notificationPort = notificationPort;
+	}
+
+	public String getNotificationSecurityOption() {
+		return notificationSecurityOption;
+	}
+
+	public void setNotificationSecurityOption(String notificationSecurityOption) {
+		this.notificationSecurityOption = notificationSecurityOption;
+	}
+
+	public String getLicenseNotificationDaysBeforeExpire() {
+		return licenseNotificationDaysBeforeExpire;
+	}
+
+	public void setLicenseNotificationDaysBeforeExpire(String licenseNotificationDaysBeforeExpire) {
+		this.licenseNotificationDaysBeforeExpire = licenseNotificationDaysBeforeExpire;
+	}
+
+	public String getLicenseTimeInterval() {
+		return licenseTimeInterval;
+	}
+
+	public void setLicenseTimeInterval(String licenseTimeInterval) {
+		this.licenseTimeInterval = licenseTimeInterval;
 	}
 }

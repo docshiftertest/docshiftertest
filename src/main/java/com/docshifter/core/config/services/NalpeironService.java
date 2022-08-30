@@ -5,6 +5,7 @@ import com.docshifter.core.licensing.dtos.LicensingDto;
 import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.utils.NetworkUtils;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
+import com.nalpeiron.ModulesIndicator;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,6 +29,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -367,41 +369,6 @@ public class NalpeironService implements ILicensingService {
     }
 
     /**
-     * Saves a computerId entry to the persistent licensing path.
-     * @param computerId The computerId to save.
-     * @throws IOException Something went wrong while trying to write to the persistent licensing file.
-     */
-    private void persistComputerId(String computerId) throws IOException {
-        Files.writeString(persistentLicPath, computerId + System.lineSeparator(),
-                StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-    }
-
-    /**
-     * Validates that the computerId of the current machine hasn't changed since last time it was checked and cached
-     * into memory. If a change has occurred, then this will also replace the previously persisted computerId with its
-     * new value.
-     * @return {@code true} if the computerId has changed since last time and the new one has been persisted, {@code false}
-     * if nothing in particular has happened or if an error occurred while replacing the computerId in the persistent
-     * file.
-     */
-    private boolean checkComputerId() {
-        try {
-            String lastComputerId = helper.getCachedComputerId();
-            String computerId = helper.getComputerID();
-            if (!computerId.equals(lastComputerId)) {
-                log.debug("The computerId has seemingly changed since last time! Will update {} to {} in {} so it can" +
-                        " be cleaned on next startup", lastComputerId, computerId, persistentLicPath);
-                persistComputerId(computerId);
-                FileUtils.deleteLineOrFileIfEmpty(persistentLicPath, lastComputerId);
-                return true;
-            }
-        } catch (Exception ex) {
-            log.error("Unable to check or persist computerId to {}", persistentLicPath, ex);
-        }
-        return false;
-    }
-
-    /**
      * Opens the Nalpeiron library and checks if it hasn't been tampered with.
      * @throws DocShifterLicenseException Could not properly open or validate the Nalpeiron library, so you should
      * probably kill the application...
@@ -581,6 +548,44 @@ public class NalpeironService implements ILicensingService {
      */
     public LocalDateTime getLeaseExpirationDate() throws DocShifterLicenseException {
         return helper.getLeaseExpirationDate();
+    }
+
+    /**
+     * Gets the max receivers allowed.
+     * @Return {@code String} the number of max receivers allowed.
+     * @throws DocShifterLicenseException Something went wrong while fetching the value of the TAA field.
+     */
+    public String getMaxReceivers() throws DocShifterLicenseException {
+        return helper.getUDFValue(NalpeironHelper.MAX_RECEIVERS_UDF_KEY);
+    }
+
+    /**
+     * Gets all the licensed modules for the license
+     * @return {@code String} list with the name of the licensed modules.
+     * @throws DocShifterLicenseException Something went wrong while getting the feature status.
+     */
+    public List<String> getLicensedModules() throws DocShifterLicenseException {
+
+        List<String> modulesLicensed = new ArrayList<>();
+
+        for (ModulesIndicator modulesIndicator : ModulesIndicator.values()) {
+
+            if (modulesIndicator.getProductName().isEmpty()) {
+                continue;
+            }
+
+            NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(modulesIndicator.getId());
+
+            if (featureStatus.isValid()) {
+                modulesLicensed.add(modulesIndicator.getProductName());
+            }
+        }
+
+        modulesLicensed = modulesLicensed.stream().sorted().toList();
+
+        log.debug("Modules licensed: {}", modulesLicensed);
+
+        return modulesLicensed;
     }
 
     @PreDestroy
