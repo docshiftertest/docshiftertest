@@ -276,7 +276,7 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 					conditionArray = breakFirst[1].split(Pattern.quote("||"));
 				}
 				for (String aCondition : conditionArray) {
-					if (!aCondition.startsWith("#result")) {
+					if (!aCondition.startsWith("#result") && breakFirst != null) {
 						aCondition = breakFirst[0] + "'" + aCondition + "'";
 					}
 				if (evaluateExpression(result, aCondition)) {
@@ -303,7 +303,6 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 		log.debug("looping nodes list " + Arrays.toString(nodes.toArray()));
 		for (Node cn : nodes) {
 
-
 			log.debug("checking if the list contains node {}", cn.getModuleConfiguration().getName());
 			if (nodeIds.contains(cn.getModuleConfiguration().getName())) {
 				log.debug("node found adding to returns {}", cn.getModuleConfiguration().getName());
@@ -311,7 +310,14 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 			}
 		}
 
-		parameters.setSuccess(TaskStatus.SUCCESS);
+		if(returnNodes.isEmpty()){
+			log.error("Cannot find a valid default configuration, please check your option module configuration");
+			parameters.setSuccess(TaskStatus.FAILURE);
+		}
+		else {
+			parameters.setSuccess(TaskStatus.SUCCESS);
+		}
+
 		if (parameters.getResultPath() == null) {
 			parameters.setResultPath(inFilePath);
 		}
