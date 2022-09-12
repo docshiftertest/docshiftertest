@@ -312,7 +312,7 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 
 		if(returnNodes.isEmpty()){
 			log.error("Cannot find a valid default configuration, please check your option module configuration");
-			parameters.setSuccess(TaskStatus.FAILURE);
+			parameters.setSuccess(TaskStatus.BAD_CONFIG);
 		}
 		else {
 			parameters.setSuccess(TaskStatus.SUCCESS);
