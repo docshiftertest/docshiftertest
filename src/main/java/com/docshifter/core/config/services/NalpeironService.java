@@ -439,11 +439,15 @@ public class NalpeironService implements ILicensingService {
      * performing the check. You should probably kill the application if this happens...
      */
     private void doContainerCheck() throws DocShifterLicenseException {
+        String maxReceiversUDF = helper.getUDFValue(NalpeironHelper.MAX_RECEIVERS_UDF_KEY);
+        if (containerClusterer == null && StringUtils.isNotBlank(maxReceiversUDF)) {
+            throw new DocShifterLicenseException("Your license code appears to be suited for a containerized " +
+                    "installation but no container environment was detected. Please contact DocShifter for support.");
+        }
         if (containerChecker == null) {
             return;
         }
         log.debug("Performing container check");
-        String maxReceiversUDF = helper.getUDFValue(NalpeironHelper.MAX_RECEIVERS_UDF_KEY);
         int maxReceivers = 0;
 
         if (StringUtils.isNotBlank(maxReceiversUDF)) {
@@ -564,7 +568,7 @@ public class NalpeironService implements ILicensingService {
                     helper.returnLicense(licenseCode);
                     FileUtils.deleteLineOrFileIfEmpty(persistentLicPath, lastComputerId);
                 } catch (Exception ex) {
-                    log.warn("Could not return license {} correctly!", licenseCode);
+                    log.warn("Could not return license {} correctly!", licenseCode, ex);
                     if (!checkComputerId()) {
                         log.info("Will keep {} in {} so it can be cleaned on next startup", lastComputerId, persistentLicPath);
                     }
