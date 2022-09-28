@@ -40,10 +40,15 @@ public class KubernetesClusterer implements IContainerClusterer {
 	@Override
 	public Set<String> listOtherReplicas(String hostname) throws DocShifterLicenseException {
 		// Hostname matches the current pod name, e.g. receiver-596c884f74-775pr
+		int lastIndexOfDash = hostname.lastIndexOf('-');
+		if (lastIndexOfDash < 0) {
+			throw new DocShifterLicenseException("It appears that you are running the component " + hostname + " as a" +
+					" standalone pod, which is not supported for clustering purposes. Please deploy it behind a " +
+					"Deployment or StatefulSet controller.");
+		}
 		// The current name of the underlying ReplicaSet managing pods for the Deployment, e.g. receiver-596c884f74
-		String currRs = hostname.substring(0, hostname.lastIndexOf('-'));
+		String currRs = hostname.substring(0, lastIndexOfDash);
 		String currDeploy;
-		int lastIndexOfDash;
 		if ((lastIndexOfDash = currRs.lastIndexOf('-')) >= 0){
 			// The current Deployment controller, e.g. receiver
 			currDeploy = currRs.substring(0, lastIndexOfDash);
@@ -58,9 +63,18 @@ public class KubernetesClusterer implements IContainerClusterer {
 		String currNs = k8sClient.getConfiguration().getNamespace();
 		List<Pod> pods;
 		try {
+			Pod currPod = k8sClient.pods()
+					.inNamespace(currNs)
+					.withName(hostname)
+					.get();
+			String appLabel = currPod.getMetadata().getLabels().get("app");
+			if (appLabel == null) {
+				throw new NullPointerException("We looked for an \"app\" label on \"" + hostname +"\" but nothing was" +
+						" found! Could this component be running as a standalone pod?");
+			}
 			pods = k8sClient.pods()
 					.inNamespace(currNs)
-					.withLabel("app", currDeploy)
+					.withLabel("app", appLabel)
 					.list()
 					.getItems();
 			if (pods == null) {
@@ -68,7 +82,7 @@ public class KubernetesClusterer implements IContainerClusterer {
 			}
 		} catch (Exception ex) {
 			throw new DocShifterLicenseException("Unable to query the Kubernetes API correctly. Did you provide the service account with the" +
-					" appropriate credentials to GET a Deployment?", ex);
+					" appropriate credentials to GET and LIST single/multiple Pods in the current namespace?", ex);
 		}
 		String currHostname = NetworkUtils.getLocalHostName();
 		cachedReplicasPerComponent.put(currDeploy, pods.stream()

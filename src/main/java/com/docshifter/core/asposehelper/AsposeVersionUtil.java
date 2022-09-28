@@ -42,6 +42,7 @@ public class AsposeVersionUtil {
 		asposeMappings.put("diagram", com.aspose.diagram.Diagram.class);
 		asposeMappings.put("cad", com.aspose.cad.Image.class);
 		asposeMappings.put("html", com.aspose.html.HTMLDocument.class);
+		asposeMappings.put("barcode", com.aspose.barcode.barcoderecognition.BarCodeReader.class);
 	}
 
 	/**
