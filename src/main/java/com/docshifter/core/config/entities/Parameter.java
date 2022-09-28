@@ -15,6 +15,7 @@ import javax.persistence.Id;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
 @TypeName("Parameter")
+//@DiffIgnore
 public class Parameter implements Comparable<Parameter>
 {
 

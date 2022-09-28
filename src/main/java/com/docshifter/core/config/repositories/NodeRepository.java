@@ -1,5 +1,6 @@
 package com.docshifter.core.config.repositories;
 
+import com.docshifter.core.config.entities.ModuleConfiguration;
 import com.docshifter.core.config.entities.Node;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,6 @@ public interface NodeRepository extends JpaRepository<Node, Long> {
 	//TODO
 	@Query("select n from Node n")
 	Node getSenderByClassNameAndParamValue(String className, String paramValue);
+
+	List<Node> findNodeByModuleConfiguration(ModuleConfiguration moduleConfiguration);
 }
