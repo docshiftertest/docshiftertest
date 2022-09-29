@@ -19,6 +19,7 @@ import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.jgroups.annotations.Component;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -75,12 +76,22 @@ public class AuditTrailConfiguration {
 
             }
 
+            /**
+             * When deleting an object this method will be called
+             * @param domainObject the domain object to be deleted
+             * @return a map of changes to be saved.
+             */
             @Override
             public Map<String, String> provideForDeletedObject(Object domainObject) {
 
                 return findWorkFlowValues(domainObject);
             }
 
+            /**
+             * When saving/updating an object this method will be called
+             * @param domainObject the domain object to be saved
+             * @return a map of changes to be saved.
+             */
             @Override
             public Map<String, String> provideForCommittedObject(Object domainObject) {
                 return findWorkFlowValues(domainObject);
@@ -175,7 +186,7 @@ public class AuditTrailConfiguration {
      *
      * @return the javers bean
      */
-    @Bean
+    @Component
     public Javers javers() {
         ConnectionProvider connectionProvider = () -> DataSourceUtils.getConnection(DataSourceBuilder.create().url("jdbc:postgresql://localhost:5432/audit").password("DS_AUDIT").username("ds_audit").build());
 
