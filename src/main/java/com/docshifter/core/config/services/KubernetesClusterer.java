@@ -6,6 +6,9 @@ import com.docshifter.core.utils.NetworkUtils;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodTemplateSpec;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.StatefulSet;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Conditional;
@@ -46,31 +49,54 @@ public class KubernetesClusterer implements IContainerClusterer {
 					" standalone pod, which is not supported for clustering purposes. Please deploy it behind a " +
 					"Deployment or StatefulSet controller.");
 		}
-		// The current name of the underlying ReplicaSet managing pods for the Deployment, e.g. receiver-596c884f74
-		String currRs = hostname.substring(0, lastIndexOfDash);
-		String currDeploy;
-		if ((lastIndexOfDash = currRs.lastIndexOf('-')) >= 0){
+		// The current name of either the underlying ReplicaSet managing pods for the Deployment, e.g.
+		// receiver-596c884f74, or the StatefulSet itself, e.g. mq
+		String controllerName = hostname.substring(0, lastIndexOfDash);
+		boolean isDeployment = true;
+		if ((lastIndexOfDash = controllerName.lastIndexOf('-')) >= 0){
 			// The current Deployment controller, e.g. receiver
-			currDeploy = currRs.substring(0, lastIndexOfDash);
+			controllerName = controllerName.substring(0, lastIndexOfDash);
 		} else {
-			// If the hostname contained only one hyphen, then it's probably a StatefulSet
-			currDeploy = currRs;
+			// If the hostname contained only one hyphen, then it's likely a StatefulSet
+			isDeployment = false;
 		}
-		if (cachedReplicasPerComponent.containsKey(currDeploy)) {
-			return cachedReplicasPerComponent.get(currDeploy);
+		if (cachedReplicasPerComponent.containsKey(controllerName)) {
+			return cachedReplicasPerComponent.get(controllerName);
 		}
 		// The current namespace, e.g. docshifter
 		String currNs = k8sClient.getConfiguration().getNamespace();
 		List<Pod> pods;
 		try {
-			Pod currPod = k8sClient.pods()
-					.inNamespace(currNs)
-					.withName(hostname)
-					.get();
-			String appLabel = currPod.getMetadata().getLabels().get("app");
+			PodTemplateSpec template = null;
+			if (isDeployment) {
+				Deployment deployment = k8sClient.apps()
+						.deployments()
+						.inNamespace(currNs)
+						.withName(controllerName)
+						.get();
+				if (deployment != null) {
+					template = deployment.getSpec().getTemplate();
+				}
+			} else {
+				StatefulSet statefulSet = k8sClient.apps()
+						.statefulSets()
+						.inNamespace(currNs)
+						.withName(controllerName)
+						.get();
+				if (statefulSet != null) {
+					template = statefulSet.getSpec().getTemplate();
+				}
+			}
+			if (template == null) {
+				final String controllerType = isDeployment ? "deployment" : "statefulset";
+				throw new NullPointerException("We looked for a " + controllerType + " with name \"" + controllerName +
+						"\" but nothing was found! Could \"" + hostname + "\" be running as a standalone pod or was " +
+						"the " + controllerType + " recently renamed?");
+			}
+			String appLabel = template.getMetadata().getLabels().get("app");
 			if (appLabel == null) {
-				throw new NullPointerException("We looked for an \"app\" label on \"" + hostname +"\" but nothing was" +
-						" found! Could this component be running as a standalone pod?");
+				throw new NullPointerException("We looked for an \"app\" label on the \"" + controllerName +"\" " +
+						"template but nothing was found!");
 			}
 			pods = k8sClient.pods()
 					.inNamespace(currNs)
@@ -82,15 +108,16 @@ public class KubernetesClusterer implements IContainerClusterer {
 			}
 		} catch (Exception ex) {
 			throw new DocShifterLicenseException("Unable to query the Kubernetes API correctly. Did you provide the service account with the" +
-					" appropriate credentials to GET and LIST single/multiple Pods in the current namespace?", ex);
+					" appropriate credentials to GET a Deployment/StatefulSet and LIST multiple Pods in the current " +
+					"namespace? Consult this exception's cause for more details.", ex);
 		}
 		String currHostname = NetworkUtils.getLocalHostName();
-		cachedReplicasPerComponent.put(currDeploy, pods.stream()
+		cachedReplicasPerComponent.put(controllerName, pods.stream()
 				.map(Pod::getMetadata)
 				.map(ObjectMeta::getName)
 				.filter(name -> !currHostname.equals(name))
 				.collect(Collectors.toSet()));
-		return cachedReplicasPerComponent.get(currDeploy);
+		return cachedReplicasPerComponent.get(controllerName);
 	}
 
 	/**
