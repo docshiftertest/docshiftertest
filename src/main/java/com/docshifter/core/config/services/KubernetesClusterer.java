@@ -51,7 +51,11 @@ public class KubernetesClusterer implements IContainerClusterer {
 		}
 		// The current name of either the underlying ReplicaSet managing pods for the Deployment, e.g.
 		// receiver-596c884f74, or the StatefulSet itself, e.g. mq
-		String controllerName = hostname.substring(0, lastIndexOfDash);
+		final String hostnameWithoutLastDash = hostname.substring(0, lastIndexOfDash);
+		String controllerName = hostnameWithoutLastDash;
+		// Assume we're dealing with a Deployment by default, but a hostname with two hyphens or more might be a
+		// StatefulSet as well! E.g. message-queue-0 might be a pod managed by a StatefulSet controller named
+		// message-queue
 		boolean isDeployment = true;
 		if ((lastIndexOfDash = controllerName.lastIndexOf('-')) >= 0){
 			// The current Deployment controller, e.g. receiver
@@ -61,10 +65,13 @@ public class KubernetesClusterer implements IContainerClusterer {
 			isDeployment = false;
 		}
 		if (cachedReplicasPerComponent.containsKey(controllerName)) {
+			log.debug("Using {} data for matching hostname {} from cache", controllerName, hostname);
 			return cachedReplicasPerComponent.get(controllerName);
 		}
 		// The current namespace, e.g. docshifter
 		String currNs = k8sClient.getConfiguration().getNamespace();
+		log.debug("Deduced controller name {} from hostname {}, current namespace is {}", controllerName, hostname,
+				currNs);
 		List<Pod> pods;
 		try {
 			PodTemplateSpec template = null;
@@ -77,7 +84,15 @@ public class KubernetesClusterer implements IContainerClusterer {
 				if (deployment != null) {
 					template = deployment.getSpec().getTemplate();
 				}
-			} else {
+			}
+			if (template == null) {
+				if (isDeployment) {
+					// If we thought it was a Deployment before, but we couldn't get one, deduce the potential
+					// StatefulSet name from the hostname and try getting that instead as a last resort...
+					log.debug("Deployment {} was not found! Checking if there is perhaps a StatefulSet named {}",
+							controllerName,	hostnameWithoutLastDash);
+					controllerName = hostnameWithoutLastDash;
+				}
 				StatefulSet statefulSet = k8sClient.apps()
 						.statefulSets()
 						.inNamespace(currNs)
@@ -85,19 +100,22 @@ public class KubernetesClusterer implements IContainerClusterer {
 						.get();
 				if (statefulSet != null) {
 					template = statefulSet.getSpec().getTemplate();
+					isDeployment = false;
 				}
 			}
+			final String controllerType = isDeployment ? "Deployment" : "StatefulSet";
 			if (template == null) {
-				final String controllerType = isDeployment ? "deployment" : "statefulset";
 				throw new NullPointerException("We looked for a " + controllerType + " with name \"" + controllerName +
-						"\" but nothing was found! Could \"" + hostname + "\" be running as a standalone pod or was " +
-						"the " + controllerType + " recently renamed?");
+						"\" in namespace \"" + currNs + "\" but nothing was found! Could \"" + hostname + "\" be running " +
+						"as a standalone pod or was the " + controllerType + " recently renamed?");
 			}
+			log.debug("Located a {} with name {} in namespace {}", controllerType, controllerName, currNs);
 			String appLabel = template.getMetadata().getLabels().get("app");
 			if (appLabel == null) {
 				throw new NullPointerException("We looked for an \"app\" label on the \"" + controllerName +"\" " +
 						"template but nothing was found!");
 			}
+			log.debug("Looking for pods with app label {} that we can cluster with", appLabel);
 			pods = k8sClient.pods()
 					.inNamespace(currNs)
 					.withLabel("app", appLabel)
@@ -109,7 +127,7 @@ public class KubernetesClusterer implements IContainerClusterer {
 		} catch (Exception ex) {
 			throw new DocShifterLicenseException("Unable to query the Kubernetes API correctly. Did you provide the service account with the" +
 					" appropriate credentials to GET a Deployment/StatefulSet and LIST multiple Pods in the current " +
-					"namespace? Consult this exception's cause for more details.", ex);
+					"namespace \"" + currNs + "\"? Consult this exception's cause for more details.", ex);
 		}
 		String currHostname = NetworkUtils.getLocalHostName();
 		cachedReplicasPerComponent.put(controllerName, pods.stream()
@@ -124,6 +142,7 @@ public class KubernetesClusterer implements IContainerClusterer {
 	 * Clears the cached Kubernetes API results.
 	 */
 	public void clearCache() {
+		log.debug("Clearing Kubernetes clusterer cache");
 		cachedReplicasPerComponent.clear();
 	}
 }
