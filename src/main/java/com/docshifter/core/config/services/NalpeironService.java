@@ -56,7 +56,6 @@ public class NalpeironService implements ILicensingService {
      * used in a containerized environment.
      */
     private static final Path persistentLicPath = persistentLicDirPath.resolve(NetworkUtils.getLocalHostName());
-    private static final int COMPUTER_ID_CHECK_MINUTES = 30;
 
     @Value("${docshifter.applang:}")
     private String appLanguage;
@@ -132,15 +131,11 @@ public class NalpeironService implements ILicensingService {
      */
     private final IContainerChecker containerChecker;
     private final WebClient licensingApiClient;
-    private final ScheduledExecutorService scheduler;
-    private ScheduledFuture<?> computerIdChecker;
 
     public NalpeironService(@Qualifier("licensingApiClient") WebClient licensingApiClient,
-                            ScheduledExecutorService scheduler,
                             @Nullable IContainerClusterer containerClusterer,
                             @Nullable IContainerChecker containerChecker) {
         this.licensingApiClient = licensingApiClient;
-        this.scheduler = scheduler;
         this.containerClusterer = containerClusterer;
         this.containerChecker = containerChecker;
     }
@@ -329,8 +324,6 @@ public class NalpeironService implements ILicensingService {
         } catch (IOException ioe) {
             throw new DocShifterLicenseException("Could not create or write to persistent licensing file: " + persistentLicPath, ioe);
         }
-        computerIdChecker = scheduler.scheduleAtFixedRate(this::checkComputerId, 1, COMPUTER_ID_CHECK_MINUTES,
-                TimeUnit.MINUTES);
     }
 
     /**
@@ -356,8 +349,8 @@ public class NalpeironService implements ILicensingService {
             String lastComputerId = helper.getCachedComputerId();
             String computerId = helper.getComputerID();
             if (!computerId.equals(lastComputerId)) {
-                log.warn("The computerId has seemingly changed since last time! Will update {} to {} in {} so it can " +
-                        "be cleaned on next startup", lastComputerId, computerId, persistentLicPath);
+                log.debug("The computerId has seemingly changed since last time! Will update {} to {} in {} so it can" +
+                        " be cleaned on next startup", lastComputerId, computerId, persistentLicPath);
                 persistComputerId(computerId);
                 FileUtils.deleteLineOrFileIfEmpty(persistentLicPath, lastComputerId);
                 return true;
@@ -540,6 +533,15 @@ public class NalpeironService implements ILicensingService {
     }
 
     /**
+     * Gets the maintenanceExpirationDate
+     * @return An maintenance date relative to the local time of the machine.
+     * @throws DocShifterLicenseException
+     */
+    public LocalDateTime getMaintenanceExpirationDate() throws DocShifterLicenseException {
+        return helper.getMaintenanceExpirationDate();
+    }
+
+    /**
      * Gets the lease date of the current license. For an online active activation, the lease date signifies the date
      * when the component will report back to the Nalpeiron licensing server. For an offline active activation, this
      * date means that the offline activation will be invalidated then (regardless of expiration date set) so the
@@ -574,14 +576,14 @@ public class NalpeironService implements ILicensingService {
 
         for (ModulesIndicator modulesIndicator : ModulesIndicator.values()) {
 
-            if (modulesIndicator.getProductName().isEmpty()) {
+            if (modulesIndicator.getOperation().isEmpty()) {
                 continue;
             }
 
             NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(modulesIndicator.getId());
 
             if (featureStatus.isValid()) {
-                modulesLicensed.add(modulesIndicator.getProductName());
+                modulesLicensed.add(modulesIndicator.getOperation());
             }
         }
 
