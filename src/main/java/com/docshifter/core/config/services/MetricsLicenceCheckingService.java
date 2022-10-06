@@ -32,10 +32,11 @@ public class MetricsLicenceCheckingService {
                 isLicensed = true;
             }
             catch (DocShifterLicenseException dilly) {
-                if (dilly.getNalpErrorCode() == -1096 && "NSL entitlement not found".equalsIgnoreCase(dilly.getNalpErrorMsg())) {
+                //https://support.nalpeiron.com/hc/en-us/articles/360051138153-Error-Code-1096
+                if (dilly.getNalpErrorCode() == -1096) {
                     log.info("Metrics not licensed");
                 } else {
-                    log.info("Metrics Licence exception", dilly);
+                    log.error("Metrics Licence exception", dilly);
                 }
                 isLicensed = false;
             }
