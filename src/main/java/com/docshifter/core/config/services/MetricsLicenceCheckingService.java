@@ -32,11 +32,12 @@ public class MetricsLicenceCheckingService {
                 isLicensed = true;
             }
             catch (DocShifterLicenseException dilly) {
-                log.info("Metrics Licence exception", dilly);
+                if (dilly.getNalpErrorCode() == -1096 && "NSL entitlement not found".equalsIgnoreCase(dilly.getNalpErrorMsg())) {
+                    log.info("Metrics not licensed");
+                } else {
+                    log.info("Metrics Licence exception", dilly);
+                }
                 isLicensed = false;
-            }
-            catch (Throwable ball) {
-                log.warn("Threw throwable ball", ball);
             }
         }
         return isLicensed;
