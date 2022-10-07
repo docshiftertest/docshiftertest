@@ -34,9 +34,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 @Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
@@ -524,18 +521,32 @@ public class NalpeironService implements ILicensingService {
     }
 
     /**
-     * Gets the expiration date of the current license.
+     * Checks if the license is permanent
+     * @return if the license is permanent or not
+     * @throws DocShifterLicenseException Something went wrong while trying to fetch this information.
+     */
+    public boolean isLicensePermanent() throws DocShifterLicenseException {
+
+        NalpeironHelper.LicenseType licenseType = helper.getLicenseType();
+
+        return NalpeironHelper.LicenseType.PERMANENT.equals(licenseType)
+                || NalpeironHelper.LicenseType.CONCURRENT_PERMANENT.equals(licenseType);
+    }
+
+    /**
+     * Gets the subscription expiration date of the current license
+     * or a date far away in the future for a permanent license
      * @return An expiration date relative to the local time of the machine.
      * @throws DocShifterLicenseException Something went wrong while trying to fetch this information.
      */
-    public LocalDateTime getLicenseExpirationDate() throws DocShifterLicenseException {
+    public LocalDateTime getSubscriptionExpirationDate() throws DocShifterLicenseException {
         return helper.getSubscriptionExpirationDate();
     }
 
     /**
      * Gets the maintenanceExpirationDate
      * @return An maintenance date relative to the local time of the machine.
-     * @throws DocShifterLicenseException
+     * @throws DocShifterLicenseException exception while trying to get the date
      */
     public LocalDateTime getMaintenanceExpirationDate() throws DocShifterLicenseException {
         return helper.getMaintenanceExpirationDate();
