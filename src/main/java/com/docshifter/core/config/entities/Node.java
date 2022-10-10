@@ -4,8 +4,6 @@ package com.docshifter.core.config.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.DiffInclude;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -19,7 +17,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -32,26 +29,18 @@ public class Node {
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private long id;
 
-	@DiffInclude
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne(cascade = CascadeType.REMOVE)
 	@JsonIgnore()
 	private Node parentNode;
 
-	@DiffInclude
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "parentNode", cascade = CascadeType.ALL)
 	private Set<Node> childNodes=null;
 
-	@DiffInclude
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne
 	private ModuleConfiguration moduleConfiguration;
-
-	@DiffIgnore
-	@JsonIgnore
-	@OneToMany(mappedBy="rootNode", cascade={CascadeType.ALL})
-	private List<ChainConfiguration> chainConfigurationList;
 
 	public Node(){}
 	
@@ -124,14 +113,6 @@ public class Node {
 	
 	public void setModuleConfiguration(ModuleConfiguration moduleConfiguration){
 		this.moduleConfiguration = moduleConfiguration;
-	}
-
-	public List<ChainConfiguration> getChainConfigurationList() {
-		return chainConfigurationList;
-	}
-
-	public void setChainConfigurationList(List<ChainConfiguration> chainConfigurationList) {
-		this.chainConfigurationList = chainConfigurationList;
 	}
 
 	public void clearAllChildNodes(){

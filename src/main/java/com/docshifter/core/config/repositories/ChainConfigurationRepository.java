@@ -29,18 +29,6 @@ public interface ChainConfigurationRepository extends CrudRepository<ChainConfig
 
     ChainConfiguration findOneByName(String name);
 
-
-    @Query(value = "select cc.*" +
-    "from docshifter.module_configuration_parameter_values mcpv "+
-    "left join docshifter.parameter p on mcpv.parameter_values_key = p.id " +
-    "join docshifter.node n on mcpv.module_configuration_id = n.module_configuration_id " +
-    "join docshifter.chain_configuration cc on n.id = cc.root_node_id " +
-    "where ((:entityField = 'ChainConfiguration' and cc.id = :id )" +
-            "or ((:entityField = 'Parameter' and p.id = :id)) " +
-            "or (:entityField = 'Node' and n.id = :id))"
-            , nativeQuery = true)
-    List<ChainConfiguration> findByParams(@Param("entityField") String entityField, @Param("id") Long id);
-
     @Query("SELECT cc FROM ChainConfiguration cc WHERE cc.id IN :ids")
     List<ChainConfiguration> findByIds(@Param("ids") Set<Long> ids);
 
