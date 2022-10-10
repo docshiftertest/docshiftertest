@@ -1,7 +1,5 @@
 package com.docshifter.core.monitoring.entities;
 
-import org.javers.core.metamodel.annotation.TypeName;
-
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -19,7 +17,6 @@ import java.util.Map;
  * Created by blazejm on 17.05.2017.
  */
 @Entity(name = "MonitoringWebhookTemplate")
-@TypeName("MonitoringWebhookTemplate")
 public class WebhookTemplate {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

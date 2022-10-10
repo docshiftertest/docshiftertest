@@ -3,7 +3,6 @@ package com.docshifter.core.config.entities;
 import com.docshifter.core.operations.FailureLevel;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -25,8 +24,7 @@ import javax.persistence.ManyToOne;
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
-@TypeName("ChainConfiguration")
-public class ChainConfiguration {
+public class ChainConfiguration{
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -36,8 +34,8 @@ public class ChainConfiguration {
 	private String description;
 	private String printerName;
 	private String queueName;
-
 	private long timeout;
+
 	@Column(columnDefinition = "int default 2")
 	private Integer priority;
 

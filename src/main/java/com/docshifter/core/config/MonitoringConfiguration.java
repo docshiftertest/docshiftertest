@@ -1,6 +1,5 @@
 package com.docshifter.core.config;
 
-import org.javers.core.metamodel.annotation.TypeName;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -16,7 +15,6 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 @Configuration
 @EnableAsync
-@TypeName("MonitoringConfiguration")
 public class MonitoringConfiguration {
 	@Bean
 	public RestTemplate restTemplate() {

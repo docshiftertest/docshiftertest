@@ -1,7 +1,6 @@
 package com.docshifter.core.monitoring.entities;
 
 import com.docshifter.core.monitoring.enums.ConfigurationTypes;
-import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,7 +19,6 @@ import java.util.List;
  */
 @Entity(name = "MonitoringMailConfigItem")
 @DiscriminatorValue(ConfigurationTypes.MAIL)
-@TypeName("MonitoringMailConfigItem")
 public class MailConfigurationItem extends AbstractConfigurationItem {
     @OneToOne(cascade = CascadeType.ALL,
             fetch = FetchType.EAGER)

@@ -18,6 +18,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,8 +29,7 @@ import java.util.Set;
 @Log4j2
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
-@TypeName("Module")
-public class Module {
+public class Module implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

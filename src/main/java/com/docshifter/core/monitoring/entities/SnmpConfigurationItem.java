@@ -1,7 +1,6 @@
 package com.docshifter.core.monitoring.entities;
 
 import com.docshifter.core.monitoring.enums.ConfigurationTypes;
-import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -11,7 +10,6 @@ import javax.persistence.Entity;
  */
 @Entity(name = "MonitoringSnmpConfigItem")
 @DiscriminatorValue(ConfigurationTypes.SNMP)
-@TypeName("MonitoringSnmpConfigItem")
 public class SnmpConfigurationItem extends AbstractConfigurationItem {
     private String community = "public";
     private String trapOid = ".1.3.6.1.2.1.1.6";

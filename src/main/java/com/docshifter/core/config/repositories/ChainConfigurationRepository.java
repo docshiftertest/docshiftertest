@@ -1,13 +1,13 @@
 package com.docshifter.core.config.repositories;
 
 import com.docshifter.core.config.entities.ChainConfiguration;
-import com.docshifter.core.config.services.ChainConfigurationSample;
 import com.docshifter.core.config.entities.Node;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
+import com.docshifter.core.config.services.ChainConfigurationSample;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 import java.util.Set;
 
@@ -15,12 +15,13 @@ import java.util.Set;
  * Created by michiel.vandriessche@docbyte.com on 8/19/16.
  */
 
-@JaversSpringDataAuditable
 public interface ChainConfigurationRepository extends CrudRepository<ChainConfiguration, Long> {
 
 	List<ChainConfiguration> findByEnabled(boolean enabled);
 
 	ChainConfiguration findByRootNode(Node rootNode);
+
+	List<ChainConfiguration> findAllByRootNode(Node rootNode);
 
 	ChainConfiguration findByRootNodeId(Long id);
 
@@ -60,6 +61,9 @@ public interface ChainConfigurationRepository extends CrudRepository<ChainConfig
     
     @Query("select cc.name FROM ChainConfiguration cc where cc.id = :id")
     String findWorkflowNameById(@Param("id") Long configurationID);
+
+    @Query("select cc.name FROM ChainConfiguration cc where cc.enabled = :enabled")
+    List<String> findAllWorkflowNameByEnabled(@Param("enabled") boolean enabled);
 
     List<ChainConfigurationSample> findAllBy();
 }

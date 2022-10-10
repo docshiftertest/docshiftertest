@@ -1,14 +1,12 @@
 package com.docshifter.datasource.config.audit;
 
 import org.hibernate.cfg.Environment;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
 import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -20,7 +18,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableJpaRepositories(
-        entityManagerFactoryRef = "auditEM",
+        entityManagerFactoryRef = "auditEntityManagerFactory",
         transactionManagerRef = "auditTransactionManager",
         basePackages = "com.docshifter.core.audit.repositories")
 public class ConfigurationAuditDB {
@@ -37,7 +35,9 @@ public class ConfigurationAuditDB {
         return DataSourceBuilder.create()
                 .url(url)
                 .username("ds_audit")
-                .password("md5907beaf2d1a1f0553804f1ee4990bd55")
+//                .password("md5907beaf2d1a1f0553804f1ee4990bd55")
+//                .password("4fd2fdf8836f10d88151f2f8172b3357")
+                .password("DS_AUDIT") // change it to md5
                 .build();
     }
 
