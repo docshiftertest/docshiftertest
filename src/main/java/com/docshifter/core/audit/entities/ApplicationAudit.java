@@ -1,5 +1,6 @@
 package com.docshifter.core.audit.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApplicationAudit extends AbstractAuditInfo {
+public class ApplicationAudit implements AuditInfo {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -23,13 +24,30 @@ public class ApplicationAudit extends AbstractAuditInfo {
 
     private String details;
 
-    public ApplicationAudit(UUID id, String details, String oldValue, String newValue, String propertyName, String username, long eventDateTime){
-        this.id = id;
-        this.details = details;
-        this.setOldValue(oldValue);
-        this.setNewValue(newValue);
-        this.setPropertyName(propertyName);
-        this.setEventDateTime(eventDateTime);
-        this.setUsername(username);
+    private String oldValue;
+    private String newValue;
+    private String username;
+    private long eventDateTime;
+    private String propertyName;
+
+    @Override
+    public String getUsername() {
+        return this.username;
     }
+
+    @Override
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @Override
+    public long getEventDateTime() {
+        return this.eventDateTime;
+    }
+
+    @Override
+    public void setEventDateTime(long eventDateTime) {
+        this.eventDateTime = eventDateTime;
+    }
+
 }
