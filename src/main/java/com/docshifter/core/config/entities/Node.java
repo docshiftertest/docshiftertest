@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -23,7 +24,7 @@ import java.util.function.Consumer;
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
-public class Node {
+public class Node implements Serializable {
 	@Id
 	@Column(name = "ID")
 	@GeneratedValue(strategy= GenerationType.IDENTITY)

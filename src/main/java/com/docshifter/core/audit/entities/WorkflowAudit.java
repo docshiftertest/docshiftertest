@@ -10,9 +10,9 @@ import javax.persistence.Id;
 import java.util.UUID;
 
 @Entity
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 public class WorkflowAudit implements AuditInfo {
 
     @Id
@@ -29,6 +29,20 @@ public class WorkflowAudit implements AuditInfo {
     private String newValue;
     private String changeType;
     private String moduleName;
+
+    public WorkflowAudit(UUID uuid, String workflowName, String changeType, String propertyName, String moduleName, String oldValue, String newValue,
+            String configurationName , String username, long eventDateTime) {
+        this.id = uuid;
+        this.workflowName = workflowName;
+        this.setEventDateTime(eventDateTime);
+        this.changeType = changeType;
+        this.configurationName = configurationName;
+        this.moduleName = moduleName;
+        this.setOldValue(oldValue);
+        this.setNewValue(newValue);
+        this.setPropertyName(propertyName);
+        this.setUsername(username);
+    }
 
     @Override
     public String getUsername() {
@@ -49,5 +63,7 @@ public class WorkflowAudit implements AuditInfo {
     public void setEventDateTime(long eventDateTime) {
         this.eventDateTime = eventDateTime;
     }
+
+
 
 }

@@ -3,6 +3,8 @@ package com.docshifter.core.config.entities;
 import com.docshifter.core.operations.FailureLevel;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -31,22 +33,35 @@ public class ChainConfiguration implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 
+	@DiffInclude
 	private String name;
+
+	@DiffInclude
 	private String description;
+
+	@DiffInclude
 	private String printerName;
+
+	@DiffInclude
 	private String queueName;
+
+	@DiffInclude
 	private long timeout;
 
+	@DiffInclude
 	@Column(columnDefinition = "int default 2")
 	private Integer priority;
 
+	@DiffInclude
 	private boolean enabled;
 
+	@DiffInclude
 	@Enumerated(EnumType.STRING)
 	private FailureLevel failureLevel;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne(cascade=CascadeType.ALL)
+	@DiffIgnore
 	private Node rootNode;
 
 	public ChainConfiguration() {}

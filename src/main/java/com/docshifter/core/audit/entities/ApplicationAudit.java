@@ -1,6 +1,5 @@
 package com.docshifter.core.audit.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,8 +20,6 @@ public class ApplicationAudit implements AuditInfo {
     @Id
     @GeneratedValue(generator = "UUID")
     private UUID id;
-
-    private String details;
 
     private String oldValue;
     private String newValue;
@@ -50,4 +47,33 @@ public class ApplicationAudit implements AuditInfo {
         this.eventDateTime = eventDateTime;
     }
 
+    @Override
+    public String getOldValue() {
+        return oldValue;
+    }
+
+    @Override
+    public void setOldValue(String oldValue) {
+        this.oldValue = oldValue;
+    }
+
+    @Override
+    public String getNewValue() {
+        return newValue;
+    }
+
+    @Override
+    public void setNewValue(String newValue) {
+        this.newValue = newValue;
+    }
+
+    @Override
+    public String getPropertyName() {
+        return propertyName;
+    }
+
+    @Override
+    public void setPropertyName(String propertyName) {
+        this.propertyName = propertyName;
+    }
 }
