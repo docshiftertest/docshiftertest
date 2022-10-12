@@ -1,6 +1,8 @@
 package com.docshifter.core.config;
 
+import com.docshifter.core.config.conditions.IsInGenericContainerCondition;
 import com.docshifter.core.config.conditions.IsInKubernetesCondition;
+import com.docshifter.core.config.conditions.IsNotInAnyContainerCondition;
 import com.docshifter.core.config.services.ConfigurationService;
 import com.docshifter.core.config.services.GeneralConfigService;
 import com.docshifter.core.config.services.HealthManagementService;
@@ -18,9 +20,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.boot.actuate.info.InfoEndpoint;
+import org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
@@ -34,6 +38,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.jms.ConnectionFactory;
+import javax.sql.DataSource;
 import java.util.List;
 
 /**
@@ -41,6 +46,7 @@ import java.util.List;
  */
 @Configuration
 @ComponentScan(basePackages = {"com.docshifter.core", "com.docshifter.core.monitoring"})
+@EnableDiscoveryClient
 @Log4j2
 public class DocShifterConfiguration {
 
@@ -217,5 +223,28 @@ public class DocShifterConfiguration {
 	@Bean
 	public WebClient licensingApiClient() {
 		return WebClient.create("https://api.licensing.docshifter.com");
+	}
+
+	@Bean
+	@Conditional(IsNotInAnyContainerCondition.class)
+	public InstallationType classicalInstallationType() {
+		return InstallationType.CLASSICAL;
+	}
+
+	@Bean
+	@Conditional(IsInGenericContainerCondition.class)
+	public InstallationType genericContainerInstallationType() {
+		return InstallationType.CONTAINERIZED_GENERIC;
+	}
+
+	@Bean
+	@Conditional(IsInKubernetesCondition.class)
+	public InstallationType kubernetesContainerInstallationType() {
+		return InstallationType.CONTAINERIZED_KUBERNETES;
+	}
+
+	@Bean
+	public DataSourceHealthIndicator dataSourceHealthIndicator(DataSource dataSource) {
+		return new DataSourceHealthIndicator(dataSource);
 	}
 }
