@@ -6,12 +6,18 @@ import com.docshifter.core.utils.NetworkUtils;
 import com.sun.management.OperatingSystemMXBean;
 import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQMessage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator;
 import org.springframework.boot.availability.ApplicationAvailability;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.EventListener;
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.user.SimpSubscription;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.messaging.SessionSubscribeEvent;
+import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 import javax.jms.JMSException;
 import java.io.IOException;
@@ -33,31 +39,39 @@ import java.util.concurrent.TimeUnit;
 public class StatusService {
 
     private static final OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
-    private final ApplicationContext applicationContext;
+    private final String applicationName;
     private final ApplicationAvailability applicationAvailability;
     private final DataSourceHealthIndicator dataSourceHealthIndicator;
     protected final SimpMessagingTemplate websocketTemplate;
+    protected final SimpUserRegistry websocketUserRegistry;
     private final ScheduledExecutorService scheduler;
     private final InstallationType installationType;
     private final HealthManagementService healthManagementService;
     private final FileStore currFileStore;
     private ScheduledFuture<?> runningFuture;
+    public static final String STOMP_DESTINATION = "/topic/serviceHeartbeats";
 
-    public StatusService(ApplicationContext applicationContext,
+    public StatusService(@Value("${spring.application.name:unnamed}") String applicationName,
                          ApplicationAvailability applicationAvailability,
                          DataSourceHealthIndicator dataSourceHealthIndicator,
                          SimpMessagingTemplate websocketTemplate,
+                         SimpUserRegistry websocketUserRegistry,
                          ScheduledExecutorService scheduler,
                          InstallationType installationType,
                          HealthManagementService healthManagementService) throws IOException {
-        this.applicationContext = applicationContext;
+        this.applicationName = applicationName;
         this.applicationAvailability = applicationAvailability;
         this.dataSourceHealthIndicator = dataSourceHealthIndicator;
         this.websocketTemplate = websocketTemplate;
+        this.websocketUserRegistry = websocketUserRegistry;
         this.scheduler = scheduler;
         this.installationType = installationType;
         this.healthManagementService = healthManagementService;
         this.currFileStore = Files.getFileStore(Path.of(""));
+
+        if (!websocketUserRegistry.findSubscriptions(this::matchSubscription).isEmpty()) {
+            configureScheduler(true);
+        }
     }
 
     /**
@@ -77,13 +91,17 @@ public class StatusService {
             return;
         }
 
+        configureScheduler(start);
+    }
+
+    private void configureScheduler(boolean start) {
         if (start ^ runningFuture == null) {
             log.error("Received {} in message body, but the future has already {}", start, start ? "started" :"stopped");
             return;
         }
 
         if (start) {
-            runningFuture = scheduler.schedule(this::sendHeartbeat, 5, TimeUnit.SECONDS);
+            runningFuture = scheduler.scheduleWithFixedDelay(this::sendHeartbeat, 0, 5, TimeUnit.SECONDS);
         } else {
             runningFuture.cancel(true);
             runningFuture = null;
@@ -111,7 +129,7 @@ public class StatusService {
         );
 
         ServiceHeartbeatDTO.DataPoints jvmComponent = new ServiceHeartbeatDTO.DataPoints(
-                applicationContext.getApplicationName(),
+                applicationName,
                 osBean.getProcessCpuLoad(),
                 Runtime.getRuntime().freeMemory(),
                 Runtime.getRuntime().maxMemory(),
@@ -129,6 +147,30 @@ public class StatusService {
                         dataSourceHealthIndicator.health()),
                 instance,
                 jvmComponent);
-        websocketTemplate.convertAndSend(dto);
+        websocketTemplate.convertAndSend(STOMP_DESTINATION, dto);
     }
+
+    protected boolean matchSubscription(SimpSubscription subscription) {
+        return STOMP_DESTINATION.equals(subscription.getDestination());
+    }
+
+    @EventListener
+    public void handleSubscribeEvent(SessionSubscribeEvent event) {
+        if (runningFuture == null
+                && STOMP_DESTINATION.equals(SimpMessageHeaderAccessor.wrap(event.getMessage()).getDestination())) {
+            configureScheduler(true);
+        }
+    }
+
+    @EventListener
+    public void handleUnsubscribeEvent(SessionUnsubscribeEvent event) {
+        if (runningFuture != null
+                // TODO destination always null? Keep track of session ID and link to dest?
+                && STOMP_DESTINATION.equals(SimpMessageHeaderAccessor.wrap(event.getMessage()).getDestination())
+                && websocketUserRegistry.findSubscriptions(this::matchSubscription).isEmpty()) {
+            configureScheduler(false);
+        }
+    }
+
+
 }

@@ -9,7 +9,10 @@ import java.net.UnknownHostException;
  * Created by Julian Isaac on 29.07.2021
  */
 @Log4j2
-public class NetworkUtils {
+public final class NetworkUtils {
+    private NetworkUtils() {}
+
+    public static final String LOCALHOST = "localhost";
 
     private static final String[] HOSTNAME_ENV_VARS = {
             "COMPUTERNAME", // Windows
@@ -26,11 +29,11 @@ public class NetworkUtils {
      * @return Either a specific hostname or "localhost". Never returns null or an empty value
      */
     public static String getLocalHostName() {
-        String origHostname = "localhost";
+        String origHostname = LOCALHOST;
         try {
             origHostname = InetAddress.getLocalHost().getHostName();
             // Try to get a more specific name first if this returned localhost
-            if (StringUtils.isNotBlank(origHostname) && !origHostname.equalsIgnoreCase("localhost")) {
+            if (StringUtils.isNotBlank(origHostname) && !origHostname.equalsIgnoreCase(LOCALHOST)) {
                 return origHostname;
             }
         }
