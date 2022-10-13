@@ -49,7 +49,7 @@ public class ChainConfiguration implements Serializable {
 	private long timeout;
 
 	@DiffInclude
-	@Column(columnDefinition = "int default 2")
+	@Column(columnDefinition = "int default 5")
 	private Integer priority;
 
 	@DiffInclude
@@ -173,27 +173,25 @@ public class ChainConfiguration implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder sBuf = new StringBuilder();
-		sBuf.append("ChainConfiguration = {");
-		sBuf.append("Name: ");
-		sBuf.append(this.name);
-		sBuf.append(", Description: ");
-		sBuf.append(this.description);
-		sBuf.append(", Enabled: ");
-		sBuf.append(this.enabled);
-		sBuf.append(", Printer Name: ");
-		sBuf.append(this.printerName);
-		sBuf.append(", Queue Name: ");
-		sBuf.append(this.queueName);
-		sBuf.append(", Root Node: ");
-		sBuf.append(this.rootNode);
-		sBuf.append(", Timeout: ");
-		sBuf.append(this.timeout);
-		sBuf.append(", Priority: ");
-		sBuf.append(this.priority);
-		sBuf.append(", FailureLevel: ");
-		sBuf.append(this.failureLevel);
-		sBuf.append("}");
-		return sBuf.toString();
+		return "ChainConfiguration = {" +
+				"Name: " +
+				this.name +
+				", Description: " +
+				this.description +
+				", Enabled: " +
+				this.enabled +
+				", Printer Name: " +
+				this.printerName +
+				", Queue Name: " +
+				this.queueName +
+				", Root Node: " +
+				this.rootNode +
+				", Timeout: " +
+				this.timeout +
+				", Priority: " +
+				this.priority +
+				", FailureLevel: " +
+				this.failureLevel +
+				"}";
 	}
 }
