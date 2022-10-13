@@ -1,11 +1,11 @@
 package com.docshifter.core.config.services;
 
+import com.docshifter.core.config.entities.Module;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import com.docshifter.core.licensing.dtos.LicensingDto;
 import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.utils.NetworkUtils;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
-import com.nalpeiron.ModulesIndicator;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -581,20 +581,20 @@ public class NalpeironService implements ILicensingService {
      * @return {@code String} list with the name of the licensed modules.
      * @throws DocShifterLicenseException Something went wrong while getting the feature status.
      */
-    public List<String> getLicensedModules() throws DocShifterLicenseException {
+    public List<String> getLicensedModules(List<Module> modules) throws DocShifterLicenseException {
 
         List<String> modulesLicensed = new ArrayList<>();
 
-        for (ModulesIndicator modulesIndicator : ModulesIndicator.values()) {
+        for (Module module : modules) {
 
-            if (modulesIndicator.getOperation().isEmpty()) {
+            if (module.getCode() == null) {
                 continue;
             }
 
-            NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(modulesIndicator.getId());
+            NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(module.getCode());
 
             if (featureStatus.isValid()) {
-                modulesLicensed.add(modulesIndicator.getOperation());
+                modulesLicensed.add(module.getName());
             }
         }
 
