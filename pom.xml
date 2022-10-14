@@ -371,6 +371,12 @@
             <version>${kubernetes-client.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.vladmihalcea</groupId>
+            <artifactId>hibernate-types-52</artifactId>
+            <version>2.19.2</version>
+        </dependency>
+
         <!-- Not sure where else pdfbox is brought in, but we do use it here and there -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
