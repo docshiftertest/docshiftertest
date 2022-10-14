@@ -7,13 +7,14 @@ import lombok.Setter;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
-public class WorkflowAudit implements AuditInfo {
+public class WorkflowAudit implements Serializable {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -43,27 +44,5 @@ public class WorkflowAudit implements AuditInfo {
         this.setPropertyName(propertyName);
         this.setUsername(username);
     }
-
-    @Override
-    public String getUsername() {
-        return this.username;
-    }
-
-    @Override
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    @Override
-    public long getEventDateTime() {
-        return this.eventDateTime;
-    }
-
-    @Override
-    public void setEventDateTime(long eventDateTime) {
-        this.eventDateTime = eventDateTime;
-    }
-
-
 
 }
