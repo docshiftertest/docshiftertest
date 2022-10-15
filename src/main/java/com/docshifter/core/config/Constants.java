@@ -1,32 +1,37 @@
 package com.docshifter.core.config;
 
-public class Constants {
+public final class Constants {
+	private Constants() {}
 
-	public final static String MQ_SYSTEM = "mq_system";
-	public final static String MQ_URL = "mq_url";
-	public final static String MQ_QUEUE = "mq_queue";
-	public final static String MQ_METRICS_QUEUE = "docshifter_metrics";
-	public final static String MQ_USER = "mq_user";
-	public final static String MQ_PASSWORD = "mq_password";
-	public final static String TEMPFOLDER = "tempfolder";
-	public final static String ERRORFOLDER = "errorfolder";
-	public final static String OPENOFFICE_HOST = " ";
-	public final static String OPENOFFICE_PORT = " ";
+	public static final String MQ_SYSTEM = "mq_system";
+	public static final String MQ_URL = "mq_url";
+	public static final String MQ_QUEUE = "mq_queue";
+	public static final String MQ_METRICS_QUEUE = "docshifter_metrics";
+	public static final String MQ_USER = "mq_user";
+	public static final String MQ_PASSWORD = "mq_password";
+	public static final String TEMPFOLDER = "tempfolder";
+	public static final String ERRORFOLDER = "errorfolder";
+	public static final String OPENOFFICE_HOST = " ";
+	public static final String OPENOFFICE_PORT = " ";
 
 
-    public final static String RELOAD_QUEUE = "VirtualTopic.docshifterReload";
-	public final static String SYNC_QUEUE = "docshifterSync";
-	public final static String STATUS_QUEUE = "VirtualTopic.docshifterStatus";
-	public final static String DEFAULT_QUEUE = "docshifter";
+    public static final String RELOAD_QUEUE = "VirtualTopic.docshifterReload";
+	public static final String SYNC_QUEUE = "docshifterSync";
+	public static final String DEFAULT_QUEUE = "docshifter";
 	
 	/**
 	 * Used to cache {@link com.docshifter.core.config.services.ConfigurationService#getSenderConfiguration(long)}
 	 */
-	public final static String SENDER_CONFIGURATION_CACHE = "senderConfiguration";
+	public static final String SENDER_CONFIGURATION_CACHE = "senderConfiguration";
 	
 	/**
 	 * This constant should reflect 
 	 * {@link DocShifterConfiguration#topicListener(javax.jms.ConnectionFactory, org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer)} method name.
 	 */
-	public final static String TOPIC_LISTENER = "topicListener";
+	public static final String TOPIC_LISTENER = "topicListener";
+
+	/**
+	 * Prefix to use for all API routes
+	 */
+	public static final String API_PATH_PREFIX = "api";
 }

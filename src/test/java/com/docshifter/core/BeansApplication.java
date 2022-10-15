@@ -1,7 +1,7 @@
 package com.docshifter.core;
 
 import com.docshifter.core.config.DocShifterConfiguration;
-import com.docshifter.core.config.StatusService;
+import com.docshifter.core.config.services.StatusService;
 import com.docshifter.datasource.config.docshifter.ConfigurationDocshifterDB;
 import com.docshifter.datasource.config.metrics.ConfigurationMetricsDB;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

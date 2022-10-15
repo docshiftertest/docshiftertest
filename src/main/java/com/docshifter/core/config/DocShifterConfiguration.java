@@ -200,11 +200,6 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
-	public ActiveMQTopic servicesStatus() {
-		return new ActiveMQTopic(Constants.STATUS_QUEUE);
-	}
-
-	@Bean
 	@Conditional(IsInKubernetesCondition.class)
 	public KubernetesClient k8sClient() {
 		return new DefaultKubernetesClient();
