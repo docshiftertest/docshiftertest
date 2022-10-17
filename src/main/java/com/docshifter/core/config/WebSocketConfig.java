@@ -4,7 +4,6 @@ import com.docshifter.core.config.services.GeneralConfigService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.messaging.simp.config.StompBrokerRelayRegistration;
 import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
 import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -34,15 +33,15 @@ public class WebSocketConfig extends AbstractSecurityWebSocketMessageBrokerConfi
 		String mqUser = generalConfigService.getString(Constants.MQ_USER);
 		String mqPassword = generalConfigService.getString(Constants.MQ_PASSWORD);
 
-		StompBrokerRelayRegistration relayConfig = config.enableStompBrokerRelay("/queue", "/topic")
+		config.enableStompBrokerRelay("/queue", "/topic")
 				.setRelayHost(mqUrl.getHost())
+				.setRelayPort(61613)
 				.setUserDestinationBroadcast("/topic/log-unresolved-user")
 				.setUserRegistryBroadcast("/topic/log-user-registry")
 				.setClientLogin(mqUser)
 				.setClientPasscode(mqPassword)
 				.setSystemLogin(mqUser)
 				.setSystemPasscode(mqPassword);
-		relayConfig.setRelayPort(61613);
 		config.setApplicationDestinationPrefixes("/app");
 	}
 

@@ -65,7 +65,7 @@ public class DefaultServiceHeatbeatDTOSupplier implements Supplier<Set<ServiceHe
 		);
 
 		ServiceHeartbeatDTO.DataPoints jvmComponent = new ServiceHeartbeatDTO.DataPoints(
-				applicationName,
+				applicationName + " (" + NetworkUtils.getLocalHostName() + ")",
 				osBean.getProcessCpuLoad(),
 				Runtime.getRuntime().freeMemory(),
 				Runtime.getRuntime().maxMemory(),
