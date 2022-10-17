@@ -605,6 +605,14 @@ public class NalpeironService implements ILicensingService {
         return modulesLicensed;
     }
 
+    /**
+     * Gets the license code
+     * @return a String with the license code number
+     */
+    public String getLicenseCode() {
+        return helper.getLicenseCode();
+    }
+
     @PreDestroy
     private void cleanup() throws Throwable {
         if (helper == null) {
