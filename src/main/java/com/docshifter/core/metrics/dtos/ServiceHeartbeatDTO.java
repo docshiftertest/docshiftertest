@@ -1,5 +1,6 @@
 package com.docshifter.core.metrics.dtos;
 
+import com.netflix.appinfo.InstanceInfo;
 import org.springframework.boot.availability.LivenessState;
 
 import java.time.ZonedDateTime;
@@ -10,6 +11,14 @@ public record ServiceHeartbeatDTO(ZonedDateTime timestamp,
 								  boolean dbConnection,
 								  DataPoints instance,
 								  DataPoints jvmComponent) {
+	/**
+	 * Gets a friendly component ID for this heartbeat. It should be unique across all the different DocShifter components
+	 * and machines present in an installation.
+	 */
+	public String getComponentId() {
+		return jvmComponent().name() + " (" + instance.name() + ")";
+	}
+
 	public enum InstallationType {
 		CLASSICAL,
 		CONTAINERIZED;
@@ -44,6 +53,14 @@ public record ServiceHeartbeatDTO(ZonedDateTime timestamp,
 			}
 
 			return UP;
+		}
+
+		public static Status mapFrom(InstanceInfo.InstanceStatus eurekaStatus) {
+			return switch (eurekaStatus) {
+				case UP -> UP;
+				case DOWN, OUT_OF_SERVICE, UNKNOWN -> DOWN;
+				case STARTING -> STARTING;
+			};
 		}
 	}
 
