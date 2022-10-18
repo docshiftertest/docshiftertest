@@ -6,6 +6,7 @@ import com.docshifter.core.utils.NetworkUtils;
 import com.sun.management.OperatingSystemMXBean;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator;
 import org.springframework.boot.availability.ApplicationAvailability;
 import org.springframework.stereotype.Service;
@@ -65,7 +66,7 @@ public class DefaultServiceHeatbeatDTOSupplier implements Supplier<Set<ServiceHe
 		);
 
 		ServiceHeartbeatDTO.DataPoints jvmComponent = new ServiceHeartbeatDTO.DataPoints(
-				applicationName + " (" + NetworkUtils.getLocalHostName() + ")",
+				applicationName,
 				osBean.getProcessCpuLoad(),
 				Runtime.getRuntime().freeMemory(),
 				Runtime.getRuntime().maxMemory(),
@@ -79,8 +80,8 @@ public class DefaultServiceHeatbeatDTOSupplier implements Supplier<Set<ServiceHe
 				ZonedDateTime.now(),
 				ServiceHeartbeatDTO.InstallationType.mapFrom(installationType),
 				ServiceHeartbeatDTO.Status.mapFrom(healthManagementService.isAppReady(),
-						applicationAvailability.getLivenessState(),
-						dataSourceHealthIndicator.health()),
+						applicationAvailability.getLivenessState()),
+				dataSourceHealthIndicator.health().getStatus() == Status.UP,
 				instance,
 				jvmComponent));
 	}

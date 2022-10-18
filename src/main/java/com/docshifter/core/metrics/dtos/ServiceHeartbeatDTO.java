@@ -1,6 +1,5 @@
 package com.docshifter.core.metrics.dtos;
 
-import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.availability.LivenessState;
 
 import java.time.ZonedDateTime;
@@ -8,6 +7,7 @@ import java.time.ZonedDateTime;
 public record ServiceHeartbeatDTO(ZonedDateTime timestamp,
 								  InstallationType installationType,
 								  Status status,
+								  boolean dbConnection,
 								  DataPoints instance,
 								  DataPoints jvmComponent) {
 	public enum InstallationType {
@@ -30,12 +30,11 @@ public record ServiceHeartbeatDTO(ZonedDateTime timestamp,
 	public enum Status {
 		STARTING,
 		UP,
-		UP_NO_DATABASE,
 		UNHEALTHY,
 		DOWN,
 		GONE;
 
-		public static Status mapFrom(boolean isAppReady, LivenessState livenessState, Health dbHealth) {
+		public static Status mapFrom(boolean isAppReady, LivenessState livenessState) {
 			if (!isAppReady) {
 				return STARTING;
 			}
@@ -44,7 +43,7 @@ public record ServiceHeartbeatDTO(ZonedDateTime timestamp,
 				return UNHEALTHY;
 			}
 
-			return dbHealth.getStatus() == org.springframework.boot.actuate.health.Status.UP ? UP : UP_NO_DATABASE;
+			return UP;
 		}
 	}
 
