@@ -9,6 +9,7 @@ public record ServiceHeartbeatDTO(ZonedDateTime timestamp,
 								  InstallationType installationType,
 								  Status status,
 								  boolean dbConnection,
+								  boolean isPrimary,
 								  DataPoints instance,
 								  DataPoints jvmComponent) {
 	/**
@@ -71,6 +72,6 @@ public record ServiceHeartbeatDTO(ZonedDateTime timestamp,
 							 Long diskUsage,
 							 Long diskMax,
 							 Double diskPressure,
-							 Double networkPressure) {
+							 Long networkUsage) {
 	}
 }

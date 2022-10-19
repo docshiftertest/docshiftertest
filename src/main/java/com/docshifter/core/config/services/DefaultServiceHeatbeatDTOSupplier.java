@@ -82,6 +82,7 @@ public class DefaultServiceHeatbeatDTOSupplier implements Supplier<Set<ServiceHe
 				ServiceHeartbeatDTO.Status.mapFrom(healthManagementService.isAppReady(),
 						applicationAvailability.getLivenessState()),
 				dataSourceHealthIndicator.health().getStatus() == Status.UP,
+				false, // TODO
 				instance,
 				jvmComponent));
 	}
