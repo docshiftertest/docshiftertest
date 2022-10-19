@@ -57,7 +57,7 @@ public class DefaultServiceHeatbeatDTOSupplier implements Supplier<Set<ServiceHe
 		ServiceHeartbeatDTO.DataPoints instance = new ServiceHeartbeatDTO.DataPoints(
 				NetworkUtils.getLocalHostName(),
 				osBean.getCpuLoad(),
-				osBean.getFreeMemorySize(),
+				osBean.getTotalMemorySize() - osBean.getFreeMemorySize(),
 				osBean.getTotalMemorySize(),
 				diskUsed,
 				diskTotal,
@@ -68,7 +68,7 @@ public class DefaultServiceHeatbeatDTOSupplier implements Supplier<Set<ServiceHe
 		ServiceHeartbeatDTO.DataPoints jvmComponent = new ServiceHeartbeatDTO.DataPoints(
 				applicationName,
 				osBean.getProcessCpuLoad(),
-				Runtime.getRuntime().freeMemory(),
+				Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(),
 				Runtime.getRuntime().maxMemory(),
 				diskUsed,
 				diskTotal,
