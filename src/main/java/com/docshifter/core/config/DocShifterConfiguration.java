@@ -8,6 +8,7 @@ import com.docshifter.core.config.services.GeneralConfigService;
 import com.docshifter.core.config.services.HealthManagementService;
 import com.docshifter.core.config.services.IJmsTemplateFactory;
 import com.docshifter.core.config.services.JmsTemplateFactory;
+import com.docshifter.core.utils.NetworkUtils;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -25,6 +26,8 @@ import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.commons.util.InetUtils;
+import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
@@ -241,5 +244,12 @@ public class DocShifterConfiguration {
 	@Bean
 	public DataSourceHealthIndicator dataSourceHealthIndicator(DataSource dataSource) {
 		return new DataSourceHealthIndicator(dataSource);
+	}
+
+	@Bean
+	public EurekaInstanceConfigBean eurekaInstanceConfig(InetUtils inetUtils) {
+		EurekaInstanceConfigBean bean = new EurekaInstanceConfigBean(inetUtils);
+		bean.setHostname(NetworkUtils.getLocalHostName());
+		return bean;
 	}
 }

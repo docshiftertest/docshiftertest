@@ -61,8 +61,8 @@ public class StatusService {
     }
 
     private void configureScheduler(boolean start) {
-        if (start ^ runningFuture == null) {
-            log.error("Received {}, but the future has already {}", start, start ? "started" : "stopped");
+        if (start ^ (runningFuture == null || runningFuture.isDone())) {
+            log.warn("Received {}, but the future has already {}", start, start ? "started" : "stopped");
             return;
         }
 
@@ -85,7 +85,11 @@ public class StatusService {
 
     private void storeAndSendDto(ServiceHeartbeatDTO dto) {
         lastHeartbeats.add(dto);
-        websocketTemplate.convertAndSend(STOMP_DESTINATION, dto);
+        try {
+            websocketTemplate.convertAndSend(STOMP_DESTINATION, dto);
+        } catch (Exception ex) {
+            log.error("Could not send DTO to {}", STOMP_DESTINATION, ex);
+        }
     }
 
     private boolean matchSubscription(SimpSubscription subscription) {
@@ -97,7 +101,7 @@ public class StatusService {
         SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.wrap(event.getMessage());
         if (STOMP_DESTINATION.equals(accessor.getDestination())) {
             sessionsToTrack.add(accessor.getSessionId());
-            if (runningFuture == null) {
+            if (runningFuture == null || runningFuture.isDone()) {
                 configureScheduler(true);
             } else {
                 // Replay last heartbeats (if any) to the client that just subscribed
@@ -105,7 +109,11 @@ public class StatusService {
                     // TODO figure out why this is not reaching the user... Needs proper authentication setup first
                     //  and/or can't send a message to a single user through a topic?
                     Map<String, Object> headers = Map.of(SimpMessageHeaderAccessor.SESSION_ID_HEADER, accessor.getSessionId());
-                    websocketTemplate.convertAndSendToUser(accessor.getSessionId(), STOMP_DESTINATION, heartbeat, headers);
+                    try {
+                        websocketTemplate.convertAndSendToUser(accessor.getSessionId(), STOMP_DESTINATION, heartbeat, headers);
+                    } catch (Exception ex) {
+                        log.error("Could not send DTO to user {} at {}", accessor.getSessionId(), STOMP_DESTINATION, ex);
+                    }
                 }
             }
         }
