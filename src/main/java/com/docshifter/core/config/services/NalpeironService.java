@@ -569,11 +569,26 @@ public class NalpeironService implements ILicensingService {
 
     /**
      * Gets the max receivers allowed.
-     * @Return {@code String} the number of max receivers allowed.
-     * @throws DocShifterLicenseException Something went wrong while fetching the value of the TAA field.
+     * @Return {@code Integer} the number of max receivers allowed.
      */
-    public String getMaxReceivers() throws DocShifterLicenseException {
-        return helper.getUDFValue(NalpeironHelper.MAX_RECEIVERS_UDF_KEY);
+    public Integer getMaxReceivers() {
+
+        String udfValue;
+        Integer maxReceivers = null;
+        try {
+            udfValue = helper.getUDFValue(NalpeironHelper.MAX_RECEIVERS_UDF_KEY);
+            maxReceivers = Integer.parseInt(udfValue);
+        }
+        catch (NumberFormatException numberFormatException) {
+            log.debug("There is a problem while converting to a number: [{}]  ",
+                    maxReceivers, numberFormatException);
+        }
+        catch (DocShifterLicenseException docShifterLicenseException) {
+            log.debug("It was not possible to get the number of receivers for the license.",
+                    docShifterLicenseException);
+        }
+
+        return maxReceivers;
     }
 
     /**
