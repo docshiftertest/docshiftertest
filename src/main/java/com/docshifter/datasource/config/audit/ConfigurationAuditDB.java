@@ -35,7 +35,8 @@ public class ConfigurationAuditDB {
         return DataSourceBuilder.create()
                 .url(url)
                 .username("ds_audit")
-                .password("dc9daec4c16279d7792a133c2d638c36")
+                .password("DS_AUDIT")
+//                .password("dc9daec4c16279d7792a133c2d638c36")
                 .build();
     }
 
