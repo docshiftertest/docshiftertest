@@ -288,12 +288,6 @@
 
         <dependency>
             <groupId>org.javers</groupId>
-            <artifactId>javers-spring-jpa</artifactId>
-            <version>6.7.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.javers</groupId>
             <artifactId>javers-persistence-sql</artifactId>
             <version>6.7.1</version>
         </dependency>
