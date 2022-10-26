@@ -17,7 +17,7 @@ public record ServiceHeartbeatDTO(ZonedDateTime timestamp,
 	 * and machines present in an installation.
 	 */
 	public String getComponentId() {
-		return jvmComponent().name() + " (" + instance.name() + ")";
+		return jvmComponent().name() + " (" + instance().name() + ")";
 	}
 
 	public enum InstallationType {
@@ -43,6 +43,21 @@ public record ServiceHeartbeatDTO(ZonedDateTime timestamp,
 		UNHEALTHY,
 		DOWN,
 		GONE;
+
+		/**
+		 * Indicates whether this component is running/working/active.
+		 */
+		public boolean isActive() {
+			return this != DOWN && this != GONE;
+		}
+
+		/**
+		 * Indicates whether this component is active AND has fully started up, and therefore is ready to perform useful
+		 * work.
+		 */
+		public boolean isReady() {
+			return this == UP || this == UNHEALTHY;
+		}
 
 		public static Status mapFrom(boolean isAppReady, LivenessState livenessState) {
 			if (!isAppReady) {
