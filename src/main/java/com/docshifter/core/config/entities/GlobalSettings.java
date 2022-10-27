@@ -56,6 +56,30 @@ public class GlobalSettings implements Serializable
 		this.mqUserPassword = mqUserPassword;
 	}
 
+	public GlobalSettings(String mqSystem, String mqURL, String mqQueue, String mqMetricsQueue, String mqUser,
+						  String mqUserPassword, String defaultTempFolder, String defaultErrorFolder) {
+		this.mqSystem = mqSystem;
+		this.mqURL = mqURL;
+		this.mqQueue = mqQueue;
+		this.mqMetricsQueue = mqMetricsQueue;
+		this.mqUser = mqUser;
+		this.mqUserPassword = mqUserPassword;
+		this.defaultTempFolder = defaultTempFolder;
+		this.defaultErrorFolder = defaultErrorFolder;
+	}
+
+	public GlobalSettings(long id, String mqSystem, String mqURL, String mqQueue, String mqMetricsQueue,
+						  String mqUser, String mqUserPassword, String defaultTempFolder, String defaultErrorFolder) {
+		this.id = id;
+		this.mqSystem = mqSystem;
+		this.mqURL = mqURL;
+		this.mqQueue = mqQueue;
+		this.mqMetricsQueue = mqMetricsQueue;
+		this.mqUser = mqUser;
+		this.mqUserPassword = mqUserPassword;
+		this.defaultTempFolder = defaultTempFolder;
+		this.defaultErrorFolder = defaultErrorFolder;
+	}
 
 	public String getDefaultTempFolder()
 	{
@@ -143,4 +167,5 @@ public class GlobalSettings implements Serializable
 	public String getDefaultErrorFolder() {
 		return defaultErrorFolder;
 	}
+
 }

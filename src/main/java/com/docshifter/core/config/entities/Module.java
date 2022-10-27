@@ -43,6 +43,8 @@ public class Module implements Serializable {
 	private String condition;
 	private String inputFiletype;
 	private String outputFileType;
+	@Column(unique = true)
+	private String code;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
@@ -80,7 +82,19 @@ public class Module implements Serializable {
 		this.parameters = parameters;
 	}
 
-
+	public Module(long id, String name, String classname, String description, String type, String condition,
+				  String inputFiletype, String outputFileType, String code, Set<Parameter> parameters) {
+		this.id = id;
+		this.name = name;
+		this.classname = classname;
+		this.description = description;
+		this.type = type;
+		this.condition = condition;
+		this.inputFiletype = inputFiletype;
+		this.outputFileType = outputFileType;
+		this.code = code;
+		this.parameters = parameters;
+	}
 
 	public Module(Module module) {
 		this(module.getDescription(), module.getName(), module.getClassname(), module.getType(), module.getCondition(), new HashSet<Parameter>(module.getParameters()));
@@ -270,4 +284,11 @@ public class Module implements Serializable {
 		this.condition = condition;
 	}
 
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
 }
