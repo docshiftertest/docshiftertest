@@ -35,14 +35,14 @@ public class WorkflowAudit implements Serializable {
             String configurationName , String username, long eventDateTime) {
         this.id = uuid;
         this.workflowName = workflowName;
-        this.setEventDateTime(eventDateTime);
+        this.eventDateTime = eventDateTime;
         this.changeType = changeType;
         this.configurationName = configurationName;
         this.moduleName = moduleName;
-        this.setOldValue(oldValue);
-        this.setNewValue(newValue);
-        this.setPropertyName(propertyName);
-        this.setUsername(username);
+        this.oldValue = oldValue;
+        this.newValue = newValue;
+        this.propertyName = propertyName;
+        this.username = username;
     }
 
 }
