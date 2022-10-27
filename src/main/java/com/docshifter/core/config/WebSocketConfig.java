@@ -33,7 +33,7 @@ public class WebSocketConfig extends AbstractSecurityWebSocketMessageBrokerConfi
 		String mqUser = generalConfigService.getString(Constants.MQ_USER);
 		String mqPassword = generalConfigService.getString(Constants.MQ_PASSWORD);
 
-		config.enableStompBrokerRelay("/queue", "/topic")
+		config.enableStompBrokerRelay("/queue", "/topic", "/user")
 				.setRelayHost(mqUrl.getHost())
 				.setRelayPort(61613)
 				.setUserDestinationBroadcast("/topic/log-unresolved-user")
