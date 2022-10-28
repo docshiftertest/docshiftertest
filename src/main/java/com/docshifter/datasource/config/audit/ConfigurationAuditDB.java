@@ -1,10 +1,10 @@
 package com.docshifter.datasource.config.audit;
 
-import org.hibernate.cfg.Environment;
+import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
+import org.hibernate.cfg.AvailableSettings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
-import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -14,6 +14,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.util.Objects;
 import java.util.Properties;
 
 @Configuration
@@ -35,14 +36,13 @@ public class ConfigurationAuditDB {
         return DataSourceBuilder.create()
                 .url(url)
                 .username("ds_audit")
-                .password("DS_AUDIT")
-//                .password("dc9daec4c16279d7792a133c2d638c36")
+                .password("aae4d1b46100a43119b6c43eacff8f74")
                 .build();
     }
 
     @Bean
     public PlatformTransactionManager auditTransactionManager() {
-        return new JpaTransactionManager(auditEntityManagerFactory().getObject());
+        return new JpaTransactionManager(Objects.requireNonNull(auditEntityManagerFactory().getObject()));
     }
 
     @Bean
@@ -52,11 +52,11 @@ public class ConfigurationAuditDB {
         jpaVendorAdapter.setGenerateDdl(false);
 
         Properties properties = new Properties();
-        properties.setProperty(Environment.DIALECT, dialect);
-        properties.setProperty(Environment.DEFAULT_SCHEMA, "audit");
-        properties.put(Environment.PHYSICAL_NAMING_STRATEGY, SpringPhysicalNamingStrategy.class.getName());
-        properties.put(Environment.IMPLICIT_NAMING_STRATEGY, SpringImplicitNamingStrategy.class.getName());
-        properties.setProperty(Environment.HBM2DDL_AUTO, schemaCreation);
+        properties.setProperty(AvailableSettings.DIALECT, dialect);
+        properties.setProperty(AvailableSettings.DEFAULT_SCHEMA, "audit");
+        properties.put(AvailableSettings.PHYSICAL_NAMING_STRATEGY, CamelCaseToUnderscoresNamingStrategy.class.getName());
+        properties.put(AvailableSettings.IMPLICIT_NAMING_STRATEGY, SpringImplicitNamingStrategy.class.getName());
+        properties.setProperty(AvailableSettings.HBM2DDL_AUTO, schemaCreation);
 
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 
