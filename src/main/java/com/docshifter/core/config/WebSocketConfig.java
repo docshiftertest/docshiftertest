@@ -52,6 +52,10 @@ public class WebSocketConfig extends AbstractSecurityWebSocketMessageBrokerConfi
 
 	@Override
 	public void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
+		// We are required to register STOMP endpoints even if we just want to publish messages and don't want to serve
+		// an actual Websocket endpoint on any components other than Console, otherwise Spring will complain. However,
+		// we can deny all traffic by default, and then override and set up the correct inbound traffic rules in
+		// Console.
 		messages.anyMessage().denyAll();
 	}
 }
