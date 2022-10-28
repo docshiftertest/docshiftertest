@@ -1,14 +1,14 @@
 package com.docshifter.core.config.entities;
 
-import java.nio.file.Path;
-import java.time.Instant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.nio.file.Path;
+import java.time.Instant;
 
 @Entity
 public class QueueMonitor {

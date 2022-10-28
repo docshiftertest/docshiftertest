@@ -3,6 +3,8 @@ package com.docshifter.core.config.entities;
 import com.docshifter.core.operations.FailureLevel;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -14,6 +16,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import java.io.Serializable;
 
 
 //Read-only: Use this strategy when you are sure that your data never changes. If you try to update the data with this strategy Hibernate will throw an exception.
@@ -24,30 +27,42 @@ import javax.persistence.ManyToOne;
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
-public class ChainConfiguration {
+public class ChainConfiguration implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 
+	@DiffInclude
 	private String name;
+
+	@DiffInclude
 	private String description;
+
+	@DiffInclude
 	private String printerName;
+
+	@DiffInclude
 	private String queueName;
 
+	@DiffInclude
 	private long timeout;
-	@Column(columnDefinition = "int default 2")
+
+	@DiffInclude
+	@Column(columnDefinition = "int default 5")
 	private Integer priority;
 
+	@DiffInclude
 	private boolean enabled;
 
+	@DiffInclude
 	@Enumerated(EnumType.STRING)
 	private FailureLevel failureLevel;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne(cascade=CascadeType.ALL)
+	@DiffIgnore
 	private Node rootNode;
-
 
 	public ChainConfiguration() {}
 
@@ -158,27 +173,25 @@ public class ChainConfiguration {
 
 	@Override
 	public String toString() {
-		StringBuilder sBuf = new StringBuilder();
-		sBuf.append("ChainConfiguration = {");
-		sBuf.append("Name: ");
-		sBuf.append(this.name);
-		sBuf.append(", Description: ");
-		sBuf.append(this.description);
-		sBuf.append(", Enabled: ");
-		sBuf.append(this.enabled);
-		sBuf.append(", Printer Name: ");
-		sBuf.append(this.printerName);
-		sBuf.append(", Queue Name: ");
-		sBuf.append(this.queueName);
-		sBuf.append(", Root Node: ");
-		sBuf.append(this.rootNode);
-		sBuf.append(", Timeout: ");
-		sBuf.append(this.timeout);
-		sBuf.append(", Priority: ");
-		sBuf.append(this.priority);
-		sBuf.append(", FailureLevel: ");
-		sBuf.append(this.failureLevel);
-		sBuf.append("}");
-		return sBuf.toString();
+		return "ChainConfiguration = {" +
+				"Name: " +
+				this.name +
+				", Description: " +
+				this.description +
+				", Enabled: " +
+				this.enabled +
+				", Printer Name: " +
+				this.printerName +
+				", Queue Name: " +
+				this.queueName +
+				", Root Node: " +
+				this.rootNode +
+				", Timeout: " +
+				this.timeout +
+				", Priority: " +
+				this.priority +
+				", FailureLevel: " +
+				this.failureLevel +
+				"}";
 	}
 }

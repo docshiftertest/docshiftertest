@@ -1,5 +1,6 @@
 package com.docshifter.core.config.services;
 
+import com.docshifter.core.config.entities.Module;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import com.docshifter.core.licensing.dtos.LicensingDto;
 import com.docshifter.core.utils.FileUtils;
@@ -28,6 +29,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -519,12 +521,35 @@ public class NalpeironService implements ILicensingService {
     }
 
     /**
-     * Gets the expiration date of the current license.
+     * Checks if the license is permanent
+     * @return if the license is permanent or not
+     * @throws DocShifterLicenseException Something went wrong while trying to fetch this information.
+     */
+    public boolean isLicensePermanent() throws DocShifterLicenseException {
+
+        NalpeironHelper.LicenseType licenseType = helper.getLicenseType();
+
+        return NalpeironHelper.LicenseType.PERMANENT.equals(licenseType)
+                || NalpeironHelper.LicenseType.CONCURRENT_PERMANENT.equals(licenseType);
+    }
+
+    /**
+     * Gets the subscription expiration date of the current license
+     * or a date far away in the future for a permanent license
      * @return An expiration date relative to the local time of the machine.
      * @throws DocShifterLicenseException Something went wrong while trying to fetch this information.
      */
-    public LocalDateTime getLicenseExpirationDate() throws DocShifterLicenseException {
+    public LocalDateTime getSubscriptionExpirationDate() throws DocShifterLicenseException {
         return helper.getSubscriptionExpirationDate();
+    }
+
+    /**
+     * Gets the maintenanceExpirationDate
+     * @return An maintenance date relative to the local time of the machine.
+     * @throws DocShifterLicenseException exception while trying to get the date
+     */
+    public LocalDateTime getMaintenanceExpirationDate() throws DocShifterLicenseException {
+        return helper.getMaintenanceExpirationDate();
     }
 
     /**
@@ -540,6 +565,67 @@ public class NalpeironService implements ILicensingService {
      */
     public LocalDateTime getLeaseExpirationDate() throws DocShifterLicenseException {
         return helper.getLeaseExpirationDate();
+    }
+
+    /**
+     * Gets the max receivers allowed.
+     * @Return {@code Integer} the number of max receivers allowed.
+     */
+    public Integer getMaxReceivers() {
+
+        String udfValue;
+        Integer maxReceivers = null;
+        try {
+            udfValue = helper.getUDFValue(NalpeironHelper.MAX_RECEIVERS_UDF_KEY);
+            maxReceivers = Integer.parseInt(udfValue);
+        }
+        catch (NumberFormatException numberFormatException) {
+            log.debug("There is a problem while converting to a number: [{}]  ",
+                    maxReceivers, numberFormatException);
+        }
+        catch (DocShifterLicenseException docShifterLicenseException) {
+            log.debug("It was not possible to get the number of receivers for the license.",
+                    docShifterLicenseException);
+        }
+
+        return maxReceivers;
+    }
+
+    /**
+     * Gets all the licensed modules for the license
+     * @return {@code String} list with the name of the licensed modules.
+     * @throws DocShifterLicenseException Something went wrong while getting the feature status.
+     */
+    public List<String> getLicensedModules(List<Module> modules) throws DocShifterLicenseException {
+
+        List<String> modulesLicensed = new ArrayList<>();
+
+        for (Module module : modules) {
+
+            if (module.getCode() == null) {
+                continue;
+            }
+
+            NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(module.getCode());
+
+            if (featureStatus.isValid()) {
+                modulesLicensed.add(module.getName());
+            }
+        }
+
+        modulesLicensed = modulesLicensed.stream().sorted().toList();
+
+        log.debug("Modules licensed: {}", modulesLicensed);
+
+        return modulesLicensed;
+    }
+
+    /**
+     * Gets the license code
+     * @return a String with the license code number
+     */
+    public String getLicenseCode() {
+        return helper.getLicenseCode();
     }
 
     @PreDestroy

@@ -2,7 +2,6 @@ package com.docshifter.core.config.entities;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -17,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -24,12 +24,11 @@ import java.util.function.Consumer;
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
-public class Node {
+public class Node implements Serializable {
 	@Id
 	@Column(name = "ID")
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private long id;
-
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne(cascade = CascadeType.REMOVE)
@@ -43,7 +42,7 @@ public class Node {
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne
 	private ModuleConfiguration moduleConfiguration;
-	
+
 	public Node(){}
 	
 	public Node(Node parentNode, ModuleConfiguration moduleConfiguration){
@@ -101,7 +100,7 @@ public class Node {
 	public Set<Node> getChildNodes(){
 		return childNodes;
 	}
-	
+
 	public void setChildNodes(Set<Node> childNodes){
 		if (childNodes == null) {
 			childNodes = new HashSet<>();
@@ -116,7 +115,7 @@ public class Node {
 	public void setModuleConfiguration(ModuleConfiguration moduleConfiguration){
 		this.moduleConfiguration = moduleConfiguration;
 	}
-	
+
 	public void clearAllChildNodes(){
 		for(Node n : childNodes){
 			n.clearAllChildNodes();

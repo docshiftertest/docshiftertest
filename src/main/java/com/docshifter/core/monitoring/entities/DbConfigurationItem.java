@@ -1,7 +1,7 @@
 package com.docshifter.core.monitoring.entities;
 
-import com.docshifter.core.security.Encrypted;
 import com.docshifter.core.monitoring.enums.ConfigurationTypes;
+import com.docshifter.core.security.Encrypted;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;

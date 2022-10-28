@@ -1,14 +1,15 @@
 package com.docshifter.core.config.entities;
 
+import com.docshifter.core.security.Encrypted;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import com.docshifter.core.security.Encrypted;
+import java.io.Serializable;
 
 @Entity
-public class GlobalSettings
+public class GlobalSettings implements Serializable
 {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -55,6 +56,30 @@ public class GlobalSettings
 		this.mqUserPassword = mqUserPassword;
 	}
 
+	public GlobalSettings(String mqSystem, String mqURL, String mqQueue, String mqMetricsQueue, String mqUser,
+						  String mqUserPassword, String defaultTempFolder, String defaultErrorFolder) {
+		this.mqSystem = mqSystem;
+		this.mqURL = mqURL;
+		this.mqQueue = mqQueue;
+		this.mqMetricsQueue = mqMetricsQueue;
+		this.mqUser = mqUser;
+		this.mqUserPassword = mqUserPassword;
+		this.defaultTempFolder = defaultTempFolder;
+		this.defaultErrorFolder = defaultErrorFolder;
+	}
+
+	public GlobalSettings(long id, String mqSystem, String mqURL, String mqQueue, String mqMetricsQueue,
+						  String mqUser, String mqUserPassword, String defaultTempFolder, String defaultErrorFolder) {
+		this.id = id;
+		this.mqSystem = mqSystem;
+		this.mqURL = mqURL;
+		this.mqQueue = mqQueue;
+		this.mqMetricsQueue = mqMetricsQueue;
+		this.mqUser = mqUser;
+		this.mqUserPassword = mqUserPassword;
+		this.defaultTempFolder = defaultTempFolder;
+		this.defaultErrorFolder = defaultErrorFolder;
+	}
 
 	public String getDefaultTempFolder()
 	{
@@ -142,4 +167,5 @@ public class GlobalSettings
 	public String getDefaultErrorFolder() {
 		return defaultErrorFolder;
 	}
+
 }

@@ -64,7 +64,7 @@ public class NalpeironHelper {
     /**
      * Format of the datetime Strings the Nalpeiron libs return. E.g.: Wed Jul 17 19:59:12 2013
      */
-    private static final DateTimeFormatter NALP_DATE_FORMAT = DateTimeFormatter.ofPattern("E MMM dd hh:mm:ss y",
+    private static final DateTimeFormatter NALP_DATE_FORMAT = DateTimeFormatter.ofPattern("E MMM dd HH:mm:ss y",
             new Locale("en", "US"));
     public static final String LICENSING_IDENTIFIER = "licensing";
     public static final String EXPIRY_DATE_UDF_KEY = "pslExpiryDate";

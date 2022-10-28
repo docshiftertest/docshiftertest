@@ -1,8 +1,8 @@
 package com.docshifter.core.config.repositories;
 
 import com.docshifter.core.config.entities.ChainConfiguration;
-import com.docshifter.core.config.services.ChainConfigurationSample;
 import com.docshifter.core.config.entities.Node;
+import com.docshifter.core.config.services.ChainConfigurationSample;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -20,6 +20,10 @@ public interface ChainConfigurationRepository extends CrudRepository<ChainConfig
 	List<ChainConfiguration> findByEnabled(boolean enabled);
 
 	ChainConfiguration findByRootNode(Node rootNode);
+
+	List<ChainConfiguration> findAllByRootNode(Node rootNode);
+
+	ChainConfiguration findByRootNodeId(Long id);
 
 	ChainConfiguration findByQueueName(String queueName);
 
@@ -45,6 +49,9 @@ public interface ChainConfigurationRepository extends CrudRepository<ChainConfig
     
     @Query("select cc.name FROM ChainConfiguration cc where cc.id = :id")
     String findWorkflowNameById(@Param("id") Long configurationID);
+
+    @Query("select cc.name FROM ChainConfiguration cc where cc.enabled = :enabled")
+    List<String> findAllWorkflowNameByEnabled(@Param("enabled") boolean enabled);
 
     List<ChainConfigurationSample> findAllBy();
 }

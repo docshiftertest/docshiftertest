@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * Created by blazejm on 11.05.2017.
  */
+
 //@Repository
 public interface MailTemplateRepository extends CrudRepository<MailTemplate, Long> {
     List<MailTemplate> findByMailConfigurationItemId(long mailConfigurationItemId);
