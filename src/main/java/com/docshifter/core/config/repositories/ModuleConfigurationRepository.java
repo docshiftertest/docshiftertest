@@ -21,5 +21,4 @@ public interface ModuleConfigurationRepository extends CrudRepository<ModuleConf
 
     List<ModuleConfiguration> findByModuleType(String type);
 
-
 }

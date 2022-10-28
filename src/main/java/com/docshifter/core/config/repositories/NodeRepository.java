@@ -1,8 +1,10 @@
 package com.docshifter.core.config.repositories;
 
+import com.docshifter.core.config.entities.ModuleConfiguration;
 import com.docshifter.core.config.entities.Node;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
 import java.util.List;
 
 /**
@@ -22,4 +24,6 @@ public interface NodeRepository extends JpaRepository<Node, Long> {
 	//TODO
 	@Query("select n from Node n")
 	Node getSenderByClassNameAndParamValue(String className, String paramValue);
+
+	List<Node> findNodeByModuleConfiguration(ModuleConfiguration moduleConfiguration);
 }

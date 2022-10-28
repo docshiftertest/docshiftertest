@@ -3,14 +3,8 @@ package com.docshifter.core.config.entities;
 import com.docshifter.core.security.Encrypted;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -24,11 +18,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyClass;
 import javax.persistence.Transient;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
-public class ModuleConfiguration {
+public class ModuleConfiguration implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,14 +48,14 @@ public class ModuleConfiguration {
 
 	public ModuleConfiguration() {}
 
-	public ModuleConfiguration(int id, Module module, String name,
+	public ModuleConfiguration(long id, Module module, String name,
 							   String description, Map<Parameter, String> parameterValues) {
 		super();
 		this.id = id;
 		this.module = module;
 		this.name = name;
 		this.description = description;
-		this.parameterValues = parameterValues;
+		this.parameterValues =parameterValues;
 	}
 
 	public ModuleConfiguration(Module module, String name,
