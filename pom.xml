@@ -302,11 +302,6 @@
             <version>6.7.1</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-
         <!-- jasypt to encrypt properties -->
         <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
