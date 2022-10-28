@@ -71,7 +71,7 @@ public class StatusService {
     }
 
     @JmsListener(destination = RESTART_SERVICE_JMS_QUEUE + "/#{T(com.docshifter.core.metrics.dtos.ServiceHeartbeatDTO)" +
-            ".generateComponentId('${spring.application.name}')}")
+            ".generateComponentId('${spring.application.name:unknown}')}")
     public boolean restartService() {
         if (appReadyTime == null || appReadyTime.plusSeconds(30).isAfter(Instant.now())) {
             log.info("Received a restart command, but application has recently started up, so will ignore it!");
