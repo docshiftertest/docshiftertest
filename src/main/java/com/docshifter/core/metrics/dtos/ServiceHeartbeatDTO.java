@@ -1,5 +1,6 @@
 package com.docshifter.core.metrics.dtos;
 
+import com.docshifter.core.utils.NetworkUtils;
 import com.netflix.appinfo.InstanceInfo;
 import org.springframework.boot.availability.LivenessState;
 
@@ -13,11 +14,28 @@ public record ServiceHeartbeatDTO(ZonedDateTime timestamp,
 								  DataPoints instance,
 								  DataPoints jvmComponent) {
 	/**
+	 * Generates a friendly component ID by combining the name of a component with the one of an instance. This should
+	 * form a unique identifier across all the different DocShifter components and machines present in an installation.
+	 */
+	public static String generateComponentId(String componentName, String instanceName) {
+		return componentName + " (" + instanceName + ")";
+	}
+
+	/**
+	 * Generates a friendly component ID by combining the name of a component with the one of the current instance.
+	 * This should form a unique identifier across all the different DocShifter components and machines present in an
+	 * installation.
+	 */
+	public static String generateComponentId(String componentName) {
+		return generateComponentId(componentName, NetworkUtils.getLocalHostName());
+	}
+
+	/**
 	 * Gets a friendly component ID for this heartbeat. It should be unique across all the different DocShifter components
 	 * and machines present in an installation.
 	 */
 	public String getComponentId() {
-		return jvmComponent().name() + " (" + instance().name() + ")";
+		return generateComponentId(jvmComponent().name(), instance().name());
 	}
 
 	public enum InstallationType {
