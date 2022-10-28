@@ -5,19 +5,9 @@ import java.util.Comparator;
 /**
  * <p>A {@link String} {@link Comparator} that orders in a Windows Explorer-like (when sorting by names), friendly file
  * name fashion. E.g. the String "1. First file" is directly followed by "2. Second file" and not "11. Eleventh file".</p>
- *
- * <p><b>This class is <i>NOT</i> thread safe, so do not share a single instance across multiple threads but
- * initialize a new one each time instead!</b></p>
  * @see <a href="https://stackoverflow.com/a/3066778">This StackOverflow answer, which this code is based on.</a>
  */
 public class WindowsExplorerStringComparator implements Comparator<String> {
-	private String string1;
-	private String string2;
-	private int position1;
-	private int position2;
-	private int length1;
-	private int length2;
-
 	/**
 	 * Compares its two arguments for order.
 	 * Returns a negative integer, zero, or a positive integer as the first argument is less than, equal to,
@@ -28,21 +18,17 @@ public class WindowsExplorerStringComparator implements Comparator<String> {
 	@Override
 	public int compare(String first, String second) {
 
-		string1 = first;
-		string2 = second;
-		length1 = first.length();
-		length2 = second.length();
-		position1 = 0;
-		position2 = 0;
+		String[] strings = {first, second};
+		int[] positions = {0, 0};
 
 		int result = 0;
-		while (result == 0 && position1 < length1 && position2 < length2) {
-			char ch1 = string1.charAt(position1);
-			char ch2 = string2.charAt(position2);
+		while (result == 0 && positions[0] < strings[0].length() && positions[1] < strings[1].length()) {
+			char ch1 = strings[0].charAt(positions[0]);
+			char ch2 = strings[1].charAt(positions[1]);
 
 			if (Character.isDigit(ch1)) {
 				if (Character.isDigit(ch2)) {
-					result = compareNumbers();
+					result = compareNumbers(strings, positions);
 				}
 				else {
 					result = -1;
@@ -50,7 +36,7 @@ public class WindowsExplorerStringComparator implements Comparator<String> {
 			}
 			else if (Character.isLetter(ch1))  {
 				if (Character.isLetter(ch2)) {
-					result = compareOther(true);
+					result = compareOther(true, strings, positions);
 				}
 				else {
 					result = 1;
@@ -64,52 +50,52 @@ public class WindowsExplorerStringComparator implements Comparator<String> {
 					result = -1;
 				}
 				else {
-					result = compareOther(false);
+					result = compareOther(false, strings, positions);
 				}
 			}
 
-			position1++;
-			position2++;
+			positions[0]++;
+			positions[1]++;
 		}
 
 		if (result == 0) {
-			result = length1 - length2;
+			result = strings[0].length() - strings[1].length();
 		}
 
 		return result;
 	}
 
-	private int compareNumbers() {
+	private static int compareNumbers(String[] strings, int[] positions) {
 
-		int end1 = getEnd(position1 + 1, length1, string1);
+		int end1 = getEnd(positions[0] + 1, strings[0]);
 
-		int fullLength1 = end1 - position1;
-		while (position1 < end1 && string2.charAt(position1) == '0') {
-			position1++;
+		int fullLength1 = end1 - positions[0];
+		while (positions[0] < end1 && strings[1].charAt(positions[0]) == '0') {
+			positions[0]++;
 		}
 
-		int end2 = getEnd(position2 + 1, length2, string2);
+		int end2 = getEnd(positions[1] + 1, strings[1]);
 
-		int fullLength2 = end2 - position2;
-		while (position2 < end2 && string2.charAt(position2) == '0') {
-			position2++;
+		int fullLength2 = end2 - positions[1];
+		while (positions[1] < end2 && strings[1].charAt(positions[1]) == '0') {
+			positions[1]++;
 		}
 
-		int delta = (end1 - position1) - (end2 - position2);
+		int delta = (end1 - positions[0]) - (end2 - positions[1]);
 		if (delta != 0) {
 			return delta;
 		}
 
-		while (position1 < end1 && position2 < end2) {
-			delta = string1.charAt(position1++) - string2.charAt(position2++);
+		while (positions[0] < end1 && positions[1] < end2) {
+			delta = strings[0].charAt(positions[0]++) - strings[1].charAt(positions[1]++);
 
 			if (delta != 0) {
 				return delta;
 			}
 		}
 
-		position1--;
-		position2--;
+		positions[0]--;
+		positions[1]--;
 
 		return fullLength2 - fullLength1;
 	}
@@ -117,23 +103,22 @@ public class WindowsExplorerStringComparator implements Comparator<String> {
 	/**
 	 * Gets the last character that is a digit while comparing numbers
 	 * @param end the characters to start checking
-	 * @param length the total length of the string
 	 * @param string the string to check
 	 * @return the int representing the position of the last digit
 	 */
-	private int getEnd(int end, int length, String string) {
+	private static int getEnd(int end, String string) {
 
-		while (end < length && Character.isDigit(string.charAt(end))) {
+		while (end < string.length() && Character.isDigit(string.charAt(end))) {
 			end++;
 		}
 
 		return end;
 	}
 
-	private int compareOther(boolean isLetters) {
+	private static int compareOther(boolean isLetters, String[] strings, int[] positions) {
 
-		char ch1 = string1.charAt(position1);
-		char ch2 = string2.charAt(position2);
+		char ch1 = strings[0].charAt(positions[0]);
+		char ch2 = strings[1].charAt(positions[1]);
 
 		if (ch1 == ch2) {
 			return 0;
