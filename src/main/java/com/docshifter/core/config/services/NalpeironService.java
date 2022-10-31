@@ -602,14 +602,11 @@ public class NalpeironService implements ILicensingService {
 
         for (Module module : modules) {
 
-            if (module.getCode() == null) {
-                continue;
-            }
-
-            NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(module.getCode());
-
-            if (featureStatus.isValid()) {
-                modulesLicensed.add(module.getName());
+            if (StringUtils.isNotBlank(module.getCode())) {
+                NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(module.getCode());
+                if (featureStatus.isValid()) {
+                    modulesLicensed.add(module.getName());
+                }
             }
         }
 
