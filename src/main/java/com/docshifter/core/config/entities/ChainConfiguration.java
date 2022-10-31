@@ -17,6 +17,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
+import java.util.UUID;
 
 
 //Read-only: Use this strategy when you are sure that your data never changes. If you try to update the data with this strategy Hibernate will throw an exception.
@@ -64,15 +65,18 @@ public class ChainConfiguration implements Serializable {
 	@DiffIgnore
 	private Node rootNode;
 
+	@DiffInclude
+	private UUID chainConfigurationUuid;
+
 	public ChainConfiguration() {}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-			  long timeout, long priority, FailureLevel failureLevel) {
-		this(name, description, enabled, rootNode, printerName, queueName, timeout, (int) priority, failureLevel);
+			  long timeout, long priority, FailureLevel failureLevel, UUID chainConfigurationUuid) {
+		this(name, description, enabled, rootNode, printerName, queueName, timeout, (int) priority, failureLevel, chainConfigurationUuid);
 	}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-							  long timeout, int priority, FailureLevel failureLevel) {
+							  long timeout, int priority, FailureLevel failureLevel, UUID chainConfigurationUuid) {
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
@@ -82,6 +86,7 @@ public class ChainConfiguration implements Serializable {
 		this.timeout = timeout;
 		this.priority = priority;
 		this.failureLevel = failureLevel;
+		this.chainConfigurationUuid = chainConfigurationUuid;
 	}
 
 	public String getDescription() {
@@ -171,6 +176,14 @@ public class ChainConfiguration implements Serializable {
 		this.failureLevel = failureLevel;
 	}
 
+	public UUID getChainConfigurationUuid() {
+		return chainConfigurationUuid;
+	}
+
+	public void setChainConfigurationUuid(UUID chainConfigurationUuid) {
+		this.chainConfigurationUuid = chainConfigurationUuid;
+	}
+
 	@Override
 	public String toString() {
 		return "ChainConfiguration = {" +
@@ -192,6 +205,8 @@ public class ChainConfiguration implements Serializable {
 				this.priority +
 				", FailureLevel: " +
 				this.failureLevel +
+				", uuid: " +
+				this.chainConfigurationUuid +
 				"}";
 	}
 }

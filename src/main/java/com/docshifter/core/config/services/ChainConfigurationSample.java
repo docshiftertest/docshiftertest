@@ -1,5 +1,7 @@
 package com.docshifter.core.config.services;
 
+import java.util.UUID;
+
 /**
  * @author Created by Juan Marques on 20/07/2021
  * ChainConfiguration sample class used to query only specific columns
@@ -17,4 +19,6 @@ public interface ChainConfigurationSample {
     Integer getPriority();
 
     Long getTimeout();
+
+    UUID getChainConfigurationUuid();
 }
