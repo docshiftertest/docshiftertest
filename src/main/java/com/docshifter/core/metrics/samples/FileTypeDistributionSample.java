@@ -5,5 +5,5 @@ package com.docshifter.core.metrics.samples;
  */
 public interface FileTypeDistributionSample {
    String getExtension();
-   long getCount();
+   Long getCount();
 }

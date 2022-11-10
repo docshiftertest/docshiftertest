@@ -6,17 +6,10 @@ import com.docshifter.core.metrics.samples.TasksStatisticsSample;
 import com.docshifter.core.metrics.entities.Dashboard;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 
-import javax.persistence.QueryHint;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
-
-import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
-import static org.hibernate.jpa.QueryHints.HINT_FETCH_SIZE;
-import static org.hibernate.jpa.QueryHints.HINT_READONLY;
 
 /**
  * Created by Julian Isaac on 02.08.2021
@@ -56,9 +49,10 @@ SELECT count(*),
        stddev_pop(processing_duration) as standardDeviation,
        var_pop(processing_duration) as variance,
        avg(processing_duration) as average
+FROM metrics.dashboard
 WHERE is_licensed = true
        AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
-FROM metrics.dashboard""", nativeQuery = true)
+       AND success is not NULL""", nativeQuery = true)
     TasksStatisticsSample getProcessingSummaryStatistics(@Param("workflowNameList") Set<String> workflowNameList);
 
     @Query(value = """
@@ -76,10 +70,11 @@ SELECT count(*),
        stddev_pop(processing_duration) as standardDeviation,
        var_pop(processing_duration) as variance,
        avg(processing_duration) as average
+FROM metrics.dashboard
 WHERE is_licensed = true
        AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
        AND on_message_hit BETWEEN :startDate AND :endDate
-FROM metrics.dashboard""", nativeQuery = true)
+       AND success is not NULL""", nativeQuery = true)
     TasksStatisticsSample getProcessingSummaryStatistics(@Param("workflowNameList") Set<String> workflowNameList,
                                                          @Param("startDate") Long startDate,
                                                          @Param("endDate") Long endDate);
@@ -100,29 +95,100 @@ WHERE dash.isLicensed = true
        AND dash.onMessageHit BETWEEN :startDate AND :endDate
 GROUP BY dash.workflowName, dash.success""")
     List<ProcessedTasksSample> getWorkflowTasksSamples(@Param("workflowNameList") Set<String> workflowNameList,
-                                                        @Param("startDate") Long startDate,
-                                                        @Param("endDate") Long endDate);
+                                                       @Param("startDate") Long startDate,
+                                                       @Param("endDate") Long endDate);
 
     @Query(value = """
-SELECT extract(:dateUnit FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
+SELECT extract(HOUR FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
 FROM metrics.dashboard
 WHERE is_licensed = true
        AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
-GROUP BY dateValue""", nativeQuery = true)
-    List<TasksDistributionSample> getTasksDistributionSamples(@Param("workflowNameList") Set<String> workflowNameList,
-                                                              @Param("dateUnit") String dateUnit);
+       AND success is not NULL
+GROUP BY dateValue
+ORDER BY dateValue""", nativeQuery = true)
+    List<TasksDistributionSample> getTasksDistributionSamplesByHour(@Param("workflowNameList") Set<String> workflowNameList);
 
     @Query(value = """
-SELECT extract(:dateUnit FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
+SELECT extract(HOUR FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
 FROM metrics.dashboard
 WHERE is_licensed = true
        AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
        AND on_message_hit BETWEEN :startDate AND :endDate
-GROUP BY dateValue""", nativeQuery = true)
-    List<TasksDistributionSample> getTasksDistributionSamples(@Param("workflowNameList") Set<String> workflowNameList,
-                                                              @Param("dateUnit") String dateUnit,
+       AND success is not NULL
+GROUP BY dateValue
+ORDER BY dateValue""", nativeQuery = true)
+    List<TasksDistributionSample> getTasksDistributionSamplesByHour(@Param("workflowNameList") Set<String> workflowNameList,
                                                               @Param("startDate") Long startDate,
                                                               @Param("endDate") Long endDate);
+
+    @Query(value = """
+SELECT extract(WEEK FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
+FROM metrics.dashboard
+WHERE is_licensed = true
+       AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+       AND success is not NULL
+GROUP BY dateValue
+ORDER BY dateValue""", nativeQuery = true)
+    List<TasksDistributionSample> getTasksDistributionSamplesByWeek(@Param("workflowNameList") Set<String> workflowNameList);
+
+    @Query(value = """
+SELECT extract(WEEK FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
+FROM metrics.dashboard
+WHERE is_licensed = true
+       AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+       AND on_message_hit BETWEEN :startDate AND :endDate
+       AND success is not NULL
+GROUP BY dateValue
+ORDER BY dateValue""", nativeQuery = true)
+    List<TasksDistributionSample> getTasksDistributionSamplesByWeek(@Param("workflowNameList") Set<String> workflowNameList,
+                                                                    @Param("startDate") Long startDate,
+                                                                    @Param("endDate") Long endDate);
+
+    @Query(value = """
+SELECT extract(MONTH FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
+FROM metrics.dashboard
+WHERE is_licensed = true
+       AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+       AND success is not NULL
+GROUP BY dateValue
+ORDER BY dateValue""", nativeQuery = true)
+    List<TasksDistributionSample> getTasksDistributionSamplesByMonth(@Param("workflowNameList") Set<String> workflowNameList);
+
+    @Query(value = """
+SELECT extract(MONTH FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
+FROM metrics.dashboard
+WHERE is_licensed = true
+       AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+       AND on_message_hit BETWEEN :startDate AND :endDate
+       AND success is not NULL
+GROUP BY dateValue
+ORDER BY dateValue""", nativeQuery = true)
+    List<TasksDistributionSample> getTasksDistributionSamplesByMonth(@Param("workflowNameList") Set<String> workflowNameList,
+                                                                    @Param("startDate") Long startDate,
+                                                                    @Param("endDate") Long endDate);
+
+    @Query(value = """
+SELECT extract(YEAR FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
+FROM metrics.dashboard
+WHERE is_licensed = true
+       AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+       AND success is not NULL
+GROUP BY dateValue
+ORDER BY dateValue""", nativeQuery = true)
+    List<TasksDistributionSample> getTasksDistributionSamplesByYear(@Param("workflowNameList") Set<String> workflowNameList);
+
+    @Query(value = """
+SELECT extract(YEAR FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
+FROM metrics.dashboard
+WHERE is_licensed = true
+       AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+       AND on_message_hit BETWEEN :startDate AND :endDate
+       AND success is not NULL
+GROUP BY dateValue
+ORDER BY dateValue""", nativeQuery = true)
+    List<TasksDistributionSample> getTasksDistributionSamplesByYear(@Param("workflowNameList") Set<String> workflowNameList,
+                                                                    @Param("startDate") Long startDate,
+                                                                    @Param("endDate") Long endDate);
 
     @Query("""
 SELECT DISTINCT dash.workflowName as workflowName
@@ -130,16 +196,11 @@ FROM Dashboard dash
 WHERE dash.isLicensed = true""")
     Set<String> findAllDistinctDashboardWorkflowName();
 
+    // TODO: Implement backend (instead of solely frontend) pagination?
     @Query(value = """
 SELECT *
 FROM metrics.getErrorLogData(:success, :startDate, :endDate)""", nativeQuery = true)
-    // @QueryHints({
-    //         @QueryHint(name = HINT_FETCH_SIZE, value = "500"),
-    //         @QueryHint(name = HINT_CACHEABLE, value = "false"),
-    //         @QueryHint(name = HINT_READONLY, value = "true"),
-    //         @QueryHint()
-    // })
-    Stream<String> findAllLogsBySuccess(@Param("success") Boolean success,
+    List<String> findAllLogsBySuccess(@Param("success") Boolean success,
                                         @Param("startDate") Long startDate,
                                         @Param("endDate") Long endDate);
 }

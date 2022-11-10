@@ -5,6 +5,6 @@ package com.docshifter.core.metrics.samples;
  * @author Created by Juan Marques on 03/08/2021
  */
 public interface TasksDistributionSample {
-    byte getDateValue();
-    long getCount();
+    short getDateValue();
+    Long getCount();
 }

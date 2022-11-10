@@ -6,5 +6,5 @@ package com.docshifter.core.metrics.samples;
 public interface ProcessedTasksSample {
     String getWorkflowName();
     Boolean getSuccess();
-    long getCount();
+    Long getCount();
 }
