@@ -20,5 +20,5 @@ public interface ChainConfigurationSample {
 
     Long getTimeout();
 
-    UUID getChainConfigurationUuid();
+    UUID getUuid();
 }

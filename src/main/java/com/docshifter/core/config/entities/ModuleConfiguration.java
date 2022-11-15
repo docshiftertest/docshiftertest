@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -38,6 +39,7 @@ public class ModuleConfiguration implements Serializable {
 	private Module module;
 	private String name;
 	private String description;
+	private UUID uuid;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@JsonIgnore
@@ -49,22 +51,25 @@ public class ModuleConfiguration implements Serializable {
 	public ModuleConfiguration() {}
 
 	public ModuleConfiguration(long id, Module module, String name,
-							   String description, Map<Parameter, String> parameterValues) {
+							   String description, UUID uuid,
+							   Map<Parameter, String> parameterValues) {
 		super();
 		this.id = id;
 		this.module = module;
 		this.name = name;
 		this.description = description;
+		this.uuid = uuid;
 		this.parameterValues =parameterValues;
 	}
 
 	public ModuleConfiguration(Module module, String name,
-							   String description, Map<Parameter, String> parameterValues) {
+							   String description, UUID uuid,
+							   Map<Parameter, String> parameterValues) {
 		super();
-//		this.id = id;
 		this.module = module;
 		this.name = name;
 		this.description = description;
+		this.uuid = uuid;
 		this.parameterValues = parameterValues;
 	}
 
@@ -137,6 +142,14 @@ public class ModuleConfiguration implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public UUID getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(UUID moduleConfigurationUuid) {
+		this.uuid = moduleConfigurationUuid;
 	}
 
 	@SuppressWarnings("rawtypes")

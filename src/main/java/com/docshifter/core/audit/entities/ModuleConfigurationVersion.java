@@ -17,17 +17,17 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-public class ChainConfigurationVersion {
+public class ModuleConfigurationVersion {
 
     @Id
     @GeneratedValue(generator = "UUID")
     private UUID id;
 
-    private UUID chainConfigurationUuid;
+    private UUID moduleConfigurationUuid;
 
     @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
     @Column(columnDefinition = "jsonb")
-    private String chainConfigurationJson;
+    private String moduleConfigurationJson;
 
     private Integer version;
 }

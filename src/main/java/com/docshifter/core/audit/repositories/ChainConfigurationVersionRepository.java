@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface ChainConfigurationVersionRepository extends JpaRepository<ChainConfigurationVersion, Long> {
+public interface ChainConfigurationVersionRepository extends JpaRepository<ChainConfigurationVersion, String> {
 
     List<ChainConfigurationVersion> findAllByChainConfigurationUuid(UUID uuid);
 

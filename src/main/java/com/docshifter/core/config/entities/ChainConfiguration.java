@@ -66,7 +66,7 @@ public class ChainConfiguration implements Serializable {
 	private Node rootNode;
 
 	@DiffInclude
-	private UUID chainConfigurationUuid;
+	private UUID uuid;
 
 	public ChainConfiguration() {}
 
@@ -86,7 +86,7 @@ public class ChainConfiguration implements Serializable {
 		this.timeout = timeout;
 		this.priority = priority;
 		this.failureLevel = failureLevel;
-		this.chainConfigurationUuid = chainConfigurationUuid;
+		this.uuid = chainConfigurationUuid;
 	}
 
 	public String getDescription() {
@@ -176,12 +176,12 @@ public class ChainConfiguration implements Serializable {
 		this.failureLevel = failureLevel;
 	}
 
-	public UUID getChainConfigurationUuid() {
-		return chainConfigurationUuid;
+	public UUID getUuid() {
+		return uuid;
 	}
 
-	public void setChainConfigurationUuid(UUID chainConfigurationUuid) {
-		this.chainConfigurationUuid = chainConfigurationUuid;
+	public void setUuid(UUID chainConfigurationUuid) {
+		this.uuid = chainConfigurationUuid;
 	}
 
 	@Override
@@ -206,7 +206,7 @@ public class ChainConfiguration implements Serializable {
 				", FailureLevel: " +
 				this.failureLevel +
 				", uuid: " +
-				this.chainConfigurationUuid +
+				this.uuid +
 				"}";
 	}
 }

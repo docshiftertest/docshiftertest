@@ -5,13 +5,13 @@ import com.docshifter.core.config.entities.ModuleConfiguration;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 8/19/16.
  */
 //@Repository
 public interface ModuleConfigurationRepository extends CrudRepository<ModuleConfiguration, Long> {
-
 
     List<ModuleConfiguration> findByModuleId(long id);
 
@@ -20,5 +20,7 @@ public interface ModuleConfigurationRepository extends CrudRepository<ModuleConf
     List<ModuleConfiguration> findByModule(Module module);
 
     List<ModuleConfiguration> findByModuleType(String type);
+
+    ModuleConfiguration findByUuid(UUID uuid);
 
 }
