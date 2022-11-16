@@ -15,21 +15,23 @@ import java.util.Set;
  * Created by Julian Isaac on 02.08.2021
  */
 public interface DashboardRepository extends JpaRepository<Dashboard, String> {
-    @Query("""
-SELECT dash.success, count(dash)
-FROM Dashboard dash
-WHERE dash.isLicensed = true
-       AND (dash.workflowName in (:workflowNameList) OR 'ALL' in (:workflowNameList))
-GROUP BY dash.success""")
+    @Query(value = """
+SELECT success, count(*)
+FROM metrics.dashboard
+WHERE is_licensed = true
+       AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+GROUP BY success""", nativeQuery = true) // Non-native didn't appear to work here for some reason. All fields on
+                                         // each ProcessedTasksSample were null?
     List<ProcessedTasksSample> getProcessedTasksSamples(@Param("workflowNameList") Set<String> workflowNameList);
 
-    @Query("""
-SELECT dash.success, count(dash)
-FROM Dashboard dash
-WHERE dash.isLicensed = true
-       AND (dash.workflowName in (:workflowNameList) OR 'ALL' in (:workflowNameList))
-       AND dash.onMessageHit BETWEEN :startDate AND :endDate
-GROUP BY dash.success""")
+    @Query(value = """
+SELECT success, count(*)
+FROM metrics.dashboard
+WHERE is_licensed = true
+       AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+       AND (on_message_hit BETWEEN :startDate AND :endDate OR success is NULL)
+GROUP BY success""", nativeQuery = true) // Non-native didn't appear to work here for some reason. All fields on
+                                         // each ProcessedTasksSample were null?
     List<ProcessedTasksSample> getProcessedTasksSamples(@Param("workflowNameList") Set<String> workflowNameList,
                                                         @Param("startDate") Long startDate,
                                                         @Param("endDate") Long endDate);
@@ -52,7 +54,8 @@ SELECT count(*),
 FROM metrics.dashboard
 WHERE is_licensed = true
        AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
-       AND success is not NULL""", nativeQuery = true)
+       AND success is not NULL""", nativeQuery = true) // Needs to be native because many statistical functions (such
+                                                       // as percentile_cont) are missing in non-native HQL.
     TasksStatisticsSample getProcessingSummaryStatistics(@Param("workflowNameList") Set<String> workflowNameList);
 
     @Query(value = """
@@ -74,26 +77,29 @@ FROM metrics.dashboard
 WHERE is_licensed = true
        AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
        AND on_message_hit BETWEEN :startDate AND :endDate
-       AND success is not NULL""", nativeQuery = true)
+       AND success is not NULL""", nativeQuery = true) // Needs to be native because many statistical functions (such
+                                                       // as percentile_cont) are missing in non-native HQL.
     TasksStatisticsSample getProcessingSummaryStatistics(@Param("workflowNameList") Set<String> workflowNameList,
                                                          @Param("startDate") Long startDate,
                                                          @Param("endDate") Long endDate);
 
-    @Query("""
-SELECT dash.workflowName, dash.success, count(dash)
-FROM Dashboard dash
-WHERE dash.isLicensed = true
-       AND (dash.workflowName in (:workflowNameList) OR 'ALL' in (:workflowNameList))
-GROUP BY dash.workflowName, dash.success""")
+    @Query(value = """
+SELECT workflow_name, success, count(*)
+FROM metrics.dashboard
+WHERE is_licensed = true
+       AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+GROUP BY workflow_name, success""", nativeQuery = true) // Non-native didn't appear to work here for some reason. All
+                                                        // fields on each ProcessedTasksSample were null?
     List<ProcessedTasksSample> getWorkflowTasksSamples(@Param("workflowNameList") Set<String> workflowNameList);
 
-    @Query("""
-SELECT dash.workflowName, dash.success, count(dash)
-FROM Dashboard dash
-WHERE dash.isLicensed = true
-       AND (dash.workflowName in (:workflowNameList) OR 'ALL' in (:workflowNameList))
-       AND dash.onMessageHit BETWEEN :startDate AND :endDate
-GROUP BY dash.workflowName, dash.success""")
+    @Query(value = """
+SELECT workflow_name, success, count(*)
+FROM metrics.dashboard
+WHERE is_licensed = true
+       AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+       AND on_message_hit BETWEEN :startDate AND :endDate
+GROUP BY workflow_name, success""", nativeQuery = true) // Non-native didn't appear to work here for some reason. All
+                                                        // fields on each ProcessedTasksSample were null?
     List<ProcessedTasksSample> getWorkflowTasksSamples(@Param("workflowNameList") Set<String> workflowNameList,
                                                        @Param("startDate") Long startDate,
                                                        @Param("endDate") Long endDate);
@@ -105,7 +111,8 @@ WHERE is_licensed = true
        AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
        AND success is not NULL
 GROUP BY dateValue
-ORDER BY dateValue""", nativeQuery = true)
+ORDER BY dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
+                                           // choose from in a non-native HQL extract function.
     List<TasksDistributionSample> getTasksDistributionSamplesByHour(@Param("workflowNameList") Set<String> workflowNameList);
 
     @Query(value = """
@@ -116,7 +123,8 @@ WHERE is_licensed = true
        AND on_message_hit BETWEEN :startDate AND :endDate
        AND success is not NULL
 GROUP BY dateValue
-ORDER BY dateValue""", nativeQuery = true)
+ORDER BY dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
+                                           // choose from in a non-native HQL extract function.
     List<TasksDistributionSample> getTasksDistributionSamplesByHour(@Param("workflowNameList") Set<String> workflowNameList,
                                                               @Param("startDate") Long startDate,
                                                               @Param("endDate") Long endDate);
@@ -128,7 +136,8 @@ WHERE is_licensed = true
        AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
        AND success is not NULL
 GROUP BY dateValue
-ORDER BY dateValue""", nativeQuery = true)
+ORDER BY dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
+                                           // choose from in a non-native HQL extract function.
     List<TasksDistributionSample> getTasksDistributionSamplesByWeek(@Param("workflowNameList") Set<String> workflowNameList);
 
     @Query(value = """
@@ -139,7 +148,8 @@ WHERE is_licensed = true
        AND on_message_hit BETWEEN :startDate AND :endDate
        AND success is not NULL
 GROUP BY dateValue
-ORDER BY dateValue""", nativeQuery = true)
+ORDER BY dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
+                                           // choose from in a non-native HQL extract function.
     List<TasksDistributionSample> getTasksDistributionSamplesByWeek(@Param("workflowNameList") Set<String> workflowNameList,
                                                                     @Param("startDate") Long startDate,
                                                                     @Param("endDate") Long endDate);
@@ -151,7 +161,8 @@ WHERE is_licensed = true
        AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
        AND success is not NULL
 GROUP BY dateValue
-ORDER BY dateValue""", nativeQuery = true)
+ORDER BY dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
+                                           // choose from in a non-native HQL extract function.
     List<TasksDistributionSample> getTasksDistributionSamplesByMonth(@Param("workflowNameList") Set<String> workflowNameList);
 
     @Query(value = """
@@ -162,7 +173,8 @@ WHERE is_licensed = true
        AND on_message_hit BETWEEN :startDate AND :endDate
        AND success is not NULL
 GROUP BY dateValue
-ORDER BY dateValue""", nativeQuery = true)
+ORDER BY dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
+                                           // choose from in a non-native HQL extract function.
     List<TasksDistributionSample> getTasksDistributionSamplesByMonth(@Param("workflowNameList") Set<String> workflowNameList,
                                                                     @Param("startDate") Long startDate,
                                                                     @Param("endDate") Long endDate);
@@ -174,7 +186,8 @@ WHERE is_licensed = true
        AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
        AND success is not NULL
 GROUP BY dateValue
-ORDER BY dateValue""", nativeQuery = true)
+ORDER BY dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
+                                           // choose from in a non-native HQL extract function.
     List<TasksDistributionSample> getTasksDistributionSamplesByYear(@Param("workflowNameList") Set<String> workflowNameList);
 
     @Query(value = """
@@ -185,7 +198,8 @@ WHERE is_licensed = true
        AND on_message_hit BETWEEN :startDate AND :endDate
        AND success is not NULL
 GROUP BY dateValue
-ORDER BY dateValue""", nativeQuery = true)
+ORDER BY dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
+                                           // choose from in a non-native HQL extract function.
     List<TasksDistributionSample> getTasksDistributionSamplesByYear(@Param("workflowNameList") Set<String> workflowNameList,
                                                                     @Param("startDate") Long startDate,
                                                                     @Param("endDate") Long endDate);
@@ -199,7 +213,9 @@ WHERE dash.isLicensed = true""")
     // TODO: Implement backend (instead of solely frontend) pagination?
     @Query(value = """
 SELECT *
-FROM metrics.getErrorLogData(:success, :startDate, :endDate)""", nativeQuery = true)
+FROM metrics.getErrorLogData(:success, :startDate, :endDate)""", nativeQuery = true) // Needs to be native as we are
+                                                                                     // calling into a custom PL/pgSQL
+                                                                                     // function.
     List<String> findAllLogsBySuccess(@Param("success") Boolean success,
                                         @Param("startDate") Long startDate,
                                         @Param("endDate") Long endDate);

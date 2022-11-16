@@ -6,5 +6,5 @@ package com.docshifter.core.metrics.samples;
  */
 public interface TasksDistributionSample {
     short getDateValue();
-    Long getCount();
+    long getCount();
 }

@@ -22,7 +22,8 @@ FROM (SELECT dbf.file_name,
       INNER JOIN metrics.dashboard db ON dbf.task_id = db.task_id
       WHERE db.is_licensed = true
              AND (db.workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))) processed
-GROUP BY extension""", nativeQuery = true)
+GROUP BY extension""", nativeQuery = true) // Needs to be native because subqueries can't be used in HQL FROM clauses
+                                           // (yet)
     List<FileTypeDistributionSample> findAllFileTypeDistribution(@Param("workflowNameList") Set<String> workflowNameList);
 
     @Query(value = """
@@ -34,7 +35,8 @@ FROM (SELECT dbf.file_name,
       WHERE db.is_licensed = true
              AND (db.workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
              AND db.on_message_hit BETWEEN :startDate AND :endDate) processed
-GROUP BY extension""", nativeQuery = true)
+GROUP BY extension""", nativeQuery = true) // Needs to be native because subqueries can't be used in HQL FROM clauses
+                                           // (yet)
     List<FileTypeDistributionSample> findAllFileTypeDistribution(@Param("workflowNameList") Set<String> workflowNameList,
                                                                  @Param("startDate") Long startDate,
                                                                  @Param("endDate") Long endDate);
@@ -53,7 +55,8 @@ FROM (SELECT dbf.file_name, CASE WHEN dbf.file_size < 100 THEN 0
       INNER JOIN metrics.dashboard db ON dbf.task_id = db.task_id
       WHERE db.is_licensed = true
              AND (db.workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))) t
-GROUP BY t.range""", nativeQuery = true)
+GROUP BY t.range""", nativeQuery = true) // Needs to be native because subqueries can't be used in HQL FROM clauses
+                                         // (yet)
     List<FileSizeDistributionSample> findAllFileSizeDistribution(@Param("workflowNameList") Set<String> workflowNameList);
 
     @Query(value = """
@@ -71,7 +74,8 @@ FROM (SELECT dbf.file_name, CASE WHEN dbf.file_size < 100 THEN 0
       WHERE db.is_licensed = true
              AND (db.workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
              AND db.on_message_hit BETWEEN :startDate AND :endDate) t
-GROUP BY t.range""", nativeQuery = true)
+GROUP BY t.range""", nativeQuery = true) // Needs to be native because subqueries can't be used in HQL FROM clauses
+                                         // (yet)
     List<FileSizeDistributionSample> findAllFileSizeDistribution(@Param("workflowNameList") Set<String> workflowNameList,
                                                                  @Param("startDate") Long startDate,
                                                                  @Param("endDate") Long endDate);

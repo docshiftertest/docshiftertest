@@ -5,17 +5,17 @@ package com.docshifter.core.metrics.samples;
  */
 public interface TasksStatisticsSample {
     long getCount();
-    long getSum();
-    long getMinimum();
-    long getMaximum();
-    double getFirstPercentile();
-    double getFifthPercentile();
-    double getFirstQuartile();
-    double getMedian();
-    double getThirdQuartile();
-    double getNinetyFifthPercentile();
-    double getNinetyNinthPercentile();
-    double getStandardDeviation();
-    double getVariance();
-    double getAverage();
+    Long getSum();
+    Long getMinimum();
+    Long getMaximum();
+    Double getFirstPercentile();
+    Double getFifthPercentile();
+    Double getFirstQuartile();
+    Double getMedian();
+    Double getThirdQuartile();
+    Double getNinetyFifthPercentile();
+    Double getNinetyNinthPercentile();
+    Double getStandardDeviation();
+    Double getVariance();
+    Double getAverage();
 }
