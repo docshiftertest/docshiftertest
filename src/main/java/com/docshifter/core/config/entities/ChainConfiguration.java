@@ -71,12 +71,12 @@ public class ChainConfiguration implements Serializable {
 	public ChainConfiguration() {}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-			  long timeout, long priority, FailureLevel failureLevel, UUID chainConfigurationUuid) {
-		this(name, description, enabled, rootNode, printerName, queueName, timeout, (int) priority, failureLevel, chainConfigurationUuid);
+			  long timeout, long priority, FailureLevel failureLevel, UUID uuid) {
+		this(name, description, enabled, rootNode, printerName, queueName, timeout, (int) priority, failureLevel, uuid);
 	}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-							  long timeout, int priority, FailureLevel failureLevel, UUID chainConfigurationUuid) {
+							  long timeout, int priority, FailureLevel failureLevel, UUID uuid) {
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
@@ -86,7 +86,7 @@ public class ChainConfiguration implements Serializable {
 		this.timeout = timeout;
 		this.priority = priority;
 		this.failureLevel = failureLevel;
-		this.uuid = chainConfigurationUuid;
+		this.uuid = uuid;
 	}
 
 	public String getDescription() {
@@ -180,8 +180,8 @@ public class ChainConfiguration implements Serializable {
 		return uuid;
 	}
 
-	public void setUuid(UUID chainConfigurationUuid) {
-		this.uuid = chainConfigurationUuid;
+	public void setUuid(UUID uuid) {
+		this.uuid = uuid;
 	}
 
 	@Override
