@@ -43,14 +43,14 @@ GROUP BY extension""", nativeQuery = true) // Needs to be native because subquer
 
     @Query(value = """
 SELECT t.range, count(*)
-FROM (SELECT dbf.file_name, CASE WHEN dbf.file_size < 100 THEN 0
-                             WHEN dbf.file_size < 250 THEN 1
-                             WHEN dbf.file_size < 500 THEN 2
-                             WHEN dbf.file_size < 1000 THEN 3
-                             WHEN dbf.file_size < 5000 THEN 4
-                             WHEN dbf.file_size < 10000 THEN 5
-                             WHEN dbf.file_size < 25000 THEN 6
-                             ELSE 7 END as range
+FROM (SELECT dbf.file_name, CASE WHEN dbf.file_size < 100 THEN 'Smaller than 0.1 MB'
+                             WHEN dbf.file_size < 250 THEN '0.1-0.25 MB'
+                             WHEN dbf.file_size < 500 THEN '0.25-0.5 MB'
+                             WHEN dbf.file_size < 1000 THEN '0.5-1 MB'
+                             WHEN dbf.file_size < 5000 THEN '1-5 MB'
+                             WHEN dbf.file_size < 10000 THEN '5-10 MB'
+                             WHEN dbf.file_size < 25000 THEN '10-25 MB'
+                             ELSE '25+ MB' END as range
       FROM metrics.dashboard_file dbf
       INNER JOIN metrics.dashboard db ON dbf.task_id = db.task_id
       WHERE db.is_licensed = true
@@ -61,14 +61,14 @@ GROUP BY t.range""", nativeQuery = true) // Needs to be native because subquerie
 
     @Query(value = """
 SELECT t.range, count(*)
-FROM (SELECT dbf.file_name, CASE WHEN dbf.file_size < 100 THEN 0
-                             WHEN dbf.file_size < 250 THEN 1
-                             WHEN dbf.file_size < 500 THEN 2
-                             WHEN dbf.file_size < 1000 THEN 3
-                             WHEN dbf.file_size < 5000 THEN 4
-                             WHEN dbf.file_size < 10000 THEN 5
-                             WHEN dbf.file_size < 25000 THEN 6
-                             ELSE 7 END as range
+FROM (SELECT dbf.file_name, CASE WHEN dbf.file_size < 100 THEN 'Smaller than 0.1 MB'
+                             WHEN dbf.file_size < 250 THEN '0.1-0.25 MB'
+                             WHEN dbf.file_size < 500 THEN '0.25-0.5 MB'
+                             WHEN dbf.file_size < 1000 THEN '0.5-1 MB'
+                             WHEN dbf.file_size < 5000 THEN '1-5 MB'
+                             WHEN dbf.file_size < 10000 THEN '5-10 MB'
+                             WHEN dbf.file_size < 25000 THEN '10-25 MB'
+                             ELSE '25+ MB' END as range
       FROM metrics.dashboard_file dbf
       INNER JOIN metrics.dashboard db ON dbf.task_id = db.task_id
       WHERE db.is_licensed = true

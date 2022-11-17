@@ -84,7 +84,7 @@ WHERE is_licensed = true
                                                          @Param("endDate") Long endDate);
 
     @Query(value = """
-SELECT workflow_name, success, count(*)
+SELECT workflow_name as workflowName, success, count(*) -- Need to explicitly give a camel case alias to workflow_name because stoopid Hibernate isn't smart enough to fill in the field otherwise
 FROM metrics.dashboard
 WHERE is_licensed = true
        AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
@@ -93,7 +93,7 @@ GROUP BY workflow_name, success""", nativeQuery = true) // Non-native didn't app
     List<ProcessedTasksSample> getWorkflowTasksSamples(@Param("workflowNameList") Set<String> workflowNameList);
 
     @Query(value = """
-SELECT workflow_name, success, count(*)
+SELECT workflow_name as workflowName, success, count(*) -- Need to explicitly give a camel case alias to workflow_name because stoopid Hibernate isn't smart enough to fill in the field otherwise
 FROM metrics.dashboard
 WHERE is_licensed = true
        AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
