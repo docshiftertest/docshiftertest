@@ -58,11 +58,12 @@ FROM metrics.dashboard
 WHERE is_licensed = true
        AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
        AND on_message_hit BETWEEN :startDate AND :endDate
-GROUP BY workflow_name, success""", nativeQuery = true) // Non-native didn't appear to work here for some reason. All
-                                                        // fields on each ProcessedTasksSample were null?
-                                                        // Also need to explicitly give a camel case alias to
-                                                        // workflow_name because stoopid Hibernate isn't smart enough
-                                                        // to fill in the field otherwise
+GROUP BY workflowName, success
+ORDER BY workflowName""", nativeQuery = true) // Non-native didn't appear to work here for some reason. All
+                                              // fields on each ProcessedTasksSample were null?
+                                              // Also need to explicitly give a camel case alias to
+                                              // workflow_name because stoopid Hibernate isn't smart enough
+                                              // to fill in the field otherwise
     List<ProcessedTasksSample> getWorkflowTasksSamples(@Param("workflowNameList") Set<String> workflowNameList,
                                                        @Param("startDate") long startDate,
                                                        @Param("endDate") long endDate);
@@ -126,7 +127,8 @@ ORDER BY dateValue""", nativeQuery = true) // Needs to be native because we don'
     @Query("""
 SELECT DISTINCT dash.workflowName as workflowName
 FROM Dashboard dash
-WHERE dash.isLicensed = true""")
+WHERE dash.isLicensed = true
+ORDER BY workflowName""")
     Set<String> findAllDistinctDashboardWorkflowName();
 
     // TODO: Implement backend (instead of solely frontend) pagination?

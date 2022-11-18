@@ -17,7 +17,8 @@ INNER JOIN metrics.dashboard ds ON df.task_id = ds.task_id
 WHERE ds.is_licensed = true
        AND (ds.workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
        AND ds.on_message_hit BETWEEN :startDate AND :endDate
-GROUP BY fontName""", nativeQuery = true) // Non-native didn't appear to work here for some reason. Count returned null?
+GROUP BY fontName
+ORDER BY fontName""", nativeQuery = true) // Non-native didn't appear to work here for some reason. Count returned null?
     List<DocumentFontsSample> findAllDocumentFonts(@Param("workflowNameList") Set<String> workflowNameList,
                                                    @Param("startDate") long startDate,
                                                    @Param("endDate") long endDate);
@@ -28,9 +29,10 @@ FROM metrics.document_fonts df
 INNER JOIN metrics.dashboard ds ON df.task_id = ds.task_id
 WHERE ds.is_licensed = true
        AND (ds.workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
-       AND (:isInput is NULL OR :isInput = df.input)
+       AND :isInput = df.input
        AND ds.on_message_hit BETWEEN :startDate AND :endDate
-GROUP BY fontName""", nativeQuery = true) // Non-native didn't appear to work here for some reason. Count returned null?
+GROUP BY fontName
+ORDER BY fontName""", nativeQuery = true) // Non-native didn't appear to work here for some reason. Count returned null?
     List<DocumentFontsSample> findAllDocumentFonts(@Param("workflowNameList") Set<String> workflowNameList,
                                                    @Param("isInput") boolean isInput,
                                                    @Param("startDate") long startDate,
