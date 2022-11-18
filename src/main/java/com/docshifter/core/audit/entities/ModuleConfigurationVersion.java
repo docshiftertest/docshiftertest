@@ -25,6 +25,8 @@ public class ModuleConfigurationVersion {
 
     private UUID moduleConfigurationUuid;
 
+    private String moduleConfigurationName;
+
     @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
     @Column(columnDefinition = "jsonb")
     private String moduleConfigurationJson;

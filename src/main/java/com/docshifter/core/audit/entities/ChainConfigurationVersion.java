@@ -25,6 +25,8 @@ public class ChainConfigurationVersion {
 
     private UUID chainConfigurationUuid;
 
+    private String chainConfigurationName;
+
     @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
     @Column(columnDefinition = "jsonb")
     private String chainConfigurationJson;
