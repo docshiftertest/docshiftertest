@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 9/6/16.
@@ -136,16 +137,16 @@ public class ChainConfigurationRepositoryTest extends AbstractSpringTest {
 		Map<Parameter, String> map16 = new HashMap<Parameter, String>();
 		map16.put(p16, "parameter16");
 
-		mc1 = new ModuleConfiguration(m1, "testsconf1" + millis, "testconfiguration1" + millis, map3);
-		mc2 = new ModuleConfiguration(m2, "testsconf2" + millis, "testconfiguration2" + millis, map1);
-		mc3 = new ModuleConfiguration(m2, "testsconf3" + millis, "testconfiguration3" + millis, map0);
-		mc4 = new ModuleConfiguration(m4, "testsconf4" + millis, "testconfiguration4" + millis, map4);
-		mc7 = new ModuleConfiguration(m7, "testsconf7" + millis, "testconfiguration7" + millis, map7);
-		mc8 = new ModuleConfiguration(m12, "testsconf8" + millis, "testconfiguration8" + millis, map16);
-		mc9 = new ModuleConfiguration(m13, "testsconf9" + millis, "testconfiguration9" + millis, map13);
-		mc10 = new ModuleConfiguration(m14, "testsconf10" + millis, "testconfiguration10" + millis, map14);
-		mc11 = new ModuleConfiguration(m15, "testsconf11" + millis, "testconfiguration11" + millis, map15);
-		mc12 = new ModuleConfiguration(m2, "testsconf12" + millis, "testconfiguration12" + millis, map2);
+		mc1 = new ModuleConfiguration(m1, "testsconf1" + millis, "testconfiguration1" + millis, UUID.randomUUID(), map3);
+		mc2 = new ModuleConfiguration(m2, "testsconf2" + millis, "testconfiguration2" + millis, UUID.randomUUID(), map1);
+		mc3 = new ModuleConfiguration(m2, "testsconf3" + millis, "testconfiguration3" + millis, UUID.randomUUID(), map0);
+		mc4 = new ModuleConfiguration(m4, "testsconf4" + millis, "testconfiguration4" + millis, UUID.randomUUID(), map4);
+		mc7 = new ModuleConfiguration(m7, "testsconf7" + millis, "testconfiguration7" + millis, UUID.randomUUID(), map7);
+		mc8 = new ModuleConfiguration(m12, "testsconf8" + millis, "testconfiguration8" + millis, UUID.randomUUID(), map16);
+		mc9 = new ModuleConfiguration(m13, "testsconf9" + millis, "testconfiguration9" + millis, UUID.randomUUID(), map13);
+		mc10 = new ModuleConfiguration(m14, "testsconf10" + millis, "testconfiguration10" + millis, UUID.randomUUID(), map14);
+		mc11 = new ModuleConfiguration(m15, "testsconf11" + millis, "testconfiguration11" + millis, UUID.randomUUID(), map15);
+		mc12 = new ModuleConfiguration(m2, "testsconf12" + millis, "testconfiguration12" + millis, UUID.randomUUID(), map2);
 
 
 
@@ -193,7 +194,7 @@ public class ChainConfigurationRepositoryTest extends AbstractSpringTest {
 		n7 = new Node(null, mc7);
 
 
-		chc1 = new ChainConfiguration("testchain", "desc", true, n1, null, null, 60, 2, FailureLevel.FILE);
+		chc1 = new ChainConfiguration("testchain", "desc", true, n1, null, null, 60, 2, FailureLevel.FILE, UUID.randomUUID());
 
 		chainConfigurationRepository.save(chc1);
 

@@ -10,8 +10,9 @@ public final class AuditConstants {
     public static final String NEW_OBJECT = "New Object";
     public static final String OBJECT_REMOVED = "Object Removed";
     public static final String OBJECT_DUPLICATED = "Object Duplicated";
-    public static final String OBJECT_EXPORTED = "Object Exported";
+    public static final String OBJECT_EXPORTED = "Object Exported - Version ";
     public static final String OBJECT_IMPORTED = "Object Imported";
     public static final String PROPERTY_CHANGED = "Property Changed";
+    public static final String NEW_VERSION = "New Version";
 
 }
