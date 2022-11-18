@@ -10,28 +10,29 @@ import java.util.List;
 import java.util.Set;
 
 public interface DocumentFontsRepository extends JpaRepository<DocumentFonts, String> {
-    @Query("""
-SELECT coalesce(df.fontName, df.altFontName) as fontName, count(df)
-FROM DocumentFonts df
-INNER JOIN df.dashboard ds
-WHERE ds.isLicensed = true
-       AND (ds.workflowName in (:workflowNameList) OR 'ALL' in (:workflowNameList))
-       AND :isInput is NULL OR :isInput = df.input
-GROUP BY fontName""")
+    @Query(value = """
+SELECT coalesce(df.font_name, df.alt_font_name) as fontName, count(*)
+FROM metrics.document_fonts df
+INNER JOIN metrics.dashboard ds ON df.task_id = ds.task_id
+WHERE ds.is_licensed = true
+       AND (ds.workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+       AND ds.on_message_hit BETWEEN :startDate AND :endDate
+GROUP BY fontName""", nativeQuery = true) // Non-native didn't appear to work here for some reason. Count returned null?
     List<DocumentFontsSample> findAllDocumentFonts(@Param("workflowNameList") Set<String> workflowNameList,
-                                                   @Param("isInput") Boolean isInput);
+                                                   @Param("startDate") long startDate,
+                                                   @Param("endDate") long endDate);
 
-    @Query("""
-SELECT coalesce(df.fontName, df.altFontName) as fontName, count(df)
-FROM DocumentFonts df
-INNER JOIN df.dashboard ds
-WHERE ds.isLicensed = true
-       AND (ds.workflowName in (:workflowNameList) OR 'ALL' in (:workflowNameList))
-       AND :isInput is NULL OR :isInput = df.input
-       AND ds.onMessageHit BETWEEN :startDate AND :endDate
-GROUP BY fontName""")
+    @Query(value = """
+SELECT coalesce(df.font_name, df.alt_font_name) as fontName, count(*)
+FROM metrics.document_fonts df
+INNER JOIN metrics.dashboard ds ON df.task_id = ds.task_id
+WHERE ds.is_licensed = true
+       AND (ds.workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+       AND (:isInput is NULL OR :isInput = df.input)
+       AND ds.on_message_hit BETWEEN :startDate AND :endDate
+GROUP BY fontName""", nativeQuery = true) // Non-native didn't appear to work here for some reason. Count returned null?
     List<DocumentFontsSample> findAllDocumentFonts(@Param("workflowNameList") Set<String> workflowNameList,
-                                                   @Param("isInput") Boolean isInput,
-                                                   @Param("startDate") Long startDate,
-                                                   @Param("endDate") Long endDate);
+                                                   @Param("isInput") boolean isInput,
+                                                   @Param("startDate") long startDate,
+                                                   @Param("endDate") long endDate);
 }
