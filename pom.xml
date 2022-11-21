@@ -22,7 +22,8 @@
         <!-- Despite the fact Aspose show a classifier, it's apparently not needed -->
         <!-- SIGHS -->
         <!-- aspose.cad.classifier>jdk16</aspose.cad.classifier -->
-        <aspose.cells.version>22.11</aspose.cells.version>
+        <!-- pageSize A4 becomes letter starting on version 22.7 and onwards -->
+        <aspose.cells.version>22.6</aspose.cells.version>
         <aspose.diagram.version>22.4</aspose.diagram.version>
         <aspose.diagram.classifier>jdk16</aspose.diagram.classifier>
         <aspose.email.version>22.10</aspose.email.version>
