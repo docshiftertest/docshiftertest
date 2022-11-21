@@ -22,10 +22,10 @@
         <!-- Despite the fact Aspose show a classifier, it's apparently not needed -->
         <!-- SIGHS -->
         <!-- aspose.cad.classifier>jdk16</aspose.cad.classifier -->
-        <aspose.cells.version>22.6</aspose.cells.version>
+        <aspose.cells.version>22.11</aspose.cells.version>
         <aspose.diagram.version>22.4</aspose.diagram.version>
         <aspose.diagram.classifier>jdk16</aspose.diagram.classifier>
-        <aspose.email.version>22.3</aspose.email.version>
+        <aspose.email.version>22.10</aspose.email.version>
         <aspose.email.classifier>jdk16</aspose.email.classifier>
         <aspose.imaging.version>22.4</aspose.imaging.version>
         <aspose.imaging.classifier>jdk16</aspose.imaging.classifier>
@@ -34,20 +34,20 @@
         <aspose.note.classifier>jdk17</aspose.note.classifier>
         -->
         <!--		<aspose.ocr.version>21.5</aspose.ocr.version>-->
-        <aspose.pdf.version>22.7.1</aspose.pdf.version>
+        <aspose.pdf.version>22.10</aspose.pdf.version>
         <aspose.pdf.classifier>jdk17</aspose.pdf.classifier>
-        <aspose.slides.version>22.3</aspose.slides.version>
+        <aspose.slides.version>22.10</aspose.slides.version>
         <aspose.slides.classifier>jdk16</aspose.slides.classifier>
         <!-- Kept back to 20.12 because of hideous spamming of tmp by awful borked Asspose lib -->
         <aspose.tasks.version>22.3</aspose.tasks.version>
         <aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
-        <aspose.words.version>22.8</aspose.words.version>
+        <aspose.words.version>22.11</aspose.words.version>
         <aspose.words.classifier>jdk17</aspose.words.classifier>
         <aspose.html.version>21.12</aspose.html.version>
         <!-- Despite the fact Aspose claim a classifier is not needed, apparently it is -->
         <!-- SIGHS again -->
         <aspose.html.classifier>jdk1.8</aspose.html.classifier>
-        <aspose.barcode.version>22.6</aspose.barcode.version>
+        <aspose.barcode.version>22.11</aspose.barcode.version>
         <aspose.barcode.classifier>jdk18</aspose.barcode.classifier>
         <artemis.version>2.23.1</artemis.version>
         <kubernetes-client.version>5.3.0</kubernetes-client.version>
