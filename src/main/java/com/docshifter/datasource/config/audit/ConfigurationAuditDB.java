@@ -28,8 +28,6 @@ public class ConfigurationAuditDB {
     private String url;
     @Value("${spring.jpa.database-platform}")
     private String dialect;
-    @Value("${spring.jpa.hibernate.ddl-auto}")
-    private String schemaCreation;
 
     @Bean
     public DataSource auditDataSource() {
@@ -56,7 +54,7 @@ public class ConfigurationAuditDB {
         properties.setProperty(AvailableSettings.DEFAULT_SCHEMA, "audit");
         properties.put(AvailableSettings.PHYSICAL_NAMING_STRATEGY, CamelCaseToUnderscoresNamingStrategy.class.getName());
         properties.put(AvailableSettings.IMPLICIT_NAMING_STRATEGY, SpringImplicitNamingStrategy.class.getName());
-        properties.setProperty(AvailableSettings.HBM2DDL_AUTO, schemaCreation);
+        properties.setProperty(AvailableSettings.HBM2DDL_AUTO, "none");
 
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 

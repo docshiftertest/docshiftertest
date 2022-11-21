@@ -9,6 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * @author Created by Juan Marques on 09/03/2021
  */
-@SpringBootApplication(scanBasePackageClasses = {DocShifterConfiguration.class,ConfigurationDocshifterDB.class, ConfigurationMetricsDB.class, ConfigurationAuditDB.class})
+@SpringBootApplication(scanBasePackageClasses = {DocShifterConfiguration.class,ConfigurationDocshifterDB.class, ConfigurationMetricsDB.class})
 public class BeansApplication {
 }

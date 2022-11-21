@@ -1,6 +1,7 @@
 package com.docshifter.core;
 
 import com.docshifter.core.config.services.ILicensingService;
+import com.docshifter.datasource.config.audit.ConfigurationAuditDB;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
