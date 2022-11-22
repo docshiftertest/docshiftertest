@@ -48,6 +48,10 @@ FROM (SELECT dbf.file_name, CASE WHEN dbf.file_size < 100 THEN array['0', 'Small
 GROUP BY t.range
 ORDER BY t.range""", nativeQuery = true) // Needs to be native because subqueries can't be used in HQL FROM clauses
                                          // (yet)
+                                         // t.range is an array so the first element can be used to maintain a correct
+                                         // ordering, second element is the actual label to be displayed for the
+                                         // group (hence SELECT t.range[2], and PostgreSQL uses one-based indexing for
+                                         // arrays)
     List<FileSizeDistributionSample> findAllFileSizeDistribution(@Param("workflowNameList") Set<String> workflowNameList,
                                                                  @Param("startDate") long startDate,
                                                                  @Param("endDate") long endDate);

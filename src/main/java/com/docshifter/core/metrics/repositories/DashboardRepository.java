@@ -69,43 +69,115 @@ ORDER BY workflowName""", nativeQuery = true) // Non-native didn't appear to wor
                                                        @Param("endDate") long endDate);
 
     @Query(value = """
-SELECT extract(HOUR FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
-FROM metrics.dashboard
-WHERE is_licensed = true
-       AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
-       AND on_message_hit BETWEEN :startDate AND :endDate
-       AND success is not NULL
-GROUP BY dateValue
-ORDER BY dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
-                                           // choose from in a non-native HQL extract function.
+SELECT t.dateValue, max(t.count) as count
+FROM (SELECT extract(HOUR FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
+      FROM metrics.dashboard
+      WHERE is_licensed = true
+             AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+             AND on_message_hit BETWEEN :startDate AND :endDate
+             AND success is not NULL
+      GROUP BY dateValue
+      UNION ALL
+      SELECT dateValue, 0
+      FROM generate_series(0, 23, 1) dateValue) t
+GROUP BY t.dateValue
+ORDER BY t.dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
+                                             // choose from in a non-native HQL extract function.
+                                             // Make sure to fill in any potential gaps in the records by creating a
+                                             // union with all possible hour values and simply returning 0 when there is
+                                             // no matching record available
     List<TasksDistributionSample> getTasksDistributionSamplesByHour(@Param("workflowNameList") Set<String> workflowNameList,
                                                               @Param("startDate") long startDate,
                                                               @Param("endDate") long endDate);
 
     @Query(value = """
-SELECT extract(WEEK FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
-FROM metrics.dashboard
-WHERE is_licensed = true
-       AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
-       AND on_message_hit BETWEEN :startDate AND :endDate
-       AND success is not NULL
-GROUP BY dateValue
-ORDER BY dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
-                                           // choose from in a non-native HQL extract function.
+SELECT t.dateValue, max(t.count) as count
+FROM (SELECT extract(ISODOW FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
+      FROM metrics.dashboard
+      WHERE is_licensed = true
+             AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+             AND on_message_hit BETWEEN :startDate AND :endDate
+             AND success is not NULL
+      GROUP BY dateValue
+      UNION ALL
+      SELECT DISTINCT extract(ISODOW FROM date) as dateValue, 0
+      FROM generate_series(to_timestamp(:startDate / 1000), to_timestamp(:endDate / 1000), '1 day') date) t
+GROUP BY t.dateValue
+ORDER BY t.dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
+                                             // choose from in a non-native HQL extract function.
+                                             // Make sure to fill in any potential gaps in the records by creating a
+                                             // union with all possible weekday values and simply returning 0 when
+                                             // there is no matching record available. Also omit any weekdays that
+                                             // were not selected in the date range.
+    List<TasksDistributionSample> getTasksDistributionSamplesByDayOfWeek(@Param("workflowNameList") Set<String> workflowNameList,
+                                                                    @Param("startDate") long startDate,
+                                                                    @Param("endDate") long endDate);
+
+    @Query(value = """
+SELECT t.dateValue, max(t.count) as count
+FROM (SELECT extract(DAY FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
+      FROM metrics.dashboard
+      WHERE is_licensed = true
+             AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+             AND on_message_hit BETWEEN :startDate AND :endDate
+             AND success is not NULL
+      GROUP BY dateValue
+      UNION ALL
+      SELECT DISTINCT extract(DAY FROM date) as dateValue, 0
+      FROM generate_series(to_timestamp(:startDate / 1000), to_timestamp(:endDate / 1000), '1 day') date) t
+GROUP BY t.dateValue
+ORDER BY t.dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
+                                             // choose from in a non-native HQL extract function.
+                                             // Make sure to fill in any potential gaps in the records by creating a
+                                             // union with all possible day-of-month values and simply returning 0 when
+                                             // there is no matching record available. Also omit any days of the month
+                                             // that were not selected in the date range.
+    List<TasksDistributionSample> getTasksDistributionSamplesByDayOfMonth(@Param("workflowNameList") Set<String> workflowNameList,
+                                                                         @Param("startDate") long startDate,
+                                                                         @Param("endDate") long endDate);
+
+    @Query(value = """
+SELECT t.dateValue, max(t.count) as count
+FROM (SELECT extract(WEEK FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
+      FROM metrics.dashboard
+      WHERE is_licensed = true
+             AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+             AND on_message_hit BETWEEN :startDate AND :endDate
+             AND success is not NULL
+      GROUP BY dateValue
+      UNION ALL
+      SELECT DISTINCT extract(WEEK FROM date) as dateValue, 0
+      FROM generate_series(to_timestamp(:startDate / 1000), to_timestamp(:endDate / 1000), '1 day') date) t
+GROUP BY t.dateValue
+ORDER BY t.dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
+                                             // choose from in a non-native HQL extract function.
+                                             // Make sure to fill in any potential gaps in the records by creating a
+                                             // union with all possible week number values and simply returning 0 when
+                                             // there is no matching record available. Also omit any week numbers that
+                                             // were not selected in the date range.
     List<TasksDistributionSample> getTasksDistributionSamplesByWeek(@Param("workflowNameList") Set<String> workflowNameList,
                                                                     @Param("startDate") long startDate,
                                                                     @Param("endDate") long endDate);
 
     @Query(value = """
-SELECT extract(MONTH FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
-FROM metrics.dashboard
-WHERE is_licensed = true
-       AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
-       AND on_message_hit BETWEEN :startDate AND :endDate
-       AND success is not NULL
-GROUP BY dateValue
-ORDER BY dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
-                                           // choose from in a non-native HQL extract function.
+SELECT t.dateValue, max(t.count) as count
+FROM (SELECT extract(MONTH FROM to_timestamp(on_message_hit / 1000)) as dateValue, count(*)
+      FROM metrics.dashboard
+      WHERE is_licensed = true
+             AND (workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+             AND on_message_hit BETWEEN :startDate AND :endDate
+             AND success is not NULL
+      GROUP BY dateValue
+      UNION ALL
+      SELECT DISTINCT extract(MONTH FROM date) as dateValue, 0
+      FROM generate_series(to_timestamp(:startDate / 1000), to_timestamp(:endDate / 1000), '1 day') date) t
+GROUP BY t.dateValue
+ORDER BY t.dateValue""", nativeQuery = true) // Needs to be native because we don't have as many time unit keywords to
+                                             // choose from in a non-native HQL extract function.
+                                             // Make sure to fill in any potential gaps in the records by creating a
+                                             // union with all possible month values and simply returning 0 when
+                                             // there is no matching record available. Also omit any months that
+                                             // were not selected in the date range.
     List<TasksDistributionSample> getTasksDistributionSamplesByMonth(@Param("workflowNameList") Set<String> workflowNameList,
                                                                     @Param("startDate") long startDate,
                                                                     @Param("endDate") long endDate);
