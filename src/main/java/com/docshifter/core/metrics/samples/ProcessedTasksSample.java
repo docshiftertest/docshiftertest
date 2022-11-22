@@ -1,10 +1,10 @@
-package com.docshifter.core.metrics.Sample;
+package com.docshifter.core.metrics.samples;
 
 /**
  * @author Created by Juan Marques on 17/08/2021
  */
 public interface ProcessedTasksSample {
-
-    Long getOnMessageHit();
+    String getWorkflowName();
     Boolean getSuccess();
+    long getCount();
 }

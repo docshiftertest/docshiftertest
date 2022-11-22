@@ -14,16 +14,15 @@ import java.util.HashMap;
 @Profile(NalpeironHelper.LICENSING_IDENTIFIER)
 public class MetricsLicenceCheckingService {
 
-    private static ILicensingService nalpeironService;
-    private static Boolean isLicensed;
+    private final ILicensingService nalpeironService;
+    private Boolean isLicensed;
 
     @Autowired
     public MetricsLicenceCheckingService(ILicensingService nalpeironService) {
         this.nalpeironService = nalpeironService;
     }
 
-    @Bean
-    public static boolean isLicensed() {
+    public boolean isLicensed() {
         if (isLicensed == null) {
             try {
                 long[] fid = nalpeironService.validateAndStartModule("METR", new long[]{0L});
