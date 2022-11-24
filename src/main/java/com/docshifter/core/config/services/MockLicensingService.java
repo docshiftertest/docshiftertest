@@ -48,66 +48,78 @@ public class MockLicensingService implements ILicensingService {
 				2, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules()));
 
 		// === Novartis ===
-		// 2023 Non-production usage with Insights
+		// 2023 Non-production usage (DEV) with Insights
 		keys.put("f5abaef5-bf9f-415a-84e8-a41b870a9c7b", new License(
 				new GregorianCalendar(2023, Calendar.APRIL, 21, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics,
-				LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
-		// 2023 Production usage with Insights
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2023 Non-production usage (VAL) with Insights
+		keys.put("118b3006-3754-4eff-84bb-9db21c8a1387", new License(
+				new GregorianCalendar(2023, Calendar.APRIL, 21, 23, 59, 59).getTime(),
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2023 Production usage (PROD) with Insights
 		keys.put("735d1db5-cb8e-4431-b599-0228f97c721e", new License(
 				new GregorianCalendar(2023, Calendar.APRIL, 21, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics,
-				LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
-		// 2023 Non-production usage with Insights + OCR
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2023 Non-production usage (DEV) with Insights + OCR
 		keys.put("565c9dc8-3650-42eb-8de7-5495b489659e", new License(
 				new GregorianCalendar(2023, Calendar.APRIL, 21, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics,
-				LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
-		// 2023 Production usage with Insights + OCR
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2023 Non-production usage (VAL) with Insights + OCR
+		keys.put("b7b2f768-eb6a-4f13-bb07-02cfc4fa9533", new License(
+				new GregorianCalendar(2023, Calendar.APRIL, 21, 23, 59, 59).getTime(),
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2023 Production usage (PROD) with Insights + OCR
 		keys.put("f9cb115e-4cae-45bb-919d-5a643b317750", new License(
 				new GregorianCalendar(2023, Calendar.APRIL, 21, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics,
-				LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
-		// 2024 Non-production usage with Insights
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2024 Non-production usage (DEV) with Insights
 		keys.put("b21f20e3-2dc0-4e12-a226-6ae67060a392", new License(
 				new GregorianCalendar(2024, Calendar.APRIL, 21, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics,
-				LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
-		// 2024 Production usage with Insights
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2024 Non-production usage (VAL) with Insights
+		keys.put("d34eb463-03e1-471f-a035-1e949756fb25", new License(
+				new GregorianCalendar(2024, Calendar.APRIL, 21, 23, 59, 59).getTime(),
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2024 Production usage (PROD) with Insights
 		keys.put("dae3513b-f1d5-422e-a03d-dbfab6b8e548", new License(
 				new GregorianCalendar(2024, Calendar.APRIL, 21, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics,
-				LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
-		// 2024 Non-production usage with Insights + OCR
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2024 Non-production usage (DEV) with Insights + OCR
 		keys.put("667b3146-9936-40f9-853a-6c7fff708d22", new License(
 				new GregorianCalendar(2024, Calendar.APRIL, 21, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics,
-				LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
-		// 2024 Production usage with Insights + OCR
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2024 Non-production usage (VAL) with Insights + OCR
+		keys.put("b3651458-b2b2-4613-904d-e5a77efd1473", new License(
+				new GregorianCalendar(2024, Calendar.APRIL, 21, 23, 59, 59).getTime(),
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2024 Production usage (PROD) with Insights + OCR
 		keys.put("b739b836-e914-43b4-a2b4-2d636cfdc224", new License(
 				new GregorianCalendar(2024, Calendar.APRIL, 21, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics,
-				LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
-		// 2025 Non-production usage with Insights
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2025 Non-production usage (DEV) with Insights
 		keys.put("cb1c95c9-7d9d-414a-9bad-ed1eeb4e900d", new License(
 				new GregorianCalendar(2025, Calendar.APRIL, 21, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics,
-				LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
-		// 2025 Production usage with Insights
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2025 Non-production usage (VAL) with Insights
+		keys.put("2075c55a-a8ce-4a5c-822a-412a78d6db07", new License(
+				new GregorianCalendar(2025, Calendar.APRIL, 21, 23, 59, 59).getTime(),
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2025 Production usage (PROD) with Insights
 		keys.put("0f4b11cf-fbfb-4837-b4dc-e12ddf7a7afc", new License(
 				new GregorianCalendar(2025, Calendar.APRIL, 21, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics,
-				LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
-		// 2025 Non-production usage with Insights + OCR
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2025 Non-production usage (DEV) with Insights + OCR
 		keys.put("233d1b50-a99f-4197-b6c7-3d0efb89d082", new License(
 				new GregorianCalendar(2025, Calendar.APRIL, 21, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics,
-				LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
-		// 2025 Production usage with Insights + OCR
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2025 Non-production usage (VAL) with Insights + OCR
+		keys.put("e87b86f4-0228-44b5-9af4-d2f98ec145da", new License(
+				new GregorianCalendar(2025, Calendar.APRIL, 21, 23, 59, 59).getTime(),
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+		// 2025 Production usage (PROD) with Insights + OCR
 		keys.put("06ce52e2-4f76-4c20-a7c7-32b337a6a3ac", new License(
 				new GregorianCalendar(2025, Calendar.APRIL, 21, 23, 59, 59).getTime(),
-				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics,
-				LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
+				null, MockLicensingModuleSet.DocShifterHiFi.getLicensableModules(), LicensableModule.Metrics, LicensableModule.Transformation_OCR, LicensableModule.Release_Documentum_Export, LicensableModule.Release_Documentum_New_Rendition));
 
 		// === Preyer ===
 		keys.put("b1656ce3-6c9b-4382-895c-429378c37632", new License(
