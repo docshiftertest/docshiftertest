@@ -59,7 +59,7 @@ public class MailConfigurationItemDto extends AbstractConfigurationItemDto {
 
     public String getPassword() {
     	
-    	if(StringUtils.isBlank(password)) {
+    	if(StringUtils.isBlank(password) && StringUtils.isNotBlank(this.getEncryptedPassword())) {
     		return SecurityUtils.decryptMessage(this.getEncryptedPassword(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
     				SecurityProperties.SECRET.getValue(), this.getClass());
     	}
@@ -69,7 +69,9 @@ public class MailConfigurationItemDto extends AbstractConfigurationItemDto {
 
     public void setPassword(String password) {
         this.password = password;
-        this.setEncryptedPassword();
+        if (StringUtils.isNotBlank(password)) {
+            this.setEncryptedPassword();
+        }
     }
 
     public String getEncryptedPassword() {
@@ -145,7 +147,7 @@ public class MailConfigurationItemDto extends AbstractConfigurationItemDto {
 
     public String getClientSecret() {
 
-        if (StringUtils.isBlank(clientSecret)) {
+        if (StringUtils.isBlank(clientSecret) && StringUtils.isNotBlank(this.getEncryptedClientSecret())) {
             return SecurityUtils.decryptMessage(this.getEncryptedClientSecret(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
                     SecurityProperties.SECRET.getValue(), this.getClass());
         }
@@ -155,7 +157,10 @@ public class MailConfigurationItemDto extends AbstractConfigurationItemDto {
 
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
-        this.setEncryptedClientSecret();
+
+        if (StringUtils.isNotBlank(clientSecret)) {
+            this.setEncryptedClientSecret();
+        }
     }
 
     public String getEncryptedClientSecret() {

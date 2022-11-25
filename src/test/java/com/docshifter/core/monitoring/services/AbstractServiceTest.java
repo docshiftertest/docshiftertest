@@ -37,9 +37,6 @@ public abstract class AbstractServiceTest extends AbstractSpringTest {
         mailConfigurationItem.setPort(587);
         mailConfigurationItem.setFromAddress("blaze@localhost");
         mailConfigurationItem.setSsl(false);
-        mailConfigurationItem.setClientId("id");
-        mailConfigurationItem.setClientSecret("secret");
-        mailConfigurationItem.setTenant("tenant");
 
         mailConfigurationItem.setNotificationLevels(Arrays.asList(
                 NotificationLevels.ERROR,
