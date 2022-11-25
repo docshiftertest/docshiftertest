@@ -32,6 +32,7 @@ public abstract class AbstractServiceTest extends AbstractSpringTest {
         mailConfigurationItem = new MailConfigurationItemDto();
         mailConfigurationItem.setToAddresses("test1@email.com, test2@email.com");
         mailConfigurationItem.setHost("localhost");
+        mailConfigurationItem.setUsername("some");
         mailConfigurationItem.setPassword("secret");
         mailConfigurationItem.setPort(587);
         mailConfigurationItem.setFromAddress("blaze@localhost");
