@@ -27,6 +27,11 @@ public class SmtpConfiguration {
     private String fromAddress;
     private boolean ssl;
 
+    // Office 365
+    private String clientId;
+    private String clientSecret;
+    private String tenant;
+
     public Long getId() {
         return id;
     }
@@ -82,4 +87,29 @@ public class SmtpConfiguration {
     public void setSsl(boolean ssl) {
         this.ssl = ssl;
     }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
+    }
+
 }
