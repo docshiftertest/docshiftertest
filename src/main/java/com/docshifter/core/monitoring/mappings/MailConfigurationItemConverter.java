@@ -35,6 +35,11 @@ public class MailConfigurationItemConverter implements ConfigurationItemConverte
             dto.setPassword(entity.getSmtpConfiguration().getPassword());
             dto.setFromAddress(entity.getSmtpConfiguration().getFromAddress());
             dto.setSsl(entity.getSmtpConfiguration().isSsl());
+
+            // Office 365
+            dto.setClientId(entity.getSmtpConfiguration().getClientId());
+            dto.setClientSecret(entity.getSmtpConfiguration().getClientSecret());
+            dto.setTenant(entity.getSmtpConfiguration().getTenant());
         }
 
         if(entity.getMonitoringFilter() != null){
@@ -79,7 +84,12 @@ public class MailConfigurationItemConverter implements ConfigurationItemConverte
         entity.getSmtpConfiguration().setFromAddress(dto.getFromAddress());
         entity.getSmtpConfiguration().setSsl(dto.isSsl());
 
-        CommonConverter.convertFilterToEntity(dto,entity);
+        // Office 365
+        entity.getSmtpConfiguration().setClientId(dto.getClientId());
+        entity.getSmtpConfiguration().setClientSecret(dto.getClientSecret());
+        entity.getSmtpConfiguration().setTenant(dto.getTenant());
+
+        CommonConverter.convertFilterToEntity(dto, entity);
 
         if (entity.getMailAddresses() == null) entity.setMailAddresses(new ArrayList<>());
         convertMailAddresses(dto.getToAddressList(), entity.getMailAddresses());

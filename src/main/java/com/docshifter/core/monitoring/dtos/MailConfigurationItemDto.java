@@ -22,6 +22,12 @@ public class MailConfigurationItemDto extends AbstractConfigurationItemDto {
     private String fromAddress;
     private boolean ssl;
 
+    // Office 365
+    private String clientId;
+    private String clientSecret;
+    private String encryptedClientSecret;
+    private String tenant;
+
     private String toAddresses;
 
     private String templateTitle;
@@ -127,5 +133,45 @@ public class MailConfigurationItemDto extends AbstractConfigurationItemDto {
         return Arrays.stream(toAddresses.split("[\\s;,]"))
                 .filter(s -> s != null && !s.isEmpty())
                 .collect(Collectors.toList());
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getClientSecret() {
+
+        if (StringUtils.isBlank(clientSecret)) {
+            return SecurityUtils.decryptMessage(this.getEncryptedClientSecret(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
+                    SecurityProperties.SECRET.getValue(), this.getClass());
+        }
+
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+        this.setEncryptedClientSecret();
+    }
+
+    public String getEncryptedClientSecret() {
+        return encryptedClientSecret;
+    }
+
+    private void setEncryptedClientSecret() {
+        this.encryptedClientSecret = SecurityUtils.encryptMessage(this.getClientSecret(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
+                SecurityProperties.SECRET.getValue(), this.getClass());
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 }

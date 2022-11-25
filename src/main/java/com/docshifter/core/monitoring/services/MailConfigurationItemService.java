@@ -7,7 +7,6 @@ import com.docshifter.core.monitoring.mappings.ConfigurationItemConverter;
 import com.docshifter.core.monitoring.mappings.MailConfigurationItemConverter;
 import com.docshifter.core.monitoring.repositories.MailConfigurationItemRepository;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,13 +18,15 @@ public class MailConfigurationItemService extends AbstractConfigurationItemServi
 {
 	private static final Logger log = Logger.getLogger(com.docshifter.core.monitoring.services.MailConfigurationItemService.class.getName());
 
-    @Autowired
-    private MailConfigurationItemConverter converter;
+    private final MailConfigurationItemConverter converter;
+    private final MailConfigurationItemRepository repository;
 
-    @Autowired
-    private MailConfigurationItemRepository repository;
+	public MailConfigurationItemService(MailConfigurationItemConverter converter, MailConfigurationItemRepository repository) {
+		this.converter = converter;
+		this.repository = repository;
+	}
 
-    @Override
+	@Override
     protected ConfigurationItemConverter<MailConfigurationItem, MailConfigurationItemDto> getConverter() {
         return converter;
     }
