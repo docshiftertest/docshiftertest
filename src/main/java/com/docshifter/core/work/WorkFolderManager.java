@@ -130,7 +130,7 @@ public class WorkFolderManager {
 			}
 		}
 		catch (Exception exc) {
-			log.error("We caught an unexpected excetion trying to validate the {} folder", workOrError, exc);
+			log.error("We caught an unexpected exception trying to validate the {} folder", workOrError, exc);
 			result = false;
 		}
 		return result;
