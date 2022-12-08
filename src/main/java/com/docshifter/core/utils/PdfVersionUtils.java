@@ -94,13 +94,20 @@ public final class PdfVersionUtils {
     public static PdfFormat parsePdfOutputType(String postPdfOutput, String pdfAComplianceLevel) {
         PdfFormat result;
 
-        if ("PDFA".equals(postPdfOutput.trim().toUpperCase().replaceAll("[/ _-]", ""))) {
+        if (isPdfA(postPdfOutput)) {
             result = parsePdfAComplianceLevel(pdfAComplianceLevel);
         }
         else {
             result = parsePdfOutputType(postPdfOutput);
         }
         return result;
+    }
+
+    /**
+     * Returns whether the requested PDF output is of any PDF/A format.
+     */
+    public static boolean isPdfA(String postPdfOutput) {
+        return "PDFA".equals(postPdfOutput.trim().toUpperCase().replaceAll("[/ _-]", ""));
     }
 
     /**
