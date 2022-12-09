@@ -17,4 +17,10 @@
     <suppress>
         <cve>CVE-2022-31569</cve>
     </suppress>
+    <suppress>
+        <cve>CVE-2022-1471</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2011-1797</cve>
+    </suppress>
 </suppressions>
