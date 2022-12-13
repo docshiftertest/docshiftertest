@@ -15,9 +15,9 @@ public class RoundRobinListTest {
 
     @Test
     public void cycleBuildURI() {
-        var savedMqUrl = "(tcp://10.110.0.74:61616,tcp://3.249.114.10:61616)?ha=true";
+        var savedMqUrl = "(tcp://10.110.0.74:61616,tcp://3.249.114.10:61616,tcp://AWS1-PROD.com.docshifter:61616)?ha=true";
 
-        var mqUrlAddresses = Arrays.stream(savedMqUrl.replaceAll("[^a-zA-Z0-9/:.,]", "")
+        var mqUrlAddresses = Arrays.stream(savedMqUrl.replaceAll("[^a-zA-Z0-9/:.,-]", "")
                         .replace("hatrue", "")
                         .split(","))
                 .map(this::buildMQURI)

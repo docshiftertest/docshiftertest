@@ -85,7 +85,7 @@ public class WebSocketConfig extends AbstractSecurityWebSocketMessageBrokerConfi
         // Removes irregular chars keeping only "/ : and ."
         // input (tcp://10.110.0.74:61616,tcp://3.249.114.10:61616)?ha=true
         // output tcp://10.110.0.74:61616 and tcp://3.249.114.10:61616
-        var mqUrlAddresses = Arrays.stream(savedMQUrl.replaceAll("[^a-zA-Z0-9/:.,]", "")
+        var mqUrlAddresses = Arrays.stream(savedMQUrl.replaceAll("[^a-zA-Z0-9/:.,-]", "")
                         .replace("hatrue", "")
                         // Split urls by , before building the URI
                         .split(","))
