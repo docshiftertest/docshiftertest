@@ -23,6 +23,11 @@ public class GlobalNotification {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private long id;
 
+    private String notificationTenantId;
+    private String notificationClientId;
+    @Encrypted
+    private String notificationClientSecret;
+
     private String notificationEmailFrom;
     private String notificationEmailTo;
     private String notificationEmailUsername;
