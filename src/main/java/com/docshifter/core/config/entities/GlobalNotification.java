@@ -2,7 +2,6 @@ package com.docshifter.core.config.entities;
 
 import com.docshifter.core.security.Encrypted;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
