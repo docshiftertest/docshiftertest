@@ -14,5 +14,7 @@ public final class AuditConstants {
     public static final String OBJECT_IMPORTED = "Object Imported";
     public static final String PROPERTY_CHANGED = "Property Changed";
     public static final String NEW_VERSION = "New Version";
+    public static final String NO_VALUE = "-";
+
 
 }
