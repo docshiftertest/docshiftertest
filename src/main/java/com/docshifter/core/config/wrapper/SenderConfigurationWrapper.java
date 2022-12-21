@@ -1,15 +1,12 @@
 package com.docshifter.core.config.wrapper;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import lombok.extern.log4j.Log4j2;
 import com.docshifter.core.config.repositories.ChainConfigurationRepository;
 import com.docshifter.core.config.entities.Node;
 import org.apache.logging.log4j.util.Strings;
-
 import static java.util.Objects.isNull;
 
 @Log4j2
@@ -46,22 +43,22 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 		
 		if (allParams.containsKey(name)) {
 			String value = allParams.get(name);
-			// Redact any password fields
-			if (name.contains("pass")) {
-				log.debug("containsKey {} so returning a value of length: {}",
+			// Redact any password or secret fields
+			if (name.contains("pass") || name.contains("secret")) {
+				log.debug("allParams contains the key: {} but is a password or secret, so only telling you the length of the value is: {}",
 						name, value.length());
 			}
 			else {
-				log.debug("containsKey {} so returning: {}",
+				log.debug("allParams contains the key: {} so returning the value: {}",
 						name, value);
 			}
 			return value;
-		} else {
-			log.debug("returning (defaultValue): {} for key: {}",
-					defaultValue, name);
+		}
+		else {
+			log.debug("allParams did not contain the key: {}, so using defaultValue: {}",
+					name, defaultValue);
 			return defaultValue;
 		}
-		
 	}
 
 	/**
@@ -94,6 +91,10 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 			if (allParams.containsKey(name)) {
 				result = Integer.parseInt(allParams.get(name));
 			}
+			else {
+				log.debug("allParams did not contain the key: {}, so using defaultValue: {}",
+						name, defaultValue);
+			}
 		}
 		catch (NumberFormatException niffy) {
 			// Just log it, we already set the default value
@@ -113,7 +114,10 @@ public class SenderConfigurationWrapper extends NodeWrapper {
 		
 		if (allParams.containsKey(name)) {
 			return Boolean.parseBoolean(allParams.get(name));
-		} else {
+		}
+		else {
+			log.debug("allParams did not contain the key: {}, so using defaultValue: {}",
+					name, defaultValue);
 			return defaultValue;
 		}
 	}
