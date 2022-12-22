@@ -86,7 +86,7 @@ public class EmailServiceImpl implements EmailService {
 
         graphClient.users(configItem.getFromAddress()).sendMail(userSendMailParameterSet).buildRequest().post();
 
-        log.info("Email sent to {{}} with message: [{}] successfully.",
+        log.info("Email sent to [{}] with message: [{}] successfully.",
                 toAddress, notification.getMessage());
     }
 
