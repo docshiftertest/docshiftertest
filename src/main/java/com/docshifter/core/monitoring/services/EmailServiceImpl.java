@@ -83,7 +83,11 @@ public class EmailServiceImpl implements EmailService {
         UserSendMailParameterSet userSendMailParameterSet = new UserSendMailParameterSet();
         userSendMailParameterSet.message = message;
         userSendMailParameterSet.saveToSentItems = true;
+
         graphClient.users(configItem.getFromAddress()).sendMail(userSendMailParameterSet).buildRequest().post();
+
+        log.debug("Email sent to [{}] with message: [{}] successfully.",
+                toAddress, notification.getMessage());
     }
 
     /**
