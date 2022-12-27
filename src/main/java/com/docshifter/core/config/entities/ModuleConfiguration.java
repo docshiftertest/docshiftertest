@@ -3,7 +3,6 @@ package com.docshifter.core.config.entities;
 import com.docshifter.core.security.Encrypted;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -25,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -180,15 +180,20 @@ public class ModuleConfiguration implements Serializable {
 	@Transient
 	public void setJsonParameterValues(List<Map> parameterValues)
 	{
-		ObjectMapper mapper = new ObjectMapper();
 		this.parameterValues = parameterValues.stream()
 				.map(m -> {
 					try {
+						long id = Long.parseLong(String.valueOf(m.get("id")));
+						Parameter param = module.getParameters().stream()
+								.filter(p -> p.getId() == id)
+								.findAny()
+								.orElseThrow(() -> new NoSuchElementException("No parameter found with id " + id + " " +
+										"in module."));
 						return new AbstractMap.SimpleImmutableEntry<>(
-								mapper.readValue(String.valueOf(m.get("id")), Parameter.class),
+								param,
 								String.valueOf(m.get("value")));
 					} catch (Exception ex) {
-						throw new IllegalArgumentException("Unable to deserialize parameter JSON", ex);
+						throw new IllegalArgumentException("Unable to deserialize parameter JSON.", ex);
 					}
 				}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
