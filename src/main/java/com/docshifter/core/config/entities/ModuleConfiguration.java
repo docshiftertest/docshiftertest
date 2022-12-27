@@ -3,6 +3,7 @@ package com.docshifter.core.config.entities;
 import com.docshifter.core.security.Encrypted;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -19,11 +20,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyClass;
 import javax.persistence.Transient;
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -153,7 +156,7 @@ public class ModuleConfiguration implements Serializable {
 	}
 
 	@SuppressWarnings("rawtypes")
-	@JsonProperty("parameters")
+	@JsonProperty(value = "parameters", access = JsonProperty.Access.READ_ONLY)
 	@Transient
 	public List<Map> jsonParameterValues()
 	{
@@ -170,6 +173,24 @@ public class ModuleConfiguration implements Serializable {
 		}
 
 		return parameters;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@JsonProperty(value = "parameters", access = JsonProperty.Access.WRITE_ONLY)
+	@Transient
+	public void setJsonParameterValues(List<Map> parameterValues)
+	{
+		ObjectMapper mapper = new ObjectMapper();
+		this.parameterValues = parameterValues.stream()
+				.map(m -> {
+					try {
+						return new AbstractMap.SimpleImmutableEntry<>(
+								mapper.readValue(String.valueOf(m.get("id")), Parameter.class),
+								String.valueOf(m.get("value")));
+					} catch (Exception ex) {
+						throw new IllegalArgumentException("Unable to deserialize parameter JSON", ex);
+					}
+				}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	public boolean compareTo(Object obj) {
