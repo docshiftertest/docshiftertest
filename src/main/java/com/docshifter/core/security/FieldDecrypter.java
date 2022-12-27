@@ -36,7 +36,7 @@ public class FieldDecrypter {
 
 		Object encryptedMessage = ReflectionUtils.getField(field, entity);
 
-		// No need to encrypt null values
+		// No need to decrypt null values
 		if (encryptedMessage == null) {
 			log.debug("Not decrypting NULL value for field {}", field.getName());
 			return;
