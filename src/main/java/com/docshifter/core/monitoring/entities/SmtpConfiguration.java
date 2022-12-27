@@ -29,6 +29,7 @@ public class SmtpConfiguration {
 
     // Office 365
     private String clientId;
+    @Encrypted
     private String clientSecret;
     private String tenant;
 
