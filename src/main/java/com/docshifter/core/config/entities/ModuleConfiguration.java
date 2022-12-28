@@ -155,6 +155,16 @@ public class ModuleConfiguration implements Serializable {
 		this.uuid = moduleConfigurationUuid;
 	}
 
+	/**
+	 * Transforms the format of the {@link #parameterValues} field from a {@link Map}&lt;{@link Parameter}, {@link String}&gt;
+	 * into a {@link List}&lt;{@link Map}&gt; (where each Map contains exactly the keys {@code id} and {@code value})
+	 * for JSON serialization purposes. This is a relic from old times however and the reason why we need this
+	 * conversion in the first place has been long-lost... I suppose it isn't/wasn't possible for Jackson to work
+	 * with Maps that have complex key types, and we wanted to save on JSON payload size by not having to repeat each
+	 * {@link Parameter} JSON in full again? But why not perform a conversion to a simple
+	 * {@link Map}&lt;{@link String}, {@link String}&gt; then instead of this unwieldy list of Maps? Anyway, we're
+	 * now keeping it this way for backwards compatibility purposes...
+	 */
 	@SuppressWarnings("rawtypes")
 	@JsonProperty(value = "parameters", access = JsonProperty.Access.READ_ONLY)
 	@Transient
@@ -175,6 +185,9 @@ public class ModuleConfiguration implements Serializable {
 		return parameters;
 	}
 
+	/**
+	 * JSON deserialization method that does the exact opposite of {@link #jsonParameterValues()}.
+	 */
 	@SuppressWarnings("rawtypes")
 	@JsonProperty(value = "parameters", access = JsonProperty.Access.WRITE_ONLY)
 	@Transient
@@ -183,12 +196,12 @@ public class ModuleConfiguration implements Serializable {
 		this.parameterValues = parameterValues.stream()
 				.map(m -> {
 					try {
-						long id = Long.parseLong(String.valueOf(m.get("id")));
+						long paramId = Long.parseLong(String.valueOf(m.get("id")));
 						Parameter param = module.getParameters().stream()
-								.filter(p -> p.getId() == id)
+								.filter(p -> p.getId() == paramId)
 								.findAny()
-								.orElseThrow(() -> new NoSuchElementException("No parameter found with id " + id + " " +
-										"in module."));
+								.orElseThrow(() -> new NoSuchElementException("No parameter found with ID " + paramId +
+										" in module: " + module.getName() + " (ID: " + module.getId() + ")"));
 						return new AbstractMap.SimpleImmutableEntry<>(
 								param,
 								String.valueOf(m.get("value")));
