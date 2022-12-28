@@ -6,6 +6,7 @@ package com.docshifter.core.security;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
@@ -20,6 +21,7 @@ import com.docshifter.core.security.utils.SecurityUtils;
  * @author Created by juan.marques on 09/12/2019.
  */
 @Component
+@Log4j2
 public class FieldDecrypter {
 
 	public void decrypt(Object entity) {
@@ -33,6 +35,12 @@ public class FieldDecrypter {
 		field.setAccessible(true);
 
 		Object encryptedMessage = ReflectionUtils.getField(field, entity);
+
+		// No need to decrypt null values
+		if (encryptedMessage == null) {
+			log.debug("Not decrypting NULL value for field {}", field.getName());
+			return;
+		}
 
 		if (encryptedMessage instanceof Map) {
 			if (field.getName().equalsIgnoreCase(SecurityProperties.MODULE_PARAMETER_VALUES.getValue())) {
