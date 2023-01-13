@@ -594,18 +594,22 @@ public class NalpeironService implements ILicensingService {
     /**
      * Gets all the licensed modules for the license
      * @return {@code String} list with the name of the licensed modules.
-     * @throws DocShifterLicenseException Something went wrong while getting the feature status.
      */
-    public List<String> getLicensedModules(List<Module> modules) throws DocShifterLicenseException {
+    public List<String> getLicensedModules(List<Module> modules) {
 
         List<String> modulesLicensed = new ArrayList<>();
 
         for (Module module : modules) {
 
             if (StringUtils.isNotBlank(module.getCode())) {
-                NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(module.getCode());
-                if (featureStatus.isValid()) {
-                    modulesLicensed.add(module.getName());
+                try {
+                    NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(module.getCode());
+                    if (featureStatus.isValid()) {
+                        modulesLicensed.add(module.getName());
+                    }
+                } catch (DocShifterLicenseException docShifterLicenseException) {
+                    log.debug("Module [{}] is not licensed.",
+                            module.getName(), docShifterLicenseException);
                 }
             }
         }
