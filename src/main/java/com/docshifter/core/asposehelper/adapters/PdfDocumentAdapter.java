@@ -21,8 +21,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Log4j2
-public class PdfDocumentAdapter implements UnifiedDocument {
-	private final Document adaptee;
+public class PdfDocumentAdapter extends AbstractAdapter<Document> implements UnifiedDocument {
 	private final Double headerMargin;
 	private final Double footerMargin;
 
@@ -31,7 +30,7 @@ public class PdfDocumentAdapter implements UnifiedDocument {
 	}
 
 	public PdfDocumentAdapter(String path, double headerMargin, double footerMargin) {
-		adaptee = new Document(path);
+		super(new Document(path));
 		this.headerMargin = headerMargin;
 		this.footerMargin = footerMargin;
 	}
@@ -47,11 +46,9 @@ public class PdfDocumentAdapter implements UnifiedDocument {
 		adaptee.close();
 	}
 
-	public class PageAdapter implements UnifiedPage {
-		private final Page adaptee;
-
+	public class PageAdapter extends AbstractAdapter<Page> implements UnifiedPage {
 		public PageAdapter(Page page) {
-			adaptee = page;
+			super(page);
 		}
 
 		@Override
@@ -80,6 +77,7 @@ public class PdfDocumentAdapter implements UnifiedDocument {
 				throw new UnsupportedOperationException("Header auto-detect functionality is not supported (yet) for " +
 						"PDFs.");
 			}
+			// TODO: test landscape
 			return adaptee.getMediaBox().getHeight() - headerMargin;
 		}
 
@@ -93,7 +91,7 @@ public class PdfDocumentAdapter implements UnifiedDocument {
 		}
 
 		@Override
-		public Stream<RichTextParagraph> getMainText() {
+		public Stream<RichTextParagraph> getBodyText() {
 			ParagraphAbsorber absorber = new ParagraphAbsorber();
 			absorber.visit(adaptee);
 			return absorber.getPageMarkups().stream()
@@ -145,12 +143,9 @@ public class PdfDocumentAdapter implements UnifiedDocument {
 		}
 	}
 
-	public static class RichTextParagraphAdapter extends AbstractRichTextParagraph {
-
-		private final MarkupSection adaptee;
-
+	public static class RichTextParagraphAdapter extends AbstractRichTextParagraphAdapter<MarkupSection> {
 		public RichTextParagraphAdapter(MarkupSection section) {
-			adaptee = section;
+			super(section);
 		}
 
 		@Override
@@ -178,12 +173,9 @@ public class PdfDocumentAdapter implements UnifiedDocument {
 		}
 	}
 
-	public static class SegmentAdapter extends AbstractSegment {
-
-		private final TextSegment adaptee;
-
+	public static class SegmentAdapter extends AbstractSegmentAdapter<TextSegment> {
 		public SegmentAdapter(TextSegment segment) {
-			adaptee = segment;
+			super(segment);
 		}
 
 		@Override
