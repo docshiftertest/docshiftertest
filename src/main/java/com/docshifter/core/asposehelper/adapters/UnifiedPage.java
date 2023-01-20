@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 public interface UnifiedPage {
 	Stream<RichTextParagraph> getHeaderText();
 	Stream<RichTextParagraph> getFooterText();
-	Stream<RichTextParagraph> getMainText();
+	Stream<RichTextParagraph> getBodyText();
 	Stream<InputStream> getImages();
 	Color getBackgroundColor();
 	int getNumber();
