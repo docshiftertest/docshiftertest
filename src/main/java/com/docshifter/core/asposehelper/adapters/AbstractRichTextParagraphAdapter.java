@@ -8,6 +8,11 @@ public abstract class AbstractRichTextParagraphAdapter<T> extends AbstractAdapte
 	}
 
 	@Override
+	public Type getType() {
+		return Type.TEXT_PARAGRAPH;
+	}
+
+	@Override
 	public String toString() {
 		return getSegments()
 				.map(Segment::getContent)

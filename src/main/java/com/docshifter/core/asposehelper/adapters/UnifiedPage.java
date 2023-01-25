@@ -8,8 +8,9 @@ public interface UnifiedPage {
 	Stream<RichTextParagraph> getHeaderText();
 	Stream<RichTextParagraph> getFooterText();
 	Stream<RichTextParagraph> getBodyText();
-	Stream<InputStream> getImages();
+	Stream<Image> getImages();
+	Stream<Bookmark> getBookmarks();
 	Color getBackgroundColor();
 	int getNumber();
-	//String getBookmarks();
+	void markForDeletion();
 }
