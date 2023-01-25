@@ -1,5 +1,7 @@
 package com.docshifter.core.asposehelper.adapters;
 
+import com.aspose.words.BookmarkEnd;
+import com.aspose.words.BookmarkStart;
 import com.aspose.words.CompositeNode;
 import com.aspose.words.Document;
 import com.aspose.words.HeaderFooter;
@@ -15,34 +17,46 @@ import com.aspose.words.Section;
 import com.aspose.words.Shape;
 import com.aspose.words.ShapeType;
 import com.aspose.words.Underline;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
+import lombok.extern.log4j.Log4j2;
 
 import java.awt.*;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+@Log4j2
 public class WordDocumentAdapter implements UnifiedDocument {
 
 	private final Document adaptee;
 	private final LayoutCollector layoutCollector;
+	private final Set<Node> nodesToDelete = new HashSet<>();
 	private boolean dirty = true;
 
-	public WordDocumentAdapter(Path path) throws Exception {
+	public WordDocumentAdapter(Path path) {
 		this(path.toString());
 	}
 
-	public WordDocumentAdapter(String path) throws Exception {
-		adaptee = new Document(path);
+	public WordDocumentAdapter(String path) {
+		try {
+			adaptee = new Document(path);
+		} catch (Exception ex) {
+			throw new WordProcessingException("Unable to load document at " + path, ex);
+		}
 		layoutCollector = new LayoutCollector(adaptee);
 	}
 
@@ -62,9 +76,18 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		return StreamSupport.stream(Spliterators.spliterator(new PageAdapterIterator(flattenedBodyNodes), pageCount, 0), false);
 	}
 
-	private void updatePageLayout() {
+	@Override
+	public void commitDeletes() {
+		dirty = true;
+		for (Iterator<Node> it = nodesToDelete.iterator(); it.hasNext();) {
+			it.next().remove();
+			it.remove();
+		}
+	}
+
+	private boolean updatePageLayout() {
 		if (!dirty) {
-			return;
+			return false;
 		}
 		try {
 			adaptee.updatePageLayout();
@@ -72,6 +95,7 @@ public class WordDocumentAdapter implements UnifiedDocument {
 			throw new WordProcessingException("Could not update page layout.", ex);
 		}
 		dirty = false;
+		return true;
 	}
 
 	public boolean isDirty() {
@@ -128,10 +152,12 @@ public class WordDocumentAdapter implements UnifiedDocument {
 					rootNode = currentNode.getParentNode();
 				} while (rootNode.getParentNode().getNodeType() != NodeType.BODY);
 				List<Node> stragglers = new ArrayList<>();
+				Node nextNode = currentNode;
 				do {
 					stragglers.add(currentNode);
 					currentNode = currentNode.getNextSibling();
 				} while (currentNode != null);
+				currentNode = nextNode;
 				preamble = new AbstractMap.SimpleImmutableEntry<>(rootNode, stragglers);
 			}
 
@@ -172,10 +198,9 @@ public class WordDocumentAdapter implements UnifiedDocument {
 			if (currentResult == null) {
 				throw new NoSuchElementException();
 			}
+			currentResult.markForDeletion();
+			commitDeletes();
 			currentResult = null;
-			throw new UnsupportedOperationException("Not implemented yet.");
-			// TODO
-			//currentResult.remove();
 		}
 	}
 
@@ -217,11 +242,7 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		public PageAdapter(PageCollection page, int number) {
 			this.adaptee = page;
 			this.number = number;
-			Node currNode = page.firstNode();
-			do {
-				currNode = currNode.getParentNode();
-			} while (currNode.getNodeType() != NodeType.SECTION);
-			adapteeSection = (Section) currNode;
+			adapteeSection = (Section) page.firstNode().getAncestor(NodeType.SECTION);
 		}
 
 		@Override
@@ -273,7 +294,19 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		}
 
 		private int getPageNumberInSection() {
-			updatePageLayout();
+			if (updatePageLayout()) {
+				log.debug("Page layout required update. Fetching new page number.");
+				int newNumber;
+				try {
+					newNumber = layoutCollector.getStartPageIndex(adaptee.firstNode());
+				} catch (Exception ex) {
+					throw new WordProcessingException("Could not get start index of first node on the page.", ex);
+				}
+				if (newNumber != number) {
+					throw new IllegalStateException("Page information is outdated as modifications have been made to " +
+							"the document. All pages need to be refetched.");
+				}
+			}
 			int startOfSection;
 			try {
 				startOfSection = layoutCollector.getStartPageIndex(adapteeSection);
@@ -302,13 +335,8 @@ public class WordDocumentAdapter implements UnifiedDocument {
 							return Stream.empty();
 						})
 						.map(Run.class::cast)
-						.collect(Collectors.groupingBy(straggler -> {
-							Node current = straggler;
-							do {
-								current = current.getParentNode();
-							} while (straggler.getNodeType() != NodeType.PARAGRAPH);
-							return (Paragraph) current;
-						})).entrySet().stream()
+						.collect(Collectors.groupingBy(straggler -> (Paragraph) straggler.getAncestor(NodeType.PARAGRAPH)))
+						.entrySet().stream()
 						.map(entry -> new RichTextParagraphAdapter(entry.getKey(), entry.getValue().stream()));
 			}
 
@@ -343,13 +371,8 @@ public class WordDocumentAdapter implements UnifiedDocument {
 							return Stream.empty();
 						})
 						.map(Run.class::cast)
-						.collect(Collectors.groupingBy(straggler -> {
-							Node current = straggler;
-							do {
-								current = current.getParentNode();
-							} while (straggler.getNodeType() != NodeType.PARAGRAPH);
-							return (Paragraph) current;
-						})).entrySet().stream()
+						.collect(Collectors.groupingBy(straggler -> (Paragraph) straggler.getAncestor(NodeType.PARAGRAPH)))
+						.entrySet().stream()
 						.map(entry -> new RichTextParagraphAdapter(entry.getKey(), entry.getValue().stream()));
 			}
 
@@ -358,7 +381,7 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		}
 
 		@Override
-		public Stream<InputStream> getImages() {
+		public Stream<Image> getImages() {
 			return adaptee.combinedNodes()
 					.filter(n -> n.getNodeType() == NodeType.SHAPE)
 					.map(Shape.class::cast)
@@ -369,13 +392,15 @@ public class WordDocumentAdapter implements UnifiedDocument {
 							throw new WordProcessingException("Cannot check if shape has an image.", ex);
 						}
 					})
-					.map(s -> {
-						try {
-							return s.getImageData().toStream();
-						} catch (Exception ex) {
-							throw new WordProcessingException("Cannot convert image data to stream.", ex);
-						}
-					});
+					.map(ImageAdapter::new);
+		}
+
+		@Override
+		public Stream<Bookmark> getBookmarks() {
+			return adaptee.combinedNodes()
+					.filter(n -> n.getNodeType() == NodeType.BOOKMARK_START)
+					.map(BookmarkStart.class::cast)
+					.map(BookmarkAdapter::new);
 		}
 
 		@Override
@@ -397,10 +422,133 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		public int getNumber() {
 			return number;
 		}
+
+		@Override
+		public void markForDeletion() {
+			nodesToDelete.addAll(adaptee.preamble.getValue());
+			nodesToDelete.addAll(adaptee.body);
+			nodesToDelete.addAll(adaptee.appendix.getValue());
+		}
+	}
+
+	public class ImageAdapter extends AbstractAdapter<Shape> implements Image {
+		public ImageAdapter(Shape adaptee) {
+			super(adaptee);
+		}
+
+		@Override
+		public InputStream getInputStream() {
+			try {
+				return adaptee.getImageData().toStream();
+			} catch (Exception ex) {
+				throw new WordProcessingException("Cannot convert image data to stream.", ex);
+			}
+		}
+
+		@Override
+		public void markForDeletion() {
+			nodesToDelete.add(adaptee);
+		}
+
+		@Override
+		public Type getType() {
+			return Type.IMAGE;
+		}
+	}
+
+	public class BookmarkAdapter implements Bookmark {
+		private final BookmarkStart startAdaptee;
+		private final BookmarkEnd endAdaptee;
+		private final Paragraph startParentParagraph;
+		private final Paragraph endParentParagraph;
+		private final Set<Paragraph> embeddedParagraphs;
+
+		public BookmarkAdapter(BookmarkStart start) {
+			this.startAdaptee = start;
+			int openBookmarks = 1;
+			Node currNode = start;
+			Set<Paragraph> embeddedParagraphs = new HashSet<>();
+			do {
+				currNode = currNode.nextPreOrder(adaptee);
+				if (currNode.getNodeType() == NodeType.BOOKMARK_START) {
+					openBookmarks++;
+				} else if (currNode.getNodeType() == NodeType.BOOKMARK_END) {
+					openBookmarks--;
+				} else if (currNode.getNodeType() == NodeType.PARAGRAPH) {
+					embeddedParagraphs.add((Paragraph) currNode);
+				}
+			} while (openBookmarks > 0);
+			this.endAdaptee = (BookmarkEnd) currNode;
+			this.embeddedParagraphs = Collections.unmodifiableSet(embeddedParagraphs);
+			this.startParentParagraph = (Paragraph) start.getAncestor(NodeType.PARAGRAPH);
+			this.endParentParagraph = (Paragraph) endAdaptee.getAncestor(NodeType.PARAGRAPH);
+		}
+
+		@Override
+		public String getTitle() {
+			return startAdaptee.getName();
+		}
+
+		@Override
+		public boolean pointsTo(RichTextParagraph paragraph) {
+			if (paragraph instanceof RichTextParagraphAdapter paraAdapter) {
+				Paragraph destination = paraAdapter.adaptee;
+				return destination == startParentParagraph || destination == endParentParagraph || embeddedParagraphs.contains(destination);
+			}
+			throw new IllegalStateException("Only paragraphs within the same document can be analyzed.");
+		}
+
+		@Override
+		public boolean supportsStyling() {
+			return false;
+		}
+
+		@Override
+		public boolean isBold() {
+			return false;
+		}
+
+		@Override
+		public void setBold(boolean bold) {
+			throw new UnsupportedOperationException("Bookmark styling is not supported for Word documents.");
+		}
+
+		@Override
+		public boolean isItalic() {
+			return false;
+		}
+
+		@Override
+		public void setItalic(boolean italic) {
+			throw new UnsupportedOperationException("Bookmark styling is not supported for Word documents.");
+		}
+
+		@Override
+		public void markForDeletion() {
+			nodesToDelete.add(startAdaptee);
+			nodesToDelete.add(endAdaptee);
+		}
+
+		@Override
+		public Type getType() {
+			return Type.BOOKMARK;
+		}
 	}
 
 	public class RichTextParagraphAdapter extends AbstractRichTextParagraphAdapter<Paragraph> {
 		private final Stream<Run> actualRuns;
+		private final BiMap<Integer, Alignment> alignmentMap = ImmutableBiMap.<Integer, Alignment>builder()
+				.put(ParagraphAlignment.LEFT, Alignment.LEFT)
+				.put(ParagraphAlignment.CENTER, Alignment.CENTER)
+				.put(ParagraphAlignment.RIGHT, Alignment.RIGHT)
+				.put(ParagraphAlignment.JUSTIFY, Alignment.JUSTIFIED)
+				.put(ParagraphAlignment.DISTRIBUTED, Alignment.FULLY_JUSTIFIED)
+				.put(ParagraphAlignment.ARABIC_LOW_KASHIDA, Alignment.ARABIC_LOW_KISHIDA)
+				.put(ParagraphAlignment.ARABIC_MEDIUM_KASHIDA, Alignment.ARABIC_MEDIUM_KISHIDA)
+				.put(ParagraphAlignment.ARABIC_HIGH_KASHIDA, Alignment.ARABIC_HIGH_KISHIDA)
+				.put(ParagraphAlignment.THAI_DISTRIBUTED, Alignment.THAI_DISTRIBUTED)
+				.put(ParagraphAlignment.MATH_ELEMENT_CENTER_AS_GROUP, Alignment.MATH_ELEMENT_CENTER_AS_GROUP)
+				.build();
 
 		public RichTextParagraphAdapter(Paragraph paragraph) {
 			this(paragraph,
@@ -417,30 +565,37 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		@Override
 		public Alignment getHorizontalAlignment() {
 			int alignment = adaptee.getParagraphFormat().getAlignment();
-			return switch (alignment) {
-				case ParagraphAlignment.LEFT -> Alignment.LEFT;
-				case ParagraphAlignment.CENTER -> Alignment.CENTER;
-				case ParagraphAlignment.RIGHT -> Alignment.RIGHT;
-				case ParagraphAlignment.JUSTIFY -> Alignment.JUSTIFIED;
-				// TODO: test distributed
-				case ParagraphAlignment.DISTRIBUTED -> Alignment.FULLY_JUSTIFIED;
-				case ParagraphAlignment.ARABIC_LOW_KASHIDA -> Alignment.ARABIC_LOW_KISHIDA;
-				case ParagraphAlignment.ARABIC_MEDIUM_KASHIDA -> Alignment.ARABIC_MEDIUM_KISHIDA;
-				case ParagraphAlignment.ARABIC_HIGH_KASHIDA -> Alignment.ARABIC_HIGH_KISHIDA;
-				case ParagraphAlignment.THAI_DISTRIBUTED -> Alignment.THAI_DISTRIBUTED;
-				case ParagraphAlignment.MATH_ELEMENT_CENTER_AS_GROUP -> Alignment.MATH_ELEMENT_CENTER_AS_GROUP;
-				default -> throw new IllegalStateException("Unknown alignment flag found: "
+			Alignment mapping = alignmentMap.get(alignment);
+			if (mapping == null) {
+				throw new IllegalStateException("Unknown alignment flag found: "
 						+ ParagraphAlignment.getName(alignment) + " (" + alignment + ")");
-			};
+			}
+			return mapping;
+		}
+
+		@Override
+		public void setHorizontalAlignment(Alignment alignment) {
+			Integer mapping = alignmentMap.inverse().get(alignment);
+			if (mapping == null) {
+				throw new UnsupportedOperationException("Cannot convert alignment flag " + alignment + " to one that " +
+						"is supported in Word documents.");
+			}
+			adaptee.getParagraphFormat().setAlignment(mapping);
+			dirty = true;
 		}
 
 		@Override
 		public Stream<Segment> getSegments() {
 			return actualRuns.map(SegmentAdapter::new);
 		}
+
+		@Override
+		public void markForDeletion() {
+			nodesToDelete.add(adaptee);
+		}
 	}
 
-	public static class SegmentAdapter extends AbstractSegmentAdapter<Run> {
+	public class SegmentAdapter extends AbstractSegmentAdapter<Run> {
 		public SegmentAdapter(Run run) {
 			super(run);
 		}
@@ -451,8 +606,20 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		}
 
 		@Override
+		public void setContent(String content) {
+			adaptee.setText(content);
+			dirty = true;
+		}
+
+		@Override
 		public boolean isBold() {
 			return adaptee.getFont().getBold();
+		}
+
+		@Override
+		public void setBold(boolean bold) {
+			adaptee.getFont().setBold(bold);
+			dirty = true;
 		}
 
 		@Override
@@ -461,8 +628,20 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		}
 
 		@Override
+		public void setItalic(boolean italic) {
+			adaptee.getFont().setItalic(italic);
+			dirty = true;
+		}
+
+		@Override
 		public boolean isUnderline() {
 			return adaptee.getFont().getUnderline() != Underline.NONE;
+		}
+
+		@Override
+		public void setUnderline(boolean underline) {
+			adaptee.getFont().setUnderline(Underline.NONE);
+			dirty = true;
 		}
 
 		@Override
@@ -471,8 +650,24 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		}
 
 		@Override
+		public void setStrikethrough(boolean strikethrough) {
+			adaptee.getFont().setStrikeThrough(strikethrough);
+			dirty = true;
+		}
+
+		@Override
 		public boolean isInvisibleRendering() {
 			return false;
+		}
+
+		@Override
+		public boolean isInvisibleRenderingSupported() {
+			return false;
+		}
+
+		@Override
+		public void setInvisibleRendering(boolean invisibleRendering) {
+			throw new UnsupportedOperationException("Word documents don't support text rendering.");
 		}
 
 		@Override
@@ -481,8 +676,20 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		}
 
 		@Override
+		public void setForegroundColor(Color color) {
+			adaptee.getFont().setColor(color);
+			dirty = true;
+		}
+
+		@Override
 		public Color getBackgroundColor() {
 			return adaptee.getFont().getHighlightColor();
+		}
+
+		@Override
+		public void setBackgroundColor(Color color) {
+			adaptee.getFont().setHighlightColor(color);
+			dirty = true;
 		}
 
 		@Override
@@ -491,13 +698,36 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		}
 
 		@Override
+		public void setUnderlineColor(Color color) {
+			adaptee.getFont().setUnderlineColor(color);
+			dirty = true;
+		}
+
+		@Override
 		public double getFontSize() {
 			return adaptee.getFont().getSize();
 		}
 
 		@Override
+		public void setFontSize(double fontSize) {
+			adaptee.getFont().setSize(fontSize);
+			dirty = true;
+		}
+
+		@Override
 		public String getFontName() {
 			return adaptee.getFont().getName();
+		}
+
+		@Override
+		public void setFontName(String fontName) {
+			adaptee.getFont().setName(fontName);
+			dirty = true;
+		}
+
+		@Override
+		public void markForDeletion() {
+			nodesToDelete.add(adaptee);
 		}
 	}
 }

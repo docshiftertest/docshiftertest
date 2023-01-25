@@ -110,7 +110,7 @@ public final class ConfigUtils {
 				lower = upper;
 				upper = tmpLower;
 			}
-			rangeMarkers.addAll(Arrays.asList(RangeMarker.createRange(negate == inverted, lower, upper)));
+			rangeMarkers.addAll(Arrays.asList(RangeMarker.createRange(!negate, lower, upper)));
 		}
 
 		int realMin = reversed ? max : min;
@@ -218,7 +218,7 @@ public final class ConfigUtils {
 
 		public static RangeMarker[] createRange(boolean isInclusion, int startPosition, int endPosition) {
 			RangeMarker start = new RangeMarker(isInclusion, startPosition, endPosition);
-			return start == start.otherSide ? new RangeMarker[]{start} : new RangeMarker[]{start, start.otherSide};
+			return start.isSingleValueMarker() ? new RangeMarker[]{start} : new RangeMarker[]{start, start.otherSide};
 		}
 
 		public boolean isSingleValueMarker() {
