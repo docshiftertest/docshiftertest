@@ -11,6 +11,7 @@ import com.aspose.pdf.FitHExplicitDestination;
 import com.aspose.pdf.FitRExplicitDestination;
 import com.aspose.pdf.FitVExplicitDestination;
 import com.aspose.pdf.Page;
+import com.aspose.pdf.Point;
 import com.aspose.pdf.XYZExplicitDestination;
 
 import java.util.Objects;
@@ -195,9 +196,14 @@ public class ExplicitDestinationTransformer {
 	}
 
 	public XYZExplicitDestination toCustomZoom(double zoom) {
+		Point topLeft = getTopLeft();
+		return new XYZExplicitDestination(page, topLeft.getX(), topLeft.getY(), zoom);
+	}
+
+	public Point getTopLeft() {
 		double left = this.left == null ? 0 : this.left;
 		double top = this.top == null ? page.getRect().getURY() : this.top;
-		return new XYZExplicitDestination(page, left, top, zoom);
+		return new Point(left, top);
 	}
 
 	public XYZExplicitDestination toActualSize() {

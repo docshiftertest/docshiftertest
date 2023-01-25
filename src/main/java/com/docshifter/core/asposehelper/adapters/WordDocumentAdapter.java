@@ -575,6 +575,9 @@ public class WordDocumentAdapter implements UnifiedDocument {
 
 		@Override
 		public void setHorizontalAlignment(Alignment alignment) {
+			if (alignment == Alignment.NONE) {
+				alignment = Alignment.LEFT;
+			}
 			Integer mapping = alignmentMap.inverse().get(alignment);
 			if (mapping == null) {
 				throw new UnsupportedOperationException("Cannot convert alignment flag " + alignment + " to one that " +
