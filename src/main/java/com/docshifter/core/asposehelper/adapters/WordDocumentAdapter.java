@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterators;
 import java.util.function.Function;
@@ -40,32 +41,25 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Log4j2
-public class WordDocumentAdapter implements UnifiedDocument {
-
-	private final Document adaptee;
-	private final LayoutCollector layoutCollector;
+public class WordDocumentAdapter extends AbstractAdapter<Document> implements UnifiedDocument {
+	private LayoutCollector layoutCollector;
 	private final Set<Node> nodesToDelete = new HashSet<>();
 	private boolean dirty = true;
 
-	public WordDocumentAdapter(Path path) {
+	public WordDocumentAdapter(Path path) throws Exception {
 		this(path.toString());
 	}
 
-	public WordDocumentAdapter(String path) {
-		try {
-			adaptee = new Document(path);
-		} catch (Exception ex) {
-			throw new WordProcessingException("Unable to load document at " + path, ex);
-		}
-		layoutCollector = new LayoutCollector(adaptee);
+	public WordDocumentAdapter(String path) throws Exception {
+		super(new Document(path));
 	}
 
 	@Override
 	public Stream<UnifiedPage> getPages() {
+		updatePageLayout();
 		int pageCount;
 		try {
 			pageCount = adaptee.getPageCount();
-			dirty = false;
 		} catch (Exception ex) {
 			throw new WordProcessingException("Unable to calculate page count.", ex);
 		}
@@ -85,10 +79,22 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		}
 	}
 
+	@Override
+	public void save(String path) {
+		try {
+			adaptee.save(path);
+		} catch (Exception ex) {
+			throw new WordProcessingException("Unable to save Word document", ex);
+		}
+	}
+
 	private boolean updatePageLayout() {
 		if (!dirty) {
 			return false;
 		}
+		// Need to initialize a new collector each time because simply calling updatePageLayout() might retain the
+		// old page numbers after deleting a page.
+		layoutCollector = new LayoutCollector(adaptee);
 		try {
 			adaptee.updatePageLayout();
 		} catch (Exception ex) {
@@ -104,7 +110,9 @@ public class WordDocumentAdapter implements UnifiedDocument {
 
 	@Override
 	public void close() {
-		layoutCollector.setDocument(null);
+		if (layoutCollector != null) {
+			layoutCollector.setDocument(null);
+		}
 	}
 
 	public class PageAdapterIterator implements Iterator<PageAdapter> {
@@ -234,19 +242,18 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		}
 	}
 
-	public class PageAdapter implements UnifiedPage {
-		private final PageCollection adaptee;
+	public class PageAdapter extends AbstractAdapter<PageCollection> implements UnifiedPage, UnifiedPage.PageSection {
 		private final int number;
 		private final Section adapteeSection;
 
 		public PageAdapter(PageCollection page, int number) {
-			this.adaptee = page;
+			super(page);
 			this.number = number;
 			adapteeSection = (Section) page.firstNode().getAncestor(NodeType.SECTION);
 		}
 
 		@Override
-		public Stream<RichTextParagraph> getHeaderText() {
+		public Optional<PageSection> getHeader() {
 			int numberInSection = getPageNumberInSection();
 			int headerFooterType;
 			if (numberInSection == 1) {
@@ -261,16 +268,13 @@ public class WordDocumentAdapter implements UnifiedDocument {
 				headerFooter = adapteeSection.getHeadersFooters().getByHeaderFooterType(HeaderFooterType.HEADER_PRIMARY);
 			}
 			if (headerFooter == null) {
-				return Stream.empty();
+				return Optional.empty();
 			}
-			return StreamSupport.stream(
-							((NodeCollection<? extends Node>)headerFooter.getChildNodes(NodeType.PARAGRAPH, true)).spliterator(), false)
-					.map(Paragraph.class::cast)
-					.map(RichTextParagraphAdapter::new);
+			return Optional.of(new HeaderFooterPageSectionAdapter(headerFooter));
 		}
 
 		@Override
-		public Stream<RichTextParagraph> getFooterText() {
+		public Optional<PageSection> getFooter() {
 			int numberInSection = getPageNumberInSection();
 			int headerFooterType;
 			if (numberInSection == 1) {
@@ -285,12 +289,9 @@ public class WordDocumentAdapter implements UnifiedDocument {
 				headerFooter = adapteeSection.getHeadersFooters().getByHeaderFooterType(HeaderFooterType.FOOTER_PRIMARY);
 			}
 			if (headerFooter == null) {
-				return Stream.empty();
+				return Optional.empty();
 			}
-			return StreamSupport.stream(
-					((NodeCollection<? extends Node>)headerFooter.getChildNodes(NodeType.PARAGRAPH, true)).spliterator(), false)
-					.map(Paragraph.class::cast)
-					.map(RichTextParagraphAdapter::new);
+			return Optional.of(new HeaderFooterPageSectionAdapter(headerFooter));
 		}
 
 		private int getPageNumberInSection() {
@@ -317,7 +318,12 @@ public class WordDocumentAdapter implements UnifiedDocument {
 		}
 
 		@Override
-		public Stream<RichTextParagraph> getBodyText() {
+		public PageSection getBody() {
+			return this;
+		}
+
+		@Override
+		public Stream<RichTextParagraph> getTextParagraphs() {
 			// TODO: test paragraphs nested in paragraphs
 			Stream<RichTextParagraph> preamble = Stream.empty();
 			if (adaptee.preamble != null) {
@@ -425,9 +431,56 @@ public class WordDocumentAdapter implements UnifiedDocument {
 
 		@Override
 		public void markForDeletion() {
-			nodesToDelete.addAll(adaptee.preamble.getValue());
+			if (adaptee.preamble != null) {
+				nodesToDelete.addAll(adaptee.preamble.getValue());
+			}
 			nodesToDelete.addAll(adaptee.body);
-			nodesToDelete.addAll(adaptee.appendix.getValue());
+			if (adaptee.appendix != null) {
+				nodesToDelete.addAll(adaptee.appendix.getValue());
+			}
+		}
+	}
+
+	public class HeaderFooterPageSectionAdapter extends AbstractAdapter<HeaderFooter> implements UnifiedPage.PageSection {
+		public HeaderFooterPageSectionAdapter(HeaderFooter adaptee) {
+			super(adaptee);
+		}
+
+		@Override
+		public Stream<RichTextParagraph> getTextParagraphs() {
+			return StreamSupport.stream(
+							((NodeCollection<? extends Node>)adaptee.getChildNodes(NodeType.PARAGRAPH, true)).spliterator(), false)
+					.map(Paragraph.class::cast)
+					.map(RichTextParagraphAdapter::new);
+		}
+
+		@Override
+		public Stream<Image> getImages() {
+			return StreamSupport.stream(
+							((NodeCollection<? extends Node>)adaptee.getChildNodes(NodeType.SHAPE, true)).spliterator(), false)
+					.map(Shape.class::cast)
+					.filter(s -> {
+						try {
+							return s.getShapeType() == ShapeType.IMAGE && s.hasImage();
+						} catch (Exception ex) {
+							throw new WordProcessingException("Cannot check if shape has an image.", ex);
+						}
+					})
+					.map(ImageAdapter::new);
+		}
+
+		@Override
+		public Stream<Bookmark> getBookmarks() {
+			return StreamSupport.stream(
+							((NodeCollection<? extends Node>)adaptee.getChildNodes(NodeType.BOOKMARK_START, true)).spliterator(), false)
+					.filter(n -> n.getNodeType() == NodeType.BOOKMARK_START)
+					.map(BookmarkStart.class::cast)
+					.map(BookmarkAdapter::new);
+		}
+
+		@Override
+		public void markForDeletion() {
+			nodesToDelete.add(adaptee);
 		}
 	}
 

@@ -1,10 +1,11 @@
 package com.docshifter.core.asposehelper.adapters;
 
 import com.aspose.pdf.Document;
-import com.aspose.pdf.ExplicitDestination;
 import com.aspose.pdf.FontRepository;
 import com.aspose.pdf.FontStyles;
 import com.aspose.pdf.HorizontalAlignment;
+import com.aspose.pdf.ImagePlacement;
+import com.aspose.pdf.ImagePlacementAbsorber;
 import com.aspose.pdf.MarkupSection;
 import com.aspose.pdf.OutlineItemCollection;
 import com.aspose.pdf.Page;
@@ -22,16 +23,21 @@ import com.google.common.collect.ImmutableBiMap;
 import lombok.extern.log4j.Log4j2;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.nio.file.Path;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.function.DoublePredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -40,7 +46,7 @@ import java.util.stream.StreamSupport;
 public class PdfDocumentAdapter extends AbstractAdapter<Document> implements UnifiedDocument {
 	private final Double headerMargin;
 	private final Double footerMargin;
-	private Map<Integer, Map<OutlineItemCollection, ExplicitDestination>> bookmarkCache = null;
+	private Map<Integer, Map<OutlineItemCollection, Point>> bookmarkCache = null;
 	private final Set<Page> pagesToDelete = new HashSet<>();
 	private final Set<MarkupSection> markupsToClear = new HashSet<>();
 	private final Set<XImage> imagesToDelete = new HashSet<>();
@@ -63,16 +69,16 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 				.map(PageAdapter::new);
 	}
 
-	private Map<Integer, Map<OutlineItemCollection, ExplicitDestination>> getBookmarkCache() {
+	private Map<Integer, Map<OutlineItemCollection, Point>> getBookmarkCache() {
 		if (bookmarkCache == null) {
 			bookmarkCache =
 					StreamSupport.stream(
 							Spliterators.spliteratorUnknownSize(
 									new FlatOutlineIterator(adaptee.getOutlines()),
 									Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.SORTED), false)
-							.map(oic -> new AbstractMap.SimpleImmutableEntry<>(oic, OutlineUtils.extractExplicitDestinationSoft(adaptee, oic)))
+							.map(oic -> new AbstractMap.SimpleImmutableEntry<>(oic,OutlineUtils.extractExplicitDestinationSoft(adaptee, oic)))
 							.collect(Collectors.groupingBy(entry -> entry.getValue().getPageNumber(),
-									Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+									Collectors.toMap(Map.Entry::getKey, entry -> ExplicitDestinationTransformer.create(entry.getValue()).getTopLeft())));
 		}
 		return bookmarkCache;
 	}
@@ -80,7 +86,7 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 	@Override
 	public void commitDeletes() {
 		for (Iterator<Page> it = pagesToDelete.iterator(); it.hasNext();) {
-			adaptee.getPages().remove(it.next());
+			adaptee.getPages().delete(it.next().getNumber());
 			it.remove();
 		}
 		for (Iterator<MarkupSection> it = markupsToClear.iterator(); it.hasNext();) {
@@ -109,6 +115,11 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 	}
 
 	@Override
+	public void save(String path) {
+		adaptee.save(path);
+	}
+
+	@Override
 	public void close() {
 		adaptee.close();
 	}
@@ -119,23 +130,20 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 		}
 
 		@Override
-		public Stream<RichTextParagraph> getHeaderText() {
-			ParagraphAbsorber absorber = new ParagraphAbsorber();
-			absorber.visit(adaptee);
-			return absorber.getPageMarkups().stream()
-					.flatMap(markup -> markup.getSections().stream())
-					.filter(section -> section.getRectangle().getLLY() > calculateHeaderBoundary())
-					.map(RichTextParagraphAdapter::new);
+		public Optional<PageSection> getHeader() {
+			if (headerMargin == 0) {
+				return Optional.empty();
+			}
+			return Optional.of(new PageSectionAdapter(adaptee, adaptee.getMediaBox().getHeight(),
+					calculateHeaderBoundary(), false));
 		}
 
 		@Override
-		public Stream<RichTextParagraph> getFooterText() {
-			ParagraphAbsorber absorber = new ParagraphAbsorber();
-			absorber.visit(adaptee);
-			return absorber.getPageMarkups().stream()
-					.flatMap(markup -> markup.getSections().stream())
-					.filter(section -> section.getRectangle().getURY() < calculateFooterBoundary())
-					.map(RichTextParagraphAdapter::new);
+		public Optional<PageSection> getFooter() {
+			if (footerMargin == 0) {
+				return Optional.empty();
+			}
+			return Optional.of(new PageSectionAdapter(adaptee, calculateFooterBoundary(), 0, false));
 		}
 
 		private double calculateHeaderBoundary() {
@@ -158,26 +166,8 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 		}
 
 		@Override
-		public Stream<RichTextParagraph> getBodyText() {
-			ParagraphAbsorber absorber = new ParagraphAbsorber();
-			absorber.visit(adaptee);
-			return absorber.getPageMarkups().stream()
-					.flatMap(markup -> markup.getSections().stream())
-					.filter(section -> section.getRectangle().getLLY() >= calculateFooterBoundary()
-							&& section.getRectangle().getURY() <= calculateHeaderBoundary())
-					.map(RichTextParagraphAdapter::new);
-		}
-
-		@Override
-		public Stream<Image> getImages() {
-			return StreamSupport.stream(adaptee.getResources().getImages().spliterator(), false)
-					.map(ImageAdapter::new);
-		}
-
-		@Override
-		public Stream<Bookmark> getBookmarks() {
-			return getBookmarkCache().get(getNumber()).entrySet().stream()
-					.map(entry -> new BookmarkAdapter(entry.getKey(), entry.getValue()));
+		public PageSection getBody() {
+			return new PageSectionAdapter(adaptee, calculateHeaderBoundary(), calculateFooterBoundary(), true);
 		}
 
 		@Override
@@ -197,19 +187,91 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 		}
 	}
 
-	public class ImageAdapter extends AbstractAdapter<XImage> implements Image {
-		public ImageAdapter(XImage adaptee) {
+	public class PageSectionAdapter extends AbstractAdapter<Page> implements UnifiedPage.PageSection {
+		private final DoublePredicate boundsPredicate;
+
+		public PageSectionAdapter(Page adaptee, double upperThreshold, double lowerThreshold, boolean inclusiveBounds) {
+			super(adaptee);
+			if (inclusiveBounds) {
+				boundsPredicate = upperY -> upperY >= lowerThreshold && upperY <= upperThreshold;
+			} else {
+				boundsPredicate = upperY -> upperY > lowerThreshold && upperY < upperThreshold;
+			}
+		}
+
+		@Override
+		public Stream<RichTextParagraph> getTextParagraphs() {
+			ParagraphAbsorber absorber = new ParagraphAbsorber();
+			absorber.visit(adaptee);
+			return absorber.getPageMarkups().stream()
+					.flatMap(markup -> markup.getSections().stream())
+					.filter(section -> boundsPredicate.test(section.getRectangle().getURY()))
+					.map(RichTextParagraphAdapter::new);
+		}
+
+		@Override
+		public Stream<Image> getImages() {
+			ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
+			absorber.visit(adaptee);
+			return StreamSupport.stream(absorber.getImagePlacements().spliterator(), false)
+					.filter(placement -> boundsPredicate.test(placement.getRectangle().getURY()))
+					.map(ImageAdapter::new);
+		}
+
+		@Override
+		public Stream<Bookmark> getBookmarks() {
+			return getBookmarkCache().get(adaptee.getNumber()).entrySet().stream()
+					.filter(entry -> boundsPredicate.test(entry.getValue().getY()))
+					.map(entry -> new BookmarkAdapter(entry.getKey(), entry.getValue()));
+		}
+
+		@Override
+		public void markForDeletion() {
+			getTextParagraphs().forEach(RichTextParagraph::markForDeletion);
+			getImages().forEach(Image::markForDeletion);
+			getBookmarks().forEach(Bookmark::markForDeletion);
+		}
+	}
+
+	public class ImageAdapter extends AbstractAdapter<ImagePlacement> implements Image {
+		public ImageAdapter(ImagePlacement adaptee) {
 			super(adaptee);
 		}
 
 		@Override
 		public InputStream getInputStream() {
-			return adaptee.toStream();
+			// Doesn't work! (InputStream does not appear to be in a valid format)
+			// return adaptee.getImage().toStream();
+			return imageToInputStream(adaptee.getImage());
+		}
+
+		private InputStream imageToInputStream(XImage img) {
+			PipedInputStream pis = new PipedInputStream();
+			try {
+				PipedOutputStream pos = new PipedOutputStream(pis);
+				new Thread(() -> {
+					try {
+						img.save(pos);
+					} catch (Exception ex) {
+						log.error("Unable to save image to piped output stream.", ex);
+					} finally {
+						try {
+							pos.close();
+						} catch (Exception ex) {
+							log.error("Ran into an exception while trying to close piped stream during saving of "
+									+ "image", ex);
+						}
+					}
+				}).start();
+				return pis;
+			} catch (IOException ioe) {
+				throw new PdfProcessingException("Could not create a piped output stream.", ioe);
+			}
 		}
 
 		@Override
 		public void markForDeletion() {
-			imagesToDelete.add(adaptee);
+			imagesToDelete.add(adaptee.getImage());
 		}
 
 		@Override
@@ -221,9 +283,9 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 	public class BookmarkAdapter extends AbstractAdapter<OutlineItemCollection> implements Bookmark {
 		private final Point topLeftDest;
 
-		public BookmarkAdapter(OutlineItemCollection oic, ExplicitDestination dest) {
+		public BookmarkAdapter(OutlineItemCollection oic, Point topLeftDest) {
 			super(oic);
-			this.topLeftDest = ExplicitDestinationTransformer.create(dest).getTopLeft();
+			this.topLeftDest = topLeftDest;
 		}
 
 		@Override
