@@ -499,6 +499,16 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 		}
 
 		@Override
+		public double getWidth() {
+			return adaptee.getWidth();
+		}
+
+		@Override
+		public double getHeight() {
+			return adaptee.getHeight();
+		}
+
+		@Override
 		public void markForDeletion() {
 			nodesToDelete.add(adaptee);
 		}
