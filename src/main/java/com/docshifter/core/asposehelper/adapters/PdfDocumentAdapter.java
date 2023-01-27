@@ -245,6 +245,16 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 			return imageToInputStream(adaptee.getImage());
 		}
 
+		@Override
+		public double getWidth() {
+			return adaptee.getRectangle().getWidth();
+		}
+
+		@Override
+		public double getHeight() {
+			return adaptee.getRectangle().getHeight();
+		}
+
 		private InputStream imageToInputStream(XImage img) {
 			PipedInputStream pis = new PipedInputStream();
 			try {

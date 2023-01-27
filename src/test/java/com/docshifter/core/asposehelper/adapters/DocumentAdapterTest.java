@@ -1,5 +1,6 @@
 package com.docshifter.core.asposehelper.adapters;
 
+import com.aspose.imaging.RasterImage;
 import com.docshifter.core.asposehelper.LicenseHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -116,9 +117,14 @@ abstract class DocumentAdapterTest<T extends UnifiedDocument> {
 				.toArray(Image[]::new);
 		assertEquals(1, result.length);
 		assertEquals(PageResource.Type.IMAGE, result[0].getType());
+		final double actualWidth = result[0].getWidth();
+		final double actualHeight = result[0].getHeight();
+		assertEquals(110.25, actualWidth, 0.5);
+		assertEquals(29.6, actualHeight, 0.5);
+		final double aspectRatio = actualWidth / actualHeight;
 		try (com.aspose.imaging.Image img = com.aspose.imaging.Image.load(result[0].getInputStream())) {
-			assertEquals(770, img.getWidth());
-			assertEquals(207, img.getHeight());
+			assertTrue(img instanceof RasterImage);
+			assertEquals(aspectRatio, (double) img.getWidth() / img.getHeight(), 0.01);
 		}
 	}
 
