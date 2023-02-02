@@ -35,7 +35,7 @@
         <aspose.note.classifier>jdk17</aspose.note.classifier>
         -->
         <!--		<aspose.ocr.version>21.5</aspose.ocr.version>-->
-        <aspose.pdf.version>22.11</aspose.pdf.version>
+        <aspose.pdf.version>23.1</aspose.pdf.version>
         <aspose.pdf.classifier>jdk17</aspose.pdf.classifier>
         <!-- Be careful when bumping slides to a higher version! There seems to be a licensing-related issue in
          combination with Java 17, potentially due to the Xerces dependency:
