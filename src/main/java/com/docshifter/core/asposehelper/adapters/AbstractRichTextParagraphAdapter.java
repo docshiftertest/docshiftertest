@@ -2,9 +2,9 @@ package com.docshifter.core.asposehelper.adapters;
 
 import java.util.stream.Collectors;
 
-public abstract class AbstractRichTextParagraphAdapter<T> extends AbstractAdapter<T> implements RichTextParagraph {
-	protected AbstractRichTextParagraphAdapter(T adaptee) {
-		super(adaptee);
+public abstract class AbstractRichTextParagraphAdapter<T> extends AbstractAdapterChild<T, UnifiedPage.PageSection> implements RichTextParagraph {
+	protected AbstractRichTextParagraphAdapter(T adaptee, UnifiedPage.PageSection parent) {
+		super(adaptee, parent);
 	}
 
 	@Override

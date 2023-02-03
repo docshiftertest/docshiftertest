@@ -1,5 +1,7 @@
 package com.docshifter.core.asposehelper.adapters;
 
+import com.docshifter.core.exceptions.InputCorruptException;
+import com.docshifter.core.exceptions.UnsupportedInputFormatException;
 import com.docshifter.core.utils.FileUtils;
 import lombok.AllArgsConstructor;
 
@@ -12,16 +14,16 @@ public class UnifiedDocumentFactory {
 
 	public UnifiedDocument getDocument(Path path) {
 		String extension = FileUtils.getExtension(path);
-		return switch (extension.toLowerCase()) {
-			case "doc", "docm", "docx", "dot", "dotm", "dotx", "odt" -> {
-				try {
-					yield new WordDocumentAdapter(path);
-				} catch (Exception ex) {
-					throw new WordProcessingException("Could not load Word document at path: " + path, ex);
-				}
-			}
-			case "pdf" -> new PdfDocumentAdapter(path, headerMargin, footerMargin);
-			default -> throw new UnsupportedOperationException("Unsupported document format: " + extension);
-		};
+		try {
+			return switch (extension.toLowerCase()) {
+				case "doc", "docm", "docx", "dot", "dotm", "dotx", "odt" -> new WordDocumentAdapter(path);
+				case "pdf" -> new PdfDocumentAdapter(path, headerMargin, footerMargin);
+				default -> throw new UnsupportedInputFormatException("Unsupported document format: " + extension);
+			};
+		} catch (UnsupportedInputFormatException ex) {
+			throw ex;
+		} catch (Exception ex) {
+			throw new InputCorruptException("Could not load document at path: " + path, ex);
+		}
 	}
 }

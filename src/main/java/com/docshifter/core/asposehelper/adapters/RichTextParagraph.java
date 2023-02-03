@@ -22,7 +22,7 @@ public interface RichTextParagraph extends PageResource {
 		THAI_DISTRIBUTED
 	}
 
-	interface Segment {
+	interface Segment extends Child<RichTextParagraph> {
 		String getContent();
 		void setContent(String content);
 		boolean isBold();
@@ -46,6 +46,7 @@ public interface RichTextParagraph extends PageResource {
 		void setFontSize(double fontSize);
 		String getFontName();
 		void setFontName(String fontName);
+		Segment splitAt(int index);
 		void markForDeletion();
 	}
 }

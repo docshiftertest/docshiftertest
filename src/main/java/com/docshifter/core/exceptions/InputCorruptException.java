@@ -1,9 +1,10 @@
 package com.docshifter.core.exceptions;
 
 /**
- * {@link Exception} that can be thrown (mainly from within modules) to signify that an input was corrupt.
+ * More specialized {@link IllegalArgumentException} that can be thrown (mainly from within modules) to signify that
+ * an input was corrupt.
  */
-public class InputCorruptException extends Exception {
+public class InputCorruptException extends IllegalArgumentException {
     public InputCorruptException() {
         super();
     }

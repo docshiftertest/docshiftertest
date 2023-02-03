@@ -9,10 +9,22 @@ import java.util.stream.Stream;
  * divided in pages.
  */
 public interface UnifiedDocument extends Closeable {
+	enum Type {
+		WORD,
+		PDF,
+		OTHER
+	}
+
+	Type getType();
+
 	/**
 	 * Gets all pages in the document.
 	 */
 	Stream<UnifiedPage> getPages();
+
+	default int getPageCount() {
+		return (int) getPages().count();
+	}
 
 	/**
 	 * Commits all previously marked delete operations in the document tree.
