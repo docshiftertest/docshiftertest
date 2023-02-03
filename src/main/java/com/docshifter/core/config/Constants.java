@@ -18,6 +18,9 @@ public final class Constants {
     public static final String RELOAD_QUEUE = "VirtualTopic.docshifterReload";
 	public static final String SYNC_QUEUE = "docshifterSync";
 	public static final String DEFAULT_QUEUE = "docshifter";
+
+	public static final String STOMP_ONGOING_TASK_DESTINATION = "/topic/ongoingTask";
+	public static final String ONGOING_TASK_QUEUE_DESTINATION = "VirtualTopic.ongoingTask";
 	
 	/**
 	 * Used to cache {@link com.docshifter.core.config.services.ConfigurationService#getSenderConfiguration(long)}

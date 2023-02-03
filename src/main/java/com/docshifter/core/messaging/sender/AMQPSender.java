@@ -2,15 +2,18 @@ package com.docshifter.core.messaging.sender;
 
 import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.services.IJmsTemplateFactory;
+import com.docshifter.core.config.services.impl.OngoingTaskService;
 import com.docshifter.core.messaging.message.DocShifterMetricsSenderMessage;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
+import com.docshifter.core.metrics.dtos.OngoingTaskDTO;
 import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.TaskStatus;
 import com.docshifter.core.task.VeevaTask;
+import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.utils.NetworkUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
@@ -18,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 
@@ -36,16 +39,19 @@ public class AMQPSender implements IMessageSender {
 	private final IJmsTemplateFactory jmsTemplateFactory;
 	private final int queueReplyTimeout;
 
+	private final OngoingTaskService ongoingTaskService;
+
 	public AMQPSender(JmsTemplate defaultJmsTemplate, JmsTemplate metricsJmsTemplate,
 					  IJmsTemplateFactory jmsTemplateFactory,
 					  ActiveMQQueue docshifterQueue, ActiveMQQueue docshifterMetricsQueue,
-					  int queueReplyTimeout) {
+					  int queueReplyTimeout, OngoingTaskService ongoingTaskService) {
 		this.defaultJmsTemplate = defaultJmsTemplate;
 		this.metricsJmsTemplate = metricsJmsTemplate;
 		this.jmsTemplateFactory = jmsTemplateFactory;
 		this.docshifterQueue = docshifterQueue;
 		this.docshifterMetricsQueue = docshifterMetricsQueue;
 		this.queueReplyTimeout = queueReplyTimeout;
+		this.ongoingTaskService = ongoingTaskService;
 	}
 
 	private SyncTask sendSyncTask(String queue, ChainConfiguration chainConfiguration, Task task) {
@@ -93,7 +99,7 @@ public class AMQPSender implements IMessageSender {
 					.hostName(NetworkUtils.getLocalHostName())
 					.senderPickedUp(System.currentTimeMillis())
 					.workflowName(chainConfiguration.getName())
-					.documentPathList(Arrays.asList(task.getSourceFilePath()))
+					.documentPathList(Collections.singletonList(task.getSourceFilePath()))
 					.build();
 			log.debug("...about to send it...");
 			sendMetrics(metricsMessage);
@@ -131,6 +137,12 @@ public class AMQPSender implements IMessageSender {
 		log.info("Sending message: {} (priority = {}, timeout = {} ms) for file: {} using workflow {}", message,
 				taskPriority, taskTimeoutInMillis, task.getSourceFilePath(), chainConfiguration.getName());
 
+		var filename = FileUtils.getFilename(task.getSourceFilePath());
+
+		var ongoingTaskDTO = new OngoingTaskDTO(task.getId(), chainConfiguration.getName(), filename, task.getData(),
+				OngoingTaskDTO.Status.WAITING_TO_BE_PROCESSED);
+
+		ongoingTaskService.notifyConsoleOngoingTask(ongoingTaskDTO);
 
 		if (DocshifterMessageType.SYNC.equals(type)) {
 			JmsTemplate jmsTemplate = jmsTemplateFactory.create(taskPriority, taskTimeoutInMillis, taskTimeoutInMillis);
