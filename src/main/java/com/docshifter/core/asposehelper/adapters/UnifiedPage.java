@@ -7,11 +7,19 @@ import java.util.stream.Stream;
 /**
  * A general page inside a {@link UnifiedDocument}. Allows access to all of its {@link PageResource}s.
  */
-public interface UnifiedPage {
+public interface UnifiedPage extends Child<UnifiedDocument> {
 	/**
 	 * Represents a distinct part of the page.
 	 */
 	interface PageSection {
+		enum Type {
+			HEADER,
+			FOOTER,
+			BODY
+		}
+
+		Type getType();
+
 		/**
 		 * Gets all text present inn the page section, grouped by paragraph.
 		 */
@@ -32,6 +40,7 @@ public interface UnifiedPage {
 		 * delete operations.
 		 */
 		void markForDeletion();
+		UnifiedPage getPage();
 	}
 	/**
 	 * Gets the header section of the page (if any).

@@ -29,6 +29,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.nio.file.Path;
 import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,6 +40,7 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.DoublePredicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -48,10 +50,10 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 	private final Double footerMargin;
 	private Map<Integer, Map<OutlineItemCollection, Point>> bookmarkCache = null;
 	private final Set<Page> pagesToDelete = new HashSet<>();
-	private final Set<MarkupSection> markupsToClear = new HashSet<>();
+	private final Set<TextFragment> fragmentsToDelete = new HashSet<>();
 	private final Set<XImage> imagesToDelete = new HashSet<>();
 	private final Set<OutlineItemCollection> bookmarksToDelete = new HashSet<>();
-	private final Map<TextFragment, Set<TextSegment>> segmentsToDelete = new HashMap<>();
+	private final Set<TextSegment> segmentsToDelete = new HashSet<>();
 
 	public PdfDocumentAdapter(Path path, double headerMargin, double footerMargin) {
 		this(path.toString(), headerMargin, footerMargin);
@@ -64,9 +66,19 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 	}
 
 	@Override
+	public Type getType() {
+		return Type.PDF;
+	}
+
+	@Override
 	public Stream<UnifiedPage> getPages() {
 		return StreamSupport.stream(adaptee.getPages().spliterator(), false)
 				.map(PageAdapter::new);
+	}
+
+	@Override
+	public int getPageCount() {
+		return adaptee.getPages().size();
 	}
 
 	private Map<Integer, Map<OutlineItemCollection, Point>> getBookmarkCache() {
@@ -89,16 +101,12 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 			adaptee.getPages().delete(it.next().getNumber());
 			it.remove();
 		}
-		for (Iterator<MarkupSection> it = markupsToClear.iterator(); it.hasNext();) {
-			it.next().getFragments().clear();
+		for (Iterator<TextFragment> it = fragmentsToDelete.iterator(); it.hasNext();) {
+			it.next().setText("");
 			it.remove();
 		}
-		for (Iterator<Map.Entry<TextFragment, Set<TextSegment>>> it = segmentsToDelete.entrySet().iterator(); it.hasNext();) {
-			Map.Entry<TextFragment, Set<TextSegment>> currEntry = it.next();
-			TextFragment tf = currEntry.getKey();
-			for (TextSegment textSegment : currEntry.getValue()) {
-				tf.getSegments().remove(textSegment);
-			}
+		for (Iterator<TextSegment> it = segmentsToDelete.iterator(); it.hasNext();) {
+			it.next().setText("");
 			it.remove();
 		}
 		for (Iterator<XImage> it = imagesToDelete.iterator(); it.hasNext();) {
@@ -124,9 +132,9 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 		adaptee.close();
 	}
 
-	public class PageAdapter extends AbstractAdapter<Page> implements UnifiedPage {
+	public class PageAdapter extends AbstractAdapterChild<Page, PdfDocumentAdapter> implements UnifiedPage {
 		public PageAdapter(Page page) {
-			super(page);
+			super(page, PdfDocumentAdapter.this);
 		}
 
 		@Override
@@ -134,8 +142,8 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 			if (headerMargin == 0) {
 				return Optional.empty();
 			}
-			return Optional.of(new PageSectionAdapter(adaptee, adaptee.getMediaBox().getHeight(),
-					calculateHeaderBoundary(), false));
+			return Optional.of(new PageSectionAdapter(adaptee, this, PageSection.Type.HEADER,
+					adaptee.getMediaBox().getHeight(), calculateHeaderBoundary(), false));
 		}
 
 		@Override
@@ -143,7 +151,8 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 			if (footerMargin == 0) {
 				return Optional.empty();
 			}
-			return Optional.of(new PageSectionAdapter(adaptee, calculateFooterBoundary(), 0, false));
+			return Optional.of(new PageSectionAdapter(adaptee, this, PageSection.Type.FOOTER,
+					calculateFooterBoundary(), 0, false));
 		}
 
 		private double calculateHeaderBoundary() {
@@ -167,7 +176,8 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 
 		@Override
 		public PageSection getBody() {
-			return new PageSectionAdapter(adaptee, calculateHeaderBoundary(), calculateFooterBoundary(), true);
+			return new PageSectionAdapter(adaptee, this, PageSection.Type.BODY, calculateHeaderBoundary(),
+					calculateFooterBoundary(), true);
 		}
 
 		@Override
@@ -187,16 +197,25 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 		}
 	}
 
-	public class PageSectionAdapter extends AbstractAdapter<Page> implements UnifiedPage.PageSection {
+	public class PageSectionAdapter extends AbstractAdapterChild<Page, PageAdapter> implements UnifiedPage.PageSection {
 		private final DoublePredicate boundsPredicate;
+		private final Type type;
 
-		public PageSectionAdapter(Page adaptee, double upperThreshold, double lowerThreshold, boolean inclusiveBounds) {
-			super(adaptee);
+		public PageSectionAdapter(Page adaptee, PageAdapter parent, Type type, double upperThreshold,
+								  double lowerThreshold,
+								  boolean inclusiveBounds) {
+			super(adaptee, parent);
+			this.type = type;
 			if (inclusiveBounds) {
 				boundsPredicate = upperY -> upperY >= lowerThreshold && upperY <= upperThreshold;
 			} else {
 				boundsPredicate = upperY -> upperY > lowerThreshold && upperY < upperThreshold;
 			}
+		}
+
+		@Override
+		public Type getType() {
+			return type;
 		}
 
 		@Override
@@ -206,7 +225,7 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 			return absorber.getPageMarkups().stream()
 					.flatMap(markup -> markup.getSections().stream())
 					.filter(section -> boundsPredicate.test(section.getRectangle().getURY()))
-					.map(RichTextParagraphAdapter::new);
+					.map(section -> new RichTextParagraphAdapter(section, this));
 		}
 
 		@Override
@@ -215,14 +234,14 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 			absorber.visit(adaptee);
 			return StreamSupport.stream(absorber.getImagePlacements().spliterator(), false)
 					.filter(placement -> boundsPredicate.test(placement.getRectangle().getURY()))
-					.map(ImageAdapter::new);
+					.map(placement -> new ImageAdapter(placement, this));
 		}
 
 		@Override
 		public Stream<Bookmark> getBookmarks() {
-			return getBookmarkCache().get(adaptee.getNumber()).entrySet().stream()
+			return getBookmarkCache().getOrDefault(adaptee.getNumber(), new HashMap<>()).entrySet().stream()
 					.filter(entry -> boundsPredicate.test(entry.getValue().getY()))
-					.map(entry -> new BookmarkAdapter(entry.getKey(), entry.getValue()));
+					.map(entry -> new BookmarkAdapter(entry.getKey(), this, entry.getValue()));
 		}
 
 		@Override
@@ -231,11 +250,16 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 			getImages().forEach(Image::markForDeletion);
 			getBookmarks().forEach(Bookmark::markForDeletion);
 		}
+
+		@Override
+		public UnifiedPage getPage() {
+			return parent;
+		}
 	}
 
-	public class ImageAdapter extends AbstractAdapter<ImagePlacement> implements Image {
-		public ImageAdapter(ImagePlacement adaptee) {
-			super(adaptee);
+	public class ImageAdapter extends AbstractAdapterChild<ImagePlacement, PageSectionAdapter> implements Image {
+		public ImageAdapter(ImagePlacement adaptee, PageSectionAdapter parent) {
+			super(adaptee, parent);
 		}
 
 		@Override
@@ -290,11 +314,11 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 		}
 	}
 
-	public class BookmarkAdapter extends AbstractAdapter<OutlineItemCollection> implements Bookmark {
+	public class BookmarkAdapter extends AbstractAdapterChild<OutlineItemCollection, PageSectionAdapter> implements Bookmark {
 		private final Point topLeftDest;
 
-		public BookmarkAdapter(OutlineItemCollection oic, Point topLeftDest) {
-			super(oic);
+		public BookmarkAdapter(OutlineItemCollection oic, PageSectionAdapter parent, Point topLeftDest) {
+			super(oic, parent);
 			this.topLeftDest = topLeftDest;
 		}
 
@@ -357,8 +381,9 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 				.put(HorizontalAlignment.FullJustify, Alignment.FULLY_JUSTIFIED)
 				.put(HorizontalAlignment.None, Alignment.NONE)
 				.build();
-		public RichTextParagraphAdapter(MarkupSection section) {
-			super(section);
+
+		public RichTextParagraphAdapter(MarkupSection section, PageSectionAdapter parent) {
+			super(section, parent);
 		}
 
 		@Override
@@ -391,22 +416,28 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 		@Override
 		public Stream<Segment> getSegments() {
 			return adaptee.getFragments().stream()
-					.flatMap(tf -> StreamSupport.stream(tf.getSegments().spliterator(), false)
-							.map(seg -> new AbstractMap.SimpleImmutableEntry<>(tf, seg)))
-					.map(entry -> new SegmentAdapter(entry.getValue(), entry.getKey()));
+					.flatMap(tf -> {
+						TextSegment[] arr = new TextSegment[tf.getSegments().size()];
+						tf.getSegments().copyTo(arr, 0);
+						return Arrays.stream(arr)
+								.map(seg -> new AbstractMap.SimpleImmutableEntry<>(tf, seg));
+					})
+							//StreamSupport.stream(tf.getSegments().spliterator(), false)
+							//.map(seg -> new AbstractMap.SimpleImmutableEntry<>(tf, seg)))
+					.map(entry -> new SegmentAdapter(entry.getValue(), this, entry.getKey()));
 		}
 
 		@Override
 		public void markForDeletion() {
-			markupsToClear.add(adaptee);
+			fragmentsToDelete.addAll(adaptee.getFragments());
 		}
 	}
 
 	public class SegmentAdapter extends AbstractSegmentAdapter<TextSegment> {
-		private final TextFragment parent;
-		public SegmentAdapter(TextSegment segment, TextFragment parent) {
-			super(segment);
-			this.parent = parent;
+		private final TextFragment actualParent;
+		public SegmentAdapter(TextSegment segment, RichTextParagraphAdapter parent, TextFragment actualParent) {
+			super(segment, parent);
+			this.actualParent = actualParent;
 		}
 
 		@Override
@@ -501,7 +532,8 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 
 		@Override
 		public Color getBackgroundColor() {
-			return adaptee.getTextState().getBackgroundColor().toRgb();
+			com.aspose.pdf.Color color = adaptee.getTextState().getBackgroundColor();
+			return color == null ? null : color.toRgb();
 		}
 
 		@Override
@@ -541,14 +573,31 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 		}
 
 		@Override
+		protected RichTextParagraph.Segment doSplit(String end) {
+			TextFragment clonedTf = (TextFragment) actualParent.cloneWithSegments();
+			int initialSize = actualParent.getSegments().size();
+			int indexOfAdaptee = IntStream.rangeClosed(1, initialSize)
+					.filter(i -> actualParent.getSegments().get_Item(i) == adaptee)
+					.findFirst().orElseThrow();
+			TextSegment cloned = clonedTf.getSegments().get_Item(indexOfAdaptee);
+			cloned.setText(end);
+			actualParent.getSegments().add(cloned);
+			IntStream.generate(() -> indexOfAdaptee + 1)
+					.limit(initialSize - indexOfAdaptee)
+					.forEach(i -> {
+						actualParent.getSegments().delete(i);
+						actualParent.getSegments().add(clonedTf.getSegments().get_Item(i));
+						clonedTf.getSegments().delete(i);
+					});
+			if (segmentsToDelete.contains(adaptee)) {
+				segmentsToDelete.add(cloned);
+			}
+			return new SegmentAdapter(cloned, (RichTextParagraphAdapter) parent, actualParent);
+		}
+
+		@Override
 		public void markForDeletion() {
-			segmentsToDelete.compute(parent, (k, v) -> {
-				if (v == null) {
-					v = new HashSet<>();
-				}
-				v.add(adaptee);
-				return v;
-			});
+			segmentsToDelete.add(adaptee);
 		}
 	}
 }

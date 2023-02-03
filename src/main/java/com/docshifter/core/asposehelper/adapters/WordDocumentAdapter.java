@@ -55,19 +55,27 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 	}
 
 	@Override
+	public Type getType() {
+		return Type.WORD;
+	}
+
+	@Override
 	public Stream<UnifiedPage> getPages() {
-		updatePageLayout();
-		int pageCount;
-		try {
-			pageCount = adaptee.getPageCount();
-		} catch (Exception ex) {
-			throw new WordProcessingException("Unable to calculate page count.", ex);
-		}
 		Iterator<Node> flattenedBodyNodes = StreamSupport.stream(adaptee.getSections().spliterator(), false)
 				.map(Section::getBody)
 				.flatMap(body -> StreamSupport.stream(body.spliterator(), false))
 				.iterator();
-		return StreamSupport.stream(Spliterators.spliterator(new PageAdapterIterator(flattenedBodyNodes), pageCount, 0), false);
+		return StreamSupport.stream(Spliterators.spliterator(new PageAdapterIterator(flattenedBodyNodes), getPageCount(), 0), false);
+	}
+
+	@Override
+	public int getPageCount() {
+		updatePageLayout();
+		try {
+			return adaptee.getPageCount();
+		} catch (Exception ex) {
+			throw new WordProcessingException("Unable to calculate page count.", ex);
+		}
 	}
 
 	@Override
@@ -127,7 +135,7 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 
 		@Override
 		public boolean hasNext() {
-			return it.hasNext();
+			return currentNode != null || it.hasNext();
 		}
 
 		@Override
@@ -180,6 +188,7 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 				}
 				body.add(currentNode);
 				if (!it.hasNext()) {
+					currentNode = null;
 					break;
 				}
 				currentNode = it.next();
@@ -242,12 +251,18 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 		}
 	}
 
-	public class PageAdapter extends AbstractAdapter<PageCollection> implements UnifiedPage, UnifiedPage.PageSection {
+	public class PageAdapter extends AbstractAdapterChild<PageCollection, WordDocumentAdapter> implements UnifiedPage, UnifiedPage.PageSection {
 		private final int number;
 		private final Section adapteeSection;
+		private static final Map<Class<? extends Node>, Integer> NODE_TYPES_MAP = Map.of(
+				Shape.class, NodeType.SHAPE,
+				BookmarkStart.class, NodeType.BOOKMARK_START,
+				Paragraph.class, NodeType.PARAGRAPH,
+				Run.class, NodeType.RUN
+		);
 
 		public PageAdapter(PageCollection page, int number) {
-			super(page);
+			super(page, WordDocumentAdapter.this);
 			this.number = number;
 			adapteeSection = (Section) page.firstNode().getAncestor(NodeType.SECTION);
 		}
@@ -270,7 +285,7 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 			if (headerFooter == null) {
 				return Optional.empty();
 			}
-			return Optional.of(new HeaderFooterPageSectionAdapter(headerFooter));
+			return Optional.of(new HeaderFooterPageSectionAdapter(headerFooter, this));
 		}
 
 		@Override
@@ -291,7 +306,7 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 			if (headerFooter == null) {
 				return Optional.empty();
 			}
-			return Optional.of(new HeaderFooterPageSectionAdapter(headerFooter));
+			return Optional.of(new HeaderFooterPageSectionAdapter(headerFooter, this));
 		}
 
 		private int getPageNumberInSection() {
@@ -304,6 +319,7 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 					throw new WordProcessingException("Could not get start index of first node on the page.", ex);
 				}
 				if (newNumber != number) {
+					// TODO: how can we deal with this? commitChanges in general instead of only commitDeletes?
 					throw new IllegalStateException("Page information is outdated as modifications have been made to " +
 							"the document. All pages need to be refetched.");
 				}
@@ -323,63 +339,33 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 		}
 
 		@Override
+		public Type getType() {
+			return Type.BODY;
+		}
+
+		@Override
 		public Stream<RichTextParagraph> getTextParagraphs() {
 			// TODO: test paragraphs nested in paragraphs
 			Stream<RichTextParagraph> preamble = Stream.empty();
 			if (adaptee.preamble != null) {
 				preamble = adaptee.preamble.getValue().stream()
-						.flatMap(node -> {
-							if (node.getNodeType() == NodeType.RUN) {
-								return Stream.of(node);
-							}
-
-							if (node instanceof CompositeNode<? extends Node> cn) {
-								return StreamSupport.stream(
-										((NodeCollection<? extends Node>)cn.getChildNodes(NodeType.RUN, true)).spliterator(), false);
-							}
-
-							return Stream.empty();
-						})
-						.map(Run.class::cast)
+						.flatMap(node -> findAnywhere(node, Run.class))
 						.collect(Collectors.groupingBy(straggler -> (Paragraph) straggler.getAncestor(NodeType.PARAGRAPH)))
 						.entrySet().stream()
-						.map(entry -> new RichTextParagraphAdapter(entry.getKey(), entry.getValue().stream()));
+						.map(entry -> new RichTextParagraphAdapter(entry.getKey(), this, entry.getValue().stream()));
 			}
 
 			Stream<RichTextParagraph> body = adaptee.body.stream()
-					.flatMap(node -> {
-						if (node.getNodeType() == NodeType.PARAGRAPH) {
-							return Stream.of(node);
-						}
-
-						if (node instanceof CompositeNode<? extends Node> cn) {
-							return StreamSupport.stream(
-									((NodeCollection<? extends Node>)cn.getChildNodes(NodeType.PARAGRAPH, true)).spliterator(), false);
-						}
-
-						return Stream.empty();
-					}).map(Paragraph.class::cast)
-					.map(RichTextParagraphAdapter::new);
+					.flatMap(node -> findAnywhere(node, Paragraph.class))
+					.map(p -> new RichTextParagraphAdapter(p, this));
 
 			Stream<RichTextParagraph> appendix = Stream.empty();
 			if (adaptee.appendix != null) {
 				appendix = adaptee.appendix.getValue().stream()
-						.flatMap(node -> {
-							if (node.getNodeType() == NodeType.RUN) {
-								return Stream.of(node);
-							}
-
-							if (node instanceof CompositeNode<? extends Node> cn) {
-								return StreamSupport.stream(
-										((NodeCollection<? extends Node>)cn.getChildNodes(NodeType.RUN, true)).spliterator(), false);
-							}
-
-							return Stream.empty();
-						})
-						.map(Run.class::cast)
+						.flatMap(node -> findAnywhere(node, Run.class))
 						.collect(Collectors.groupingBy(straggler -> (Paragraph) straggler.getAncestor(NodeType.PARAGRAPH)))
 						.entrySet().stream()
-						.map(entry -> new RichTextParagraphAdapter(entry.getKey(), entry.getValue().stream()));
+						.map(entry -> new RichTextParagraphAdapter(entry.getKey(), this, entry.getValue().stream()));
 			}
 
 			return Stream.of(preamble, body, appendix)
@@ -389,8 +375,7 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 		@Override
 		public Stream<Image> getImages() {
 			return adaptee.combinedNodes()
-					.filter(n -> n.getNodeType() == NodeType.SHAPE)
-					.map(Shape.class::cast)
+					.flatMap(node -> findAnywhere(node, Shape.class))
 					.filter(s -> {
 						try {
 							return s.getShapeType() == ShapeType.IMAGE && s.hasImage();
@@ -398,19 +383,33 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 							throw new WordProcessingException("Cannot check if shape has an image.", ex);
 						}
 					})
-					.map(ImageAdapter::new);
+					.map(s -> new ImageAdapter(s, this));
 		}
 
 		@Override
 		public Stream<Bookmark> getBookmarks() {
 			return adaptee.combinedNodes()
-					.filter(n -> n.getNodeType() == NodeType.BOOKMARK_START)
-					.map(BookmarkStart.class::cast)
-					.map(BookmarkAdapter::new);
+					.flatMap(node -> findAnywhere(node, BookmarkStart.class))
+					.map(start -> new BookmarkAdapter(start, this));
+		}
+
+		private <T extends Node> Stream<T> findAnywhere(Node node, Class<T> nodeTypeToFind) {
+			int nodeTypeAsInt = NODE_TYPES_MAP.get(nodeTypeToFind);
+			Stream<? extends Node> stream;
+			if (node.getNodeType() == nodeTypeAsInt) {
+				stream = Stream.of(node);
+			} else if (node instanceof CompositeNode<? extends Node> cn) {
+				stream = StreamSupport.stream(
+						((NodeCollection<? extends Node>)cn.getChildNodes(nodeTypeAsInt, true)).spliterator(), false);
+			} else {
+				stream = Stream.empty();
+			}
+			return stream.map(nodeTypeToFind::cast);
 		}
 
 		@Override
 		public Color getBackgroundColor() {
+			// TODO check header/footer section
 			return adaptee.combinedNodes()
 					.filter(n -> n.getNodeType() == NodeType.SHAPE)
 					.map(Shape.class::cast)
@@ -439,11 +438,21 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 				nodesToDelete.addAll(adaptee.appendix.getValue());
 			}
 		}
+
+		@Override
+		public UnifiedPage getPage() {
+			return this;
+		}
 	}
 
-	public class HeaderFooterPageSectionAdapter extends AbstractAdapter<HeaderFooter> implements UnifiedPage.PageSection {
-		public HeaderFooterPageSectionAdapter(HeaderFooter adaptee) {
-			super(adaptee);
+	public class HeaderFooterPageSectionAdapter extends AbstractAdapterChild<HeaderFooter, PageAdapter> implements UnifiedPage.PageSection {
+		public HeaderFooterPageSectionAdapter(HeaderFooter adaptee, PageAdapter parent) {
+			super(adaptee, parent);
+		}
+
+		@Override
+		public Type getType() {
+			return adaptee.isHeader() ? Type.HEADER : Type.FOOTER;
 		}
 
 		@Override
@@ -451,7 +460,7 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 			return StreamSupport.stream(
 							((NodeCollection<? extends Node>)adaptee.getChildNodes(NodeType.PARAGRAPH, true)).spliterator(), false)
 					.map(Paragraph.class::cast)
-					.map(RichTextParagraphAdapter::new);
+					.map(p -> new RichTextParagraphAdapter(p, this));
 		}
 
 		@Override
@@ -466,7 +475,7 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 							throw new WordProcessingException("Cannot check if shape has an image.", ex);
 						}
 					})
-					.map(ImageAdapter::new);
+					.map(s -> new ImageAdapter(s, this));
 		}
 
 		@Override
@@ -475,18 +484,23 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 							((NodeCollection<? extends Node>)adaptee.getChildNodes(NodeType.BOOKMARK_START, true)).spliterator(), false)
 					.filter(n -> n.getNodeType() == NodeType.BOOKMARK_START)
 					.map(BookmarkStart.class::cast)
-					.map(BookmarkAdapter::new);
+					.map(start -> new BookmarkAdapter(start, this));
 		}
 
 		@Override
 		public void markForDeletion() {
 			nodesToDelete.add(adaptee);
 		}
+
+		@Override
+		public UnifiedPage getPage() {
+			return parent;
+		}
 	}
 
-	public class ImageAdapter extends AbstractAdapter<Shape> implements Image {
-		public ImageAdapter(Shape adaptee) {
-			super(adaptee);
+	public class ImageAdapter extends AbstractAdapterChild<Shape, UnifiedPage.PageSection> implements Image {
+		public ImageAdapter(Shape adaptee, UnifiedPage.PageSection parent) {
+			super(adaptee, parent);
 		}
 
 		@Override
@@ -522,12 +536,14 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 	public class BookmarkAdapter implements Bookmark {
 		private final BookmarkStart startAdaptee;
 		private final BookmarkEnd endAdaptee;
+		private final UnifiedPage.PageSection parent;
 		private final Paragraph startParentParagraph;
 		private final Paragraph endParentParagraph;
 		private final Set<Paragraph> embeddedParagraphs;
 
-		public BookmarkAdapter(BookmarkStart start) {
+		public BookmarkAdapter(BookmarkStart start, UnifiedPage.PageSection parent) {
 			this.startAdaptee = start;
+			this.parent = parent;
 			int openBookmarks = 1;
 			Node currNode = start;
 			Set<Paragraph> embeddedParagraphs = new HashSet<>();
@@ -596,6 +612,11 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 		public Type getType() {
 			return Type.BOOKMARK;
 		}
+
+		@Override
+		public UnifiedPage.PageSection getParent() {
+			return parent;
+		}
 	}
 
 	public class RichTextParagraphAdapter extends AbstractRichTextParagraphAdapter<Paragraph> {
@@ -613,15 +634,15 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 				.put(ParagraphAlignment.MATH_ELEMENT_CENTER_AS_GROUP, Alignment.MATH_ELEMENT_CENTER_AS_GROUP)
 				.build();
 
-		public RichTextParagraphAdapter(Paragraph paragraph) {
-			this(paragraph,
+		public RichTextParagraphAdapter(Paragraph paragraph, UnifiedPage.PageSection parent) {
+			this(paragraph, parent,
 					StreamSupport.stream(
 							((NodeCollection<? extends Node>)paragraph.getChildNodes(NodeType.RUN, true)).spliterator(), false)
 							.map(Run.class::cast));
 		}
 
-		public RichTextParagraphAdapter(Paragraph paragraph, Stream<Run> actualRuns) {
-			super(paragraph);
+		public RichTextParagraphAdapter(Paragraph paragraph, UnifiedPage.PageSection parent, Stream<Run> actualRuns) {
+			super(paragraph, parent);
 			this.actualRuns = actualRuns;
 		}
 
@@ -652,7 +673,7 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 
 		@Override
 		public Stream<Segment> getSegments() {
-			return actualRuns.map(SegmentAdapter::new);
+			return actualRuns.map(run -> new SegmentAdapter(run, this));
 		}
 
 		@Override
@@ -662,8 +683,8 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 	}
 
 	public class SegmentAdapter extends AbstractSegmentAdapter<Run> {
-		public SegmentAdapter(Run run) {
-			super(run);
+		public SegmentAdapter(Run run, RichTextParagraphAdapter parent) {
+			super(run, parent);
 		}
 
 		@Override
@@ -706,7 +727,7 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 
 		@Override
 		public void setUnderline(boolean underline) {
-			adaptee.getFont().setUnderline(Underline.NONE);
+			adaptee.getFont().setUnderline(underline ? Underline.SINGLE : Underline.NONE);
 			dirty = true;
 		}
 
@@ -789,6 +810,16 @@ public class WordDocumentAdapter extends AbstractAdapter<Document> implements Un
 		public void setFontName(String fontName) {
 			adaptee.getFont().setName(fontName);
 			dirty = true;
+		}
+
+		@Override
+		protected RichTextParagraph.Segment doSplit(String end) {
+			Run cloned = (Run) adaptee.getParentNode().insertAfter(adaptee.deepClone(true), adaptee);
+			cloned.setText(end);
+			if (nodesToDelete.contains(adaptee)) {
+				nodesToDelete.add(cloned);
+			}
+			return new SegmentAdapter(cloned, (RichTextParagraphAdapter) parent);
 		}
 
 		@Override
