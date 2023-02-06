@@ -1,8 +1,8 @@
 package com.docshifter.core.config;
 
-import com.docshifter.core.config.conditions.IsInGenericContainerCondition;
+import com.docshifter.core.config.conditions.IsInContainerCondition;
 import com.docshifter.core.config.conditions.IsInKubernetesCondition;
-import com.docshifter.core.config.conditions.IsNotInAnyContainerCondition;
+import com.docshifter.core.config.conditions.IsNotInContainerCondition;
 import com.docshifter.core.config.services.ConfigurationService;
 import com.docshifter.core.config.services.GeneralConfigService;
 import com.docshifter.core.config.services.HealthManagementService;
@@ -33,6 +33,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
@@ -224,18 +225,21 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
-	@Conditional(IsNotInAnyContainerCondition.class)
+	@Conditional(IsNotInContainerCondition.class)
 	public InstallationType classicalInstallationType() {
 		return InstallationType.CLASSICAL;
 	}
 
+	// If no specific container platform has been detected, fall back to generic
 	@Bean
-	@Conditional(IsInGenericContainerCondition.class)
+	@Conditional(IsInContainerCondition.class)
 	public InstallationType genericContainerInstallationType() {
 		return InstallationType.CONTAINERIZED_GENERIC;
 	}
 
+	// Otherwise prefer specific container platforms...
 	@Bean
+	@Primary
 	@Conditional(IsInKubernetesCondition.class)
 	public InstallationType kubernetesContainerInstallationType() {
 		return InstallationType.CONTAINERIZED_KUBERNETES;
