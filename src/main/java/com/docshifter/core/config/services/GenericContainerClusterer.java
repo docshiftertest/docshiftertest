@@ -1,6 +1,6 @@
 package com.docshifter.core.config.services;
 
-import com.docshifter.core.config.conditions.IsInGenericContainerCondition;
+import com.docshifter.core.config.conditions.IsInContainerCondition;
 import com.docshifter.core.utils.NetworkUtils;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import lombok.extern.log4j.Log4j2;
@@ -16,7 +16,7 @@ import java.util.Set;
  */
 @Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
 @Service
-@Conditional(IsInGenericContainerCondition.class)
+@Conditional(IsInContainerCondition.class)
 @Profile(NalpeironHelper.LICENSING_IDENTIFIER)
 public class GenericContainerClusterer implements IContainerClusterer {
 	@Override

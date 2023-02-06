@@ -3,11 +3,11 @@ package com.docshifter.core.config.conditions;
 import org.springframework.boot.autoconfigure.condition.NoneNestedConditions;
 import org.springframework.context.annotation.Conditional;
 
-public class IsNotInAnyContainerCondition extends NoneNestedConditions {
-	public IsNotInAnyContainerCondition() {
+public class IsNotInContainerCondition extends NoneNestedConditions {
+	public IsNotInContainerCondition() {
 		super(ConfigurationPhase.REGISTER_BEAN);
 	}
 
-	@Conditional(IsInAnyContainerCondition.class)
-	static class AnyContainerCondition {}
+	@Conditional(IsInContainerCondition.class)
+	static class ContainerCondition {}
 }
