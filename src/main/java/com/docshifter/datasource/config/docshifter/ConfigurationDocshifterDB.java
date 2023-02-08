@@ -94,4 +94,8 @@ public class ConfigurationDocshifterDB {
 
         return factoryBean;
     }
+
+        public String getUrl() {
+        return url;
+    }
 }

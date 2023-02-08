@@ -68,4 +68,9 @@ public class ConfigurationAuditDB {
 
         return factoryBean;
     }
+
+        public String getUrl() {
+        return url;
+    }
+
 }
