@@ -2,7 +2,7 @@ package com.docshifter.core.messaging.sender;
 
 import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.services.IJmsTemplateFactory;
-import com.docshifter.core.config.services.impl.OngoingTaskService;
+import com.docshifter.core.config.services.OngoingTaskService;
 import com.docshifter.core.messaging.message.DocShifterMetricsSenderMessage;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
@@ -38,7 +38,6 @@ public class AMQPSender implements IMessageSender {
 	private final JmsTemplate metricsJmsTemplate;
 	private final IJmsTemplateFactory jmsTemplateFactory;
 	private final int queueReplyTimeout;
-
 	private final OngoingTaskService ongoingTaskService;
 
 	public AMQPSender(JmsTemplate defaultJmsTemplate, JmsTemplate metricsJmsTemplate,
@@ -92,18 +91,21 @@ public class AMQPSender implements IMessageSender {
 		if (task == null) {
 			throw new IllegalArgumentException("The task to send cannot be NULL!");
 		}
-			log.debug("Creating metrics message in Sender...");
-			DocShifterMetricsSenderMessage metricsMessage = DocShifterMetricsSenderMessage
-					.builder()
-					.taskId(task.getId())
-					.hostName(NetworkUtils.getLocalHostName())
-					.senderPickedUp(System.currentTimeMillis())
-					.workflowName(chainConfiguration.getName())
-					.documentPathList(Collections.singletonList(task.getSourceFilePath()))
-					.build();
-			log.debug("...about to send it...");
-			sendMetrics(metricsMessage);
-			log.debug("...sent!");
+
+		log.debug("Creating metrics message in Sender...");
+		DocShifterMetricsSenderMessage metricsMessage = DocShifterMetricsSenderMessage
+				.builder()
+				.taskId(task.getId())
+				.hostName(NetworkUtils.getLocalHostName())
+				.senderPickedUp(System.currentTimeMillis())
+				.workflowName(chainConfiguration.getName())
+				.documentPathList(Collections.singletonList(task.getSourceFilePath()))
+				.build();
+
+		log.debug("...about to send it...");
+		sendMetrics(metricsMessage);
+		log.debug("...sent!");
+
 		DocshifterMessage message = new DocshifterMessage(
 				type,
 				task,
@@ -137,12 +139,15 @@ public class AMQPSender implements IMessageSender {
 		log.info("Sending message: {} (priority = {}, timeout = {} ms) for file: {} using workflow {}", message,
 				taskPriority, taskTimeoutInMillis, task.getSourceFilePath(), chainConfiguration.getName());
 
-		var filename = FileUtils.getFilename(task.getSourceFilePath());
-
-		var ongoingTaskDTO = new OngoingTaskDTO(task.getId(), chainConfiguration.getName(), filename, task.getData(),
-				OngoingTaskDTO.Status.WAITING_TO_BE_PROCESSED);
-
-		ongoingTaskService.notifyConsoleOngoingTask(ongoingTaskDTO);
+		ongoingTaskService.notifyConsoleOngoingTask(
+				new OngoingTaskDTO(
+						task.getId(),
+						chainConfiguration.getName(),
+						FileUtils.getFilename(task.getSourceFilePath()),
+						task.getData(),
+						OngoingTaskDTO.Status.WAITING_TO_BE_PROCESSED
+				)
+		);
 
 		if (DocshifterMessageType.SYNC.equals(type)) {
 			JmsTemplate jmsTemplate = jmsTemplateFactory.create(taskPriority, taskTimeoutInMillis, taskTimeoutInMillis);
