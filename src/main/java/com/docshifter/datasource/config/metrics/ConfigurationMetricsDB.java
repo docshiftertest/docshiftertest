@@ -72,9 +72,5 @@ public class ConfigurationMetricsDB {
 
         return factoryBean;
     }
-
-    public String getUrl() {
-        return url;
-    }
 }
 
