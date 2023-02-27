@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Value object which represents the configuration server. Code to communicated
@@ -100,17 +101,12 @@ public class ConfigurationService {
 	 *        SenderConfiguration.
 	 */
 	@Cacheable(value = Constants.SENDER_CONFIGURATION_CACHE, key = "#uid")
-	public SenderConfigurationWrapper getSenderConfiguration(long uid) {
+	public Set<SenderConfigurationWrapper> getSenderConfiguration(long uid) {
 		Optional<ChainConfiguration> cc = chainConfigurationRepository.findById(uid);
 		if (cc.isPresent()) {
-			Optional<Node> noddy = nodeRepository.findById(cc.get().getRootNode().getId());
-			if (noddy.isPresent()) {
-				return new SenderConfigurationWrapper(noddy.get(), chainConfigurationRepository);
-			}
-			else {
-				log.error("Could not find Node in nodeRepository using ID: {} for ChainConfiguration ID: {}",
-						cc.get().getRootNode().getId(), uid);
-			}
+			return cc.get().getRootNodes().stream()
+					.map(n -> new SenderConfigurationWrapper(n, chainConfigurationRepository))
+					.collect(Collectors.toUnmodifiableSet());
 		}
 		else {
 			log.error("Could not find ChainConfiguration (Workflow) using ID:{}. This may be because you have added/deleted Workflows and there are still messages on the Q referring to the old Workflow!", uid);

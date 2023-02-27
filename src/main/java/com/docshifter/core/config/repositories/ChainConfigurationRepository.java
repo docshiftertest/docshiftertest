@@ -19,11 +19,9 @@ public interface ChainConfigurationRepository extends CrudRepository<ChainConfig
 
 	List<ChainConfiguration> findByEnabled(boolean enabled);
 
-	ChainConfiguration findByRootNode(Node rootNode);
+	ChainConfiguration findByRootNodes(Node rootNode);
 
-	List<ChainConfiguration> findAllByRootNode(Node rootNode);
-
-	ChainConfiguration findByRootNodeId(Long id);
+	ChainConfiguration findByRootNodesId(Long id);
 
 	ChainConfiguration findByQueueName(String queueName);
 

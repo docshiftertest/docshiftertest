@@ -15,8 +15,11 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 import java.io.Serializable;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -61,28 +64,32 @@ public class ChainConfiguration implements Serializable {
 	private FailureLevel failureLevel;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	@ManyToOne(cascade=CascadeType.ALL)
+	@OneToMany(cascade=CascadeType.ALL)
+	@JoinTable(
+			name = "chain_configuration_root_node",
+			joinColumns = {@JoinColumn(name = "chain_configuration_id")},
+			inverseJoinColumns = {@JoinColumn(name = "node_id")})
 	@DiffIgnore
-	private Node rootNode;
+	private Set<Node> rootNodes;
 
 	@DiffInclude
 	private UUID uuid;
 
 	public ChainConfiguration() {}
 
-	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-			  long timeout, long priority, FailureLevel failureLevel, UUID uuid) {
-		this(name, description, enabled, rootNode, printerName, queueName, timeout, (int) priority, failureLevel, uuid);
+	public ChainConfiguration(String name, String description, boolean enabled, Set<Node> rootNodes, String printerName,
+							  String queueName, long timeout, long priority, FailureLevel failureLevel, UUID uuid) {
+		this(name, description, enabled, rootNodes, printerName, queueName, timeout, (int) priority, failureLevel, uuid);
 	}
 
-	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-							  long timeout, int priority, FailureLevel failureLevel, UUID uuid) {
+	public ChainConfiguration(String name, String description, boolean enabled, Set<Node> rootNodes, String printerName,
+							  String queueName, long timeout, int priority, FailureLevel failureLevel, UUID uuid) {
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
 		this.printerName = printerName;
 		this.queueName = queueName;
-		this.rootNode = rootNode;
+		this.rootNodes = rootNodes;
 		this.timeout = timeout;
 		this.priority = priority;
 		this.failureLevel = failureLevel;
@@ -105,8 +112,8 @@ public class ChainConfiguration implements Serializable {
 	}
 
 
-	public Node getRootNode() {
-		return rootNode;
+	public Set<Node> getRootNodes() {
+		return rootNodes;
 	}
 
 	public boolean isEnabled() {
@@ -128,8 +135,8 @@ public class ChainConfiguration implements Serializable {
 		this.name = name;
 	}
 
-	public void setRootNode(Node rootNode) {
-		this.rootNode = rootNode;
+	public void setRootNodes(Set<Node> rootNodes) {
+		this.rootNodes = rootNodes;
 	}
 
 	public String getPrinterName() {
@@ -197,8 +204,8 @@ public class ChainConfiguration implements Serializable {
 				this.printerName +
 				", Queue Name: " +
 				this.queueName +
-				", Root Node: " +
-				this.rootNode +
+				", Root Nodes: " +
+				this.rootNodes +
 				", Timeout: " +
 				this.timeout +
 				", Priority: " +

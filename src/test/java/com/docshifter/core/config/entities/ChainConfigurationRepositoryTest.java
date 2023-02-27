@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -188,13 +189,14 @@ public class ChainConfigurationRepositoryTest extends AbstractSpringTest {
 		moduleConfigurationRepository.save(mc12);
 
 		n1 = new Node(null, mc1);
-		n2 = new Node(n1, mc2);
-		n3 = new Node(n2, mc3);
+		n2 = new Node(Set.of(n1), mc2);
+		n3 = new Node(Set.of(n2), mc3);
 		n4 = new Node(null, mc4);
 		n7 = new Node(null, mc7);
 
 
-		chc1 = new ChainConfiguration("testchain", "desc", true, n1, null, null, 60, 2, FailureLevel.FILE, UUID.randomUUID());
+		chc1 = new ChainConfiguration("testchain", "desc", true, Set.of(n1), null, null, 60, 2, FailureLevel.FILE,
+				UUID.randomUUID());
 
 		chainConfigurationRepository.save(chc1);
 

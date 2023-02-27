@@ -13,13 +13,18 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -31,13 +36,17 @@ public class Node implements Serializable {
 	private long id;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	@ManyToOne(cascade = CascadeType.REMOVE)
-	@JsonIgnore()
-	private Node parentNode;
+	@ManyToMany(cascade = CascadeType.REMOVE)
+	@JoinTable(
+			name = "node_connection",
+			joinColumns = {@JoinColumn(name = "parent_id")},
+			inverseJoinColumns = {@JoinColumn(name = "child_id")})
+	@JsonIgnore
+	private Set<Node> parentNodes;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "parentNode", cascade = CascadeType.ALL)
-	private Set<Node> childNodes=null;
+	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "parentNodes", cascade = CascadeType.ALL)
+	private Set<Node> childNodes;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne
@@ -45,36 +54,44 @@ public class Node implements Serializable {
 
 	public Node(){}
 	
-	public Node(Node parentNode, ModuleConfiguration moduleConfiguration){
-		setParentNode(parentNode);
-		if(parentNode!=null)
-		{
-			this.parentNode.addChild(this);
+	public Node(Set<Node> parentNodes, ModuleConfiguration moduleConfiguration){
+		setParentNodes(parentNodes);
+		if (parentNodes != null) {
+			for (Node parentNode : parentNodes) {
+				parentNode.addChild(this);
+			}
+		} else {
+			this.parentNodes = new HashSet<>();
 		}
-		if(childNodes==null)
-		{
-			this.childNodes=new HashSet<>();
+		if (childNodes == null) {
+			this.childNodes = new HashSet<>();
 		}
 		this.moduleConfiguration = moduleConfiguration;
 	}
 
-	private Node deepCopyParent() {
-		if (isRoot()) {
-			return new Node(null, moduleConfiguration);
+	private Node deepCopy(Map<Node, Node> alreadyEncountered, Set<Node> encounteringChildren) {
+		if (alreadyEncountered.containsKey(this)) {
+			return alreadyEncountered.get(this);
 		}
-		return new Node(parentNode.deepCopyParent(), moduleConfiguration);
+		Node copied;
+		if (isRoot()) {
+			copied = new Node(null, moduleConfiguration);
+		} else {
+			encounteringChildren.add(this);
+			copied = new Node(parentNodes.stream()
+					.map(node -> deepCopy(alreadyEncountered, encounteringChildren))
+					.collect(Collectors.toUnmodifiableSet()), moduleConfiguration);
+			encounteringChildren.remove(this);
+		}
+		alreadyEncountered.put(this, copied);
+		childNodes.stream()
+				.filter(n -> !encounteringChildren.contains(n))
+				.forEach(n -> n.deepCopy(alreadyEncountered, encounteringChildren));
+		return copied;
 	}
 
 	public Node deepCopy() {
-		Node copiedNode = deepCopyParent();
-		deepCopyChildren(copiedNode);
-		return copiedNode;
-	}
-
-	private void deepCopyChildren(Node copiedNode) {
-		for (Node childNode : childNodes) {
-			childNode.deepCopyChildren(new Node(copiedNode, childNode.moduleConfiguration));
-		}
+		return deepCopy(new HashMap<>(), new HashSet<>());
 	}
 
 	public long getId(){
@@ -86,12 +103,12 @@ public class Node implements Serializable {
 	}
 
 
-	public Node getParentNode(){
-		return parentNode;
+	public Set<Node> getParentNodes(){
+		return parentNodes;
 	}
 	
-	public void setParentNode(Node parentNode){
-		this.parentNode = parentNode;
+	public void setParentNodes(Set<Node> parentNodes){
+		this.parentNodes = parentNodes;
 	}
 	public void addChild(Node n){
 		this.childNodes.add(n);
@@ -128,23 +145,38 @@ public class Node implements Serializable {
 	}
 	
 	public boolean compareTo(Object o){
-		if(o instanceof Node){
-			
-			Node node = (Node)o;
-			if(node.childNodes.size() != childNodes.size())
+		if(o instanceof Node node){
+			if (node.childNodes.size() != childNodes.size()) {
 				return false;
-			if(node.parentNode != parentNode)
+			}
+			if (node.parentNodes.size() != parentNodes.size()) {
 				return false;
+			}
 			
-			for(Node child : childNodes){
+			for (Node child : childNodes) {
 				boolean exists = false;
-				for(Node otherChild : node.childNodes)
-					if(child.compareTo(otherChild)){
+				for(Node otherChild : node.childNodes) {
+					if (child.compareTo(otherChild)) {
 						exists = true;
 						break;
 					}
-				if(!exists)
+				}
+				if (!exists) {
 					return false;
+				}
+			}
+
+			for (Node parent : parentNodes) {
+				boolean exists = false;
+				for (Node otherParent : node.parentNodes) {
+					if (parent.compareTo(otherParent)) {
+						exists = true;
+						break;
+					}
+				}
+				if (!exists) {
+					return false;
+				}
 			}
 			return true;
 			
@@ -174,21 +206,24 @@ public class Node implements Serializable {
 
 	@Transient
 	public boolean isRoot() {
-		return parentNode == null;
+		return parentNodes.isEmpty();
 	}
 
 	@Transient
 	@JsonIgnore
-	public Node getRoot() {
-		Node currNode = this;
-		while (!currNode.isRoot()) {
-			currNode = currNode.parentNode;
+	public Set<Node> getRoots() {
+		if (isRoot()) {
+			return Set.of(this);
 		}
-		return currNode;
+
+		return parentNodes.stream()
+				.map(Node::getRoots)
+				.flatMap(Set::stream)
+				.collect(Collectors.toUnmodifiableSet());
 	}
 
 	@Transient
 	public boolean isLeaf(){
-		return childNodes.size() == 0;
+		return childNodes.isEmpty();
 	}
 }

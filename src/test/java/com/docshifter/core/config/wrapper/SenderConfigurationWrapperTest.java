@@ -192,7 +192,7 @@ public class SenderConfigurationWrapperTest {
 		// Manually build the ModuleConfiguration with a custom ParamMap
 		ModuleConfiguration moduleConfiguration = new ModuleConfiguration(new Module(), "Some Module", "Indescribable", UUID.randomUUID(), paramMap);
 		Node node = new Node(null, moduleConfiguration);
-		when(chainConfigRepo.findByRootNode(any(Node.class))).thenReturn(chainConfig);
+		when(chainConfigRepo.findByRootNodes(any(Node.class))).thenReturn(chainConfig);
 		SenderConfigurationWrapper config = new SenderConfigurationWrapper(node, chainConfigRepo);
 		return config;
 	}

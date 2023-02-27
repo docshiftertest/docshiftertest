@@ -21,13 +21,9 @@ public abstract class NodeWrapper {
     public NodeWrapper(Node n, ChainConfigurationRepository chainConfigurationRepository) {
         this.node = n;
         this.chainConfigurationRepository = chainConfigurationRepository;
-
-        Node rootNode = n;
-        if (n != null) {
-            while (rootNode.getParentNode() != null)
-                rootNode = rootNode.getParentNode();
-        }
-        chainConfiguration = chainConfigurationRepository.findByRootNode(rootNode);
+        chainConfiguration = chainConfigurationRepository.findByRootNodes(n.getRoots().stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Expected at least one root node for: " + n)));
         this.moduleWrapper = new ModuleWrapper(n.getModuleConfiguration());
     }
 }
