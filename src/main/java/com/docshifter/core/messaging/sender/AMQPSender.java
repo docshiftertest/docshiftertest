@@ -3,27 +3,29 @@ package com.docshifter.core.messaging.sender;
 import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.services.IJmsTemplateFactory;
 import com.docshifter.core.config.services.OngoingTaskService;
+import com.docshifter.core.messaging.dto.DocShifterMessageDTO;
 import com.docshifter.core.messaging.message.DocShifterMetricsSenderMessage;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
-import com.docshifter.core.metrics.dtos.OngoingTaskDTO;
 import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.TaskStatus;
 import com.docshifter.core.task.VeevaTask;
-import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.utils.NetworkUtils;
 import lombok.extern.log4j.Log4j2;
+import org.apache.activemq.artemis.jms.client.ActiveMQMessage;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
+import javax.jms.Message;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 5/20/16.
@@ -139,16 +141,6 @@ public class AMQPSender implements IMessageSender {
 		log.info("Sending message: {} (priority = {}, timeout = {} ms) for file: {} using workflow {}", message,
 				taskPriority, taskTimeoutInMillis, task.getSourceFilePath(), chainConfiguration.getName());
 
-		ongoingTaskService.notifyConsoleOngoingTask(
-				new OngoingTaskDTO(
-						task.getId(),
-						chainConfiguration.getName(),
-						FileUtils.getFilename(task.getSourceFilePath()),
-						task.getData(),
-						OngoingTaskDTO.Status.WAITING_TO_BE_PROCESSED
-				)
-		);
-
 		if (DocshifterMessageType.SYNC.equals(type)) {
 			JmsTemplate jmsTemplate = jmsTemplateFactory.create(taskPriority, taskTimeoutInMillis, taskTimeoutInMillis);
 			JmsMessagingTemplate messagingTemplate = new JmsMessagingTemplate(jmsTemplate);
@@ -165,12 +157,23 @@ public class AMQPSender implements IMessageSender {
 			return obj;
 		}
 		else {
+			final AtomicReference<Message> msg = new AtomicReference<>();
+
 			JmsTemplate jmsTemplate = jmsTemplateFactory.create(taskPriority, taskTimeoutInMillis, 0);
 			jmsTemplate.convertAndSend(queue, message, messagePostProcessor -> {
 				log.debug("'jmsTemplate.convertAndSend': message.task type={}",
 						() -> message.getTask().getClass().getSimpleName());
+
+				msg.set(messagePostProcessor);
+
 				return messagePostProcessor;
 			});
+
+			ongoingTaskService.notifyConsoleOngoingTask(
+					(ActiveMQMessage) msg.get(),
+					DocShifterMessageDTO.Status.WAITING_TO_BE_PROCESSED
+			);
+
 			return null;
 		}
 	}

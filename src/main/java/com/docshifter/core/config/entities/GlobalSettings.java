@@ -19,7 +19,6 @@ public class GlobalSettings implements Serializable
 	private String mqURL;
 	private String mqQueue;
 	private String mqMetricsQueue;
-	private String mqOngoingTaskQueue;
 	private String mqUser;
 	@Encrypted
 	private String mqUserPassword;
@@ -34,56 +33,48 @@ public class GlobalSettings implements Serializable
 		this.defaultTempFolder = defaultTempFolder;
 	}
 	
-	public GlobalSettings(String mqSystem,
-						  String mqQueue, String mqMetricsQueue, String mqOngoingTaskQueue,
-						  String mqURL, String mqUser, String mqUserPassword)
+	public GlobalSettings(String mqSystem, String mqQueue, String mqMetricsQueue, String mqURL, String mqUser, String mqUserPassword)
 	{
 		this.mqSystem = mqSystem;
 		this.mqQueue = mqQueue;
 		this.mqMetricsQueue = mqMetricsQueue;
-		this.mqOngoingTaskQueue = mqOngoingTaskQueue;
 		this.mqURL = mqURL;
 		this.mqUser = mqUser;
 		this.mqUserPassword = mqUserPassword;
 	}
 	
-	public GlobalSettings(String defaultTempFolder, String mqSystem,
-						  String mqQueue, String mqMetricsQueue, String mqOngoingTaskQueue,
-						  String mqURL, String mqUser, String mqUserPassword)
+	public GlobalSettings(String defaultTempFolder,
+					  String mqSystem, String mqQueue, String mqMetricsQueue, String mqURL, String mqUser,
+						  String mqUserPassword)
 	{
 		this.defaultTempFolder = defaultTempFolder;
 		this.mqSystem = mqSystem;
 		this.mqQueue = mqQueue;
 		this.mqMetricsQueue = mqMetricsQueue;
-		this.mqOngoingTaskQueue = mqOngoingTaskQueue;
 		this.mqURL = mqURL;
 		this.mqUser = mqUser;
 		this.mqUserPassword = mqUserPassword;
 	}
 
-	public GlobalSettings(String mqSystem, String mqURL,
-						  String mqQueue, String mqMetricsQueue, String mqOngoingTaskQueue,
-						  String mqUser, String mqUserPassword, String defaultTempFolder, String defaultErrorFolder) {
+	public GlobalSettings(String mqSystem, String mqURL, String mqQueue, String mqMetricsQueue, String mqUser,
+						  String mqUserPassword, String defaultTempFolder, String defaultErrorFolder) {
 		this.mqSystem = mqSystem;
 		this.mqURL = mqURL;
 		this.mqQueue = mqQueue;
 		this.mqMetricsQueue = mqMetricsQueue;
-		this.mqOngoingTaskQueue = mqOngoingTaskQueue;
 		this.mqUser = mqUser;
 		this.mqUserPassword = mqUserPassword;
 		this.defaultTempFolder = defaultTempFolder;
 		this.defaultErrorFolder = defaultErrorFolder;
 	}
 
-	public GlobalSettings(long id, String mqSystem, String mqURL,
-						  String mqQueue, String mqMetricsQueue, String mqOngoingTaskQueue,
+	public GlobalSettings(long id, String mqSystem, String mqURL, String mqQueue, String mqMetricsQueue,
 						  String mqUser, String mqUserPassword, String defaultTempFolder, String defaultErrorFolder) {
 		this.id = id;
 		this.mqSystem = mqSystem;
 		this.mqURL = mqURL;
 		this.mqQueue = mqQueue;
 		this.mqMetricsQueue = mqMetricsQueue;
-		this.mqOngoingTaskQueue = mqOngoingTaskQueue;
 		this.mqUser = mqUser;
 		this.mqUserPassword = mqUserPassword;
 		this.defaultTempFolder = defaultTempFolder;
@@ -106,12 +97,9 @@ public class GlobalSettings implements Serializable
 		return mqQueue;
 	}
 
-	public String getMqMetricsQueue() {
+	public String getMqMetricsQueue()
+	{
 		return mqMetricsQueue;
-	}
-
-	public String getMqOngoingTaskQueue() {
-		return mqOngoingTaskQueue;
 	}
 
 	public String getMqURL()
@@ -147,10 +135,6 @@ public class GlobalSettings implements Serializable
 	public void setMqMetricsQueue(String mqMetricsQueue)
 	{
 		this.mqMetricsQueue = mqMetricsQueue;
-	}
-
-	public void setMqOngoingTaskQueue(String mqOngoingTaskQueue) {
-		this.mqOngoingTaskQueue = mqOngoingTaskQueue;
 	}
 
 	public void setMqURL(String mqURL)

@@ -45,7 +45,6 @@ public class GeneralConfigService {
 			params.put(Constants.MQ_URL, config.getMqURL());
 			params.put(Constants.MQ_QUEUE, config.getMqQueue());
 			params.put(Constants.MQ_METRICS_QUEUE, config.getMqMetricsQueue());
-			params.put(Constants.MQ_ONGOING_TASK_QUEUE, config.getMqOngoingTaskQueue());
 			params.put(Constants.MQ_USER, config.getMqUser());
 			params.put(Constants.MQ_PASSWORD, config.getMqUserPassword());
 			params.put(Constants.TEMPFOLDER, config.getDefaultTempFolder());

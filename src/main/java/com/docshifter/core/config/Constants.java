@@ -7,7 +7,6 @@ public final class Constants {
 	public static final String MQ_URL = "mq_url";
 	public static final String MQ_QUEUE = "mq_queue";
 	public static final String MQ_METRICS_QUEUE = "docshifter_metrics";
-	public static final String MQ_ONGOING_TASK_QUEUE = "docshifter_ongoing_task";
 	public static final String MQ_USER = "mq_user";
 	public static final String MQ_PASSWORD = "mq_password";
 	public static final String TEMPFOLDER = "tempfolder";
@@ -21,6 +20,7 @@ public final class Constants {
 	public static final String DEFAULT_QUEUE = "docshifter";
 
 	public static final String ONGOING_TASK_QUEUE = "VirtualTopic.docshifterOngoingTask";
+	public static final String MQ_ONGOING_TASK_QUEUE_NAME = "docshifterOngoingTask";
 
 	/**
 	 * Used to cache {@link com.docshifter.core.config.services.ConfigurationService#getSenderConfiguration(long)}
