@@ -135,7 +135,7 @@ public class OngoingTaskService implements IStompService<DocShifterMessageDTO> {
     }
 
     /**
-     * Converts ActiveMQMessage object to DocShifter MessageDTO.
+     * Converts {@link ActiveMQMessage} to {@link DocShifterMessageDTO}.
      *
      * @param message the ActiveMQMessage from artemis server.
      * @param status the {@link com.docshifter.core.messaging.dto.DocShifterMessageDTO.Status} for the task.
@@ -180,7 +180,7 @@ public class OngoingTaskService implements IStompService<DocShifterMessageDTO> {
     }
 
     /**
-     * Converts ActiveMQMessage object to DocShifter MessageDTO.
+     * Converts {@link DocshifterMessage} to {@link DocShifterMessageDTO}.
      *
      * @param dsMessage the {@link DocshifterMessage} to convert.
      * @param status the {@link com.docshifter.core.messaging.dto.DocShifterMessageDTO.Status} for the task.
