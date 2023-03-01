@@ -15,51 +15,308 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Utility methods to interpret and handle configurations specified by a user.
+ */
 public final class ConfigUtils {
+	/**
+	 * Bitflag that indicates the output should be inverted.
+	 * E.g. min = 1, max = 10. Input = 2,4,5,6,7. Then the output should return any integer between min and max that
+	 * is not contained in the input: 1,3,8,9,10.
+	 */
 	public static final int INVERTED = 1;
+	/**
+	 * Bitflag that indicates the output should be reversed.
+	 * E.g. min = 1, max = 10. Input = 2,4,5,6,7. Then the output should be returned in a reverse order: 7,6,5,4,2.
+	 */
 	public static final int REVERSED = 2;
 
 	private ConfigUtils() {}
 
 	/**
-	 * Returns an ordered {@link Set} of possible {@link Integer}s from a range {@link String}.
-	 * @param range The range {@link String} to analyze.
+	 * Returns a positive, ordered {@link Set} of {@link Integer}s from a range {@link String}, with a global minimum
+	 * bound of 1 and no global maximum bound (in practice however, the bound goes up to {@link Integer#MAX_VALUE}).
+	 * @param range The range {@link String} to analyze. Such a {@link String} contains one or more entries that are
+	 *                 separated by a comma. Each entry can be an individual integer, or a (closed) range of
+	 *                 integers, indicated by lower and upper bounds which are separated by a hyphen, e.g. 1-3,5,7-8
+	 *                 -> [1,2,3,5,7,8]
+	 *              <p>
+	 *              "Normal" entries
+	 *                 will be combined in the final range of integers, but there is also the possibility to create a
+	 *                 "negated" entry, starting with an exclamation mark, which will exclude one or more integers
+	 *                 from a previously specified range. One or more integers in such an entry can be included once
+	 *                 again by specifying another normal entry after that one, and this pattern can be repeated as
+	 *                 many times as you want, e.g. 1-20,!5-15,8-12,!10 -> [1,2,3,4,8,9,11,12,16,17,18,19,20].
+	 *              <p>
+	 *              Last but not least, you can also begin a range {@link String} with a
+	 *                 negated entry, in that case, you indicate that the specified range needs to be inverted, i.e.
+	 *                 the output should consist of any integers between the global minimum (1) and maximum bounds that
+	 *                 have NOT been negated. Here too, you can specify a normal entry to include some integers
+	 *                 present within a previously negated range. E.g. !4,!6-10,8 -> [1,2,3,5,8,11,12,...]
 	 * @return A {@link Set} of {@link Integer}s conforming to the range {@link String}.
 	 */
 	public static Set<Integer> getUnboundedRangeSet(String range) {
 		return getUnboundedRangeSet(range, 0);
 	}
 
+	/**
+	 * Returns a positive, ordered {@link Set} of {@link Integer}s from a range {@link String}, with a global minimum
+	 * bound of 1 and no global maximum bound (in practice however, the bound goes up to {@link Integer#MAX_VALUE}).
+	 * @param range The range {@link String} to analyze. Such a {@link String} contains one or more entries that are
+	 *                 separated by a comma. Each entry can be an individual integer, or a (closed) range of
+	 *                 integers, indicated by lower and upper bounds which are separated by a hyphen, e.g. 1-3,5,7-8
+	 *                 -> [1,2,3,5,7,8]
+	 *              <p>
+	 *              "Normal" entries
+	 *                 will be combined in the final range of integers, but there is also the possibility to create a
+	 *                 "negated" entry, starting with an exclamation mark, which will exclude one or more integers
+	 *                 from a previously specified range. One or more integers in such an entry can be included once
+	 *                 again by specifying another normal entry after that one, and this pattern can be repeated as
+	 *                 many times as you want, e.g. 1-20,!5-15,8-12,!10 -> [1,2,3,4,8,9,11,12,16,17,18,19,20].
+	 *              <p>
+	 *              Last but not least, you can also begin a range {@link String} with a
+	 *                 negated entry, in that case, you indicate that the specified range needs to be inverted, i.e.
+	 *                 the output should consist of any integers between the global minimum (1) and maximum bounds that
+	 *                 have NOT been negated. Here too, you can specify a normal entry to include some integers
+	 *                 present within a previously negated range. E.g. !4,!6-10,8 -> [1,2,3,5,8,11,12,...]
+	 * @param flags Any bitflags to apply to the output.
+	 * @return A {@link Set} of {@link Integer}s conforming to the range {@link String}.
+	 */
 	public static Set<Integer> getUnboundedRangeSet(String range, int flags) {
 		return getRangeSet(range, Integer.MAX_VALUE, flags);
 	}
 
+	/**
+	 * Returns a positive, ordered {@link Set} of {@link Integer}s from a range {@link String}, with a global minimum
+	 * bound of 1 and a specified global maximum bound.
+	 * @param range The range {@link String} to analyze. Such a {@link String} contains one or more entries that are
+	 *                 separated by a comma. Each entry can be an individual integer, or a (closed) range of
+	 *                 integers, indicated by lower and upper bounds which are separated by a hyphen, e.g. 1-3,5,7-8
+	 *                 -> [1,2,3,5,7,8]
+	 *              <p>
+	 *              The
+	 *                 individual integers or lower or upper bounds can also be the special sequence {@code LAST}
+	 *                 (case-insensitive), which then dynamically refers to the last/highest possible integer
+	 *                 in the sequence (so this depends on the global maximum bound). Furthermore, any of the 4 basic
+	 *                 arithmetic operations (+, -, /, *) may take place on the {@code LAST} sequence, given that this
+	 *                 operation is specified between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
+	 *              <p>
+	 *              "Normal" entries
+	 *                 will be combined in the final range of integers, but there is also the possibility to create a
+	 *                 "negated" entry, starting with an exclamation mark, which will exclude one or more integers
+	 *                 from a previously specified range. One or more integers in such an entry can be included once
+	 *                 again by specifying another normal entry after that one, and this pattern can be repeated as
+	 *                 many times as you want, e.g. 1-20,!5-15,8-12,!10 -> [1,2,3,4,8,9,11,12,16,17,18,19,20].
+	 *              <p>
+	 *              Last but not least, you can also begin a range {@link String} with a
+	 *                 negated entry, in that case, you indicate that the specified range needs to be inverted, i.e.
+	 *                 the output should consist of any integers between the global minimum (1) and maximum bounds that
+	 *                 have NOT been negated. Here too, you can specify a normal entry to include some integers
+	 *                 present within a previously negated range. E.g. for max 10: !4,!6-10,8 -> [1,2,3,5,8]
+	 * @param max The global maximum bound.
+	 * @return A {@link Set} of {@link Integer}s conforming to the range {@link String}.
+	 */
 	public static Set<Integer> getRangeSet(String range, int max) {
 		return getRangeSet(range, max, 0);
 	}
 
+	/**
+	 * Returns a positive, ordered {@link Set} of {@link Integer}s from a range {@link String}, with a global minimum
+	 * bound of 1 and a specified global maximum bound.
+	 * @param range The range {@link String} to analyze. Such a {@link String} contains one or more entries that are
+	 *                 separated by a comma. Each entry can be an individual integer, or a (closed) range of
+	 *                 integers, indicated by lower and upper bounds which are separated by a hyphen, e.g. 1-3,5,7-8
+	 *                 -> [1,2,3,5,7,8]
+	 *              <p>
+	 *              The
+	 *                 individual integers or lower or upper bounds can also be the special sequence {@code LAST}
+	 *                 (case-insensitive), which then dynamically refers to the last/highest possible integer
+	 *                 in the sequence (so this depends on the global maximum bound). Furthermore, any of the 4 basic
+	 *                 arithmetic operations (+, -, /, *) may take place on the {@code LAST} sequence, given that this
+	 *                 operation is specified between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
+	 *              <p>
+	 *              "Normal" entries
+	 *                 will be combined in the final range of integers, but there is also the possibility to create a
+	 *                 "negated" entry, starting with an exclamation mark, which will exclude one or more integers
+	 *                 from a previously specified range. One or more integers in such an entry can be included once
+	 *                 again by specifying another normal entry after that one, and this pattern can be repeated as
+	 *                 many times as you want, e.g. 1-20,!5-15,8-12,!10 -> [1,2,3,4,8,9,11,12,16,17,18,19,20].
+	 *              <p>
+	 *              Last but not least, you can also begin a range {@link String} with a
+	 *                 negated entry, in that case, you indicate that the specified range needs to be inverted, i.e.
+	 *                 the output should consist of any integers between the global minimum (1) and maximum bounds that
+	 *                 have NOT been negated. Here too, you can specify a normal entry to include some integers
+	 *                 present within a previously negated range. E.g. for max 10: !4,!6-10,8 -> [1,2,3,5,8]
+	 * @param max The global maximum bound.
+	 * @param flags Any bitflags to apply to the output.
+	 * @return A {@link Set} of {@link Integer}s conforming to the range {@link String}.
+	 */
 	public static Set<Integer> getRangeSet(String range, int max, int flags) {
 		return getRangeStream(range, max, flags)
 				.boxed()
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 
+	/**
+	 * Returns a positive, ordered {@link IntStream} from a range {@link String}, with a global minimum bound of 1
+	 * and no global maximum bound (in practice however, the bound goes up to {@link Integer#MAX_VALUE}).
+	 * @param range The range {@link String} to analyze. Such a {@link String} contains one or more entries that are
+	 *                 separated by a comma. Each entry can be an individual integer, or a (closed) range of
+	 *                 integers, indicated by lower and upper bounds which are separated by a hyphen, e.g. 1-3,5,7-8
+	 *                 -> [1,2,3,5,7,8]
+	 *              <p>
+	 *              "Normal" entries
+	 *                 will be combined in the final range of integers, but there is also the possibility to create a
+	 *                 "negated" entry, starting with an exclamation mark, which will exclude one or more integers
+	 *                 from a previously specified range. One or more integers in such an entry can be included once
+	 *                 again by specifying another normal entry after that one, and this pattern can be repeated as
+	 *                 many times as you want, e.g. 1-20,!5-15,8-12,!10 -> [1,2,3,4,8,9,11,12,16,17,18,19,20].
+	 *              <p>
+	 *              Last but not least, you can also begin a range {@link String} with a
+	 *                 negated entry, in that case, you indicate that the specified range needs to be inverted, i.e.
+	 *                 the output should consist of any integers between the global minimum (1) and maximum bounds that
+	 *                 have NOT been negated. Here too, you can specify a normal entry to include some integers
+	 *                 present within a previously negated range. E.g. !4,!6-10,8 -> [1,2,3,5,8,11,12,...]
+	 * @return An {@link IntStream} conforming to the range {@link String}.
+	 */
 	public static IntStream getUnboundedRangeStream(String range) {
 		return getUnboundedRangeStream(range, 0);
 	}
 
+	/**
+	 * Returns a positive, ordered {@link IntStream} from a range {@link String}, with a global minimum bound of 1
+	 * and no global maximum bound (in practice however, the bound goes up to {@link Integer#MAX_VALUE}).
+	 * @param range The range {@link String} to analyze. Such a {@link String} contains one or more entries that are
+	 *                 separated by a comma. Each entry can be an individual integer, or a (closed) range of
+	 *                 integers, indicated by lower and upper bounds which are separated by a hyphen, e.g. 1-3,5,7-8
+	 *                 -> [1,2,3,5,7,8]
+	 *              <p>
+	 *              "Normal" entries
+	 *                 will be combined in the final range of integers, but there is also the possibility to create a
+	 *                 "negated" entry, starting with an exclamation mark, which will exclude one or more integers
+	 *                 from a previously specified range. One or more integers in such an entry can be included once
+	 *                 again by specifying another normal entry after that one, and this pattern can be repeated as
+	 *                 many times as you want, e.g. 1-20,!5-15,8-12,!10 -> [1,2,3,4,8,9,11,12,16,17,18,19,20].
+	 *              <p>
+	 *              Last but not least, you can also begin a range {@link String} with a
+	 *                 negated entry, in that case, you indicate that the specified range needs to be inverted, i.e.
+	 *                 the output should consist of any integers between the global minimum (1) and maximum bounds that
+	 *                 have NOT been negated. Here too, you can specify a normal entry to include some integers
+	 *                 present within a previously negated range. E.g. !4,!6-10,8 -> [1,2,3,5,8,11,12,...]
+	 * @param flags Any bitflags to apply to the output.
+	 * @return An {@link IntStream} conforming to the range {@link String}.
+	 */
 	public static IntStream getUnboundedRangeStream(String range, int flags) {
 		return getRangeStream(range, Integer.MAX_VALUE, flags);
 	}
 
+	/**
+	 * Returns a positive, ordered {@link IntStream} from a range {@link String}, with a global minimum bound of 1
+	 * and a specified global maximum bound.
+	 * @param range The range {@link String} to analyze. Such a {@link String} contains one or more entries that are
+	 *                 separated by a comma. Each entry can be an individual integer, or a (closed) range of
+	 *                 integers, indicated by lower and upper bounds which are separated by a hyphen, e.g. 1-3,5,7-8
+	 *                 -> [1,2,3,5,7,8]
+	 *              <p>
+	 *              The
+	 *                 individual integers or lower or upper bounds can also be the special sequence {@code LAST}
+	 *                 (case-insensitive), which then dynamically refers to the last/highest possible integer
+	 *                 in the sequence (so this depends on the global maximum bound). Furthermore, any of the 4 basic
+	 *                 arithmetic operations (+, -, /, *) may take place on the {@code LAST} sequence, given that this
+	 *                 operation is specified between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
+	 *              <p>
+	 *              "Normal" entries
+	 *                 will be combined in the final range of integers, but there is also the possibility to create a
+	 *                 "negated" entry, starting with an exclamation mark, which will exclude one or more integers
+	 *                 from a previously specified range. One or more integers in such an entry can be included once
+	 *                 again by specifying another normal entry after that one, and this pattern can be repeated as
+	 *                 many times as you want, e.g. 1-20,!5-15,8-12,!10 -> [1,2,3,4,8,9,11,12,16,17,18,19,20].
+	 *              <p>
+	 *              Last but not least, you can also begin a range {@link String} with a
+	 *                 negated entry, in that case, you indicate that the specified range needs to be inverted, i.e.
+	 *                 the output should consist of any integers between the global minimum (1) and maximum bounds that
+	 *                 have NOT been negated. Here too, you can specify a normal entry to include some integers
+	 *                 present within a previously negated range. E.g. for max 10: !4,!6-10,8 -> [1,2,3,5,8]
+	 * @param max The global maximum bound.
+	 * @return An {@link IntStream} conforming to the range {@link String}.
+	 */
 	public static IntStream getRangeStream(String range, int max) {
 		return getRangeStream(range, max, 0);
 	}
 
+	/**
+	 * Returns a positive, ordered {@link IntStream} from a range {@link String}, with a global minimum bound of 1
+	 * and a specified global maximum bound.
+	 * @param range The range {@link String} to analyze. Such a {@link String} contains one or more entries that are
+	 *                 separated by a comma. Each entry can be an individual integer, or a (closed) range of
+	 *                 integers, indicated by lower and upper bounds which are separated by a hyphen, e.g. 1-3,5,7-8
+	 *                 -> [1,2,3,5,7,8]
+	 *              <p>
+	 *              The
+	 *                 individual integers or lower or upper bounds can also be the special sequence {@code LAST}
+	 *                 (case-insensitive), which then dynamically refers to the last/highest possible integer
+	 *                 in the sequence (so this depends on the global maximum bound). Furthermore, any of the 4 basic
+	 *                 arithmetic operations (+, -, /, *) may take place on the {@code LAST} sequence, given that this
+	 *                 operation is specified between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
+	 *              <p>
+	 *              "Normal" entries
+	 *                 will be combined in the final range of integers, but there is also the possibility to create a
+	 *                 "negated" entry, starting with an exclamation mark, which will exclude one or more integers
+	 *                 from a previously specified range. One or more integers in such an entry can be included once
+	 *                 again by specifying another normal entry after that one, and this pattern can be repeated as
+	 *                 many times as you want, e.g. 1-20,!5-15,8-12,!10 -> [1,2,3,4,8,9,11,12,16,17,18,19,20].
+	 *              <p>
+	 *              Last but not least, you can also begin a range {@link String} with a
+	 *                 negated entry, in that case, you indicate that the specified range needs to be inverted, i.e.
+	 *                 the output should consist of any integers between the global minimum (1) and maximum bounds that
+	 *                 have NOT been negated. Here too, you can specify a normal entry to include some integers
+	 *                 present within a previously negated range. E.g. for max 10: !4,!6-10,8 -> [1,2,3,5,8]
+	 * @param max The global maximum bound.
+	 * @param flags Any bitflags to apply to the output.
+	 * @return An {@link IntStream} conforming to the range {@link String}.
+	 */
 	public static IntStream getRangeStream(String range, int max, int flags) {
 		return getRangeStream(range, 1, max, (flags & INVERTED) == INVERTED, (flags & REVERSED) == REVERSED);
 	}
 
+	/**
+	 * Returns an ordered {@link IntStream} from a range {@link String}.
+	 * @param range The range {@link String} to analyze. Such a {@link String} contains one or more entries that are
+	 *                 separated by a comma. Each entry can be an individual integer, or a (closed) range of
+	 *                 integers, indicated by lower and upper bounds which are separated by a hyphen, e.g. 1-3,5,7-8
+	 *                 -> [1,2,3,5,7,8]
+	 *              <p>
+	 *              The
+	 *                 individual integers or lower or upper bounds can also be the special sequence {@code LAST}
+	 *                 (case-insensitive), which then dynamically refers to the last/highest possible integer
+	 *                 in the sequence (so this depends on the global maximum bound). Furthermore, any of the 4 basic
+	 *                 arithmetic operations (+, -, /, *) may take place on the {@code LAST} sequence, given that this
+	 *                 operation is specified between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
+	 *              <p>
+	 *              "Normal" entries
+	 *                 will be combined in the final range of integers, but there is also the possibility to create a
+	 *                 "negated" entry, starting with an exclamation mark, which will exclude one or more integers
+	 *                 from a previously specified range. One or more integers in such an entry can be included once
+	 *                 again by specifying another normal entry after that one, and this pattern can be repeated as
+	 *                 many times as you want, e.g. 1-20,!5-15,8-12,!10 -> [1,2,3,4,8,9,11,12,16,17,18,19,20].
+	 *              <p>
+	 *              Last but not least, you can also begin a range {@link String} with a
+	 *                 negated entry, in that case, you indicate that the specified range needs to be inverted, i.e.
+	 *                 the output should consist of any integers between the global minimum and maximum bounds that
+	 *                 have NOT been negated. Here too, you can specify a normal entry to include some integers
+	 *                 present within a previously negated range. E.g. for min 1 and max 10: !4,!6-10,8 -> [1,2,3,5,8]
+	 * @param min The global minimum bound.
+	 * @param max The global maximum bound.
+	 * @param inverted Whether to invert the output. E.g. min = 1, max = 10. Input = 2,4,5-7. If {@code true} then the
+	 *                    output should return any integer between min and max that is not contained in the input:
+	 *                    1,3,8,9,10. NOTE: The input can also be inverted by starting the range {@link String} with
+	 *                    a negated entry (as mentioned in the {@code range} parameter explanation)! So if this is
+	 *                    set to {@code true}, and the {@code range} starts with a negated entry (!), then the
+	 *                    inversion flag will be flipped and the output will be returned in a non-inverted fashion.
+	 * @param reversed Whether to reverse the output. E.g. min = 1, max = 10. Input = 2,4,5-7. If {@code true} then the
+	 *                    output should be returned in a reverse order: 7,6,5,4,2.
+	 * @return An {@link IntStream} conforming to the range {@link String}.
+	 */
 	private static IntStream getRangeStream(String range, int min, int max, boolean inverted, boolean reversed) {
 		String cleanedRange = StringUtils.deleteWhitespace(range);
 		if (StringUtils.isEmpty(cleanedRange)) {
@@ -84,6 +341,7 @@ public final class ConfigUtils {
 						.thenComparing(RangeMarker::isInclusion, Comparator.reverseOrder())
 						.thenComparing(RangeMarker::isStart)
 				);
+		// Per the Javadocs, if the first entry is a negation instead of a normal one, then we flip the inversion flag
 		if (entries[0].startsWith("!")) {
 			inverted = !inverted;
 		}
@@ -96,12 +354,14 @@ public final class ConfigUtils {
 
 			String[] rangeArr = entry.split("-", 2);
 			if (rangeArr.length > 2) {
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("A range entry cannot contain more than 2 elements (lower and " +
+						"upper bound)! Evaluated range entry: " + entry);
 			}
 			int lower = tryParseInt(rangeArr[0], min, max);
 			int upper = lower;
 			if (rangeArr.length == 2) {
 				upper = tryParseInt(rangeArr[1], lower, max);
+				// Revalidate against upper now that we know it
 				lower = tryParseInt(rangeArr[0], min, upper);
 			}
 
@@ -191,12 +451,15 @@ public final class ConfigUtils {
 		return null;
 	}
 
+	/**
+	 * Represents a single range marker/boundary.
+	 */
 	@Value
 	private static class RangeMarker {
-		private final RangeMarker otherSide;
-		private final boolean isStart;
-		private final boolean isInclusion;
-		private final int position;
+		RangeMarker otherSide;
+		boolean isStart;
+		boolean isInclusion;
+		int position;
 
 		private RangeMarker(RangeMarker otherSide, int endPosition) {
 			this.isInclusion = otherSide.isInclusion;
@@ -233,10 +496,14 @@ public final class ConfigUtils {
 			}
 			int parsed = Integer.parseInt(entry);
 			if (parsed < min) {
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("The value " + parsed + " is located below the global minimum (" + min + ")!" +
+						" If you are unsure of the minimum, you can let the value get interpreted safely by putting " +
+						"it between parentheses.");
 			}
 			if (parsed > max) {
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("The value " + parsed + " is located above the global maximum (" + max + ")!" +
+						" If you are unsure of the maximum, you can let the value get interpreted safely by putting " +
+						"it between parentheses.");
 			}
 			return parsed;
 		}
@@ -249,26 +516,28 @@ public final class ConfigUtils {
 		} else if (operands.length == 2) {
 			operator = entry.charAt(operands[0].length());
 		} else {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Only 1 or 2 operands are allowed, found more (or none) while " +
+					"evaluating: " + entry);
 		}
 		BinaryOperator<Float> operatorFn = switch (operator) {
 			case '+' -> Float::sum;
 			case '-' -> (op1, op2) -> op1 - op2;
 			case '*' -> (op1, op2) -> op1 * op2;
 			case '/' -> (op1, op2) -> op1 / op2;
-			default -> throw new IllegalArgumentException("Unexpected value: " + operator);
+			default -> throw new IllegalArgumentException("Unexpected operator value: " + operator);
 		};
 		return Arrays.stream(operands)
 				.map(op -> "last".equalsIgnoreCase(op) ? checkReasonableMax(max) : Float.parseFloat(op))
 				.reduce(operatorFn)
 				.map(Integer.class::cast)
 				.map(val -> Math.max(min, Math.min(max, val)))
-				.orElseThrow(() -> new IllegalStateException());
+				.orElseThrow(() -> new IllegalStateException("Found no operands, this should not happen as we " +
+						"have checked it before!"));
 	}
 
 	private static int checkReasonableMax(Integer max) {
 		if (max == Integer.MAX_VALUE) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("It doesn't make sense to use LAST in an unbounded range!");
 		}
 		return max;
 	}
