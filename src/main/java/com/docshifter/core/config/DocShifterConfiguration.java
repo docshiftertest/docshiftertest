@@ -1,8 +1,8 @@
 package com.docshifter.core.config;
 
-import com.docshifter.core.config.conditions.IsInGenericContainerCondition;
+import com.docshifter.core.config.conditions.IsInContainerCondition;
 import com.docshifter.core.config.conditions.IsInKubernetesCondition;
-import com.docshifter.core.config.conditions.IsNotInAnyContainerCondition;
+import com.docshifter.core.config.conditions.IsNotInContainerCondition;
 import com.docshifter.core.config.services.ConfigurationService;
 import com.docshifter.core.config.services.GeneralConfigService;
 import com.docshifter.core.config.services.HealthManagementService;
@@ -33,6 +33,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
@@ -120,6 +121,12 @@ public class DocShifterConfiguration {
 
 	@Bean
 	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
+	public JmsTemplate ongoingTaskJmsTemplate() {
+		return jmsTemplateFactory().create(IJmsTemplateFactory.HIGHEST_PRIORITY, 0,0);
+	}
+
+	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	@DependsOn("defaultJmsTemplate")
 	public JmsMessagingTemplate defaultMessagingTemplate () {
 		return new JmsMessagingTemplate(defaultJmsTemplate());
@@ -130,6 +137,13 @@ public class DocShifterConfiguration {
 	@DependsOn("metricsJmsTemplate")
 	public JmsMessagingTemplate metricsMessagingTemplate () {
 		return new JmsMessagingTemplate(metricsJmsTemplate());
+	}
+
+	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
+	@DependsOn("ongoingTaskJmsTemplate")
+	public JmsMessagingTemplate ongoingTaskMessagingTemplate () {
+		return new JmsMessagingTemplate(ongoingTaskJmsTemplate());
 	}
 
 	@Bean
@@ -198,6 +212,12 @@ public class DocShifterConfiguration {
 
 	@Bean
 	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
+	public ActiveMQTopic ongoingTaskExchange() {
+		return new ActiveMQTopic(Constants.ONGOING_TASK_QUEUE);
+	}
+
+	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public ActiveMQTopic reloadExchange() {
 		return new ActiveMQTopic(Constants.RELOAD_QUEUE);
 	}
@@ -224,18 +244,21 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
-	@Conditional(IsNotInAnyContainerCondition.class)
+	@Conditional(IsNotInContainerCondition.class)
 	public InstallationType classicalInstallationType() {
 		return InstallationType.CLASSICAL;
 	}
 
+	// If no specific container platform has been detected, fall back to generic
 	@Bean
-	@Conditional(IsInGenericContainerCondition.class)
+	@Conditional(IsInContainerCondition.class)
 	public InstallationType genericContainerInstallationType() {
 		return InstallationType.CONTAINERIZED_GENERIC;
 	}
 
+	// Otherwise prefer specific container platforms...
 	@Bean
+	@Primary
 	@Conditional(IsInKubernetesCondition.class)
 	public InstallationType kubernetesContainerInstallationType() {
 		return InstallationType.CONTAINERIZED_KUBERNETES;
