@@ -52,9 +52,13 @@ public class Node implements Serializable {
 	@ManyToOne
 	private ModuleConfiguration moduleConfiguration;
 
+	private double xPosition;
+
+	private double yPosition;
+
 	public Node(){}
 	
-	public Node(Set<Node> parentNodes, ModuleConfiguration moduleConfiguration){
+	public Node(Set<Node> parentNodes, ModuleConfiguration moduleConfiguration, double xPosition, double yPosition){
 		setParentNodes(parentNodes);
 		if (parentNodes != null) {
 			for (Node parentNode : parentNodes) {
@@ -67,6 +71,8 @@ public class Node implements Serializable {
 			this.childNodes = new HashSet<>();
 		}
 		this.moduleConfiguration = moduleConfiguration;
+		this.xPosition = xPosition;
+		this.yPosition = yPosition;
 	}
 
 	private Node deepCopy(Map<Node, Node> alreadyEncountered, Set<Node> encounteringChildren) {
@@ -75,12 +81,12 @@ public class Node implements Serializable {
 		}
 		Node copied;
 		if (isRoot()) {
-			copied = new Node(null, moduleConfiguration);
+			copied = new Node(null, moduleConfiguration, xPosition, yPosition);
 		} else {
 			encounteringChildren.add(this);
 			copied = new Node(parentNodes.stream()
 					.map(node -> deepCopy(alreadyEncountered, encounteringChildren))
-					.collect(Collectors.toUnmodifiableSet()), moduleConfiguration);
+					.collect(Collectors.toUnmodifiableSet()), moduleConfiguration, xPosition, yPosition);
 			encounteringChildren.remove(this);
 		}
 		alreadyEncountered.put(this, copied);
