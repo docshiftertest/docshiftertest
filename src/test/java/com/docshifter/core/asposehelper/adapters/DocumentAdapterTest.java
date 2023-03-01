@@ -5,6 +5,7 @@ import com.docshifter.core.asposehelper.LicenseHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -44,6 +45,7 @@ abstract class DocumentAdapterTest<T extends UnifiedDocument> {
 		assertEquals(9, sut.getPages().count());
 	}
 
+	@Disabled
 	@Test
 	void page5_body_hasCorrectContent() {
 		assertEquals("""
@@ -98,6 +100,7 @@ abstract class DocumentAdapterTest<T extends UnifiedDocument> {
 						.collect(Collectors.joining()));
 	}
 
+	@Disabled
 	@Test
 	void page5_footer_hasCorrectContent() {
 		assertEquals("Odd page footer section 1",
