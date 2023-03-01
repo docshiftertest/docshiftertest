@@ -374,12 +374,12 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 
 	public class RichTextParagraphAdapter extends AbstractRichTextParagraphAdapter<MarkupSection> {
 		private final BiMap<Integer, Alignment> alignmentMap = ImmutableBiMap.<Integer, Alignment>builder()
-				.put(HorizontalAlignment.Left, Alignment.LEFT)
-				.put(HorizontalAlignment.Center, Alignment.CENTER)
-				.put(HorizontalAlignment.Right, Alignment.RIGHT)
-				.put(HorizontalAlignment.Justify, Alignment.JUSTIFIED)
-				.put(HorizontalAlignment.FullJustify, Alignment.FULLY_JUSTIFIED)
-				.put(HorizontalAlignment.None, Alignment.NONE)
+				.put(HorizontalAlignment.Left.getValue(), Alignment.LEFT)
+				.put(HorizontalAlignment.Center.getValue(), Alignment.CENTER)
+				.put(HorizontalAlignment.Right.getValue(), Alignment.RIGHT)
+				.put(HorizontalAlignment.Justify.getValue(), Alignment.JUSTIFIED)
+				.put(HorizontalAlignment.FullJustify.getValue(), Alignment.FULLY_JUSTIFIED)
+				.put(HorizontalAlignment.None.getValue(), Alignment.NONE)
 				.build();
 
 		public RichTextParagraphAdapter(MarkupSection section, PageSectionAdapter parent) {
@@ -392,14 +392,14 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 					.map(TextFragment::getHorizontalAlignment)
 					.findFirst()
 					.map(alignment -> switch (alignment) {
-						case HorizontalAlignment.Left -> Alignment.LEFT;
-						case HorizontalAlignment.Center -> Alignment.CENTER;
-						case HorizontalAlignment.Right -> Alignment.RIGHT;
-						case HorizontalAlignment.Justify -> Alignment.JUSTIFIED;
-						case HorizontalAlignment.FullJustify -> Alignment.FULLY_JUSTIFIED;
-						case HorizontalAlignment.None -> Alignment.NONE;
-						default -> throw new IllegalStateException("Unknown alignment flag found: "
-								+ HorizontalAlignment.getName(HorizontalAlignment.class, alignment) + " (" + alignment + ")");
+							case Left -> Alignment.LEFT;
+							case Center -> Alignment.CENTER;
+							case Right -> Alignment.RIGHT;
+							case Justify -> Alignment.JUSTIFIED;
+							case FullJustify -> Alignment.FULLY_JUSTIFIED;
+							case None -> Alignment.NONE;
+							default -> throw new IllegalStateException("Unknown alignment flag found: "
+									+ alignment + " (" + alignment.getValue() + ")");
 					}).orElse(Alignment.NONE);
 		}
 
@@ -410,7 +410,7 @@ public class PdfDocumentAdapter extends AbstractAdapter<Document> implements Uni
 				throw new UnsupportedOperationException("Cannot convert alignment flag " + alignment + " to one that " +
 						"is supported in Word documents.");
 			}
-			adaptee.getFragments().forEach(tf -> tf.setHorizontalAlignment(mapping));
+			adaptee.getFragments().forEach(tf -> tf.setHorizontalAlignment(HorizontalAlignment.valueOf(mapping)));
 		}
 
 		@Override
