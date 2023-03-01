@@ -139,6 +139,22 @@ public class Node implements Serializable {
 		this.moduleConfiguration = moduleConfiguration;
 	}
 
+	public double getXPosition() {
+		return xPosition;
+	}
+
+	public void setXPosition(double xPosition) {
+		this.xPosition = xPosition;
+	}
+
+	public double getYPosition() {
+		return yPosition;
+	}
+
+	public void setYPosition(double yPosition) {
+		this.yPosition = yPosition;
+	}
+
 	public void clearAllChildNodes(){
 		for(Node n : childNodes){
 			n.clearAllChildNodes();
