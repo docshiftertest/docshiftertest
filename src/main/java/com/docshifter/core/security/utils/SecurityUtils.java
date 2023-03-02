@@ -7,7 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 import org.jasypt.salt.RandomSaltGenerator;
-
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -63,14 +63,21 @@ public class SecurityUtils {
 			decryptedMessage = decrypt.decrypt(encryptedMessage);
 
 		}
-		catch (Exception e) {
-			if (e instanceof EncryptionOperationNotPossibleException || e instanceof IllegalArgumentException || e instanceof NegativeArraySizeException) {
-				log.debug("The password is in plain text...: ", e);
+		catch (Exception exc) {
+			if (encryptedMessage.length() < 60) {
+				log.debug("The password is probably in plain text...: ");
 				decryptedMessage = encryptedMessage;
 			}
+			else if (exc instanceof EncryptionOperationNotPossibleException
+					|| exc instanceof IllegalArgumentException
+					|| exc instanceof NegativeArraySizeException
+					|| (exc instanceof IOException && exc.getMessage() != null && exc.getMessage().contains("Invalid lenByte"))) {
+					log.debug("The password may be in plain text...: ", exc);
+					decryptedMessage = encryptedMessage;
+			}
 			else {
-				log.error(e);
-				throw new EncryptionOperationNotPossibleException("Occurred an error trying to decrypt " + logClass);
+				log.error(exc);
+				throw new EncryptionOperationNotPossibleException("An error cccurred trying to decrypt " + logClass);
 			}
 		}
 		log.debug("Decryption completed for {} " , logClass);
