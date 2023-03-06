@@ -19,8 +19,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 
 //Read-only: Use this strategy when you are sure that your data never changes. If you try to update the data with this strategy Hibernate will throw an exception.
@@ -82,6 +84,22 @@ public class ChainConfiguration implements Serializable {
 		this(name, description, enabled, rootNodes, printerName, queueName, timeout, (int) priority, failureLevel, uuid);
 	}
 
+	public ChainConfiguration(ChainConfiguration copyMe) {
+		this(copyMe.name, copyMe.description, copyMe.enabled,
+				copyMe.rootNodes.stream()
+						.findAny()
+						.map(Node::deepCopyGetRoots)
+						.orElse(new HashSet<>()), copyMe.printerName, copyMe.queueName, copyMe.timeout,
+				copyMe.priority, copyMe.failureLevel);
+	}
+
+	public ChainConfiguration(String name, String description, boolean enabled, Set<Node> rootNodes,
+							  String printerName, String queueName, long timeout, int priority,
+							  FailureLevel failureLevel) {
+		this(name, description, enabled, rootNodes, printerName, queueName, timeout, priority, failureLevel,
+				UUID.randomUUID());
+	}
+
 	public ChainConfiguration(String name, String description, boolean enabled, Set<Node> rootNodes, String printerName,
 							  String queueName, long timeout, int priority, FailureLevel failureLevel, UUID uuid) {
 		this.name = name;
@@ -89,7 +107,7 @@ public class ChainConfiguration implements Serializable {
 		this.enabled = enabled;
 		this.printerName = printerName;
 		this.queueName = queueName;
-		this.rootNodes = rootNodes;
+		this.rootNodes = rootNodes == null ? new HashSet<>() : rootNodes;
 		this.timeout = timeout;
 		this.priority = priority;
 		this.failureLevel = failureLevel;
@@ -136,7 +154,7 @@ public class ChainConfiguration implements Serializable {
 	}
 
 	public void setRootNodes(Set<Node> rootNodes) {
-		this.rootNodes = rootNodes;
+		this.rootNodes = rootNodes == null ? new HashSet<>() : rootNodes;
 	}
 
 	public String getPrinterName() {
@@ -189,6 +207,17 @@ public class ChainConfiguration implements Serializable {
 
 	public void setUuid(UUID uuid) {
 		this.uuid = uuid;
+	}
+
+	/**
+	 * Performs an action on all the nodes for this workflow.
+	 * @param action The action to perform.
+	 */
+	public void forEachNode(Consumer<? super Node> action) {
+		rootNodes.stream()
+				.findAny()
+				.orElseThrow()
+				.iterateOverNode(action);
 	}
 
 	@Override
