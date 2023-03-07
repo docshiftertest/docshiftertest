@@ -45,7 +45,7 @@ abstract class DocumentAdapterTest<T extends UnifiedDocument> {
 		assertEquals(9, sut.getPages().count());
 	}
 
-	@Disabled
+	@Disabled("Different behaviour in pdf 23.1 and 23.2")
 	@Test
 	void page5_body_hasCorrectContent() {
 		assertEquals("""
@@ -100,7 +100,7 @@ abstract class DocumentAdapterTest<T extends UnifiedDocument> {
 						.collect(Collectors.joining()));
 	}
 
-	@Disabled
+	@Disabled("Different behaviour in pdf 23.1 and 23.2")
 	@Test
 	void page5_footer_hasCorrectContent() {
 		assertEquals("Odd page footer section 1",
