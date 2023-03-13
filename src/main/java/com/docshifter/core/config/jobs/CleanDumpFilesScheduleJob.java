@@ -10,12 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Clock;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Configuration
@@ -27,14 +23,14 @@ public class CleanDumpFilesScheduleJob {
 
     private final ScheduledExecutorService scheduler;
 
-    @Value("${docshifter.home}")
+    @Value("${docshifter.core.home}")
     private String dsPath;
 
     public CleanDumpFilesScheduleJob(ScheduledExecutorService scheduler) {
         this.scheduler = scheduler;
     }
 
-    @Scheduled(cron = "${docshifter.receiver.cleanup.dump.schedule:-}")
+    @Scheduled(cron = "${docshifter.cleanup.dump.schedule:-}")
     public void cleanDumpFiles() {
 
         for (String componentFolder : Constants.DUMP_FILES_FOLDER_LIST) {
