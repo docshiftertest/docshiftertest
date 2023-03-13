@@ -25,9 +25,6 @@ public class CleanDumpFilesScheduleJob {
 
     private static final Clock SYSTEM_CLOCK = Clock.systemDefaultZone();
 
-    @Value("${docshifter.receiver.cleanup.dump.10080:1440}")
-    private int dumpFilesLifeTimeMinutes;
-
     private final ScheduledExecutorService scheduler;
 
     @Value("${docshifter.home}")
@@ -41,7 +38,7 @@ public class CleanDumpFilesScheduleJob {
     public void cleanDumpFiles() {
 
         for (String componentFolder : Constants.DUMP_FILES_FOLDER_LIST) {
-            clean(Path.of(dsPath + "/" + componentFolder), dumpFilesLifeTimeMinutes);
+            clean(Path.of(dsPath + "/" + componentFolder));
         }
 
     }
@@ -49,10 +46,9 @@ public class CleanDumpFilesScheduleJob {
     /**
      * Cleans the files inside a specific path
      * @param path the path that contains the file
-     * @param lifetimeMinutes The age of the files
      */
-    private void clean(Path path, int lifetimeMinutes) {
-        log.info("Starting scheduled cleanup of files older than {} minutes in path {}", lifetimeMinutes, path);
+    private void clean(Path path) {
+        log.info("Starting scheduled cleanup of files in path {}", path);
 
         // Gets all the files and apply the filters
         File[] files = FileUtil.listFiles(new File(path.toString()), pathname -> {
@@ -62,23 +58,7 @@ public class CleanDumpFilesScheduleJob {
             }
 
             // the file needs to be dmp or trc
-            if(!FileUtils.getExtension(pathname.getPath()).equalsIgnoreCase("dmp")){
-                return false;
-            }
-
-            try {
-                Instant lastModified = Files.getLastModifiedTime(Path.of(pathname.getPath())).toInstant();
-                if (lastModified.equals(Instant.EPOCH)) {
-                    log.warn("{} cannot be checked for its lifetime! Please delete it manually when " +
-                            "necessary.", pathname.getPath());
-                    return false;
-                }
-                return lastModified.plus(lifetimeMinutes, ChronoUnit.MINUTES).isBefore(SYSTEM_CLOCK.instant());
-            } catch (IOException ioe) {
-                log.warn("{} cannot be checked for its lifetime! Please delete it manually when " +
-                        "necessary.", pathname.getPath(), ioe);
-                return false;
-            }
+            return FileUtils.getExtension(pathname.getPath()).equalsIgnoreCase("dmp") || FileUtils.getExtension(pathname.getPath()).equalsIgnoreCase("trc");
         });
 
         for(File file: files) {
