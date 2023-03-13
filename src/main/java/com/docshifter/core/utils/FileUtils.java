@@ -582,6 +582,42 @@ public final class FileUtils {
 		return sBuf.toString();
 	}
 
+    /**
+      * Attempts to delete a file.
+	 * @param scheduler Used to schedule retries after a failure.
+     * @param retryCounter The number of attempts to delete the file
+	 * @param dir The directory or file to delete.
+	 * @return Whether the file could be deleted immediately, without any errors
+     */
+    public static boolean deleteFile(ScheduledExecutorService scheduler, Path dir, int retryCounter) {
+        log.debug("Will try to delete a file... {}", dir);
+        if (!Files.isDirectory(dir) && Files.exists(dir)) {
+            try {
+                log.info("Deleting.. {}", dir);
+                Files.delete(dir);
+                return true;
+            } catch (IOException e) {
+                log.error("An error occurred when trying to delete the file: {}", dir);
+
+                final int finalRetryCounter = retryCounter - 1;
+                if (retryCounter > 0) {
+                    log.warn("Will retry deletion in 1 minute...");
+                    scheduler.schedule(() ->
+                                    // Retry deletion all the way from the beginning/root again
+                                    deleteFile(scheduler, dir, finalRetryCounter),
+                            1, TimeUnit.MINUTES);
+                } else {
+                    log.error("There are no more retries left! {} failed to delete!", dir);
+                }
+
+                return false;
+            }
+
+        }
+        log.debug("The file is a directory or doesn't exist, skipping...: {}", dir);
+        return false;
+    }
+
 	/**
 	 * Attempts to delete a file or directory, taking into account the possibility of shenanigans happening related
 	 * to calling the Java I/O API on unconventional storage types (such as NAS). For example: File.exists()
