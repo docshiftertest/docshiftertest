@@ -3,6 +3,7 @@ package com.docshifter.core.monitoring.dtos;
 import com.docshifter.core.monitoring.enums.ConfigurationTypes;
 import com.docshifter.core.security.utils.SecurityProperties;
 import com.docshifter.core.security.utils.SecurityUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -69,7 +70,7 @@ public class MailConfigurationItemDto extends AbstractConfigurationItemDto {
 	}
 
     private void setEncryptedPassword() {
-        if (this.password == null || this.password.isBlank()) {
+        if (StringUtils.isBlank(password)) {
             this.encryptedPassword = "";
         } else {
             this.encryptedPassword = SecurityUtils.encryptMessage(this.getPassword(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
@@ -154,7 +155,7 @@ public class MailConfigurationItemDto extends AbstractConfigurationItemDto {
     }
 
     private void setEncryptedClientSecret() {
-        if (this.clientSecret == null || this.clientSecret.isBlank()) {
+        if (StringUtils.isBlank(clientSecret)) {
             this.encryptedClientSecret = "";
         } else {
             this.encryptedClientSecret = SecurityUtils.encryptMessage(this.getClientSecret(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
