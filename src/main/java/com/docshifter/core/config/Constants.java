@@ -37,8 +37,4 @@ public final class Constants {
 	 * Prefix to use for all API routes
 	 */
 	public static final String API_PATH_PREFIX = "api";
-
-	public static final List<String> DUMP_FILES_FOLDER_LIST =
-			Arrays.asList("console", "sender", "receiver", "metrics",
-					"message-broker", "db-healthy-checker");
 }

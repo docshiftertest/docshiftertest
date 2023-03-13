@@ -1,6 +1,5 @@
 package com.docshifter.core.config.jobs;
 
-import com.docshifter.core.config.Constants;
 import com.docshifter.core.utils.FileUtils;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.util.FileUtil;
@@ -11,7 +10,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.time.Clock;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Configuration
@@ -19,12 +17,10 @@ import java.util.concurrent.ScheduledExecutorService;
 @Log4j2
 public class CleanDumpFilesScheduleJob {
 
-    private static final Clock SYSTEM_CLOCK = Clock.systemDefaultZone();
-
     private final ScheduledExecutorService scheduler;
 
-    @Value("${docshifter.core.home}")
-    private String dsPath;
+    @Value("${docshifter.component.home}")
+    private String docShifterComponentPath;
 
     public CleanDumpFilesScheduleJob(ScheduledExecutorService scheduler) {
         this.scheduler = scheduler;
@@ -32,11 +28,7 @@ public class CleanDumpFilesScheduleJob {
 
     @Scheduled(cron = "${docshifter.cleanup.dump.schedule:-}")
     public void cleanDumpFiles() {
-
-        for (String componentFolder : Constants.DUMP_FILES_FOLDER_LIST) {
-            clean(Path.of(dsPath + "/" + componentFolder));
-        }
-
+        clean(Path.of(docShifterComponentPath));
     }
 
     /**
