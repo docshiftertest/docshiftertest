@@ -601,13 +601,15 @@ public class NalpeironService implements ILicensingService {
         Map<String, Boolean> moduleIsLicensedByCode = new HashMap<>();
 
         for (Module module : modules) {
-            try {
-                moduleIsLicensedByCode.put(module.getCode(), helper.getFeatureStatus(module.getCode()).isValid());
-            }
-            catch (DocShifterLicenseException docShifterLicenseException) {
-                log.debug("Module [{}] is not licensed.",
-                        module.getName(), docShifterLicenseException);
-                moduleIsLicensedByCode.put(module.getCode(), false);
+            if (StringUtils.isNotBlank(module.getCode())) {
+                try {
+                    moduleIsLicensedByCode.put(module.getCode(), helper.getFeatureStatus(module.getCode()).isValid());
+                }
+                catch (DocShifterLicenseException docShifterLicenseException) {
+                    log.debug("Module [{}] is not licensed.",
+                            module.getName(), docShifterLicenseException);
+                    moduleIsLicensedByCode.put(module.getCode(), false);
+                }
             }
         }
 
