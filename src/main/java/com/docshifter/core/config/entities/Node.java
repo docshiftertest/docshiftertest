@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,9 +22,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -44,34 +48,32 @@ public class Node implements Serializable {
 			joinColumns = {@JoinColumn(name = "parent_id")},
 			inverseJoinColumns = {@JoinColumn(name = "child_id")})
 	@JsonIgnore
+	@Nonnull
 	private Set<Node> parentNodes;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "parentNodes", cascade = CascadeType.ALL)
+	@Nonnull
 	private Set<Node> childNodes;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne
+	@Nullable
 	private ModuleConfiguration moduleConfiguration;
 
 	private double xPosition;
 
 	private double yPosition;
 
-	public Node(){}
+	public Node() {
+		childNodes = new HashSet<>();
+		parentNodes = new HashSet<>();
+	}
 	
-	public Node(Set<Node> parentNodes, ModuleConfiguration moduleConfiguration, double xPosition, double yPosition){
+	public Node(@Nonnull Set<Node> parentNodes, @Nullable ModuleConfiguration moduleConfiguration, double xPosition,
+				double yPosition){
+		this();
 		setParentNodes(parentNodes);
-		if (parentNodes != null) {
-			for (Node parentNode : parentNodes) {
-				parentNode.addChild(this);
-			}
-		} else {
-			this.parentNodes = new HashSet<>();
-		}
-		if (childNodes == null) {
-			this.childNodes = new HashSet<>();
-		}
 		this.moduleConfiguration = moduleConfiguration;
 		this.xPosition = xPosition;
 		this.yPosition = yPosition;
@@ -83,14 +85,14 @@ public class Node implements Serializable {
 		}
 		Node copied;
 		if (isRoot()) {
-			copied = new Node(null, moduleConfiguration, xPosition, yPosition);
+			copied = new Node(new HashSet<>(), moduleConfiguration, xPosition, yPosition);
 			if (copiedRoots != null) {
 				copiedRoots.add(copied);
 			}
 		} else {
 			encounteringChildren.add(this);
 			copied = new Node(parentNodes.stream()
-					.map(node -> deepCopy(alreadyEncountered, encounteringChildren, copiedRoots))
+					.map(n -> n.deepCopy(alreadyEncountered, encounteringChildren, copiedRoots))
 					.collect(Collectors.toUnmodifiableSet()), moduleConfiguration, xPosition, yPosition);
 			encounteringChildren.remove(this);
 		}
@@ -119,42 +121,70 @@ public class Node implements Serializable {
 		return copiedRoots;
 	}
 
-	public long getId(){
+	public long getId() {
 		return id;
 	}
 	
-	public void setId(long id){
+	public void setId(long id) {
 		this.id = id;
 	}
 
 
-	public Set<Node> getParentNodes(){
-		return parentNodes;
-	}
-	
-	public void setParentNodes(Set<Node> parentNodes){
-		this.parentNodes = parentNodes;
-	}
-	public void addChild(Node n){
-		this.childNodes.add(n);
+	public Set<Node> getParentNodes() {
+		return Collections.unmodifiableSet(parentNodes);
 	}
 
-	public Set<Node> getChildNodes(){
-		return childNodes;
-	}
-
-	public void setChildNodes(Set<Node> childNodes){
-		if (childNodes == null) {
-			childNodes = new HashSet<>();
+	public void setParentNodes(@Nonnull Set<Node> parentNodes) {
+		Objects.requireNonNull(parentNodes);
+		clearParents();
+		for (Node p : parentNodes) {
+			addParent(p);
 		}
-		this.childNodes = childNodes;
 	}
 
+	public void addChild(@Nonnull Node n) {
+		Objects.requireNonNull(n);
+		this.childNodes.add(n);
+		n.parentNodes.add(this);
+	}
+
+	public void removeChild(@Nonnull Node n) {
+		Objects.requireNonNull(n);
+		this.childNodes.remove(n);
+		n.parentNodes.remove(this);
+	}
+
+	public void addParent(@Nonnull Node p) {
+		Objects.requireNonNull(p);
+		this.parentNodes.add(p);
+		p.childNodes.add(this);
+	}
+
+	public void removeParent(@Nonnull Node p) {
+		Objects.requireNonNull(p);
+		this.parentNodes.remove(p);
+		p.childNodes.remove(this);
+	}
+
+	@Nonnull
+	public Set<Node> getChildNodes() {
+		return Collections.unmodifiableSet(childNodes);
+	}
+
+	public void setChildNodes(@Nonnull Set<Node> childNodes) {
+		Objects.requireNonNull(childNodes);
+		clearChildren();
+		for (Node c : childNodes) {
+			addChild(c);
+		}
+	}
+
+	@Nullable
 	public ModuleConfiguration getModuleConfiguration(){
 		return moduleConfiguration;
 	}
 	
-	public void setModuleConfiguration(ModuleConfiguration moduleConfiguration){
+	public void setModuleConfiguration(@Nullable ModuleConfiguration moduleConfiguration){
 		this.moduleConfiguration = moduleConfiguration;
 	}
 
@@ -174,15 +204,30 @@ public class Node implements Serializable {
 		this.yPosition = yPosition;
 	}
 
-	public void clearAllChildNodes(){
-		for(Node n : childNodes){
+	public void clearAllChildNodes() {
+		for (Node n : childNodes) {
 			n.clearAllChildNodes();
+			removeChild(n);
 		}
-		childNodes.clear();
 	}
 	
-	public void clearChild(){
-		this.childNodes.clear();
+	public void clearChildren() {
+		for (Node childNode : childNodes) {
+			removeChild(childNode);
+		}
+	}
+
+	public void clearAllParentNodes() {
+		for (Node n : parentNodes) {
+			n.clearAllParentNodes();
+			removeParent(n);
+		}
+	}
+
+	public void clearParents() {
+		for (Node parentNode : parentNodes) {
+			removeParent(parentNode);
+		}
 	}
 	
 	public boolean compareTo(Object o){
@@ -301,13 +346,14 @@ public class Node implements Serializable {
 	}
 
 	@Transient
-	public int getTotalChildNodesCount(){
-		if(isLeaf())
+	public int getTotalChildNodesCount() {
+		if(isLeaf()) {
 			return 0;
-		else{
+		} else {
 			int i = 0;
-			for(Node n : childNodes)
+			for (Node n : childNodes) {
 				i += n.getTotalChildNodesCount();
+			}
 			return i;
 		}
 	}

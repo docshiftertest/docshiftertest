@@ -6,6 +6,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
+import javax.annotation.Nonnull;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,6 +21,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -72,15 +74,19 @@ public class ChainConfiguration implements Serializable {
 			joinColumns = {@JoinColumn(name = "chain_configuration_id")},
 			inverseJoinColumns = {@JoinColumn(name = "node_id")})
 	@DiffIgnore
+	@Nonnull
 	private Set<Node> rootNodes;
 
 	@DiffInclude
 	private UUID uuid;
 
-	public ChainConfiguration() {}
+	public ChainConfiguration() {
+		rootNodes = new HashSet<>();
+	}
 
-	public ChainConfiguration(String name, String description, boolean enabled, Set<Node> rootNodes, String printerName,
-							  String queueName, long timeout, long priority, FailureLevel failureLevel, UUID uuid) {
+	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
+							  String printerName, String queueName, long timeout, long priority, FailureLevel failureLevel,
+							  UUID uuid) {
 		this(name, description, enabled, rootNodes, printerName, queueName, timeout, (int) priority, failureLevel, uuid);
 	}
 
@@ -93,21 +99,22 @@ public class ChainConfiguration implements Serializable {
 				copyMe.priority, copyMe.failureLevel);
 	}
 
-	public ChainConfiguration(String name, String description, boolean enabled, Set<Node> rootNodes,
+	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
 							  String printerName, String queueName, long timeout, int priority,
 							  FailureLevel failureLevel) {
 		this(name, description, enabled, rootNodes, printerName, queueName, timeout, priority, failureLevel,
 				UUID.randomUUID());
 	}
 
-	public ChainConfiguration(String name, String description, boolean enabled, Set<Node> rootNodes, String printerName,
-							  String queueName, long timeout, int priority, FailureLevel failureLevel, UUID uuid) {
+	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
+							  String printerName, String queueName, long timeout, int priority, FailureLevel failureLevel,
+							  UUID uuid) {
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
 		this.printerName = printerName;
 		this.queueName = queueName;
-		this.rootNodes = rootNodes == null ? new HashSet<>() : rootNodes;
+		setRootNodes(rootNodes);
 		this.timeout = timeout;
 		this.priority = priority;
 		this.failureLevel = failureLevel;
@@ -130,6 +137,7 @@ public class ChainConfiguration implements Serializable {
 	}
 
 
+	@Nonnull
 	public Set<Node> getRootNodes() {
 		return rootNodes;
 	}
@@ -153,8 +161,9 @@ public class ChainConfiguration implements Serializable {
 		this.name = name;
 	}
 
-	public void setRootNodes(Set<Node> rootNodes) {
-		this.rootNodes = rootNodes == null ? new HashSet<>() : rootNodes;
+	public void setRootNodes(@Nonnull Set<Node> rootNodes) {
+		Objects.requireNonNull(rootNodes);
+		this.rootNodes = rootNodes;
 	}
 
 	public String getPrinterName() {
