@@ -188,11 +188,11 @@ public class ChainConfigurationRepositoryTest extends AbstractSpringTest {
 		moduleConfigurationRepository.save(mc11);
 		moduleConfigurationRepository.save(mc12);
 
-		n1 = new Node(null, mc1, 0, 0);
-		n2 = new Node(Set.of(n1), mc2, 0, 50);
-		n3 = new Node(Set.of(n2), mc3, 0, 100);
-		n4 = new Node(null, mc4, 0, 150);
-		n7 = new Node(null, mc7, 0, 200);
+		n1 = new Node(new HashSet<>(), mc1, 0d, 0d);
+		n2 = new Node(Set.of(n1), mc2, 0d, 50d);
+		n3 = new Node(Set.of(n2), mc3, 0d, 100d);
+		n4 = new Node(new HashSet<>(), mc4, 0d, 150d);
+		n7 = new Node(new HashSet<>(), mc7, 0d, 200d);
 
 
 		chc1 = new ChainConfiguration("testchain", "desc", true, Set.of(n1), null, null, 60, 2, FailureLevel.FILE,

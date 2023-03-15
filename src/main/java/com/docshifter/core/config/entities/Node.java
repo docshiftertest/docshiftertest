@@ -61,17 +61,17 @@ public class Node implements Serializable {
 	@Nullable
 	private ModuleConfiguration moduleConfiguration;
 
-	private double xPosition;
+	private Double xPosition;
 
-	private double yPosition;
+	private Double yPosition;
 
 	public Node() {
 		childNodes = new HashSet<>();
 		parentNodes = new HashSet<>();
 	}
 	
-	public Node(@Nonnull Set<Node> parentNodes, @Nullable ModuleConfiguration moduleConfiguration, double xPosition,
-				double yPosition){
+	public Node(@Nonnull Set<Node> parentNodes, @Nullable ModuleConfiguration moduleConfiguration, Double xPosition,
+				Double yPosition){
 		this();
 		setParentNodes(parentNodes);
 		this.moduleConfiguration = moduleConfiguration;
@@ -188,19 +188,19 @@ public class Node implements Serializable {
 		this.moduleConfiguration = moduleConfiguration;
 	}
 
-	public double getXPosition() {
+	public Double getXPosition() {
 		return xPosition;
 	}
 
-	public void setXPosition(double xPosition) {
+	public void setXPosition(Double xPosition) {
 		this.xPosition = xPosition;
 	}
 
-	public double getYPosition() {
+	public Double getYPosition() {
 		return yPosition;
 	}
 
-	public void setYPosition(double yPosition) {
+	public void setYPosition(Double yPosition) {
 		this.yPosition = yPosition;
 	}
 
