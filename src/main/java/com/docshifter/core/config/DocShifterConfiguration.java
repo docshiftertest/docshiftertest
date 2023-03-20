@@ -121,6 +121,12 @@ public class DocShifterConfiguration {
 
 	@Bean
 	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
+	public JmsTemplate ongoingTaskJmsTemplate() {
+		return jmsTemplateFactory().create(IJmsTemplateFactory.HIGHEST_PRIORITY, 0,0);
+	}
+
+	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	@DependsOn("defaultJmsTemplate")
 	public JmsMessagingTemplate defaultMessagingTemplate () {
 		return new JmsMessagingTemplate(defaultJmsTemplate());
@@ -131,6 +137,13 @@ public class DocShifterConfiguration {
 	@DependsOn("metricsJmsTemplate")
 	public JmsMessagingTemplate metricsMessagingTemplate () {
 		return new JmsMessagingTemplate(metricsJmsTemplate());
+	}
+
+	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
+	@DependsOn("ongoingTaskJmsTemplate")
+	public JmsMessagingTemplate ongoingTaskMessagingTemplate () {
+		return new JmsMessagingTemplate(ongoingTaskJmsTemplate());
 	}
 
 	@Bean
@@ -195,6 +208,12 @@ public class DocShifterConfiguration {
 	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public ActiveMQQueue defaultMetricsQueue() {
 		return new ActiveMQQueue(generalConfigService.getString(Constants.MQ_METRICS_QUEUE));
+	}
+
+	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
+	public ActiveMQTopic ongoingTaskExchange() {
+		return new ActiveMQTopic(Constants.ONGOING_TASK_QUEUE);
 	}
 
 	@Bean

@@ -1,9 +1,10 @@
 package com.docshifter.core.exceptions;
 
 /**
- * {@link Exception} that can be thrown (mainly from within modules) to signify that an input was rejected.
+ * More specialized {@link IllegalArgumentException} that can be thrown (mainly from within modules) to signify that
+ * an input was rejected.
  */
-public class InputRejectedException extends Exception {
+public class InputRejectedException extends IllegalArgumentException {
 	public InputRejectedException() {
 		super();
 	}

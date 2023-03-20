@@ -129,6 +129,22 @@ public final class FileUtils {
         return FilenameUtils.getExtension(fileName);
     }
 
+    /**
+     * Gets the name minus the path from a full fileName.
+     * This method will handle a file in either Unix or Windows format. The text after the last forward or backslash is returned.
+     *   a/b/c.txt --> c.txt
+     *   a.txt     --> a.txt
+     *   a/b/c     --> c
+     *   a/b/c/    --> ""
+     * The output will be the same irrespective of the machine that the code is running on.
+     * @Return
+     * the name of the file without the path, or an empty string if none exists. Null bytes inside string will be removed
+     * @param fileName the fileName to query, null returns null
+     */
+    public static String getFilename(String fileName){
+        return FilenameUtils.getName(fileName);
+    }
+
     public static String getExtension(Path fileName){
         return FilenameUtils.getExtension(fileName.toString());
     }

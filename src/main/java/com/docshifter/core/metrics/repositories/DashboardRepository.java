@@ -206,10 +206,11 @@ ORDER BY workflowName""")
     // TODO: Implement backend (instead of solely frontend) pagination?
     @Query(value = """
 SELECT *
-FROM metrics.getErrorLogData(:success, :startDate, :endDate)""", nativeQuery = true) // Needs to be native as we are
+FROM metrics.getHistoryLogData(:level, :isSuccess, :startDate, :endDate)""", nativeQuery = true) // Needs to be native as we are
                                                                                      // calling into a custom PL/pgSQL
                                                                                      // function.
-    List<String> findAllLogsBySuccess(@Param("success") boolean success,
-                                        @Param("startDate") long startDate,
-                                        @Param("endDate") long endDate);
+    List<String> findAllLogsByLevel(@Param("level") String level,
+                                    @Param("isSuccess") Boolean isSuccess,
+                                    @Param("startDate") long startDate,
+                                    @Param("endDate") long endDate);
 }
