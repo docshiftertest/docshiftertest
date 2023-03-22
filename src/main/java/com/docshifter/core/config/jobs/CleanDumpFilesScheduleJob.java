@@ -50,7 +50,7 @@ public class CleanDumpFilesScheduleJob {
         });
 
         for(File file: files) {
-            FileUtils.deleteFile(scheduler, Path.of(file.getPath()), 3);
+            FileUtils.deleteFile(scheduler, Path.of(file.getPath()));
         }
     }
 }
