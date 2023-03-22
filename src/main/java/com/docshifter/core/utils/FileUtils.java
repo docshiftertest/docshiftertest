@@ -594,11 +594,8 @@ public final class FileUtils {
             try {
                 log.info("Deleting.. {}", dir);
                 Files.delete(dir);
-                return;
             } catch (IOException e) {
                 log.error("An error occurred when trying to delete the file: {}", dir);
-
-                return;
             }
 
         }
