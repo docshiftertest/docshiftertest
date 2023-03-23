@@ -598,6 +598,25 @@ public final class FileUtils {
 		return sBuf.toString();
 	}
 
+    /**
+      * Attempts to delete a file.
+	 * @param scheduler Used to schedule retries after a failure.
+	 * @param dir The directory or file to delete.
+	 * @return Whether the file could be deleted immediately, without any errors
+     */
+    public static void deleteFile(ScheduledExecutorService scheduler, Path dir) {
+        log.debug("Will try to delete a file... {}", dir);
+        if (!Files.isDirectory(dir) && Files.exists(dir)) {
+            try {
+                log.info("Deleting.. {}", dir);
+                Files.delete(dir);
+            } catch (IOException e) {
+                log.error("An error occurred when trying to delete the file: {}", dir);
+            }
+
+        }
+    }
+
 	/**
 	 * Attempts to delete a file or directory, taking into account the possibility of shenanigans happening related
 	 * to calling the Java I/O API on unconventional storage types (such as NAS). For example: File.exists()
