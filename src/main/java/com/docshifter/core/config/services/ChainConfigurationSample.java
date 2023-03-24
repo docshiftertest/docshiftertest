@@ -1,5 +1,6 @@
 package com.docshifter.core.config.services;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -21,4 +22,6 @@ public interface ChainConfigurationSample {
     Long getTimeout();
 
     UUID getUuid();
+
+    Date getLastModifiedDate();
 }

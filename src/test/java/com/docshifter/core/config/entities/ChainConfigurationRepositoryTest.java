@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Date;
 
 /**
  * Created by michiel.vandriessche@docbyte.com on 9/6/16.
@@ -194,7 +195,7 @@ public class ChainConfigurationRepositoryTest extends AbstractSpringTest {
 		n7 = new Node(null, mc7);
 
 
-		chc1 = new ChainConfiguration("testchain", "desc", true, n1, null, null, 60, 2, FailureLevel.FILE, UUID.randomUUID());
+		chc1 = new ChainConfiguration("testchain", "desc", true, n1, null, null, 60, 2, FailureLevel.FILE, UUID.randomUUID(), new Date());
 
 		chainConfigurationRepository.save(chc1);
 
