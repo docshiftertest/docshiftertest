@@ -45,8 +45,8 @@ public class Node implements Serializable {
 	@ManyToMany(cascade = CascadeType.REMOVE)
 	@JoinTable(
 			name = "node_connection",
-			joinColumns = {@JoinColumn(name = "parent_id")},
-			inverseJoinColumns = {@JoinColumn(name = "child_id")})
+			joinColumns = {@JoinColumn(name = "child_id")},
+			inverseJoinColumns = {@JoinColumn(name = "parent_id")})
 	@JsonIgnore
 	@Nonnull
 	private Set<Node> parentNodes;
