@@ -1,10 +1,10 @@
 package com.docshifter.core.exceptions;
 
 /**
- * {@link Exception} that can be thrown (mainly from within modules) to signify that the provided input is in a
- * format that is not supported by the module.
+ * More specialized {@link UnsupportedOperationException} that can be thrown (mainly from within modules) to signify that the
+ * provided input is in a format that is not supported by the module.
  */
-public class UnsupportedInputFormatException extends Exception {
+public class UnsupportedInputFormatException extends UnsupportedOperationException {
 	public UnsupportedInputFormatException() {
 		super();
 	}

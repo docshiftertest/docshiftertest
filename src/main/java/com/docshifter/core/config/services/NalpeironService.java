@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -592,33 +593,29 @@ public class NalpeironService implements ILicensingService {
     }
 
     /**
-     * Gets all the licensed modules for the license
-     * @return {@code String} list with the name of the licensed modules.
+     * Checks which module is licensed
+     * @return map with the code for the module and if it is licensed
      */
-    public List<String> getLicensedModules(List<Module> modules) {
+    public Map<String, Boolean> checkLicenseForAllModules(List<Module> modules) {
 
-        List<String> modulesLicensed = new ArrayList<>();
+        Map<String, Boolean> moduleIsLicensedByCode = new HashMap<>();
 
         for (Module module : modules) {
-
             if (StringUtils.isNotBlank(module.getCode())) {
                 try {
-                    NalpeironHelper.FeatureStatus featureStatus = helper.getFeatureStatus(module.getCode());
-                    if (featureStatus.isValid()) {
-                        modulesLicensed.add(module.getName());
-                    }
-                } catch (DocShifterLicenseException docShifterLicenseException) {
+                    moduleIsLicensedByCode.put(module.getCode(), helper.getFeatureStatus(module.getCode()).isValid());
+                }
+                catch (DocShifterLicenseException docShifterLicenseException) {
                     log.debug("Module [{}] is not licensed.",
                             module.getName(), docShifterLicenseException);
+                    moduleIsLicensedByCode.put(module.getCode(), false);
                 }
             }
         }
 
-        modulesLicensed = modulesLicensed.stream().sorted().toList();
+        log.debug("Modules licensed by code: {}", moduleIsLicensedByCode);
 
-        log.debug("Modules licensed: {}", modulesLicensed);
-
-        return modulesLicensed;
+        return moduleIsLicensedByCode;
     }
 
     /**

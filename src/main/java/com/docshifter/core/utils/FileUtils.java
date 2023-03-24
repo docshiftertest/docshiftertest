@@ -129,6 +129,22 @@ public final class FileUtils {
         return FilenameUtils.getExtension(fileName);
     }
 
+    /**
+     * Gets the name minus the path from a full fileName.
+     * This method will handle a file in either Unix or Windows format. The text after the last forward or backslash is returned.
+     *   a/b/c.txt --> c.txt
+     *   a.txt     --> a.txt
+     *   a/b/c     --> c
+     *   a/b/c/    --> ""
+     * The output will be the same irrespective of the machine that the code is running on.
+     * @Return
+     * the name of the file without the path, or an empty string if none exists. Null bytes inside string will be removed
+     * @param fileName the fileName to query, null returns null
+     */
+    public static String getFilename(String fileName){
+        return FilenameUtils.getName(fileName);
+    }
+
     public static String getExtension(Path fileName){
         return FilenameUtils.getExtension(fileName.toString());
     }
@@ -581,6 +597,25 @@ public final class FileUtils {
 		}
 		return sBuf.toString();
 	}
+
+    /**
+      * Attempts to delete a file.
+	 * @param scheduler Used to schedule retries after a failure.
+	 * @param dir The directory or file to delete.
+	 * @return Whether the file could be deleted immediately, without any errors
+     */
+    public static void deleteFile(ScheduledExecutorService scheduler, Path dir) {
+        log.debug("Will try to delete a file... {}", dir);
+        if (!Files.isDirectory(dir) && Files.exists(dir)) {
+            try {
+                log.info("Deleting.. {}", dir);
+                Files.delete(dir);
+            } catch (IOException e) {
+                log.error("An error occurred when trying to delete the file: {}", dir);
+            }
+
+        }
+    }
 
 	/**
 	 * Attempts to delete a file or directory, taking into account the possibility of shenanigans happening related
