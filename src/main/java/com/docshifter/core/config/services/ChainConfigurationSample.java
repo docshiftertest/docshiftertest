@@ -1,5 +1,6 @@
 package com.docshifter.core.config.services;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -23,5 +24,5 @@ public interface ChainConfigurationSample {
 
     UUID getUuid();
 
-    Date getLastModifiedDate();
+    LocalDateTime getLastModifiedDate();
 }
