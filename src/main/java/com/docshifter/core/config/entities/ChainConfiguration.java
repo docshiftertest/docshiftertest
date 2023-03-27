@@ -17,7 +17,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -70,17 +70,17 @@ public class ChainConfiguration implements Serializable {
 	private UUID uuid;
 
 	@DiffInclude
-	private Date lastModifiedDate;
+	private LocalDateTime lastModifiedDate;
 
 	public ChainConfiguration() {}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-			  long timeout, long priority, FailureLevel failureLevel, UUID uuid, Date lastModifiedDate) {
+			  long timeout, long priority, FailureLevel failureLevel, UUID uuid, LocalDateTime lastModifiedDate) {
 		this(name, description, enabled, rootNode, printerName, queueName, timeout, (int) priority, failureLevel, uuid, lastModifiedDate);
 	}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-							  long timeout, int priority, FailureLevel failureLevel, UUID uuid, Date lastModifiedDate) {
+							  long timeout, int priority, FailureLevel failureLevel, UUID uuid, LocalDateTime lastModifiedDate) {
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
@@ -189,11 +189,11 @@ public class ChainConfiguration implements Serializable {
 		this.uuid = uuid;
 	}
 
-	public Date getLastModifiedDate() {
+	public LocalDateTime getLastModifiedDate() {
 		return lastModifiedDate;
 	}
 
-	public void setLastModifiedDate(Date lastModifiedDate) {
+	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
