@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -196,7 +197,7 @@ public class ChainConfigurationRepositoryTest extends AbstractSpringTest {
 
 
 		chc1 = new ChainConfiguration("testchain", "desc", true, Set.of(n1), null, null, 60, 2, FailureLevel.FILE,
-				UUID.randomUUID());
+				LocalDateTime.now(), UUID.randomUUID());
 
 		chainConfigurationRepository.save(chc1);
 

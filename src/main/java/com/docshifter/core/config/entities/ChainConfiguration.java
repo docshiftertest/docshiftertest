@@ -20,6 +20,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -80,14 +81,18 @@ public class ChainConfiguration implements Serializable {
 	@DiffInclude
 	private UUID uuid;
 
+	@DiffInclude
+	private LocalDateTime lastModifiedDate;
+
 	public ChainConfiguration() {
 		rootNodes = new HashSet<>();
 	}
 
 	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
 							  String printerName, String queueName, long timeout, long priority, FailureLevel failureLevel,
-							  UUID uuid) {
-		this(name, description, enabled, rootNodes, printerName, queueName, timeout, (int) priority, failureLevel, uuid);
+							  LocalDateTime lastModifiedDate, UUID uuid) {
+		this(name, description, enabled, rootNodes, printerName, queueName, timeout, (int) priority, failureLevel,
+				lastModifiedDate, uuid);
 	}
 
 	public ChainConfiguration(ChainConfiguration copyMe) {
@@ -96,19 +101,19 @@ public class ChainConfiguration implements Serializable {
 						.findAny()
 						.map(Node::deepCopyGetRoots)
 						.orElse(new HashSet<>()), copyMe.printerName, copyMe.queueName, copyMe.timeout,
-				copyMe.priority, copyMe.failureLevel);
+				copyMe.priority, copyMe.failureLevel, copyMe.lastModifiedDate);
 	}
 
 	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
 							  String printerName, String queueName, long timeout, int priority,
-							  FailureLevel failureLevel) {
+							  FailureLevel failureLevel, LocalDateTime lastModifiedDate) {
 		this(name, description, enabled, rootNodes, printerName, queueName, timeout, priority, failureLevel,
-				UUID.randomUUID());
+				lastModifiedDate, UUID.randomUUID());
 	}
 
 	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
 							  String printerName, String queueName, long timeout, int priority, FailureLevel failureLevel,
-							  UUID uuid) {
+							  LocalDateTime lastModifiedDate, UUID uuid) {
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
@@ -119,6 +124,7 @@ public class ChainConfiguration implements Serializable {
 		this.priority = priority;
 		this.failureLevel = failureLevel;
 		this.uuid = uuid;
+		this.lastModifiedDate = lastModifiedDate;
 	}
 
 	public String getDescription() {
@@ -229,6 +235,14 @@ public class ChainConfiguration implements Serializable {
 				.iterateOverNode(action);
 	}
 
+	public LocalDateTime getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
 	@Override
 	public String toString() {
 		return "ChainConfiguration = {" +
@@ -252,6 +266,8 @@ public class ChainConfiguration implements Serializable {
 				this.failureLevel +
 				", uuid: " +
 				this.uuid +
+				", Last Modified Date " +
+				this.lastModifiedDate +
 				"}";
 	}
 }
