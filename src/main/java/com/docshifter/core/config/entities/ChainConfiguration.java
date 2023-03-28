@@ -231,8 +231,7 @@ public class ChainConfiguration implements Serializable {
 	public void forEachNode(Consumer<? super Node> action) {
 		rootNodes.stream()
 				.findAny()
-				.orElseThrow()
-				.iterateOverNode(action);
+				.ifPresent(n -> n.iterateOverNode(action));
 	}
 
 	public LocalDateTime getLastModifiedDate() {
