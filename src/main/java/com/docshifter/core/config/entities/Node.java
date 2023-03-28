@@ -1,7 +1,6 @@
 package com.docshifter.core.config.entities;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -47,7 +46,6 @@ public class Node implements Serializable {
 			name = "node_connection",
 			joinColumns = {@JoinColumn(name = "child_id")},
 			inverseJoinColumns = {@JoinColumn(name = "parent_id")})
-	@JsonIgnore
 	@Nonnull
 	private Set<Node> parentNodes;
 
@@ -364,7 +362,6 @@ public class Node implements Serializable {
 	}
 
 	@Transient
-	@JsonIgnore
 	public Set<Node> getRoots() {
 		if (isRoot()) {
 			return Set.of(this);
