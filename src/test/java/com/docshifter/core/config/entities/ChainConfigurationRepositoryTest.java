@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -197,7 +198,7 @@ public class ChainConfigurationRepositoryTest extends AbstractSpringTest {
 
 
 		chc1 = new ChainConfiguration("testchain", "desc", true, Set.of(n1), null, null, 60, 2, FailureLevel.FILE,
-				LocalDateTime.now(), UUID.randomUUID());
+				LocalDateTime.now(), EnumSet.noneOf(WorkflowRule.class), UUID.randomUUID());
 
 		chainConfigurationRepository.save(chc1);
 

@@ -1,6 +1,7 @@
 package com.docshifter.core.config.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -47,6 +48,7 @@ public class Node implements Serializable {
 			joinColumns = {@JoinColumn(name = "child_id")},
 			inverseJoinColumns = {@JoinColumn(name = "parent_id")})
 	@Nonnull
+	@JsonIgnore
 	private Set<Node> parentNodes;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -105,6 +107,8 @@ public class Node implements Serializable {
 	 * Performs a deep copy of the entire {@link Node} hierarchy.
 	 * @return The copied version of the current node.
 	 */
+	@Transient
+	@JsonIgnore
 	public Node deepCopy() {
 		return deepCopy(new HashMap<>(), new HashSet<>(), null);
 	}
@@ -113,6 +117,8 @@ public class Node implements Serializable {
 	 * Performs a deep copy of the entire {@link Node} hierarchy.
 	 * @return The copied version of all the root nodes in the hierarchy.
 	 */
+	@Transient
+	@JsonIgnore
 	public Set<Node> deepCopyGetRoots() {
 		Set<Node> copiedRoots = new HashSet<>();
 		deepCopy(new HashMap<>(), new HashSet<>(), copiedRoots);
@@ -344,6 +350,7 @@ public class Node implements Serializable {
 	}
 
 	@Transient
+	@JsonIgnore
 	public int getTotalChildNodesCount() {
 		if(isLeaf()) {
 			return 0;
@@ -357,11 +364,13 @@ public class Node implements Serializable {
 	}
 
 	@Transient
+	@JsonIgnore
 	public boolean isRoot() {
 		return parentNodes.isEmpty();
 	}
 
 	@Transient
+	@JsonIgnore
 	public Set<Node> getRoots() {
 		if (isRoot()) {
 			return Set.of(this);
@@ -374,6 +383,7 @@ public class Node implements Serializable {
 	}
 
 	@Transient
+	@JsonIgnore
 	public boolean isLeaf(){
 		return childNodes.isEmpty();
 	}

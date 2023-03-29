@@ -21,11 +21,15 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 
 //Read-only: Use this strategy when you are sure that your data never changes. If you try to update the data with this strategy Hibernate will throw an exception.
@@ -84,15 +88,18 @@ public class ChainConfiguration implements Serializable {
 	@DiffInclude
 	private LocalDateTime lastModifiedDate;
 
+	@DiffIgnore
+	private String brokenRules;
+
 	public ChainConfiguration() {
 		rootNodes = new HashSet<>();
 	}
 
 	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
 							  String printerName, String queueName, long timeout, long priority, FailureLevel failureLevel,
-							  LocalDateTime lastModifiedDate, UUID uuid) {
+							  LocalDateTime lastModifiedDate, @Nonnull Set<WorkflowRule> brokenRules, UUID uuid) {
 		this(name, description, enabled, rootNodes, printerName, queueName, timeout, (int) priority, failureLevel,
-				lastModifiedDate, uuid);
+				lastModifiedDate, brokenRules, uuid);
 	}
 
 	public ChainConfiguration(ChainConfiguration copyMe) {
@@ -101,19 +108,20 @@ public class ChainConfiguration implements Serializable {
 						.findAny()
 						.map(Node::deepCopyGetRoots)
 						.orElse(new HashSet<>()), copyMe.printerName, copyMe.queueName, copyMe.timeout,
-				copyMe.priority, copyMe.failureLevel, copyMe.lastModifiedDate);
+				copyMe.priority, copyMe.failureLevel, copyMe.lastModifiedDate, copyMe.getBrokenRules());
 	}
 
 	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
 							  String printerName, String queueName, long timeout, int priority,
-							  FailureLevel failureLevel, LocalDateTime lastModifiedDate) {
+							  FailureLevel failureLevel, LocalDateTime lastModifiedDate,
+							  @Nonnull Set<WorkflowRule> brokenRules) {
 		this(name, description, enabled, rootNodes, printerName, queueName, timeout, priority, failureLevel,
-				lastModifiedDate, UUID.randomUUID());
+				lastModifiedDate, brokenRules, UUID.randomUUID());
 	}
 
 	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
 							  String printerName, String queueName, long timeout, int priority, FailureLevel failureLevel,
-							  LocalDateTime lastModifiedDate, UUID uuid) {
+							  LocalDateTime lastModifiedDate, @Nonnull Set<WorkflowRule> brokenRules, UUID uuid) {
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
@@ -125,6 +133,7 @@ public class ChainConfiguration implements Serializable {
 		this.failureLevel = failureLevel;
 		this.uuid = uuid;
 		this.lastModifiedDate = lastModifiedDate;
+		setBrokenRules(brokenRules);
 	}
 
 	public String getDescription() {
@@ -240,6 +249,19 @@ public class ChainConfiguration implements Serializable {
 
 	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public Set<WorkflowRule> getBrokenRules() {
+		return Arrays.stream(brokenRules.split(","))
+				.map(WorkflowRule::valueOf)
+				.collect(Collectors.toCollection(() -> Collections.unmodifiableSet(EnumSet.noneOf(WorkflowRule.class))));
+	}
+
+	public void setBrokenRules(Set<WorkflowRule> brokenRules) {
+		Objects.requireNonNull(brokenRules);
+		this.brokenRules = brokenRules.stream()
+				.map(WorkflowRule::name)
+				.collect(Collectors.joining(","));
 	}
 
 	@Override
