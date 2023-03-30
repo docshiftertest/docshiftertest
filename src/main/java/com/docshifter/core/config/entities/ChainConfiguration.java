@@ -294,8 +294,10 @@ public class ChainConfiguration implements Serializable {
 				this.failureLevel +
 				", uuid: " +
 				this.uuid +
-				", Last Modified Date " +
+				", Last Modified Date: " +
 				this.lastModifiedDate +
+				", Broken Rules: " +
+				this.brokenRules +
 				"}";
 	}
 }
