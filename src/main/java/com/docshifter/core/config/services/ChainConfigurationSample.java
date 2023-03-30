@@ -39,8 +39,10 @@ public interface ChainConfigurationSample {
         if (StringUtils.isEmpty(getBrokenRules())) {
             return EnumSet.noneOf(WorkflowRule.class);
         }
-        return Arrays.stream(getBrokenRules().split(","))
-                .map(WorkflowRule::valueOf)
-                .collect(Collectors.toCollection(() -> Collections.unmodifiableSet(EnumSet.noneOf(WorkflowRule.class))));
+        return Collections.unmodifiableSet(
+                Arrays.stream(getBrokenRules().split(","))
+                        .map(WorkflowRule::valueOf)
+                        .collect(Collectors.toCollection(() -> EnumSet.noneOf(WorkflowRule.class)))
+        );
     }
 }

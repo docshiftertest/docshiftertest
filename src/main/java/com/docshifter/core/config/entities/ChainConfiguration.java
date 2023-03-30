@@ -257,9 +257,11 @@ public class ChainConfiguration implements Serializable {
 		if (StringUtils.isEmpty(brokenRules)) {
 			return EnumSet.noneOf(WorkflowRule.class);
 		}
-		return Arrays.stream(brokenRules.split(","))
-				.map(WorkflowRule::valueOf)
-				.collect(Collectors.toCollection(() -> Collections.unmodifiableSet(EnumSet.noneOf(WorkflowRule.class))));
+		return Collections.unmodifiableSet(
+				Arrays.stream(brokenRules.split(","))
+						.map(WorkflowRule::valueOf)
+						.collect(Collectors.toCollection(() -> EnumSet.noneOf(WorkflowRule.class)))
+		);
 	}
 
 	public void setBrokenRules(@Nonnull Set<WorkflowRule> brokenRules) {
