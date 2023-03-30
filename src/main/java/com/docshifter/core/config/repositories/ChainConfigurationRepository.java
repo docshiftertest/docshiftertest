@@ -34,15 +34,15 @@ public interface ChainConfigurationRepository extends CrudRepository<ChainConfig
     void deleteByIdIn(Set<Long> ids);
 
     @Modifying(flushAutomatically = true)
-    @Query("update ChainConfiguration cc set cc.enabled = ?1 where cc.id in ?2")
-    void enableWorkflowsById(boolean enable,Set<Long> ids);
+    @Query("update ChainConfiguration cc set cc.enabled = ?1 where cc.id in ?2 and (?1 = false or cc.brokenRules is null or cc.brokenRules = '')")
+    void enableWorkflowsById(boolean enable, Set<Long> ids);
     
     @Modifying(flushAutomatically = true)
-    @Query("update ChainConfiguration cc set cc.enabled = ?1 where cc.id = ?2")
+    @Query("update ChainConfiguration cc set cc.enabled = ?1 where cc.id = ?2 and (?1 = false or cc.brokenRules is null or cc.brokenRules = '')")
     void enableWorkFlow(boolean enable, Long id);
     
     @Modifying(flushAutomatically = true)
-    @Query("update ChainConfiguration cc set cc.enabled = ?1")
+    @Query("update ChainConfiguration cc set cc.enabled = ?1 where ?1 = false or cc.brokenRules is null or cc.brokenRules = ''")
     void enableOrDisableAllWorkFlows(boolean enable);
     
     @Query("select cc.name FROM ChainConfiguration cc where cc.id = :id")

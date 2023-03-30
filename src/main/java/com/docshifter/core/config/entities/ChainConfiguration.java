@@ -1,6 +1,7 @@
 package com.docshifter.core.config.entities;
 
 import com.docshifter.core.operations.FailureLevel;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.javers.core.metamodel.annotation.DiffIgnore;
@@ -251,13 +252,17 @@ public class ChainConfiguration implements Serializable {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
+	@Nonnull
 	public Set<WorkflowRule> getBrokenRules() {
+		if (StringUtils.isEmpty(brokenRules)) {
+			return EnumSet.noneOf(WorkflowRule.class);
+		}
 		return Arrays.stream(brokenRules.split(","))
 				.map(WorkflowRule::valueOf)
 				.collect(Collectors.toCollection(() -> Collections.unmodifiableSet(EnumSet.noneOf(WorkflowRule.class))));
 	}
 
-	public void setBrokenRules(Set<WorkflowRule> brokenRules) {
+	public void setBrokenRules(@Nonnull Set<WorkflowRule> brokenRules) {
 		Objects.requireNonNull(brokenRules);
 		this.brokenRules = brokenRules.stream()
 				.map(WorkflowRule::name)
