@@ -33,14 +33,17 @@ public interface ChainConfigurationRepository extends CrudRepository<ChainConfig
     @Modifying(flushAutomatically = true)
     void deleteByIdIn(Set<Long> ids);
 
+    // Only enable (true) workflows that have no broken rules, for disabling (false) we don't care
     @Modifying(flushAutomatically = true)
     @Query("update ChainConfiguration cc set cc.enabled = ?1 where cc.id in ?2 and (?1 = false or cc.brokenRules is null or cc.brokenRules = '')")
     void enableWorkflowsById(boolean enable, Set<Long> ids);
-    
+
+    // Only enable (true) the workflow if it has no broken rules, for disabling (false) we don't care
     @Modifying(flushAutomatically = true)
     @Query("update ChainConfiguration cc set cc.enabled = ?1 where cc.id = ?2 and (?1 = false or cc.brokenRules is null or cc.brokenRules = '')")
     void enableWorkFlow(boolean enable, Long id);
-    
+
+    // Only enable (true) all workflows that have no broken rules, for disabling (false) we don't care
     @Modifying(flushAutomatically = true)
     @Query("update ChainConfiguration cc set cc.enabled = ?1 where ?1 = false or cc.brokenRules is null or cc.brokenRules = ''")
     void enableOrDisableAllWorkFlows(boolean enable);

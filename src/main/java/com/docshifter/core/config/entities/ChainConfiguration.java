@@ -32,7 +32,12 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-
+/**
+ * An {@link Entity} that represents a workflow in DocShifter. A workflow has a couple of core configuration properties
+ * (such as a title, description, timeout,...) as well as an entire {@link Node} hierarchy (characterized by a
+ * {@link Set} of {@link #rootNodes root nodes}) and a linked
+ * {@link com.docshifter.core.monitoring.entities.Configuration monitoring configuration}.
+ */
 //Read-only: Use this strategy when you are sure that your data never changes. If you try to update the data with this strategy Hibernate will throw an exception.
 //Read-write: Use this strategy when you do lots of updates on your entity. It guarantees data consistency when multiple transactions try to access the same object. The transaction which accesses the object first acquires the lock and other transactions will not have access to the cache and will start fetching the data directly from the database.
 //Nonstrict-read-write:  It is similar to Read-write but there is no locking mechanism hence it does not guarantee data consistency between cache and database. Use this strategy when stale data for a small window is not a concern.
@@ -89,13 +94,24 @@ public class ChainConfiguration implements Serializable {
 	@DiffInclude
 	private LocalDateTime lastModifiedDate;
 
+	// This is a String because this class is a database entity and to persist a List/Set to the database you need
+	// another table to hold all your references in. So in this case we're working around that requirement by storing
+	// it as a simple text record internally, where the different (enum) elements are split by comma. NOTE: the
+	// public-facing getters/setters for this field do work with an EnumSet.
 	@DiffIgnore
 	private String brokenRules;
 
+	/**
+	 * Default constructor for JPA.
+	 */
 	public ChainConfiguration() {
 		rootNodes = new HashSet<>();
 	}
 
+	/**
+	 * Constructor that takes in all the parameters of a {@link ChainConfiguration}, but the {@code priority} as a
+	 * {@code long}.
+	 */
 	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
 							  String printerName, String queueName, long timeout, long priority, FailureLevel failureLevel,
 							  LocalDateTime lastModifiedDate, @Nonnull Set<WorkflowRule> brokenRules, UUID uuid) {
@@ -103,6 +119,10 @@ public class ChainConfiguration implements Serializable {
 				lastModifiedDate, brokenRules, uuid);
 	}
 
+	/**
+	 * Constructor that deeply copies another {@link ChainConfiguration}. NOTE: the ID and UUID will not be copied
+	 * over, so make sure to set it manually after constructing, if needed!
+	 */
 	public ChainConfiguration(ChainConfiguration copyMe) {
 		this(copyMe.name, copyMe.description, copyMe.enabled,
 				copyMe.rootNodes.stream()
@@ -112,6 +132,10 @@ public class ChainConfiguration implements Serializable {
 				copyMe.priority, copyMe.failureLevel, copyMe.lastModifiedDate, copyMe.getBrokenRules());
 	}
 
+	/**
+	 * Constructor that takes in all the parameters of a {@link ChainConfiguration}, except a {@code uuid}, which
+	 * will be randomly generated.
+	 */
 	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
 							  String printerName, String queueName, long timeout, int priority,
 							  FailureLevel failureLevel, LocalDateTime lastModifiedDate,
@@ -120,6 +144,9 @@ public class ChainConfiguration implements Serializable {
 				lastModifiedDate, brokenRules, UUID.randomUUID());
 	}
 
+	/**
+	 * Constructor that takes in all the parameters of a {@link ChainConfiguration}.
+	 */
 	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
 							  String printerName, String queueName, long timeout, int priority, FailureLevel failureLevel,
 							  LocalDateTime lastModifiedDate, @Nonnull Set<WorkflowRule> brokenRules, UUID uuid) {
@@ -252,6 +279,11 @@ public class ChainConfiguration implements Serializable {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
+	/**
+	 * Gets the requirements (i.e. {@link WorkflowRule}s) that the current workflow has not met for it to be
+	 * considered complete. If the returned {@link Set} is empty, then the current workflow is in a complete state of
+	 * course.
+	 */
 	@Nonnull
 	public Set<WorkflowRule> getBrokenRules() {
 		if (StringUtils.isEmpty(brokenRules)) {
@@ -264,6 +296,10 @@ public class ChainConfiguration implements Serializable {
 		);
 	}
 
+	/**
+	 * Sets the requirements (i.e. {@link WorkflowRule}s) that the current workflow has not met for it to be
+	 * considered complete.
+	 */
 	public void setBrokenRules(@Nonnull Set<WorkflowRule> brokenRules) {
 		Objects.requireNonNull(brokenRules);
 		this.brokenRules = brokenRules.stream()

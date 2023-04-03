@@ -32,6 +32,12 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * If an apple is the ingredient to make apple cake, then a node is an ingredient to make a workflow
+ * (or {@link ChainConfiguration} to be more correct)! Each node has a {@link ModuleConfiguration} and can be chained
+ * to one or more other nodes. That way, we can build an entire node hierarchy of parents and children, from root to
+ * leaf.
+ */
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
@@ -79,24 +85,45 @@ public class Node implements Serializable {
 		this.yPosition = yPosition;
 	}
 
+	/**
+	 * Recursive method that performs a deep copy of the entire {@link Node} hierarchy.
+	 * @param alreadyEncountered Keeps track of {@link Node}s that have already been encountered in the hierarchy
+	 *                              (= keys), and their copied versions (= values) that can be returned if we've
+	 *                              already encountered the current {@link Node}.
+	 * @param encounteringChildren Keeps track of child {@link Node}s that we are currently copying. This is to
+	 *                                prevent us from getting stuck in an infinite loop and performing double work
+	 *                                when we visit a parent node and then their children and then another parent
+	 *                                node that has common children and such...
+	 * @param copiedRoots If not {@code null}, all of the deeply copied root {@link Node}s will be stored in this
+	 * {@link Set}.
+	 * @return The copied version of the current node.
+	 */
 	private Node deepCopy(Map<Node, Node> alreadyEncountered, Set<Node> encounteringChildren, Set<Node> copiedRoots) {
 		if (alreadyEncountered.containsKey(this)) {
 			return alreadyEncountered.get(this);
 		}
 		Node copied;
 		if (isRoot()) {
+			// Root nodes have no parents, so use that specific constructor overload
+			// Just need to copy this node
 			copied = new Node(new HashSet<>(), moduleConfiguration, xPosition, yPosition);
+			// Make sure to track our copied root if it's necessary
 			if (copiedRoots != null) {
 				copiedRoots.add(copied);
 			}
 		} else {
+			// We're currently copying this node, so add it to the active encounteringChildren set
 			encounteringChildren.add(this);
+			// Make sure to recurse and copy the entire parent hierarchy first, before copying this node
 			copied = new Node(parentNodes.stream()
 					.map(n -> n.deepCopy(alreadyEncountered, encounteringChildren, copiedRoots))
 					.collect(Collectors.toUnmodifiableSet()), moduleConfiguration, xPosition, yPosition);
+			// Done copying this node, so we can remove it
 			encounteringChildren.remove(this);
 		}
 		alreadyEncountered.put(this, copied);
+		// Finally check if there are any children left that need copying (so nodes that we're currently not
+		// evaluating).
 		childNodes.stream()
 				.filter(n -> !encounteringChildren.contains(n))
 				.forEach(n -> n.deepCopy(alreadyEncountered, encounteringChildren, copiedRoots));
@@ -115,7 +142,8 @@ public class Node implements Serializable {
 
 	/**
 	 * Performs a deep copy of the entire {@link Node} hierarchy.
-	 * @return The copied version of all the root nodes in the hierarchy.
+	 * @return The copied version of all the root nodes in the hierarchy (and of course you can walk through this
+	 * entire hierarchy from these root nodes).
 	 */
 	@Transient
 	@JsonIgnore
@@ -133,13 +161,17 @@ public class Node implements Serializable {
 		this.id = id;
 	}
 
-
 	public Set<Node> getParentNodes() {
 		return Collections.unmodifiableSet(parentNodes);
 	}
 
+	/**
+	 * Overwrites the parent nodes with a different {@link Set} of parent nodes.
+	 */
 	public void setParentNodes(@Nonnull Set<Node> parentNodes) {
 		Objects.requireNonNull(parentNodes);
+		// Clear the (direct) parents of this node first to make sure we don't get any broken references (i.e. this
+		// node no longer pointing to a parent but said parent still pointing to this child)
 		clearParents();
 		for (Node p : parentNodes) {
 			addParent(p);
@@ -175,8 +207,13 @@ public class Node implements Serializable {
 		return Collections.unmodifiableSet(childNodes);
 	}
 
+	/**
+	 * Overwrites the child nodes with a different {@link Set} of child nodes.
+	 */
 	public void setChildNodes(@Nonnull Set<Node> childNodes) {
 		Objects.requireNonNull(childNodes);
+		// Clear the (direct) children of this node first to make sure we don't get any broken references (i.e. this
+		// node no longer pointing to a child but said child still pointing to this parent)
 		clearChildren();
 		for (Node c : childNodes) {
 			addChild(c);
@@ -192,35 +229,60 @@ public class Node implements Serializable {
 		this.moduleConfiguration = moduleConfiguration;
 	}
 
+	/**
+	 * Since version 8.0, we need to store the visual positions of each node, so they can be rendered correctly in the
+	 * brand-new workflow editor... So this delivers you the X coordinate.
+	 */
 	public Double getXPosition() {
 		return xPosition;
 	}
 
+	/**
+	 * Since version 8.0, we need to store the visual positions of each node, so they can be rendered correctly in the
+	 * brand-new workflow editor... So this allows you to set the X coordinate.
+	 */
 	public void setXPosition(Double xPosition) {
 		this.xPosition = xPosition;
 	}
 
+	/**
+	 * Since version 8.0, we need to store the visual positions of each node, so they can be rendered correctly in the
+	 * brand-new workflow editor... So this delivers you the Y coordinate.
+	 */
 	public Double getYPosition() {
 		return yPosition;
 	}
 
+	/**
+	 * Since version 8.0, we need to store the visual positions of each node, so they can be rendered correctly in the
+	 * brand-new workflow editor... So this allows you to set the Y coordinate.
+	 */
 	public void setYPosition(Double yPosition) {
 		this.yPosition = yPosition;
 	}
 
+	/**
+	 * Detaches the ENTIRE child hierarchy from the current node.
+	 */
 	public void clearAllChildNodes() {
 		for (Node n : childNodes) {
 			n.clearAllChildNodes();
 			removeChild(n);
 		}
 	}
-	
+
+	/**
+	 * Clears all the child nodes from the current node.
+	 */
 	public void clearChildren() {
 		for (Node childNode : childNodes) {
 			removeChild(childNode);
 		}
 	}
 
+	/**
+	 * Detaches the ENTIRE parent hierarchy from the current node.
+	 */
 	public void clearAllParentNodes() {
 		for (Node n : parentNodes) {
 			n.clearAllParentNodes();
@@ -228,6 +290,9 @@ public class Node implements Serializable {
 		}
 	}
 
+	/**
+	 * Clears all the parent nodes from the current node.
+	 */
 	public void clearParents() {
 		for (Node parentNode : parentNodes) {
 			removeParent(parentNode);
@@ -244,27 +309,27 @@ public class Node implements Serializable {
 			}
 			
 			for (Node child : childNodes) {
-				boolean exists = false;
+				boolean childExists = false;
 				for(Node otherChild : node.childNodes) {
 					if (child.compareTo(otherChild)) {
-						exists = true;
+						childExists = true;
 						break;
 					}
 				}
-				if (!exists) {
+				if (!childExists) {
 					return false;
 				}
 			}
 
 			for (Node parent : parentNodes) {
-				boolean exists = false;
+				boolean parentExists = false;
 				for (Node otherParent : node.parentNodes) {
 					if (parent.compareTo(otherParent)) {
-						exists = true;
+						parentExists = true;
 						break;
 					}
 				}
-				if (!exists) {
+				if (!parentExists) {
 					return false;
 				}
 			}
@@ -288,8 +353,8 @@ public class Node implements Serializable {
 
 	/**
 	 * Performs an action on all nodes in the node hierarchy (starting from this node, then recursively through its
-	 * parents, and finally through its children). The specified {@link Predicate} may return false to indicate an
-	 * early exit.
+	 * parents, and finally through its children). The specified {@link Predicate} may return {@code false} to
+	 * indicate an early exit.
 	 * @param func The action to perform. {@link Predicate} should return {@code true} in order to continue,
 	 * {@code false} in order to abort.
 	 */
@@ -297,24 +362,38 @@ public class Node implements Serializable {
 		iterateOverNode(func, new HashSet<>());
 	}
 
+	/**
+	 * Recursive method that performs an action on all nodes in the node hierarchy (starting from this node, then
+	 * recursively through its parents, and finally through its children). The specified {@link Predicate} may return
+	 * {@code false} to indicate an early exit.
+	 * @param func The action to perform. {@link Predicate} should return {@code true} in order to continue,
+	 * {@code false} in order to abort.
+	 * @param alreadyEncountered Keeps track of {@link Node}s that have already been encountered in the hierarchy so
+	 *                              we can skip over if we encounter them again.
+	 * @return {@code false} if an abort was signalled, {@code true} otherwise.
+	 */
 	private boolean iterateOverNode(Predicate<? super Node> func, Set<Node> alreadyEncountered) {
-		if (alreadyEncountered.contains(this)) {
+		if (!alreadyEncountered.add(this)) {
+			// If we already encountered this node, carry on...
 			return true;
 		}
-		alreadyEncountered.add(this);
+		// Run the predicate for the current node
 		if (!func.test(this)) {
 			return false;
 		}
+		// Then recurse over all the parent nodes
 		for (Node parentNode : parentNodes) {
 			if (!parentNode.iterateOverNode(func, alreadyEncountered)) {
 				return false;
 			}
 		}
+		// And finally the child nodes
 		for (Node childNode : childNodes) {
 			if (!childNode.iterateOverNode(func, alreadyEncountered)) {
 				return false;
 			}
 		}
+		// If we get to this point, carry on (otherwise we're in abort mode)
 		return true;
 	}
 
@@ -339,7 +418,13 @@ public class Node implements Serializable {
 			return true;
 		}
 
-		Set<Node> checkSet = Arrays.stream(nodesToCheck).skip(1).collect(Collectors.toSet());
+		// We will iterate starting from the first node in the array, the other nodes can be stored in our "check set".
+		// Basically we need to find each node in our check set while iterating over the node structure (originating
+		// from the first node), only then can we be certain that all the provided nodes are in some way connected
+		// together.
+		Set<Node> checkSet = Arrays.stream(nodesToCheck)
+				.skip(1)
+				.collect(Collectors.toSet());
 		nodesToCheck[0].iterateOverNode(node -> {
 			if (checkSet.remove(node)) {
 				return !checkSet.isEmpty();

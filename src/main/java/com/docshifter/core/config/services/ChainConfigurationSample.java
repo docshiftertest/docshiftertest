@@ -1,5 +1,6 @@
 package com.docshifter.core.config.services;
 
+import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.entities.WorkflowRule;
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,6 +36,13 @@ public interface ChainConfigurationSample {
 
     String getBrokenRules();
 
+    /**
+     * A more "friendly" representation of the output returned by {@link #getBrokenRules()}, as that simply fetches
+     * and fills the raw text as stored in the database into this sample. This method actually parses the raw text
+     * into a {@link Set} of {@link WorkflowRule}s, analogous to how it's implemented on the real
+     * {@link com.docshifter.core.config.entities.ChainConfiguration} entity
+     * (see {@link ChainConfiguration#getBrokenRules()}).
+     */
     default Set<WorkflowRule> getFriendlyBrokenRules() {
         if (StringUtils.isEmpty(getBrokenRules())) {
             return EnumSet.noneOf(WorkflowRule.class);
