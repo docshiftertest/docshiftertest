@@ -4,9 +4,7 @@ import com.docshifter.core.utils.FileUtils;
 import com.google.common.jimfs.Jimfs;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.LocaleUtils;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,9 +58,17 @@ public class LicenseHelper {
 	private final com.aspose.html.License htmlLicense = new com.aspose.html.License();
 	private final com.aspose.barcode.License barcodeLicense = new com.aspose.barcode.License();
 
-	private static final LicenseHelper licenseHelper = new LicenseHelper(Executors.newSingleThreadScheduledExecutor());
+	private static final LicenseHelper licenseHelper;
 
-	private LicenseHelper(ScheduledExecutorService sExe) {
+	static {
+		try {
+			licenseHelper = new LicenseHelper(Executors.newSingleThreadScheduledExecutor());
+		} catch (Exception exc) {
+			throw new RuntimeException(exc);
+		}
+	}
+
+	private LicenseHelper(ScheduledExecutorService sExe) throws Exception {
 		byte[] licenceBytes = Base64.getDecoder().decode(B64.getBytes(StandardCharsets.UTF_8));
 		String tmpFileName = UUID.randomUUID().toString();
 		try (FileSystem fs = Jimfs.newFileSystem()) {
@@ -72,11 +78,15 @@ public class LicenseHelper {
 			Path vfsLicFile = licFolder.resolve(tmpFileName);
 			setLicences(vfsLicFile, licenceBytes);
 		}
-		catch (IOException ioe) {
-			log.warn("We got an IO exception trying to use the VFS! Switched to the old method, using tmp dir");
+		catch (Exception exc) {
+			log.warn("We got an Exception trying to use the VFS! Switched to the old method, using tmp dir", exc);
 			Path tmpLicFile = Paths.get(System.getProperty("java.io.tmpdir"), tmpFileName);
-			setLicences(tmpLicFile, licenceBytes);
-			FileUtils.deletePath(sExe, tmpLicFile, true);
+			try {
+				setLicences(tmpLicFile, licenceBytes);
+			}
+			finally {
+				FileUtils.deletePath(sExe, tmpLicFile, true);
+			}
 		}
 	}
 
@@ -112,8 +122,9 @@ public class LicenseHelper {
 	 * be fromm a VFS, or if that didn't work, some temp file...
 	 * @param licFile A VFS file or a file from the temp dir to contain the licence bytes
 	 * @param licenceBytes A byte[] of the actual bytes making up the Asspose licence
+	 * @throws Exception if anything goes wrong setting the licences (I/O or Asspose exception)
 	 */
-	private void setLicences(Path licFile, byte[] licenceBytes) {
+	private void setLicences(Path licFile, byte[] licenceBytes) throws Exception {
 		setLocales();
 		try {
 			Files.write(licFile, licenceBytes);
@@ -122,26 +133,21 @@ public class LicenseHelper {
 			log.error("Trying to write to: {}, we hit an IOException", licFile, ioe);
 		}
 
-		try {
-			log.debug("Setting the licences");
-			emailLicense.setLicense(Files.newInputStream(licFile));
-			slidesLicense.setLicense(Files.newInputStream(licFile));
-			cellsLicense.setLicense(Files.newInputStream(licFile));
-			wordsLicense.setLicense(Files.newInputStream(licFile));
-			pdfLicense.setLicense(Files.newInputStream(licFile));
-			imgLicense.setLicense(Files.newInputStream(licFile));
-			tasksLicense.setLicense(Files.newInputStream(licFile));
-			//log.debug("About to do OCR licence");
-			//ocrLicense.setLicense(tmpFileFullPathStr);
-			//log.debug("OCR licence valid is: " + ocrLicense.isValid());
-			cadLicense.setLicense(Files.newInputStream(licFile));
-			diagramLicense.setLicense(Files.newInputStream(licFile));
-			htmlLicense.setLicense(Files.newInputStream(licFile));
-			barcodeLicense.setLicense(Files.newInputStream(licFile));
-		}
-		catch (Exception ex) {
-			log.error("An error occurred while loading in an Aspose license.", ex);
-		}
+		log.debug("Setting the licences");
+		emailLicense.setLicense(Files.newInputStream(licFile));
+		slidesLicense.setLicense(Files.newInputStream(licFile));
+		cellsLicense.setLicense(Files.newInputStream(licFile));
+		wordsLicense.setLicense(Files.newInputStream(licFile));
+		pdfLicense.setLicense(Files.newInputStream(licFile));
+		imgLicense.setLicense(Files.newInputStream(licFile));
+		tasksLicense.setLicense(Files.newInputStream(licFile));
+		//log.debug("About to do OCR licence");
+		//ocrLicense.setLicense(tmpFileFullPathStr);
+		//log.debug("OCR licence valid is: " + ocrLicense.isValid());
+		cadLicense.setLicense(Files.newInputStream(licFile));
+		diagramLicense.setLicense(Files.newInputStream(licFile));
+		htmlLicense.setLicense(Files.newInputStream(licFile));
+		barcodeLicense.setLicense(Files.newInputStream(licFile));
 		if (log.isDebugEnabled()) {
 			log.debug("Following Aspose versions are in use:");
 			for (String feature : AsposeVersionUtil.getSupportedFeatures()) {
