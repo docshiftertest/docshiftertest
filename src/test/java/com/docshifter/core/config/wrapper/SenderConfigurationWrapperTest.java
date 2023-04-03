@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.reset;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import javax.naming.ConfigurationException;
@@ -191,8 +192,9 @@ public class SenderConfigurationWrapperTest {
 	private SenderConfigurationWrapper setupForConfigTest(Map<Parameter, String> paramMap) throws ConfigurationException {
 		// Manually build the ModuleConfiguration with a custom ParamMap
 		ModuleConfiguration moduleConfiguration = new ModuleConfiguration(new Module(), "Some Module", "Indescribable", UUID.randomUUID(), paramMap);
-		Node node = new Node(null, moduleConfiguration);
-		when(chainConfigRepo.findByRootNode(any(Node.class))).thenReturn(chainConfig);
+		// Since 8.0 we store the x and y positions of a config in a Workflow...
+		Node node = new Node(new HashSet<>(), moduleConfiguration, 0d, 0d);
+		when(chainConfigRepo.findByRootNodes(any(Node.class))).thenReturn(chainConfig);
 		SenderConfigurationWrapper config = new SenderConfigurationWrapper(node, chainConfigRepo);
 		return config;
 	}
