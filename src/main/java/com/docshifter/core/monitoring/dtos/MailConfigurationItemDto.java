@@ -1,9 +1,8 @@
 package com.docshifter.core.monitoring.dtos;
 
+import com.docshifter.core.monitoring.enums.ConfigurationTypes;
 import com.docshifter.core.security.utils.SecurityProperties;
 import com.docshifter.core.security.utils.SecurityUtils;
-import com.docshifter.core.monitoring.dtos.AbstractConfigurationItemDto;
-import com.docshifter.core.monitoring.enums.ConfigurationTypes;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Arrays;
@@ -58,30 +57,26 @@ public class MailConfigurationItemDto extends AbstractConfigurationItemDto {
     }
 
     public String getPassword() {
-    	
-    	if(StringUtils.isBlank(password) && StringUtils.isNotBlank(this.getEncryptedPassword())) {
-    		return SecurityUtils.decryptMessage(this.getEncryptedPassword(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
-    				SecurityProperties.SECRET.getValue(), this.getClass());
-    	}
-    	
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
-        if (StringUtils.isNotBlank(password)) {
-            this.setEncryptedPassword();
-        }
+        this.setEncryptedPassword();
     }
 
     public String getEncryptedPassword() {
 		return encryptedPassword;
 	}
 
-	private void setEncryptedPassword() {
-		this.encryptedPassword = SecurityUtils.encryptMessage(this.getPassword(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
-				SecurityProperties.SECRET.getValue(), this.getClass());
-	}
+    private void setEncryptedPassword() {
+        if (StringUtils.isBlank(password)) {
+            this.encryptedPassword = "";
+        } else {
+            this.encryptedPassword = SecurityUtils.encryptMessage(this.getPassword(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
+                    SecurityProperties.SECRET.getValue(), this.getClass());
+        }
+    }
 
 	public String getFromAddress() {
         return fromAddress;
@@ -146,21 +141,13 @@ public class MailConfigurationItemDto extends AbstractConfigurationItemDto {
     }
 
     public String getClientSecret() {
-
-        if (StringUtils.isBlank(clientSecret) && StringUtils.isNotBlank(this.getEncryptedClientSecret())) {
-            return SecurityUtils.decryptMessage(this.getEncryptedClientSecret(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
-                    SecurityProperties.SECRET.getValue(), this.getClass());
-        }
-
         return clientSecret;
     }
 
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
 
-        if (StringUtils.isNotBlank(clientSecret)) {
-            this.setEncryptedClientSecret();
-        }
+        this.setEncryptedClientSecret();
     }
 
     public String getEncryptedClientSecret() {
@@ -168,8 +155,12 @@ public class MailConfigurationItemDto extends AbstractConfigurationItemDto {
     }
 
     private void setEncryptedClientSecret() {
-        this.encryptedClientSecret = SecurityUtils.encryptMessage(this.getClientSecret(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
-                SecurityProperties.SECRET.getValue(), this.getClass());
+        if (StringUtils.isBlank(clientSecret)) {
+            this.encryptedClientSecret = "";
+        } else {
+            this.encryptedClientSecret = SecurityUtils.encryptMessage(this.getClientSecret(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
+                    SecurityProperties.SECRET.getValue(), this.getClass());
+        }
     }
 
     public String getTenant() {

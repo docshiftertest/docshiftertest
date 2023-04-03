@@ -44,12 +44,12 @@ public class DbConfigurationItemDto extends AbstractConfigurationItemDto {
     }
 
     public String getPassword() {
-    	
+
     	if(StringUtils.isBlank(password)) {
     		return SecurityUtils.decryptMessage(this.getEncryptedPassword(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
     				SecurityProperties.SECRET.getValue(), this.getClass());
     	}
-    	
+
         return password;
     }
 
@@ -63,8 +63,11 @@ public class DbConfigurationItemDto extends AbstractConfigurationItemDto {
 	}
 
 	private void setEncryptedPassword() {
-		this.encryptedPassword = SecurityUtils.encryptMessage(this.getPassword(), SecurityProperties.DEFAULT_ALGORITHM.getValue(),
-				SecurityProperties.SECRET.getValue(), this.getClass());
+        if (StringUtils.isBlank(this.password)) {
+            this.encryptedPassword = "";
+        } else {
+            this.encryptedPassword = SecurityUtils.encryptMessage(this.getPassword(), SecurityProperties.DEFAULT_ALGORITHM.getValue(), SecurityProperties.SECRET.getValue(), this.getClass());
+        }
 	}
 
     public String getTableName() {

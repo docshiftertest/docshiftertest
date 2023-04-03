@@ -17,6 +17,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -68,15 +69,18 @@ public class ChainConfiguration implements Serializable {
 	@DiffInclude
 	private UUID uuid;
 
+	@DiffInclude
+	private LocalDateTime lastModifiedDate;
+
 	public ChainConfiguration() {}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-			  long timeout, long priority, FailureLevel failureLevel, UUID uuid) {
-		this(name, description, enabled, rootNode, printerName, queueName, timeout, (int) priority, failureLevel, uuid);
+			  long timeout, long priority, FailureLevel failureLevel, UUID uuid, LocalDateTime lastModifiedDate) {
+		this(name, description, enabled, rootNode, printerName, queueName, timeout, (int) priority, failureLevel, uuid, lastModifiedDate);
 	}
 
 	public ChainConfiguration(String name, String description, boolean enabled, Node rootNode, String printerName, String queueName,
-							  long timeout, int priority, FailureLevel failureLevel, UUID uuid) {
+							  long timeout, int priority, FailureLevel failureLevel, UUID uuid, LocalDateTime lastModifiedDate) {
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
@@ -87,6 +91,7 @@ public class ChainConfiguration implements Serializable {
 		this.priority = priority;
 		this.failureLevel = failureLevel;
 		this.uuid = uuid;
+		this.lastModifiedDate = lastModifiedDate;
 	}
 
 	public String getDescription() {
@@ -184,6 +189,14 @@ public class ChainConfiguration implements Serializable {
 		this.uuid = uuid;
 	}
 
+	public LocalDateTime getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
 	@Override
 	public String toString() {
 		return "ChainConfiguration = {" +
@@ -207,6 +220,8 @@ public class ChainConfiguration implements Serializable {
 				this.failureLevel +
 				", uuid: " +
 				this.uuid +
+				", Last Modified Date " +
+				this.lastModifiedDate +
 				"}";
 	}
 }
