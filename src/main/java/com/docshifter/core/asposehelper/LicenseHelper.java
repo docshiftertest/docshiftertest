@@ -65,18 +65,18 @@ public class LicenseHelper {
 	private LicenseHelper(ScheduledExecutorService sExe) {
 		byte[] licenceBytes = Base64.getDecoder().decode(B64.getBytes(StandardCharsets.UTF_8));
 		String tmpFileName = UUID.randomUUID().toString();
-		Path licFile = Paths.get(System.getProperty("java.io.tmpdir"), tmpFileName);
 		try (FileSystem fs = Jimfs.newFileSystem()) {
 			log.debug("Setting licences using the new VFS approach");
 			Path licFolder = fs.getPath("/lic");
 			Files.createDirectory(licFolder);
-			licFile = licFolder.resolve(tmpFileName);
-			setLicences(licFile, licenceBytes);
+			Path vfsLicFile = licFolder.resolve(tmpFileName);
+			setLicences(vfsLicFile, licenceBytes);
 		}
 		catch (IOException ioe) {
 			log.warn("We got an IO exception trying to use the VFS! Switched to the old method, using tmp dir");
-			setLicences(licFile, licenceBytes);
-			FileUtils.deletePath(sExe, licFile, true);
+			Path tmpLicFile = Paths.get(System.getProperty("java.io.tmpdir"), tmpFileName);
+			setLicences(tmpLicFile, licenceBytes);
+			FileUtils.deletePath(sExe, tmpLicFile, true);
 		}
 	}
 
