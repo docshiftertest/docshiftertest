@@ -52,15 +52,13 @@ public class AsposeVersionUtil {
 	 * @return String Pom version and actual version of the given aspose lib
 	 */
 	public static String getImplementationVersions(String className) {
-		StringBuilder sBuf = new StringBuilder();
-		sBuf.append("[");
-		sBuf.append(className);
-		sBuf.append("] ");
-		sBuf.append("Pom version: ");
-		sBuf.append(getVersionFromPom(className));
-		sBuf.append("  Actual version: ");
-		sBuf.append(getActualVersion(className));
-		return sBuf.toString();
+		return "[" +
+				className +
+				"] " +
+				"Pom version: " +
+				getVersionFromPom(className) +
+				"  Actual version: " +
+				getActualVersion(className);
 	}
 
 	/**
@@ -68,6 +66,10 @@ public class AsposeVersionUtil {
 	 * @param className the aspose library (e.g. words, slides, pdf, ocr...)
 	 * @return String the property set in the pom 
 	 *     (for e.g. ${aspose.words.version}, ${aspose.pdf.version}, ...)
+	 *
+	 * N.B. This depends on having the aspose_versions.properties file present, which is created
+	 *      when yuo do a maven build, otherwise you get a slightly odd null pointer message and
+	 *      Unknown for the pom version!
 	 */
 	public static String getVersionFromPom(String className) {
 		return getProperty("aspose_versions.properties", "aspose." + className.toLowerCase() + ".version");
