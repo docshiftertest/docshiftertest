@@ -1,16 +1,18 @@
 package com.docshifter.core.asposehelper;
 
 import com.docshifter.core.utils.FileUtils;
+import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.LocaleUtils;
+
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
-import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -71,7 +73,7 @@ public class LicenseHelper {
 	private LicenseHelper(ScheduledExecutorService sExe) throws Exception {
 		byte[] licenceBytes = Base64.getDecoder().decode(B64.getBytes(StandardCharsets.UTF_8));
 		String tmpFileName = UUID.randomUUID().toString();
-		try (FileSystem fs = Jimfs.newFileSystem()) {
+		try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
 			log.debug("Setting licences using the new VFS approach");
 			Path licFolder = fs.getPath("/lic");
 			Files.createDirectory(licFolder);
