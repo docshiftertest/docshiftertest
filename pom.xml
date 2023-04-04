@@ -23,7 +23,7 @@
         <!-- SIGHS -->
         <!-- aspose.cad.classifier>jdk16</aspose.cad.classifier -->
         <!-- pageSize A4 becomes letter starting on version 22.7 and onwards -->
-        <aspose.cells.version>22.6</aspose.cells.version>
+        <aspose.cells.version>23.3</aspose.cells.version>
         <aspose.diagram.version>22.4</aspose.diagram.version>
         <aspose.diagram.classifier>jdk16</aspose.diagram.classifier>
         <aspose.email.version>22.10</aspose.email.version>
@@ -35,7 +35,7 @@
         <aspose.note.classifier>jdk17</aspose.note.classifier>
         -->
         <!--		<aspose.ocr.version>21.5</aspose.ocr.version>-->
-        <aspose.pdf.version>23.2</aspose.pdf.version>
+        <aspose.pdf.version>23.3</aspose.pdf.version>
         <aspose.pdf.classifier>jdk17</aspose.pdf.classifier>
         <!-- Be careful when bumping slides to a higher version! There seems to be a licensing-related issue in
          combination with Java 17, potentially due to the Xerces dependency:
@@ -45,7 +45,7 @@
         <!-- Kept back to 20.12 because of hideous spamming of tmp by awful borked Asspose lib -->
         <aspose.tasks.version>22.3</aspose.tasks.version>
         <aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
-        <aspose.words.version>22.11</aspose.words.version>
+        <aspose.words.version>23.3</aspose.words.version>
         <aspose.words.classifier>jdk17</aspose.words.classifier>
         <aspose.html.version>21.12</aspose.html.version>
         <!-- Despite the fact Aspose claim a classifier is not needed, apparently it is -->
