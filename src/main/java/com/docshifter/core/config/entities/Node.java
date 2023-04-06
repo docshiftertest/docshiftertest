@@ -48,7 +48,7 @@ public class Node implements Serializable {
 	private long id;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	@ManyToMany(cascade = CascadeType.REMOVE)
+	@ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "node_connection",
 			joinColumns = {@JoinColumn(name = "child_id")},
