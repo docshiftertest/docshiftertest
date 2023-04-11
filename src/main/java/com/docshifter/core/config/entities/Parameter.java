@@ -2,6 +2,7 @@ package com.docshifter.core.config.entities;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 
 import javax.persistence.Cacheable;
@@ -26,7 +27,9 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	private String description;
 	private String type;
 	private Boolean required;
-	@Column(length = 100000)
+
+	@Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
+	@Column(columnDefinition = "jsonb")
 	private String valuesJson;
 	private String parameterGroup;
 	
