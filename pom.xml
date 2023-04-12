@@ -45,7 +45,7 @@
         <!-- Kept back to 20.12 because of hideous spamming of tmp by awful borked Asspose lib -->
         <aspose.tasks.version>22.3</aspose.tasks.version>
         <aspose.tasks.classifier>jdk18</aspose.tasks.classifier>
-        <aspose.words.version>23.3</aspose.words.version>
+        <aspose.words.version>23.4</aspose.words.version>
         <aspose.words.classifier>jdk17</aspose.words.classifier>
         <aspose.html.version>21.12</aspose.html.version>
         <!-- Despite the fact Aspose claim a classifier is not needed, apparently it is -->
