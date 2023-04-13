@@ -95,11 +95,12 @@ public final class ConfigUtils {
 	 *                 -> [1,2,3,5,7,8]
 	 *              <p>
 	 *              The
-	 *                 individual integers or lower or upper bounds can also be the special sequence {@code LAST}
-	 *                 (case-insensitive), which then dynamically refers to the last/highest possible integer
-	 *                 in the sequence (so this depends on the global maximum bound). Furthermore, any of the 4 basic
-	 *                 arithmetic operations (+, -, /, *) may take place on the {@code LAST} sequence, given that this
-	 *                 operation is specified between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
+	 *                 individual integers or lower or upper bounds can also be one of the special sequences
+	 *                 {@code FIRST} or {@code LAST} (case-insensitive), which then dynamically refers to respectively
+	 *                 the first/lowest or last/highest possible integer in the sequence (so this depends on the global
+	 *                 minimum/maximum bounds). Furthermore, any of the 4 basic arithmetic operations (+, -, /, *) may
+	 *                 take place on the {@code FIRST}/{@code LAST} sequences, given that this operation is specified
+	 *                 between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
 	 *              <p>
 	 *              "Normal" entries
 	 *                 will be combined in the final range of integers, but there is also the possibility to create a
@@ -129,11 +130,12 @@ public final class ConfigUtils {
 	 *                 -> [1,2,3,5,7,8]
 	 *              <p>
 	 *              The
-	 *                 individual integers or lower or upper bounds can also be the special sequence {@code LAST}
-	 *                 (case-insensitive), which then dynamically refers to the last/highest possible integer
-	 *                 in the sequence (so this depends on the global maximum bound). Furthermore, any of the 4 basic
-	 *                 arithmetic operations (+, -, /, *) may take place on the {@code LAST} sequence, given that this
-	 *                 operation is specified between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
+	 *                 individual integers or lower or upper bounds can also be one of the special sequences
+	 *                 {@code FIRST} or {@code LAST} (case-insensitive), which then dynamically refers to respectively
+	 *                 the first/lowest or last/highest possible integer in the sequence (so this depends on the global
+	 *                 minimum/maximum bounds). Furthermore, any of the 4 basic arithmetic operations (+, -, /, *) may
+	 *                 take place on the {@code FIRST}/{@code LAST} sequences, given that this operation is specified
+	 *                 between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
 	 *              <p>
 	 *              "Normal" entries
 	 *                 will be combined in the final range of integers, but there is also the possibility to create a
@@ -219,11 +221,12 @@ public final class ConfigUtils {
 	 *                 -> [1,2,3,5,7,8]
 	 *              <p>
 	 *              The
-	 *                 individual integers or lower or upper bounds can also be the special sequence {@code LAST}
-	 *                 (case-insensitive), which then dynamically refers to the last/highest possible integer
-	 *                 in the sequence (so this depends on the global maximum bound). Furthermore, any of the 4 basic
-	 *                 arithmetic operations (+, -, /, *) may take place on the {@code LAST} sequence, given that this
-	 *                 operation is specified between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
+	 *                 individual integers or lower or upper bounds can also be one of the special sequences
+	 *                 {@code FIRST} or {@code LAST} (case-insensitive), which then dynamically refers to respectively
+	 *                 the first/lowest or last/highest possible integer in the sequence (so this depends on the global
+	 *                 minimum/maximum bounds). Furthermore, any of the 4 basic arithmetic operations (+, -, /, *) may
+	 *                 take place on the {@code FIRST}/{@code LAST} sequences, given that this operation is specified
+	 *                 between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
 	 *              <p>
 	 *              "Normal" entries
 	 *                 will be combined in the final range of integers, but there is also the possibility to create a
@@ -253,11 +256,12 @@ public final class ConfigUtils {
 	 *                 -> [1,2,3,5,7,8]
 	 *              <p>
 	 *              The
-	 *                 individual integers or lower or upper bounds can also be the special sequence {@code LAST}
-	 *                 (case-insensitive), which then dynamically refers to the last/highest possible integer
-	 *                 in the sequence (so this depends on the global maximum bound). Furthermore, any of the 4 basic
-	 *                 arithmetic operations (+, -, /, *) may take place on the {@code LAST} sequence, given that this
-	 *                 operation is specified between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
+	 *                 individual integers or lower or upper bounds can also be one of the special sequences
+	 *                 {@code FIRST} or {@code LAST} (case-insensitive), which then dynamically refers to respectively
+	 *                 the first/lowest or last/highest possible integer in the sequence (so this depends on the global
+	 *                 minimum/maximum bounds). Furthermore, any of the 4 basic arithmetic operations (+, -, /, *) may
+	 *                 take place on the {@code FIRST}/{@code LAST} sequences, given that this operation is specified
+	 *                 between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
 	 *              <p>
 	 *              "Normal" entries
 	 *                 will be combined in the final range of integers, but there is also the possibility to create a
@@ -287,11 +291,12 @@ public final class ConfigUtils {
 	 *                 -> [1,2,3,5,7,8]
 	 *              <p>
 	 *              The
-	 *                 individual integers or lower or upper bounds can also be the special sequence {@code LAST}
-	 *                 (case-insensitive), which then dynamically refers to the last/highest possible integer
-	 *                 in the sequence (so this depends on the global maximum bound). Furthermore, any of the 4 basic
-	 *                 arithmetic operations (+, -, /, *) may take place on the {@code LAST} sequence, given that this
-	 *                 operation is specified between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
+	 *                 individual integers or lower or upper bounds can also be one of the special sequences
+	 *                 {@code FIRST} or {@code LAST} (case-insensitive), which then dynamically refers to respectively
+	 *                 the first/lowest or last/highest possible integer in the sequence (so this depends on the global
+	 *                 minimum/maximum bounds). Furthermore, any of the 4 basic arithmetic operations (+, -, /, *) may
+	 *                 take place on the {@code FIRST}/{@code LAST} sequences, given that this operation is specified
+	 *                 between parentheses, e.g. {@code (LAST-1)} or {@code (LAST/2)}.
 	 *              <p>
 	 *              "Normal" entries
 	 *                 will be combined in the final range of integers, but there is also the possibility to create a
@@ -373,10 +378,31 @@ public final class ConfigUtils {
 			rangeMarkers.addAll(Arrays.asList(RangeMarker.createRange(!negate, lower, upper)));
 		}
 
-		int realMin = reversed ? max : min;
-		int realMax = reversed ? min : max;
+		final int realMin = reversed ? max : min;
+		final int realMax = reversed ? min : max;
 		if (inverted) {
-			rangeMarkers.addAll(Arrays.asList(RangeMarker.createRange(true, realMin, realMax)));
+			// If we're in inverted mode, we should include every number from min to max by default
+			// Per the rangeMarkers (TreeSet) Comparator: when the positions are the same, single value markers take
+			// priority, then inclusions, then end markers
+			// Due to this ordering, a slight problem can occur where an exclusion single value marker for the
+			// minimum value gets processed first, and then we process the global "include everything from min to max
+			// by default" range, causing the former one to get ignored. To tackle this issue, we can reduce the
+			// global range to start at the minimum, excluding any consecutive single value exclusion range markers
+			// that are equal to (or follow) it.
+			int globalRangeStart = realMin;
+			for (Iterator<RangeMarker> it = rangeMarkers.iterator(); it.hasNext() && (realMin < realMax ^ reversed);) {
+				RangeMarker curr = it.next();
+				if (curr.getPosition() == realMin && curr.isSingleValueMarker() && !curr.isInclusion()) {
+					if (reversed) {
+						globalRangeStart--;
+					} else {
+						globalRangeStart++;
+					}
+				} else {
+					break;
+				}
+			}
+			rangeMarkers.addAll(Arrays.asList(RangeMarker.createRange(true, globalRangeStart, realMax)));
 		}
 
 		return combineRanges(rangeMarkers.iterator(), realMin, reversed);
@@ -491,10 +517,7 @@ public final class ConfigUtils {
 
 	private static int tryParseInt(String entry, int min, int max) {
 		if (!entry.startsWith("(") || !entry.endsWith(")")) {
-			if ("last".equalsIgnoreCase(entry)) {
-				return checkReasonableMax(max);
-			}
-			int parsed = Integer.parseInt(entry);
+			int parsed = parseOperand(entry, min, max);
 			if (parsed < min) {
 				throw new IllegalArgumentException("The value " + parsed + " is located below the global minimum (" + min + ")!" +
 						" If you are unsure of the minimum, you can let the value get interpreted safely by putting " +
@@ -527,7 +550,8 @@ public final class ConfigUtils {
 			default -> throw new IllegalArgumentException("Unexpected operator value: " + operator);
 		};
 		return Arrays.stream(operands)
-				.map(op -> "last".equalsIgnoreCase(op) ? checkReasonableMax(max) : Float.parseFloat(op))
+				.map(op -> parseOperand(op, min, max))
+				.map(Float.class::cast)
 				.reduce(operatorFn)
 				.map(Integer.class::cast)
 				.map(val -> Math.max(min, Math.min(max, val)))
@@ -535,10 +559,21 @@ public final class ConfigUtils {
 						"have checked it before!"));
 	}
 
-	private static int checkReasonableMax(Integer max) {
-		if (max == Integer.MAX_VALUE) {
-			throw new IllegalArgumentException("It doesn't make sense to use LAST in an unbounded range!");
+	private static int parseOperand(String operand, int min, int max) {
+		if ("first".equalsIgnoreCase(operand)) {
+			if (min == Integer.MIN_VALUE) {
+				throw new IllegalArgumentException("It doesn't make sense to use FIRST in an unbounded range!");
+			}
+			return min;
 		}
-		return max;
+
+		if ("last".equalsIgnoreCase(operand)) {
+			if (max == Integer.MAX_VALUE) {
+				throw new IllegalArgumentException("It doesn't make sense to use LAST in an unbounded range!");
+			}
+			return max;
+		}
+
+		return Integer.parseInt(operand);
 	}
 }
