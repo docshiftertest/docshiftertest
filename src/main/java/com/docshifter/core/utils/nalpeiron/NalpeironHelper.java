@@ -23,6 +23,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -86,6 +87,50 @@ public class NalpeironHelper {
     private static final int CACHING_DURATION_MINUTES = 30;
     private static final int LICENSE_DURATION_MINUTES = 58;
 
+    private static final Map<Integer, String> LICENCE_STATUS = new HashMap<>();
+	static {
+        LICENCE_STATUS.put(55, "Account-based Concurrent LTCO License Activated");
+        LICENCE_STATUS.put(54, "Account-based Normal LTCO License Activated ");
+        LICENCE_STATUS.put(53, "Concurrent LTCO License Activated");
+        LICENCE_STATUS.put(51, "Normal LTCO License Activated ");
+        LICENCE_STATUS.put(17, "Daemon Slave License (backup license, - to be implemented.)");
+        LICENCE_STATUS.put(16, "Daemon Master License");
+        LICENCE_STATUS.put(15, "Daemon LTCO License");
+        LICENCE_STATUS.put(14, "Daemon OEM License");
+        LICENCE_STATUS.put(5, "Account-based Concurrent license");
+        LICENCE_STATUS.put(4, "Account-Based license ");
+        LICENCE_STATUS.put(3, "Concurrent License Activated");
+        LICENCE_STATUS.put(2, "Trial Activated");
+        LICENCE_STATUS.put(1, "Authorized");
+        LICENCE_STATUS.put(0, "Undetermined");
+        LICENCE_STATUS.put(-1, "Product has Expired");
+        LICENCE_STATUS.put(-2, "Backtime Counter Tripped");
+        LICENCE_STATUS.put(-3, "Feature not Authorised");
+        LICENCE_STATUS.put(-4, "Feature/Product not Found");
+        LICENCE_STATUS.put(-5, "License doesn't verify");
+        LICENCE_STATUS.put(-6, "Returned license to server");
+        LICENCE_STATUS.put(-7, "Date set back too far");
+        LICENCE_STATUS.put(-8, "Product in Invalid State");
+        LICENCE_STATUS.put(-9, "Product in midst of offline licensing. Has created an activation request but hasn't yet imported a license.");
+        LICENCE_STATUS.put(-50, "No Available Licenses");
+        LICENCE_STATUS.put(-51, "Daemon Failed to Verify");
+        LICENCE_STATUS.put(-52, "Daemon System ID Failure");
+        LICENCE_STATUS.put(-53, "Daemon didn't find metadata");
+        LICENCE_STATUS.put(-54, "DB time and license list time don't match");
+        LICENCE_STATUS.put(-60, "Full V10 installed. Passive license invalid");
+        LICENCE_STATUS.put(-70, "License was obtained with ABL. Need credential verification");
+        LICENCE_STATUS.put(-110, "Product is InActive");
+        LICENCE_STATUS.put(-111, "Invalid Trial Period");
+        LICENCE_STATUS.put(-112, "A Trial cannot be requested for a ComputerID that has already been activated");
+        LICENCE_STATUS.put(-113, "Trial Expired");
+        LICENCE_STATUS.put(-114, "LicenseCode is inactive");
+        LICENCE_STATUS.put(-115, "Number of Allowed Activations Exceeded");
+        LICENCE_STATUS.put(-116, "Subscription Expired");
+        LICENCE_STATUS.put(-117, "Duplicate Device ID");
+        LICENCE_STATUS.put(-200, "Too Many Heartbeats Missed (Network)");
+        LICENCE_STATUS.put(-201, "Seat Revoked By Daemon");
+    }
+    private static final int RETURNED_LICENSE_TO_SERVER = -6;
     private final com.nalpeiron.passlibrary.NALP nalpPassive;
     private final PSL psl;
     private final NALP nalp;
@@ -761,8 +806,12 @@ public class NalpeironHelper {
         try {
             int i = nsl.callNSLReturnLicense(licenseNo);
 
-            if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLReturnLicense"), new NalpError(i, resolveNalpErrorMsg(i)));
+            if (i == RETURNED_LICENSE_TO_SERVER) {
+                log.debug("License successfully returned!");
+            }
+            else {
+                log.warn("Nobody expects the status of the License to be: {}, meaning: {}",
+                        i, LICENCE_STATUS.get(i));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
