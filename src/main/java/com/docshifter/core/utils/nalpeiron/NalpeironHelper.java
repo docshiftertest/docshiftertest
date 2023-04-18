@@ -87,50 +87,6 @@ public class NalpeironHelper {
     private static final int CACHING_DURATION_MINUTES = 30;
     private static final int LICENSE_DURATION_MINUTES = 58;
 
-    private static final Map<Integer, String> LICENCE_STATUS = new HashMap<>();
-	static {
-        LICENCE_STATUS.put(55, "Account-based Concurrent LTCO License Activated");
-        LICENCE_STATUS.put(54, "Account-based Normal LTCO License Activated ");
-        LICENCE_STATUS.put(53, "Concurrent LTCO License Activated");
-        LICENCE_STATUS.put(51, "Normal LTCO License Activated ");
-        LICENCE_STATUS.put(17, "Daemon Slave License (backup license, - to be implemented.)");
-        LICENCE_STATUS.put(16, "Daemon Master License");
-        LICENCE_STATUS.put(15, "Daemon LTCO License");
-        LICENCE_STATUS.put(14, "Daemon OEM License");
-        LICENCE_STATUS.put(5, "Account-based Concurrent license");
-        LICENCE_STATUS.put(4, "Account-Based license ");
-        LICENCE_STATUS.put(3, "Concurrent License Activated");
-        LICENCE_STATUS.put(2, "Trial Activated");
-        LICENCE_STATUS.put(1, "Authorized");
-        LICENCE_STATUS.put(0, "Undetermined");
-        LICENCE_STATUS.put(-1, "Product has Expired");
-        LICENCE_STATUS.put(-2, "Backtime Counter Tripped");
-        LICENCE_STATUS.put(-3, "Feature not Authorised");
-        LICENCE_STATUS.put(-4, "Feature/Product not Found");
-        LICENCE_STATUS.put(-5, "License doesn't verify");
-        LICENCE_STATUS.put(-6, "Returned license to server");
-        LICENCE_STATUS.put(-7, "Date set back too far");
-        LICENCE_STATUS.put(-8, "Product in Invalid State");
-        LICENCE_STATUS.put(-9, "Product in midst of offline licensing. Has created an activation request but hasn't yet imported a license.");
-        LICENCE_STATUS.put(-50, "No Available Licenses");
-        LICENCE_STATUS.put(-51, "Daemon Failed to Verify");
-        LICENCE_STATUS.put(-52, "Daemon System ID Failure");
-        LICENCE_STATUS.put(-53, "Daemon didn't find metadata");
-        LICENCE_STATUS.put(-54, "DB time and license list time don't match");
-        LICENCE_STATUS.put(-60, "Full V10 installed. Passive license invalid");
-        LICENCE_STATUS.put(-70, "License was obtained with ABL. Need credential verification");
-        LICENCE_STATUS.put(-110, "Product is InActive");
-        LICENCE_STATUS.put(-111, "Invalid Trial Period");
-        LICENCE_STATUS.put(-112, "A Trial cannot be requested for a ComputerID that has already been activated");
-        LICENCE_STATUS.put(-113, "Trial Expired");
-        LICENCE_STATUS.put(-114, "LicenseCode is inactive");
-        LICENCE_STATUS.put(-115, "Number of Allowed Activations Exceeded");
-        LICENCE_STATUS.put(-116, "Subscription Expired");
-        LICENCE_STATUS.put(-117, "Duplicate Device ID");
-        LICENCE_STATUS.put(-200, "Too Many Heartbeats Missed (Network)");
-        LICENCE_STATUS.put(-201, "Seat Revoked By Daemon");
-    }
-    private static final int RETURNED_LICENSE_TO_SERVER = -6;
     private final com.nalpeiron.passlibrary.NALP nalpPassive;
     private final PSL psl;
     private final NALP nalp;
@@ -337,47 +293,46 @@ public class NalpeironHelper {
 
 
     public enum LicenseStatus {
-        //SHOWERRORS(0x01, ""),
-        // [Description("Undetermined")]
-        PRODUNDETERMINED(0, ""),
-        // [Description("Authorized")]
-        PROD_AUTHORIZED(1, "", true),
-        // [Description("InTrial")]
-        PROD_INTRIAL(2, "", true),
-        // [Description("Product has expired")]
-        PROD_CONCURRENT(3, ""),
-        // [Description("ActivatedNetwork")]
-        PROD_NETWORK(14, "", true),
-        // [Description("ActivatedNetworkLTCO")]
-        PROD_NETWORK_LTCO(15, "", true),
-        // [Description("ActivatedConcurrent")]
-        PROD_PRODEXPIRED(-1, ""),
-        // [Description("Backtime Counter Tripped")]
-        PROD_BTCOUNTER(-2, ""),
-        // [Description("Feature not Authorised")]
-        PROD_FEATURESWICHEDOFF(-3, ""),
-        // [Description("Feature/Product not Found")]
-        PROD_PRODFEATNOTFOUND(-4, ""),
-        // [Description("License doesn't verify")]
-        PROD_LICENSE_DOESNT_VERIFY(-5, ""),
-        // [Description("Returned license to server")]
-        PROD_RETURNED_LICENSE(-6, ""),
-        // [Description("Date set back too far")]
-        PROD_DATE_SET_BACK_TOO_FAR(-7, ""),
-        // [Description("Product is InActive")]
-        PROD_PRODINACTIVE(-110, ""),
-        // [Description("Invalid Trial Period")]
-        PROD_INVALIDTRIAL(-111, ""),
-        // [Description("ComputerID has already been activated")]
-        PROD_COMPUTERIDALREADYACTIVE(-112, ""),
-        // [Description("Trial Expired")]
-        PROD_EXPIRED(-113, ""),
-        // [Description("LicenseCode is inactive")]
-        PROD_LCINACTIVE(-114, ""),
-        //[Description("Number of Allowed Activations Exceeded")]
-        PROD_NOT_AUTHORIZED(-115, ""),
-        //[Description("Subscription Expired")]
-        PROD_SUBSCRIPTION_EXPIRED(-116, "");
+        ACC_CONCURRENT_LTCO_ACTIVATED(55, "Account-based Concurrent LTCO License Activated"),
+        ACC_NORMAL_LTCO__ACTIVATED(54, "Account-based Normal LTCO License Activated "),
+        CONCURRENT_LTCO_ACTIVATED(53, "Concurrent LTCO License Activated"),
+        NORMAL_LTCO__ACTIVATED(51, "Normal LTCO License Activated "),
+        DAEMON_SLAVE_LICENSE(17, "Daemon Slave License (backup license, - to be implemented.)"),
+        DAEMON_MASTER_LICENSE(16, "Daemon Master License"),
+        DAEMON_LTCO_LICENSE(15, "Daemon LTCO License"),
+        DAEMON_OEM_LICENSE(14, "Daemon OEM License"),
+        PROD_ACCOUNT_BASED_CONCURRENT(5, "Account-based Concurrent license"),
+        PROD_ACCOUNT_BASED(4, "Account-Based license "),
+        PROD_CONCURRENT(3, "Concurrent License Activated"),
+        PROD_IN_TRIAL(2, "Trial Activated"),
+        PROD_AUTHORIZED(1, "Authorized"),
+        PROD_UNDETERMINED(0, "Undetermined"),
+        PROD_EXPIRED(-1, "Product has Expired"),
+		BT_COUNTER_TRIPPED(-2, "Backtime Counter Tripped"),
+        FEATURE_NOT_AUTHORIZED(-3, "Feature not Authorised"),
+        FEATURE_PROD_NOT_FOUND(-4, "Feature/Product not Found"),
+        LICENSE_DOESNT_VERIFY(-5, "License doesn't verify"),
+        RETURNED_LICENCE_TO_SERVER(-6, "Returned license to server"),
+        DATE_SET_BACK_TOO_FAR(-7, "Date set back too far"),
+        PROD_INVALID_STATE(-8, "Product in Invalid State"),
+        PROD_IN_MIDST_OFFLINE(-9, "Product in midst of offline licensing. Has created an activation request but hasn't yet imported a license."),
+		NO_LICENSES_AVAILABLE(-50, "No Available Licenses"),
+		DAEMON_FAILED_VERIFY(-51, "Daemon Failed to Verify"),
+		DAEMON_SYSTEM_ID_FAILURE(-52, "Daemon System ID Failure"),
+		DAEMON_NO_FIND_METADATA(-53, "Daemon didn't find metadata"),
+		BD_LIST_TIMES_NO_MATCH(-54, "DB time and license list time don't match"),
+		FULL_V10_NO_PSV(-60, "Full V10 installed. Passive license invalid"),
+		LICENSE_WITH_ABL_NEED_CREDENTIALS(-70, "License was obtained with ABL. Need credential verification"),
+        PROD_INACTIVE(-110, "Product is InActive"),
+        INVALID_TRIAL_PERIOD(-111, "Invalid Trial Period"),
+        COMPUTER_ID_ALREADY_ACTIVE(-112, "A Trial cannot be requested for a ComputerID that has already been activated"),
+        TRIAL_EXPIRED(-113, "Trial Expired"),
+        LICENSE_CODE_INACTIVE(-114, "LicenseCode is inactive"),
+        ALLOWED_ACTIVATIONS_EXCEEDED(-115, "Number of Allowed Activations Exceeded"),
+        PROD_SUBSCRIPTION_EXPIRED(-116, "Subscription Expired"),
+        DUPLICATE_DEVICE_ID(-117, "Duplicate Device ID"),
+        TOO_MANY_HEARTBEATS_MISSED(-200, "Too Many Heartbeats Missed (Network)"),
+        DAEMON_REVOKED_SEAT(-201, "Seat Revoked By Daemon");
 
         private final int value;
         private final String message;
@@ -806,12 +761,12 @@ public class NalpeironHelper {
         try {
             int i = nsl.callNSLReturnLicense(licenseNo);
 
-            if (i == RETURNED_LICENSE_TO_SERVER) {
+            if (i == LicenseStatus.RETURNED_LICENCE_TO_SERVER.getValue()) {
                 log.debug("License successfully returned!");
             }
             else {
                 log.warn("Nobody expects the status of the License to be: {}, meaning: {}",
-                        i, LICENCE_STATUS.get(i));
+                        i, LicenseStatus.getLicenseStatus(i));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
