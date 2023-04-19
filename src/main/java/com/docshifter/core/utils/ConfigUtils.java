@@ -390,9 +390,8 @@ public final class ConfigUtils {
 			// global range to start at the minimum, excluding any consecutive single value exclusion range markers
 			// that are equal to (or follow) it.
 			int globalRangeStart = realMin;
-			for (Iterator<RangeMarker> it = rangeMarkers.iterator(); it.hasNext() && (realMin < realMax ^ reversed);) {
-				RangeMarker curr = it.next();
-				if (curr.getPosition() == realMin && curr.isSingleValueMarker() && !curr.isInclusion()) {
+			for (RangeMarker curr : rangeMarkers) {
+				if (curr.getPosition() == globalRangeStart && curr.isSingleValueMarker() && !curr.isInclusion()) {
 					if (reversed) {
 						globalRangeStart--;
 					} else {
@@ -402,7 +401,11 @@ public final class ConfigUtils {
 					break;
 				}
 			}
-			rangeMarkers.addAll(Arrays.asList(RangeMarker.createRange(true, globalRangeStart, realMax)));
+			// No point adding a global inclusion range if we ended up excluding all the individual numbers (from min
+			// to max) in the first place...
+			if (reversed ? globalRangeStart >= realMax : globalRangeStart <= realMax) {
+				rangeMarkers.addAll(Arrays.asList(RangeMarker.createRange(true, globalRangeStart, realMax)));
+			}
 		}
 
 		return combineRanges(rangeMarkers.iterator(), realMin, reversed);

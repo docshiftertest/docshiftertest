@@ -90,4 +90,9 @@ public class ConfigUtilsTest {
 		compareStreams(ConfigUtils.getRangeStream("!1", 5),
 				IntStream.rangeClosed(2, 5));
 	}
+
+	@Test
+	void test_inverted_empty() {
+		compareStreams(ConfigUtils.getRangeStream("!1,!2,!3", 3));
+	}
 }
