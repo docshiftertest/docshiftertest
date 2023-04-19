@@ -113,7 +113,7 @@ public class NalpeironLicenseValidator implements Runnable {
 		licenseStatus = nalpeironHelper.getLicenseStatus();
 
 		// get a new heartbeat for license with the supplied license code
-		NalpeironHelper.LicenseStatus newHeartbeatStatus = NalpeironHelper.LicenseStatus.PRODUNDETERMINED;
+		NalpeironHelper.LicenseStatus newHeartbeatStatus = NalpeironHelper.LicenseStatus.PROD_UNDETERMINED;
 		try {
 			newHeartbeatStatus = nalpeironHelper.getLicense(nalpeironHelper.getLicenseCode(), xmlRegInfo);
 		} catch (DocShifterLicenseException ex) {
