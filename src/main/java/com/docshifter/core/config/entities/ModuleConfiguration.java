@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import javax.annotation.Nonnull;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,7 @@ public class ModuleConfiguration implements Serializable {
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne
+	@Nonnull
 	private Module module;
 	private String name;
 	private String description;
@@ -49,31 +52,30 @@ public class ModuleConfiguration implements Serializable {
 	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
 	@MapKeyClass(Parameter.class)
 	@Encrypted
+	@Nonnull
 	private Map<Parameter, String> parameterValues = new HashMap<>();
 
 	public ModuleConfiguration() {}
 
-	public ModuleConfiguration(long id, Module module, String name,
+	public ModuleConfiguration(long id, @Nonnull Module module, String name,
 							   String description, UUID uuid,
 							   Map<Parameter, String> parameterValues) {
-		super();
+		this(module, name, description, uuid, parameterValues);
 		this.id = id;
-		this.module = module;
-		this.name = name;
-		this.description = description;
-		this.uuid = uuid;
-		this.parameterValues =parameterValues;
 	}
 
-	public ModuleConfiguration(Module module, String name,
+	public ModuleConfiguration(@Nonnull Module module, String name,
 							   String description, UUID uuid,
 							   Map<Parameter, String> parameterValues) {
-		super();
-		this.module = module;
+		this(module);
 		this.name = name;
 		this.description = description;
 		this.uuid = uuid;
 		this.parameterValues = parameterValues;
+	}
+
+	public ModuleConfiguration(@Nonnull Module module) {
+		setModule(module);
 	}
 
 	public void setId(long id)
@@ -87,9 +89,8 @@ public class ModuleConfiguration implements Serializable {
 		return id;
 	}
 
-	public void setModule(Module module)
-	{
-		this.module = module;
+	public void setModule(@Nonnull Module module) {
+		this.module = Objects.requireNonNull(module);
 	}
 
 	@ManyToOne(
@@ -97,13 +98,14 @@ public class ModuleConfiguration implements Serializable {
 			fetch = FetchType.EAGER
 	)
 	@JoinColumn(name = "MODULEID")
+	@Nonnull
 	public Module getModule()
 	{
 		return module;
 	}
 
 
-	public void setParameterValues(Map<Parameter, String> parameterValues)
+	public void setParameterValues(@Nonnull Map<Parameter, String> parameterValues)
 	{
 		this.parameterValues = parameterValues;
 	}
@@ -119,7 +121,7 @@ public class ModuleConfiguration implements Serializable {
 	}
 
 
-
+	@Nonnull
 	public Map<Parameter, String> getParameterValues()
 	{
 		return parameterValues;
@@ -168,6 +170,7 @@ public class ModuleConfiguration implements Serializable {
 	@SuppressWarnings("rawtypes")
 	@JsonProperty(value = "parameters", access = JsonProperty.Access.READ_ONLY)
 	@Transient
+	@Nonnull
 	public List<Map> jsonParameterValues()
 	{
 		List<Map> parameters = new ArrayList<Map>();
@@ -191,7 +194,7 @@ public class ModuleConfiguration implements Serializable {
 	@SuppressWarnings("rawtypes")
 	@JsonProperty(value = "parameters", access = JsonProperty.Access.WRITE_ONLY)
 	@Transient
-	public void setJsonParameterValues(List<Map> parameterValues)
+	public void setJsonParameterValues(@Nonnull List<Map> parameterValues)
 	{
 		this.parameterValues = parameterValues.stream()
 				.map(m -> {
@@ -209,6 +212,11 @@ public class ModuleConfiguration implements Serializable {
 						throw new IllegalArgumentException("Unable to deserialize parameter JSON.", ex);
 					}
 				}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+	}
+
+	@Transient
+	public boolean isDummy() {
+		return id == 0 && name == null && description == null && uuid == null;
 	}
 
 	public boolean compareTo(Object obj) {
