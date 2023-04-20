@@ -67,6 +67,11 @@ public class Node implements Serializable {
 	@Nullable
 	private ModuleConfiguration moduleConfiguration;
 
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+	@ManyToOne
+	@Nullable
+	private Module module;
+
 	private Double xPosition;
 
 	private Double yPosition;
@@ -220,13 +225,23 @@ public class Node implements Serializable {
 		}
 	}
 
-	@Nullable
-	public ModuleConfiguration getModuleConfiguration(){
-		return moduleConfiguration;
+	@Nonnull
+	public ModuleConfiguration getModuleConfiguration() {
+		return moduleConfiguration == null ? new ModuleConfiguration(module) : moduleConfiguration;
 	}
 	
-	public void setModuleConfiguration(@Nullable ModuleConfiguration moduleConfiguration){
-		this.moduleConfiguration = moduleConfiguration;
+	public void setModuleConfiguration(@Nonnull ModuleConfiguration moduleConfiguration) {
+		if (Objects.requireNonNull(moduleConfiguration).isDummy()) {
+			setModule(moduleConfiguration.getModule());
+		} else {
+			this.moduleConfiguration = moduleConfiguration;
+			this.module = null;
+		}
+	}
+
+	public void setModule(@Nonnull Module module) {
+		this.module = Objects.requireNonNull(module);
+		this.moduleConfiguration = null;
 	}
 
 	/**
