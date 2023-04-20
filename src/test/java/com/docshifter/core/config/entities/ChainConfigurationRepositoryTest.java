@@ -117,7 +117,9 @@ public class ChainConfigurationRepositoryTest extends AbstractSpringTest {
 		m10 = new Module("testmodule10" + millis, "testmodule10" + millis, "testsmodule10" + millis, "input", null, null);
 		m11 = new Module("testmodule11" + millis, "testmodule11" + millis, "testsmodule11" + millis, "input", null, null);
 		m12 = new Module("testmodule12" + millis, "testmodule12" + millis, "testsmodule12" + millis, "input", null, null);
-
+		m13 = new Module("testmodule13" + millis, "testmodule13" + millis, "testsmodule13" + millis, "input", null, null);
+		m14 = new Module("testmodule14" + millis, "testmodule14" + millis, "testsmodule14" + millis, "input", null, null);
+		m15 = new Module("testmodule15" + millis, "testmodule15" + millis, "testsmodule15" + millis, "input", null, null);
 
 		Map<Parameter, String> map0 = new HashMap<Parameter, String>();
 		map0.put(p1, "parameter0");
@@ -162,6 +164,9 @@ public class ChainConfigurationRepositoryTest extends AbstractSpringTest {
 		m10 = moduleRepository.save(m10);
 		m11 = moduleRepository.save(m11);
 		m12 = moduleRepository.save(m12);
+		m13 = moduleRepository.save(m13);
+		m14 = moduleRepository.save(m14);
+		m15 = moduleRepository.save(m15);
 
 
 		p1 = parameterRepository.save(p1);
