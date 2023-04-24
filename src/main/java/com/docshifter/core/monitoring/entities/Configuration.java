@@ -19,7 +19,6 @@ public class Configuration {
     private Long id;
     private String name;
 
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy="configuration",
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
