@@ -1,5 +1,6 @@
 package com.docshifter.core.config.services;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -7,5 +8,6 @@ import org.springframework.context.annotation.Configuration;
  * any queries on our database in other config/service classes.
  */
 @Configuration("liquibaseConfig")
+@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 public class DummyLiquibaseConfig {
 }
