@@ -6,6 +6,7 @@ import com.docshifter.core.config.entities.GlobalSettings;
 import com.docshifter.core.config.repositories.GlobalSettingsRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import java.util.Optional;
  */
 @Service
 @Log4j2
+@DependsOn("liquibaseConfig")
 public class GeneralConfigService {
 
 	protected Map<String, String> params;
