@@ -92,7 +92,7 @@ public class ChainConfiguration implements Serializable {
 	@DiffInclude
 	private UUID uuid;
 
-	@DiffInclude
+	@DiffIgnore
 	private LocalDateTime lastModifiedDate;
 
 	// This is a String because this class is a database entity and to persist a List/Set to the database you need
