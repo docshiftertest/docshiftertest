@@ -72,10 +72,15 @@ public final class OutlineUtils {
 		// First we try to get directly from the destination
 		IAppointment outlineDest = outline.getDestination();
 
+		// If we don't have a doc, it means this method was called by extractExplicitDestinationHard
+		boolean isHard = doc == null;
+
 		ExplicitDestination bookmark = null;
 
 		if (outlineDest != null) {
-			bookmark = AppointmentUtils.asExplicitDestinationSoft(doc, outlineDest);
+			bookmark = isHard
+					? AppointmentUtils.asExplicitDestinationHard(outlineDest)
+					: AppointmentUtils.asExplicitDestinationSoft(doc, outlineDest);
 		}
 
 		// If the bookmark is null or the page inside the destination is null, we should try to get the action
@@ -87,10 +92,6 @@ public final class OutlineUtils {
 			outlineDest = outline.getAction();
 
 			if (outlineDest != null) {
-
-				// If we don't have a doc, it means this method was called by extractExplicitDestinationHard
-				boolean isHard = doc == null;
-
 				bookmark = isHard
 						? AppointmentUtils.asExplicitDestinationHard(outlineDest)
 						: AppointmentUtils.asExplicitDestinationSoft(doc, outlineDest);
@@ -98,8 +99,8 @@ public final class OutlineUtils {
 		}
 
 		if (bookmark != null) {
-			log.debug("Appropriate level {} outlineDest found referring to page {}", outline.getLevel(),
-					bookmark.getPageNumber());
+			log.debug("Appropriate level {} bookmark found referring to page {}",
+					outline.getLevel(), bookmark.getPageNumber());
 		}
 
 		return bookmark;
