@@ -26,6 +26,8 @@ public class GlobalSettings implements Serializable
 	private String defaultTempFolder;
 	private String defaultErrorFolder;
 
+	private String environment;
+
 	public GlobalSettings() {}
 	
 	public GlobalSettings(String defaultTempFolder)
@@ -33,7 +35,7 @@ public class GlobalSettings implements Serializable
 		this.defaultTempFolder = defaultTempFolder;
 	}
 	
-	public GlobalSettings(String mqSystem, String mqQueue, String mqMetricsQueue, String mqURL, String mqUser, String mqUserPassword)
+	public GlobalSettings(String mqSystem, String mqQueue, String mqMetricsQueue, String mqURL, String mqUser, String mqUserPassword, String environment)
 	{
 		this.mqSystem = mqSystem;
 		this.mqQueue = mqQueue;
@@ -41,11 +43,12 @@ public class GlobalSettings implements Serializable
 		this.mqURL = mqURL;
 		this.mqUser = mqUser;
 		this.mqUserPassword = mqUserPassword;
+		this.environment = environment;
 	}
 	
 	public GlobalSettings(String defaultTempFolder,
 					  String mqSystem, String mqQueue, String mqMetricsQueue, String mqURL, String mqUser,
-						  String mqUserPassword)
+						  String mqUserPassword, String environment)
 	{
 		this.defaultTempFolder = defaultTempFolder;
 		this.mqSystem = mqSystem;
@@ -54,10 +57,11 @@ public class GlobalSettings implements Serializable
 		this.mqURL = mqURL;
 		this.mqUser = mqUser;
 		this.mqUserPassword = mqUserPassword;
+		this.environment = environment;
 	}
 
 	public GlobalSettings(String mqSystem, String mqURL, String mqQueue, String mqMetricsQueue, String mqUser,
-						  String mqUserPassword, String defaultTempFolder, String defaultErrorFolder) {
+						  String mqUserPassword, String defaultTempFolder, String defaultErrorFolder, String environment) {
 		this.mqSystem = mqSystem;
 		this.mqURL = mqURL;
 		this.mqQueue = mqQueue;
@@ -66,10 +70,11 @@ public class GlobalSettings implements Serializable
 		this.mqUserPassword = mqUserPassword;
 		this.defaultTempFolder = defaultTempFolder;
 		this.defaultErrorFolder = defaultErrorFolder;
+		this.environment = environment;
 	}
 
 	public GlobalSettings(long id, String mqSystem, String mqURL, String mqQueue, String mqMetricsQueue,
-						  String mqUser, String mqUserPassword, String defaultTempFolder, String defaultErrorFolder) {
+						  String mqUser, String mqUserPassword, String defaultTempFolder, String defaultErrorFolder,String environment) {
 		this.id = id;
 		this.mqSystem = mqSystem;
 		this.mqURL = mqURL;
@@ -79,6 +84,7 @@ public class GlobalSettings implements Serializable
 		this.mqUserPassword = mqUserPassword;
 		this.defaultTempFolder = defaultTempFolder;
 		this.defaultErrorFolder = defaultErrorFolder;
+		this.environment = environment;
 	}
 
 	public String getDefaultTempFolder()
@@ -168,4 +174,12 @@ public class GlobalSettings implements Serializable
 		return defaultErrorFolder;
 	}
 
+
+	public String getEnvironment() {
+		return environment;
+	}
+
+	public void setEnvironment(String environment) {
+		this.environment = environment;
+	}
 }
