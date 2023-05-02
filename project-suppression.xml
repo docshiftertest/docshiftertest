@@ -23,4 +23,7 @@
     <suppress>
         <cve>CVE-2011-1797</cve>
     </suppress>
+    <suppress>
+        <cve>CVE-2023-20873</cve>
+    </suppress>
 </suppressions>
