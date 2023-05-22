@@ -102,6 +102,9 @@ public class ChainConfiguration implements Serializable {
 	@DiffIgnore
 	private String brokenRules;
 
+	@DiffInclude
+	private boolean dsexpressEnabled;
+
 	/**
 	 * Default constructor for JPA.
 	 */
@@ -115,9 +118,9 @@ public class ChainConfiguration implements Serializable {
 	 */
 	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
 							  String printerName, String queueName, long timeout, long priority, FailureLevel failureLevel,
-							  LocalDateTime lastModifiedDate, @Nonnull Set<WorkflowRule> brokenRules, UUID uuid) {
+							  LocalDateTime lastModifiedDate, @Nonnull Set<WorkflowRule> brokenRules, UUID uuid, boolean dsexpressEnabled) {
 		this(name, description, enabled, rootNodes, printerName, queueName, timeout, (int) priority, failureLevel,
-				lastModifiedDate, brokenRules, uuid);
+				lastModifiedDate, brokenRules, uuid, dsexpressEnabled);
 	}
 
 	/**
@@ -130,7 +133,8 @@ public class ChainConfiguration implements Serializable {
 						.findAny()
 						.map(Node::deepCopyGetRoots)
 						.orElse(new HashSet<>()), copyMe.printerName, copyMe.queueName, copyMe.timeout,
-				copyMe.priority, copyMe.failureLevel, copyMe.lastModifiedDate, copyMe.getBrokenRules());
+				copyMe.priority, copyMe.failureLevel, copyMe.lastModifiedDate, copyMe.getBrokenRules(),
+				copyMe.isDsexpressEnabled());
 	}
 
 	/**
@@ -140,9 +144,10 @@ public class ChainConfiguration implements Serializable {
 	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
 							  String printerName, String queueName, long timeout, int priority,
 							  FailureLevel failureLevel, LocalDateTime lastModifiedDate,
-							  @Nonnull Set<WorkflowRule> brokenRules) {
+							  @Nonnull Set<WorkflowRule> brokenRules,
+							  boolean dsexpressEnabled) {
 		this(name, description, enabled, rootNodes, printerName, queueName, timeout, priority, failureLevel,
-				lastModifiedDate, brokenRules, UUID.randomUUID());
+				lastModifiedDate, brokenRules, UUID.randomUUID(), dsexpressEnabled);
 	}
 
 	/**
@@ -150,7 +155,8 @@ public class ChainConfiguration implements Serializable {
 	 */
 	public ChainConfiguration(String name, String description, boolean enabled, @Nonnull Set<Node> rootNodes,
 							  String printerName, String queueName, long timeout, int priority, FailureLevel failureLevel,
-							  LocalDateTime lastModifiedDate, @Nonnull Set<WorkflowRule> brokenRules, UUID uuid) {
+							  LocalDateTime lastModifiedDate, @Nonnull Set<WorkflowRule> brokenRules, UUID uuid,
+							  boolean dsexpressEnabled) {
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
@@ -163,6 +169,7 @@ public class ChainConfiguration implements Serializable {
 		this.uuid = uuid;
 		this.lastModifiedDate = lastModifiedDate;
 		setBrokenRules(brokenRules);
+		this.dsexpressEnabled = dsexpressEnabled;
 	}
 
 	public String getDescription() {
@@ -262,6 +269,14 @@ public class ChainConfiguration implements Serializable {
 		this.uuid = uuid;
 	}
 
+	public boolean isDsexpressEnabled() {
+		return dsexpressEnabled;
+	}
+
+	public void setDsexpressEnabled(boolean postShifterEnabled) {
+		this.dsexpressEnabled = postShifterEnabled;
+	}
+
 	/**
 	 * Performs an action on all the nodes for this workflow.
 	 * @param action The action to perform.
@@ -335,6 +350,8 @@ public class ChainConfiguration implements Serializable {
 				this.lastModifiedDate +
 				", Broken Rules: " +
 				this.brokenRules +
+				", DSExpress Enabled: " +
+				this.dsexpressEnabled +
 				"}";
 	}
 }

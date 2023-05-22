@@ -34,6 +34,8 @@ public interface ChainConfigurationSample {
 
     LocalDateTime getLastModifiedDate();
 
+    boolean getDsexpressEnabled();
+
     String getBrokenRules();
 
     /**
