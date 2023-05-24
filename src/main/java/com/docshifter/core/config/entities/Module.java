@@ -4,26 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.javers.core.metamodel.annotation.TypeName;
 
-import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 @Log4j2
@@ -47,11 +36,11 @@ public class Module implements Serializable {
 	private String code;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	@ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinTable(name = "moduleparams",
 			joinColumns = {	@JoinColumn(name = "module") },
 			inverseJoinColumns = { @JoinColumn(name = "param") })
-	private Set<Parameter> parameters = new HashSet<Parameter>();
+	private Set<Parameter> parameters = new HashSet<>();
 
 	public Module() {
 	}
@@ -97,14 +86,14 @@ public class Module implements Serializable {
 	}
 
 	public Module(Module module) {
-		this(module.getDescription(), module.getName(), module.getClassname(), module.getType(), module.getCondition(), new HashSet<Parameter>(module.getParameters()));
+		this(module.getDescription(), module.getName(), module.getClassname(), module.getType(), module.getCondition(), new HashSet<>(module.parameters));
 	}
 
 	public void addToParameters(Parameter param) {
-		this.getParameters().add(param);
+		parameters.add(param);
 	}
 
-	public void addToParameters(Set<Parameter> params) {
+	public void addToParameters(Iterable<Parameter> params) {
 		for (Parameter param : params) {
 			this.addToParameters(param);
 		}
@@ -122,18 +111,25 @@ public class Module implements Serializable {
 		return name;
 	}
 
-
+	private Stream<Parameter> getFilteredParameterStream() {
+		return parameters.stream()
+				.filter(parameter -> parameter.getAliasOf() == null);
+	}
 
 	public Set<Parameter> getParameters() {
-		return parameters;
+		return getFilteredParameterStream().collect(Collectors.toUnmodifiableSet());
+	}
+
+	@JsonIgnore
+	@Transient
+	public Set<Parameter> getRawParameters() {
+		return Collections.unmodifiableSet(parameters);
 	}
 
 	@JsonIgnore
 	@Transient
 	public List<Parameter> getParametersAsList() {
-		List<Parameter> paramList = new ArrayList<>(this.getParameters());
-		Collections.sort(paramList);
-		return paramList;
+		return getFilteredParameterStream().sorted().toList();
 	}
 
 	@JsonIgnore
@@ -150,6 +146,9 @@ public class Module implements Serializable {
 							param.getDescription());
 				}
 				if (name.equals(param.getName())) {
+					if (param.getAliasOf() != null) {
+						return param.getAliasOf();
+					}
 					return param;
 				}
 			}
@@ -162,10 +161,10 @@ public class Module implements Serializable {
 	}
 
 	public boolean removeFromParameters(Parameter param) {
-		return this.getParameters().remove(param);
+		return parameters.remove(param);
 	}
 
-	public void removeFromParameters(Set<Parameter> params) {
+	public void removeFromParameters(Iterable<Parameter> params) {
 		for (Parameter param : params) {
 			this.removeFromParameters(param);
 		}

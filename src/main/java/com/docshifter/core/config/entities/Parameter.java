@@ -5,12 +5,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.annotation.Nullable;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -32,29 +28,57 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	@Column(columnDefinition = "jsonb")
 	private String valuesJson;
 	private String parameterGroup;
+	@ManyToOne
+	@Nullable
+	private Parameter dependsOn;
+	@ManyToOne
+	@Nullable
+	private Parameter expendableBy;
+	@ManyToOne
+	@Nullable
+	private Parameter aliasOf;
+
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+	@ManyToOne
+	@JoinTable(name = "moduleparams",
+			joinColumns = {	@JoinColumn(name = "param") },
+			inverseJoinColumns = { @JoinColumn(name = "module") })
+	private Module module;
 	
 	public Parameter() {}
 	
-	public Parameter(String name, String description, ParameterTypes type, Boolean required, String valuesJson,String parameterGroup)
-	{
+	public Parameter(String name, String description, ParameterTypes type, Boolean required, String valuesJson,
+					 String parameterGroup, @Nullable Parameter dependsOn, @Nullable Parameter expendableBy) {
 		this.name = name;
 		this.description = description;
 		this.type = type.toString();
 		this.required = required;
 		this.valuesJson = valuesJson;
 		this.parameterGroup = parameterGroup;
+		this.dependsOn = dependsOn;
+		this.expendableBy = expendableBy;
+	}
+
+	public Parameter(String name, @Nullable Parameter aliasOf) {
+		this.name = name;
+		this.aliasOf = aliasOf;
+	}
+
+	public Parameter(String name, String description, ParameterTypes type, Boolean required, String valuesJson,
+					 String parameterGroup) {
+		this(name, description, type, required, valuesJson, parameterGroup, null, null);
 	}
 
     public Parameter(String name, String description, ParameterTypes type, Boolean required) {
-	    this(name, description, type, required, null,null);
+	    this(name, description, type, required, null, null, null, null);
     }
 	
 	public Parameter(String name, String description, ParameterTypes type) {
-		this(name, description, type, false, null,null);
+		this(name, description, type, false, null, null, null, null);
 	}
 
 	public Parameter(String name, ParameterTypes type) {
-		this(name, null, type, false, null,null);
+		this(name, null, type, false, null, null, null, null);
 	}
 
 	public void setId(long id)
@@ -119,6 +143,46 @@ public class Parameter implements Comparable<Parameter>, Serializable
 
 	public void setParameterGroup(String parameterGroup) {
 		this.parameterGroup = parameterGroup;
+	}
+
+	@Nullable
+	public Parameter getDependsOn() {
+		return dependsOn;
+	}
+
+	public void setDependsOn(@Nullable Parameter dependsOn) {
+		this.dependsOn = dependsOn;
+	}
+
+	@Nullable
+	public Parameter getExpendableBy() {
+		return expendableBy;
+	}
+
+	public void setExpendableBy(@Nullable Parameter expendableBy) {
+		this.expendableBy = expendableBy;
+	}
+
+	@Nullable
+	public Parameter getAliasOf() {
+		return aliasOf;
+	}
+
+	public void setAliasOf(@Nullable Parameter aliasOf) {
+		this.aliasOf = aliasOf;
+		if (aliasOf != null) {
+			this.description = null;
+			this.type = null;
+			this.required = null;
+			this.valuesJson = null;
+			this.parameterGroup = null;
+			this.dependsOn = null;
+			this.expendableBy = null;
+		}
+	}
+
+	public Module getModule() {
+		return module;
 	}
 
 	@Override
