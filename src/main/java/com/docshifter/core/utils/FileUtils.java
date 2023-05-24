@@ -127,9 +127,9 @@ public final class FileUtils {
      *   a/b/c     --> c
      *   a/b/c/    --> ""
      * The output will be the same irrespective of the machine that the code is running on.
-     * @return The file's name
-     * the name of the file without the path, or an empty string if none exists. Null bytes inside string will be removed
      * @param fileName the fileName to query, null returns null
+     * @return The file's name without the path, or an empty string if none exists.
+     *         Null bytes inside string will be removed
      */
     public static String getFilename(String fileName){
         return FilenameUtils.getName(fileName);
