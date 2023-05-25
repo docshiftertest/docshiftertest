@@ -203,7 +203,7 @@ public class ChainConfigurationRepositoryTest extends AbstractSpringTest {
 
 
 		chc1 = new ChainConfiguration("testchain", "desc", true, Set.of(n1), null, null, 60, 2, FailureLevel.FILE,
-				LocalDateTime.now(), EnumSet.noneOf(WorkflowRule.class), UUID.randomUUID());
+				LocalDateTime.now(), EnumSet.noneOf(WorkflowRule.class), UUID.randomUUID(), true);
 
 		chainConfigurationRepository.save(chc1);
 
