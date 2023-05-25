@@ -30,12 +30,15 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	@Column(columnDefinition = "jsonb")
 	private String valuesJson;
 	private String parameterGroup;
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne
 	@Nullable
 	private Parameter dependsOn;
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne
 	@Nullable
 	private Parameter expendableBy;
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne
 	@Nullable
 	private Parameter aliasOf;
