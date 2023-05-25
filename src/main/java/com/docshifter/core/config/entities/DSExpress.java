@@ -100,7 +100,7 @@ public class DSExpress implements Serializable {
             cascade = CascadeType.PERSIST,
             fetch = FetchType.EAGER
     )
-    @JoinColumn(name = "CHAINCONFIGURATIONID")
+    @JoinColumn(name = "chain_configuration_id")
     @Nonnull
     public ChainConfiguration getChainConfiguration() {
         return chainConfiguration;
