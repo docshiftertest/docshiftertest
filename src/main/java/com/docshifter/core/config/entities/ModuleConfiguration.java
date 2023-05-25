@@ -113,10 +113,12 @@ public class ModuleConfiguration implements Serializable {
 	@Transient
 	public void setParameterValue(Parameter param, String value)
 	{
-		for(Parameter existingParam : this.getParameterValues().keySet())
+		for (Parameter existingParam : this.getParameterValues().keySet())
 		{
-			if (existingParam.getId() == param.getId())
+			if (existingParam.getId() == param.getId()) {
 				this.getParameterValues().put(existingParam, value);
+				break;
+			}
 		}
 	}
 
@@ -173,12 +175,12 @@ public class ModuleConfiguration implements Serializable {
 	@Nonnull
 	public List<Map> jsonParameterValues()
 	{
-		List<Map> parameters = new ArrayList<Map>();
+		List<Map> parameters = new ArrayList<>();
 		Map<String, String> parameter = null;
 
 		for(Map.Entry<Parameter, String> entry: parameterValues.entrySet())
 		{
-			parameter = new HashMap<String, String>();
+			parameter = new HashMap<>();
 			parameter.put("id", String.valueOf(entry.getKey().getId()));
 			parameter.put("value", entry.getValue());
 			
@@ -263,7 +265,7 @@ public class ModuleConfiguration implements Serializable {
 		}
 		sBuf.append(", ");
 		sBuf.append("\"Module\": ");
-		sBuf.append(this.getModule().toString());
+		sBuf.append(this.getModule());
 		sBuf.append("}");
 		return sBuf.toString();
 	}

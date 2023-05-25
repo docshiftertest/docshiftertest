@@ -7,6 +7,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -44,35 +45,35 @@ public class Module implements Serializable {
 
 	public Module() {
 	}
-	public Module(int id, String description, String name, String classname, String type, String condition, Set<Parameter> parameters) {
+	public Module(int id, String description, String name, String classname, String type, String condition, Collection<Parameter> parameters) {
 		this.id = id;
 		this.description = description;
 		this.name = name;
 		this.classname = classname;
 		this.type = type;
 		this.condition = condition;
-		this.parameters = parameters;
+		this.parameters.addAll(parameters);
 	}
-	public Module(String description, String name, String classname, String type, String condition, Set<Parameter> parameters) {
+	public Module(String description, String name, String classname, String type, String condition, Collection<Parameter> parameters) {
 		this.description = description;
 		this.name = name;
 		this.classname = classname;
 		this.type = type;
 		this.condition = condition;
-		this.parameters = parameters;
+		this.parameters.addAll(parameters);
 	}
 
-	public Module(int id, String description, String name, String classname, String type, Set<Parameter> parameters) {
+	public Module(int id, String description, String name, String classname, String type, Collection<Parameter> parameters) {
 		this.id = id;
 		this.description = description;
 		this.name = name;
 		this.classname = classname;
 		this.type = type;
-		this.parameters = parameters;
+		this.parameters.addAll(parameters);
 	}
 
 	public Module(long id, String name, String classname, String description, String type, String condition,
-				  String inputFiletype, String outputFileType, String code, Set<Parameter> parameters) {
+				  String inputFiletype, String outputFileType, String code, Collection<Parameter> parameters) {
 		this.id = id;
 		this.name = name;
 		this.classname = classname;
@@ -82,11 +83,11 @@ public class Module implements Serializable {
 		this.inputFiletype = inputFiletype;
 		this.outputFileType = outputFileType;
 		this.code = code;
-		this.parameters = parameters;
+		this.parameters.addAll(parameters);
 	}
 
 	public Module(Module module) {
-		this(module.getDescription(), module.getName(), module.getClassname(), module.getType(), module.getCondition(), new HashSet<>(module.parameters));
+		this(module.getDescription(), module.getName(), module.getClassname(), module.getType(), module.getCondition(), module.parameters);
 	}
 
 	public void addToParameters(Parameter param) {
@@ -132,9 +133,7 @@ public class Module implements Serializable {
 		return getFilteredParameterStream().sorted().toList();
 	}
 
-	@JsonIgnore
-	@Transient
-	public Parameter getParameter(String name) {
+	private Parameter getParameter(String name, boolean raw) {
 		log.debug("Getting parameter for name: {}", name);
 		for (Parameter param : parameters) {
 			if (param == null) {
@@ -146,14 +145,26 @@ public class Module implements Serializable {
 							param.getDescription());
 				}
 				if (name.equals(param.getName())) {
-					if (param.getAliasOf() != null) {
-						return param.getAliasOf();
+					if (raw) {
+						return param;
 					}
-					return param;
+					return param.getRealParameter();
 				}
 			}
 		}
 		return null;
+	}
+
+	@JsonIgnore
+	@Transient
+	public Parameter getParameter(String name) {
+		return getParameter(name, true);
+	}
+
+	@JsonIgnore
+	@Transient
+	public Parameter getRawParameter(String name) {
+		return getParameter(name, false);
 	}
 
 	public String getType() {
