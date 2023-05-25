@@ -5,7 +5,18 @@ import lombok.extern.log4j.Log4j2;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import javax.persistence.*;
+import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,7 +48,7 @@ public class Module implements Serializable {
 	private String code;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade= CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinTable(name = "moduleparams",
 			joinColumns = {	@JoinColumn(name = "module") },
 			inverseJoinColumns = { @JoinColumn(name = "param") })
@@ -158,13 +169,13 @@ public class Module implements Serializable {
 	@JsonIgnore
 	@Transient
 	public Parameter getParameter(String name) {
-		return getParameter(name, true);
+		return getParameter(name, false);
 	}
 
 	@JsonIgnore
 	@Transient
 	public Parameter getRawParameter(String name) {
-		return getParameter(name, false);
+		return getParameter(name, true);
 	}
 
 	public String getType() {
