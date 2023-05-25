@@ -273,8 +273,8 @@ public class ChainConfiguration implements Serializable {
 		return dsexpressEnabled;
 	}
 
-	public void setDsexpressEnabled(boolean postShifterEnabled) {
-		this.dsexpressEnabled = postShifterEnabled;
+	public void setDsexpressEnabled(boolean dsExpressShifterEnabled) {
+		this.dsexpressEnabled = dsExpressShifterEnabled;
 	}
 
 	/**
