@@ -7,9 +7,21 @@ import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 
 import javax.annotation.Nullable;
-import javax.persistence.*;
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import java.io.Serializable;
 
+/**
+ * A parameter is a configurable property within a {@link Module}. The entity that stores all parameters for a given
+ * {@link Module} is called a {@link ModuleConfiguration}.
+ */
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable
@@ -55,7 +67,24 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	private Module module;
 	
 	public Parameter() {}
-	
+
+	/**
+	 * Constructs a "normal" {@link Parameter}.
+	 * @param name The name of the {@link Parameter}.
+	 * @param description A description that explains how the {@link Parameter} behaves, how it can be configured,
+	 *                       important things to look out for etc.
+	 * @param type The type of {@link Parameter}, see {@link ParameterTypes}.
+	 * @param required Whether the {@link Parameter} must be filled in for the {@link ModuleConfiguration} to be functional.
+	 * @param valuesJson When the {@link Parameter} value can only be one out of a specific list of options, or if some
+	 *                      potential values should be suggested to the user, this JSON can be used to specify all of
+	 *                      the different options.
+	 * @param parameterGroup The name of the group this {@link Parameter} should be a part of.
+	 * @param dependsOn Another {@link Parameter} that the current one should depend on, if applicable. This means that
+	 *                     if the other {@link Parameter} has a value set, the current one should become required.
+	 * @param expendableBy Another {@link Parameter} that the current one should be expendable by, if applicable. This
+	 *                        means that if the other {@link Parameter} has a value set, the current one should become
+	 *                        not available.
+	 */
 	public Parameter(String name, String description, ParameterTypes type, Boolean required, String valuesJson,
 					 String parameterGroup, @Nullable Parameter dependsOn, @Nullable Parameter expendableBy) {
 		this.name = name;
@@ -71,6 +100,14 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		this.expendableBy = expendableBy;
 	}
 
+	/**
+	 * Constructs an "alias" {@link Parameter}. This type of {@link Parameter} simply points to another
+	 * {@link Parameter}. It is not meant to be configured by its own, but could be a leftover due to historical reasons.
+	 * @param name The name of the {@link Parameter}.
+	 * @param aliasOf The actual {@link Parameter} to point to.
+	 * @param aliasMappings When migrating to the actual {@link Parameter}, this may contain a JSON that details how
+	 *                         values should be mapped to this new {@link Parameter}.
+	 */
 	public Parameter(String name, @Nullable Parameter aliasOf, @Nullable String aliasMappings) {
 		this.name = name;
 		this.aliasOf = aliasOf;
@@ -99,11 +136,17 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		this.id = id;
 	}
 
-	public long getId()
-	{
+	/**
+	 * Gets the ID of this {@link Parameter}, or the actual {@link Parameter} it is pointing to if the current one is an
+	 * alias.
+	 */
+	public long getId() {
 		return getRealParameter().id;
 	}
 
+	/**
+	 * Gets the ID of this {@link Parameter}.
+	 */
 	public long getRawId() {
 		return id;
 	}
@@ -113,11 +156,18 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		this.name = name;
 	}
 
+	/**
+	 * Gets the name of this {@link Parameter}, or the actual {@link Parameter} it is pointing to if the current one is an
+	 * alias.
+	 */
 	public String getName()
 	{
 		return getRealParameter().name;
 	}
 
+	/**
+	 * Gets the name of this {@link Parameter}.
+	 */
 	public String getRawName() {
 		return name;
 	}
@@ -127,6 +177,10 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		this.description = description;
 	}
 
+	/**
+	 * Gets the description of this {@link Parameter}, or the actual {@link Parameter} it is pointing to if the current one is an
+	 * alias.
+	 */
 	public String getDescription() {
 		return getRealParameter().description;
 	}
@@ -136,10 +190,19 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		this.type = type;
 	}
 
+	/**
+	 * Gets the type of this {@link Parameter} in {@link String} format, or the actual {@link Parameter} it is pointing
+	 * to if the current one is an alias.
+	 * @see ParameterTypes
+	 */
 	public String getType() {
 		return getRealParameter().type;
 	}
 
+	/**
+	 * Gets the values JSON of this {@link Parameter}, or the actual {@link Parameter} it is pointing to if the current one is an
+	 * alias.
+	 */
     public String getValuesJson() {
         return getRealParameter().valuesJson;
     }
@@ -147,7 +210,11 @@ public class Parameter implements Comparable<Parameter>, Serializable
     public void setValuesJson(String valuesJson) {
         this.valuesJson = valuesJson;
     }
-    
+
+	/**
+	 * Gets the required flag of this {@link Parameter}, or the actual {@link Parameter} it is pointing to if the current one is an
+	 * alias.
+	 */
 	public Boolean getRequired() {
 		return getRealParameter().required;
 	}
@@ -156,6 +223,10 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		this.required = required;
 	}
 
+	/**
+	 * Gets the group of this {@link Parameter}, or the actual {@link Parameter} it is pointing to if the current one is an
+	 * alias.
+	 */
     public String getParameterGroup() {
 		return getRealParameter().parameterGroup;
 	}
@@ -164,11 +235,21 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		this.parameterGroup = parameterGroup;
 	}
 
+	/**
+	 * Gets the {@link Parameter} that the current {@link Parameter} (or the actual {@link Parameter} it is pointing to if
+	 * the current one is an alias) depends on, if applicable. This means that if the other {@link Parameter} has a
+	 * value set, the current one should become required.
+	 */
 	@Nullable
 	public Parameter getDependsOn() {
 		return getRealParameter().dependsOn;
 	}
 
+	/**
+	 * Sets the {@link Parameter} that the current {@link Parameter} depends on. This means that if the other
+	 * {@link Parameter} has a value set, the current one should become required. Use {@code null} if it should not
+	 * depend on anything else.
+	 */
 	public void setDependsOn(@Nullable Parameter dependsOn) {
 		if (dependsOn != null) {
 			if (dependsOn == this) {
@@ -185,11 +266,21 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		this.dependsOn = dependsOn;
 	}
 
+	/**
+	 * Gets the {@link Parameter} that the current {@link Parameter} (or the actual {@link Parameter} it is pointing to if
+	 * the current one is an alias) is expendable by, if applicable. This means that if the other {@link Parameter} has a
+	 * value set, the current one should become not available.
+	 */
 	@Nullable
 	public Parameter getExpendableBy() {
 		return getRealParameter().expendableBy;
 	}
 
+	/**
+	 * Sets the {@link Parameter} that the current {@link Parameter} is expendable by. This means that if the other
+	 * {@link Parameter} has a value set, the current one should become not available. Use {@code null} if it should not
+	 * be expendable by anything else.
+	 */
 	public void setExpendableBy(@Nullable Parameter expendableBy) {
 		if (expendableBy != null) {
 			if (expendableBy == this) {
@@ -206,11 +297,21 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		this.expendableBy = expendableBy;
 	}
 
+	/**
+	 * Gets the actual {@link Parameter} that this one is aliasing, if applicable (otherwise {@code null}). An alias
+	 * simply points to another {@link Parameter}. It is not meant to be configured by its own, but could be a leftover
+	 * due to historical reasons.
+	 */
 	@Nullable
 	public Parameter getAliasOf() {
 		return aliasOf;
 	}
 
+	/**
+	 * Sets the actual {@link Parameter} that this one is aliasing, or {@code null} if it is not an alias. An alias
+	 * simply points to another {@link Parameter}. It is not meant to be configured by its own, but could be a leftover
+	 * due to historical reasons.
+	 */
 	public void setAliasOf(@Nullable Parameter aliasOf) {
 		if (aliasOf != null) {
 			if (aliasOf == this) {
@@ -231,15 +332,27 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		this.aliasOf = aliasOf;
 	}
 
+	/**
+	 * Gets the alias mappings JSON. When migrating to the actual {@link Parameter}, this may contain a JSON that details how
+	 * values should be mapped to this new {@link Parameter}.
+	 */
 	@Nullable
 	public String getAliasMappings() {
 		return aliasMappings;
 	}
 
+	/**
+	 * Sets the alias mappings JSON. When migrating to the actual {@link Parameter}, this may contain a JSON that details how
+	 * values should be mapped to this new {@link Parameter}.
+	 */
 	public void setAliasMappings(@Nullable String aliasMappings) {
 		this.aliasMappings = aliasMappings;
 	}
 
+	/**
+	 * Gets the actual {@link Parameter}. This is the current {@link Parameter} if it is not an alias, or the
+	 * {@link Parameter} that is being pointed to if it is.
+	 */
 	public Parameter getRealParameter() {
 		if (aliasOf == null) {
 			return this;
@@ -247,8 +360,18 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		return aliasOf.getRealParameter();
 	}
 
+	/**
+	 * Gets the {@link Module} this {@link Parameter} is for.
+	 */
 	public Module getModule() {
 		return module;
+	}
+
+	/**
+	 * Sets the {@link Module} this {@link Parameter} is for.
+	 */
+	public void setModule(Module module) {
+		this.module = module;
 	}
 
 	@Override

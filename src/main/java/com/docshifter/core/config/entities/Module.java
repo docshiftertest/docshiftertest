@@ -26,6 +26,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * A module functions as a core processing unit within DocShifter workflows. Each module contains logic that handles
+ * documents in its own unique manner and can be customized through {@link Parameter}s. A set of {@link Parameter} for
+ * a given module is called a {@link ModuleConfiguration}.
+ */
 @Entity
 @Log4j2
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -101,10 +106,18 @@ public class Module implements Serializable {
 		this(module.getDescription(), module.getName(), module.getClassname(), module.getType(), module.getCondition(), module.parameters);
 	}
 
+	/**
+	 * Adds a {@link Parameter} to this module.
+	 * @param param The {@link Parameter} to add.
+	 */
 	public void addToParameters(Parameter param) {
 		parameters.add(param);
 	}
 
+	/**
+	 * Adds one or more {@link Parameter}s to this module.
+	 * @param params The {@link Parameter}s to add.
+	 */
 	public void addToParameters(Iterable<Parameter> params) {
 		for (Parameter param : params) {
 			this.addToParameters(param);
@@ -123,27 +136,46 @@ public class Module implements Serializable {
 		return name;
 	}
 
+	/**
+	 * Gets a {@link Stream} of all actual {@link Parameter}s. These are {@link Parameter}s that do not function as aliases.
+	 */
 	private Stream<Parameter> getFilteredParameterStream() {
 		return parameters.stream()
 				.filter(parameter -> parameter.getAliasOf() == null);
 	}
 
+	/**
+	 * Gets a {@link Set} of all actual {@link Parameter}s. These are {@link Parameter}s that do not function as aliases.
+	 */
 	public Set<Parameter> getParameters() {
 		return getFilteredParameterStream().collect(Collectors.toUnmodifiableSet());
 	}
 
+	/**
+	 * Gets a {@link Set} of ALL {@link Parameter}s. This includes ones function as aliases.
+	 */
 	@JsonIgnore
 	@Transient
 	public Set<Parameter> getRawParameters() {
 		return Collections.unmodifiableSet(parameters);
 	}
 
+	/**
+	 * Gets a sorted {@link List} of all actual {@link Parameter}s. These are {@link Parameter}s that do not function as aliases.
+	 */
 	@JsonIgnore
 	@Transient
 	public List<Parameter> getParametersAsList() {
 		return getFilteredParameterStream().sorted().toList();
 	}
 
+	/**
+	 * Gets a {@link Parameter} by name.
+	 * @param name The name to look for.
+	 * @param raw {@code true} if you always want the raw {@link Parameter} even if it is an alias, {@code false}
+	 *                           if you always want to get the actual {@link Parameter}, so to redirect aliases.
+	 * @return The {@link Parameter} that was found, or {@code null} if nothing was found.
+	 */
 	private Parameter getParameter(String name, boolean raw) {
 		log.debug("Getting parameter for name: {}", name);
 		for (Parameter param : parameters) {
@@ -166,12 +198,24 @@ public class Module implements Serializable {
 		return null;
 	}
 
+	/**
+	 * Gets an actual {@link Parameter} by name. So if the provided name points to an alias, it will be redirected to
+	 * the {@link Parameter} it is referring to.
+	 * @param name The name to look for.
+	 * @return The {@link Parameter} that was found, or {@code null} if nothing was found.
+	 */
 	@JsonIgnore
 	@Transient
 	public Parameter getParameter(String name) {
 		return getParameter(name, false);
 	}
 
+	/**
+	 * Gets a raw {@link Parameter} by name. So you will always get the exact {@link Parameter} with that name if it
+	 * exists, even if it merely functions as an alias.
+	 * @param name The name to look for.
+	 * @return The {@link Parameter} that was found, or {@code null} if nothing was found.
+	 */
 	@JsonIgnore
 	@Transient
 	public Parameter getRawParameter(String name) {
@@ -182,10 +226,19 @@ public class Module implements Serializable {
 		return type;
 	}
 
+	/**
+	 * Removes a {@link Parameter} from this module.
+	 * @param param The {@link Parameter} to remove.
+	 * @return {@code true} it was found and therefore removed, {@code false} otherwise.
+	 */
 	public boolean removeFromParameters(Parameter param) {
 		return parameters.remove(param);
 	}
 
+	/**
+	 * Removes one or more {@link Parameter}s from this module.
+	 * @param params The {@link Parameter}s to remove.
+	 */
 	public void removeFromParameters(Iterable<Parameter> params) {
 		for (Parameter param : params) {
 			this.removeFromParameters(param);
