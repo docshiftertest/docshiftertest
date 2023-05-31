@@ -1,6 +1,5 @@
 package com.docshifter.core.config.services;
 
-import com.docshifter.core.config.entities.Module;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import com.docshifter.core.licensing.dtos.LicensingDto;
 import com.docshifter.core.utils.FileUtils;
@@ -29,7 +28,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -593,29 +591,29 @@ public class NalpeironService implements ILicensingService {
     }
 
     /**
-     * Checks which module is licensed
-     * @return map with the code for the module and if it is licensed
+     * Checks which function is licensed
+     * @return map with the code for the function and if it is licensed
      */
-    public Map<String, Boolean> checkLicenseForAllModules(List<Module> modules) {
+    public Map<String, Boolean> checkLicenseForAllFunctions(List<String> codeFunctionList) {
 
-        Map<String, Boolean> moduleIsLicensedByCode = new HashMap<>();
+        Map<String, Boolean> functionIsLicensedByCode = new HashMap<>();
 
-        for (Module module : modules) {
-            if (StringUtils.isNotBlank(module.getCode())) {
+        for (String codeFunction : codeFunctionList) {
+            if (StringUtils.isNotBlank(codeFunction)) {
                 try {
-                    moduleIsLicensedByCode.put(module.getCode(), helper.getFeatureStatus(module.getCode()).isValid());
+                    functionIsLicensedByCode.put(codeFunction, helper.getFeatureStatus(codeFunction).isValid());
                 }
                 catch (DocShifterLicenseException docShifterLicenseException) {
-                    log.debug("Module [{}] is not licensed.",
-                            module.getName(), docShifterLicenseException);
-                    moduleIsLicensedByCode.put(module.getCode(), false);
+                    log.debug("Function with code [{}] is not licensed.",
+                            codeFunction, docShifterLicenseException);
+                    functionIsLicensedByCode.put(codeFunction, false);
                 }
             }
         }
 
-        log.debug("Modules licensed by code: {}", moduleIsLicensedByCode);
+        log.debug("Functions licensed by code: {}", functionIsLicensedByCode);
 
-        return moduleIsLicensedByCode;
+        return functionIsLicensedByCode;
     }
 
     /**
