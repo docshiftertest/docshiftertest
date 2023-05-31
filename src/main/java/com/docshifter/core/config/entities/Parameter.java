@@ -93,7 +93,7 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		this.required = required;
 		this.valuesJson = valuesJson;
 		this.parameterGroup = parameterGroup;
-		if (dependsOn == expendableBy) {
+		if (dependsOn != null && dependsOn.equals(expendableBy)) {
 			throw new IllegalArgumentException("Conflicting dependency detected: dependsOn cannot be the same as expendableBy (" + dependsOn.name + ")!");
 		}
 		this.dependsOn = dependsOn;
@@ -252,14 +252,14 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	 */
 	public void setDependsOn(@Nullable Parameter dependsOn) {
 		if (dependsOn != null) {
-			if (dependsOn == this) {
+			if (equals(dependsOn)) {
 				throw new IllegalArgumentException("The dependsOn cannot point to itself (" + name + ")!");
 			}
-			if (dependsOn.getDependsOn() == this) {
+			if (equals(dependsOn.getDependsOn())) {
 				throw new IllegalArgumentException("Circular dependsOn dependency detected: the targeted parameter "
 						+ dependsOn.name + " is already pointing to this one (" + name + ")!");
 			}
-			if (dependsOn == expendableBy) {
+			if (dependsOn.equals(expendableBy)) {
 				throw new IllegalArgumentException("Conflicting dependency detected: dependsOn cannot be the same as expendableBy (" + dependsOn.name + ")!");
 			}
 		}
@@ -283,14 +283,14 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	 */
 	public void setExpendableBy(@Nullable Parameter expendableBy) {
 		if (expendableBy != null) {
-			if (expendableBy == this) {
+			if (equals(expendableBy)) {
 				throw new IllegalArgumentException("The expendableBy cannot point to itself (" + name + ")!");
 			}
-			if (expendableBy.getExpendableBy() == this) {
+			if (equals(expendableBy.getExpendableBy())) {
 				throw new IllegalArgumentException("Circular expendableBy dependency detected: the targeted parameter "
 						+ expendableBy.name + " is already pointing to this one (" + name + ")!");
 			}
-			if (dependsOn == expendableBy) {
+			if (expendableBy.equals(dependsOn)) {
 				throw new IllegalArgumentException("Conflicting dependency detected: dependsOn cannot be the same as expendableBy (" + dependsOn.name + ")!");
 			}
 		}
@@ -314,10 +314,10 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	 */
 	public void setAliasOf(@Nullable Parameter aliasOf) {
 		if (aliasOf != null) {
-			if (aliasOf == this) {
+			if (equals(aliasOf)) {
 				throw new IllegalArgumentException("The aliasOf cannot point to itself (" + name + ")!");
 			}
-			if (aliasOf.getRealParameter() == this) {
+			if (equals(aliasOf.getRealParameter())) {
 				throw new IllegalArgumentException("Circular aliasOf dependency detected: the targeted parameter "
 						+ aliasOf.name + " is already pointing to this one (" + name + ")!");
 			}
