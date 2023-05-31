@@ -1,5 +1,7 @@
 package com.docshifter.core.config.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -17,6 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
+import java.util.Optional;
 
 /**
  * A parameter is a configurable property within a {@link Module}. The entity that stores all parameters for a given
@@ -45,10 +48,12 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne
 	@Nullable
+	@ToString.Exclude
 	private Parameter dependsOn;
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne
 	@Nullable
+	@ToString.Exclude
 	private Parameter expendableBy;
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne
@@ -241,8 +246,15 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	 * value set, the current one should become required.
 	 */
 	@Nullable
+	@JsonIgnore
 	public Parameter getDependsOn() {
 		return getRealParameter().dependsOn;
+	}
+
+	@Nullable
+	@JsonProperty("dependsOn")
+	public Long getDependsOnId() {
+		return Optional.ofNullable(getDependsOn()).map(Parameter::getRawId).orElse(null);
 	}
 
 	/**
@@ -272,8 +284,15 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	 * value set, the current one should become not available.
 	 */
 	@Nullable
+	@JsonIgnore
 	public Parameter getExpendableBy() {
 		return getRealParameter().expendableBy;
+	}
+
+	@Nullable
+	@JsonProperty("expendableBy")
+	public Long getExpendableById() {
+		return Optional.ofNullable(getExpendableBy()).map(Parameter::getRawId).orElse(null);
 	}
 
 	/**
@@ -303,6 +322,7 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	 * due to historical reasons.
 	 */
 	@Nullable
+	@JsonIgnore
 	public Parameter getAliasOf() {
 		return aliasOf;
 	}
@@ -353,6 +373,7 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	 * Gets the actual {@link Parameter}. This is the current {@link Parameter} if it is not an alias, or the
 	 * {@link Parameter} that is being pointed to if it is.
 	 */
+	@JsonIgnore
 	public Parameter getRealParameter() {
 		if (aliasOf == null) {
 			return this;
@@ -363,6 +384,7 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	/**
 	 * Gets the {@link Module} this {@link Parameter} is for.
 	 */
+	@JsonIgnore
 	public Module getModule() {
 		return module;
 	}
