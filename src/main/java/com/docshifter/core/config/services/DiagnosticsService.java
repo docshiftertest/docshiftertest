@@ -253,7 +253,12 @@ public class DiagnosticsService {
 		sb.appendln("Available processors: %d", runtime.availableProcessors());
 
 		sb.appendln("--- MEMORY ---");
-		sb.appendln("JVM max = %dB, free = %dB, total = %dB", runtime.maxMemory(), runtime.freeMemory(), runtime.totalMemory());
+		sb.appendln("JVM max memory                 = %dB", runtime.maxMemory());
+		sb.appendln("    total memory               = %dB", runtime.totalMemory());
+		sb.appendln("    unallocated (max - total)  = %dB", runtime.maxMemory() - runtime.totalMemory());
+		sb.appendln("    free memory                = %dB", runtime.freeMemory());
+		sb.appendln("    used memory (total - free) = %dB", runtime.totalMemory() - runtime.freeMemory());
+		sb.appendln("    total free (max - used)    = %dB", runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory()));
 		sb.appendln("Found %d memory pool(s).", ManagementFactory.getMemoryPoolMXBeans().size());
 		int memoryPoolNum = 1;
 		for (MemoryPoolMXBean memoryPool : ManagementFactory.getMemoryPoolMXBeans()) {
