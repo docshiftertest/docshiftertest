@@ -57,6 +57,13 @@ public class ModuleConfiguration implements Serializable {
 
 	public ModuleConfiguration() {}
 
+	public ModuleConfiguration(ModuleConfiguration moduleConfiguration){
+		this.module = moduleConfiguration.getModule();
+		this.name = moduleConfiguration.getName();
+		this.description = moduleConfiguration.getDescription();
+	}
+
+
 	public ModuleConfiguration(long id, @Nonnull Module module, String name,
 							   String description, UUID uuid,
 							   Map<Parameter, String> parameterValues) {
