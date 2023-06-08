@@ -181,9 +181,10 @@ public class EmailServiceImpl implements EmailService {
      */
     private boolean checkIfCouldSendSmtpEmail(MailConfigurationItemDto configItem) {
 
+        // There are cases where it's possible to send email with no username/password authentication
+        // so we can't check username and password
+        // e.g. SAC on DPS-1239 and people using SMTP2GO with IP verification
         return StringUtils.isNotBlank(configItem.getHost())
-                && StringUtils.isNotBlank(configItem.getUsername())
-                && StringUtils.isNotBlank(configItem.getPassword())
                 && configItem.getPort() >= 0;
     }
 

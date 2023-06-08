@@ -80,6 +80,20 @@ public class EmailServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    public void shouldSendSimpleEmailNoAuth() throws Exception {
+        NotificationDto notification = new NotificationDto();
+        notification.setLevel(NotificationLevels.ERROR);
+        notification.setMessage("some body");
+
+        mailConfigurationItem.setUsername("");
+        mailConfigurationItem.setPassword("");
+        emailService.sendEmail(mailConfigurationItem, "blazej.maciaszek@sienn.pl", notification,null);
+        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        String content = getHtmlContent(receivedMessage);
+        assertThat(content).isEqualToIgnoringWhitespace("some body");
+    }
+
+    @Test
     public void shouldSendEmailWithTemplate() throws Exception {
         NotificationDto notification = new NotificationDto();
         notification.setLevel(NotificationLevels.ERROR);

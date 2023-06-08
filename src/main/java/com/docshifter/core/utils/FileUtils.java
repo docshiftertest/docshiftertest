@@ -56,21 +56,16 @@ public final class FileUtils {
     public static boolean checkFileExist(Path path){
 
         if (Files.exists(path)) {
-            if (Files.isRegularFile(path)) {
-                return true;
-            }
-            return false;
+            return Files.isRegularFile(path);
         }
         return false;
     }
 
-    public static boolean checkFileExist(String path){
+    public static boolean checkFileExist(String filePath){
 
-        if (Files.exists(Paths.get(path))) {
-            if (Files.isRegularFile(Paths.get(path))) {
-                return true;
-            }
-            return false;
+        Path path = Paths.get(filePath);
+        if (Files.exists(path)) {
+            return Files.isRegularFile(path);
         }
         return false;
     }
@@ -79,10 +74,7 @@ public final class FileUtils {
 
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         URL destination = classloader.getResource(path);
-        if(destination == null) {
-            return false;
-        }
-        return true;
+        return destination != null;
     }
 
     public static void renameFile(String filePath, String newFilePath) {
@@ -107,11 +99,9 @@ public final class FileUtils {
 				 FileChannel outChannel = outStream.getChannel()) {
 
 				outChannel.transferFrom(inChannel, 0, inChannel.size());
-
-			} catch (IOException e) {
-				throw e;
 			}
-        }else{
+        }
+        else{
             log.info("copyfile-isfolder--->copyfolder");
             copyFolder(srcFile, destFile);
         }
@@ -137,9 +127,9 @@ public final class FileUtils {
      *   a/b/c     --> c
      *   a/b/c/    --> ""
      * The output will be the same irrespective of the machine that the code is running on.
-     * @Return
-     * the name of the file without the path, or an empty string if none exists. Null bytes inside string will be removed
      * @param fileName the fileName to query, null returns null
+     * @return The file's name without the path, or an empty string if none exists.
+     *         Null bytes inside string will be removed
      */
     public static String getFilename(String fileName){
         return FilenameUtils.getName(fileName);
@@ -177,16 +167,12 @@ public final class FileUtils {
         // Get the size of the file
         long length = file.length();
 
-        if (length > Integer.MAX_VALUE) {
-            // File is too large
-        }
-
         // Create the byte array to hold the data
         byte[] bytes = new byte[(int) length];
 
         // Read in the bytes
         int offset = 0;
-        int numRead = 0;
+        int numRead;
         while (offset < bytes.length
                 && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
             offset += numRead;
@@ -204,10 +190,25 @@ public final class FileUtils {
         return bytes;
     }
 
+    /**
+     * Shortens a filename to default 256 chars
+     * @param filename The filename to be shortened, if needed
+     * @return The (possibly shortened) filename
+     */
     public static String shortenFileName(String filename){
+        return shortenFileName(filename, 256);
+    }
+
+    /**
+     * Shortens a filename to default 256 chars
+     * @param filename The filename to be shortened, if needed
+     * @param length The length to which to shorten the filename
+     * @return The (possibly shortened) filename
+     */
+    public static String shortenFileName(String filename, int length){
         String newfilename = filename;
-        if (filename.length() > 256) {
-            newfilename = filename.substring(0, 256);
+        if (filename.length() > length) {
+            newfilename = filename.substring(0, length);
         }
         return newfilename;
     }
@@ -241,32 +242,13 @@ public final class FileUtils {
 
         // https://stackoverflow.com/a/31976060
 		if (SystemUtils.IS_OS_WINDOWS) {
-			switch (output) {
-				case "CON":
-				case "PRN":
-				case "AUX":
-				case "NUL":
-				case "COM1":
-				case "COM2":
-				case "COM3":
-				case "COM4":
-				case "COM5":
-				case "COM6":
-				case "COM7":
-				case "COM8":
-				case "COM9":
-				case "LPT1":
-				case "LPT2":
-				case "LPT3":
-				case "LPT4":
-				case "LPT5":
-				case "LPT6":
-				case "LPT7":
-				case "LPT8":
-				case "LPT9":
-					output = output.concat("_");
-					break;
-			}
+            output = switch (output) {
+                case "CON", "PRN", "AUX", "NUL",
+                        "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+                        "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9" ->
+                        output.concat("_");
+                default -> output;
+            };
 		}
 
 		if (output.equals(".")) {
@@ -280,25 +262,26 @@ public final class FileUtils {
 	}
 
     public static String getUniquePath(String infilePath){
-        String fileName = Paths.get(infilePath).getFileName().toString();
+        Path path = Paths.get(infilePath);
+        String fileName = path.getFileName().toString();
         String fileNameWOExt = getNameWithoutExtension(fileName);
         String newFileName;
-        Path newUniquePath = Paths.get(infilePath);
+        Path newUniquePath = path;
 
-        if (Files.exists(Paths.get(infilePath))) {
+        if (Files.exists(path)) {
             //Check whether it has an extension
             if (fileName.contains(".")) {
                 //If it has an extension
                 String extension = getExtension(infilePath);
                 newFileName = shortenFileName(fileNameWOExt) + System.currentTimeMillis() + "."+ extension;
-                newUniquePath = Paths.get(infilePath).getParent().resolve(newFileName);
+                newUniquePath = path.getParent().resolve(newFileName);
                 if (Files.exists(newUniquePath)) {
                     newUniquePath = Paths.get(getUniquePath(newUniquePath.toString()));
                 }
             } else {
                 //If no extension
                 newFileName = shortenFileName(fileNameWOExt) + System.currentTimeMillis();
-                newUniquePath = Paths.get(infilePath).getParent().resolve(newFileName);
+                newUniquePath = path.getParent().resolve(newFileName);
                 if (Files.exists(newUniquePath)) {
                     newUniquePath = Paths.get(getUniquePath(newUniquePath.toString()));
                 }
@@ -316,9 +299,10 @@ public final class FileUtils {
         return false;
     }
 
-    public static boolean checkFolderExist(String path){
-        if (!Files.exists(Paths.get(path))) {
-			return Files.isDirectory(Paths.get(path));
+    public static boolean checkFolderExist(String folder){
+        Path path = Paths.get(folder);
+        if (!Files.exists(path)) {
+			return Files.isDirectory(path);
 		}
         return false;
     }
@@ -386,7 +370,29 @@ public final class FileUtils {
         return dirPath.delete();
     }
 
+    /**
+     * Create the folder structure
+     * @deprecated
+     * This method should not be used because of the typo in the name
+     * <p> Use {@link FileUtils#createFolderStructure(String, String)} instead
+     *
+     * @param rootFolderPath Where to begin
+     * @param folderStructurePath The folder structure to add on
+     * @return The absolute path of the target folder if existing or created, else the root folder path
+     */
+    @Deprecated
     public static String createFolderStucture(String rootFolderPath,
+                                               String folderStructurePath) {
+        return createFolderStructure(rootFolderPath, folderStructurePath);
+    }
+
+    /**
+     * Create the folder structure
+     * @param rootFolderPath Where to begin
+     * @param folderStructurePath The folder structure to add on
+     * @return The absolute path of the target folder if existing or created, else the root folder path
+     */
+    public static String createFolderStructure(String rootFolderPath,
                                               String folderStructurePath) {
         if (folderStructurePath == null)
             folderStructurePath = "";
@@ -399,6 +405,13 @@ public final class FileUtils {
             return rootFolderPath;
     }
 
+    /**
+     * Supposed to fix crlf in a file but looks a bit weird
+     * @deprecated Logic looks a bit ropey and is not scalable for large files
+     * @param file The file whose cf/lfs we want to fix
+     * @throws IOException If something I/O like goes wrong
+     */
+    @Deprecated
     public static void fixCrLf(File file) throws IOException {
         RandomAccessFile in = new RandomAccessFile(file, "r");
         byte[] data = new byte[(int) file.length()];
@@ -428,10 +441,15 @@ public final class FileUtils {
             f.setLength(changed.length);
             f.close();
         }
-        changed = null;
-        data = null;
     }
 
+    /**
+     * Another crlf fixer?
+     * @deprecated We should probably fix these up by making one good cr/lf fixer
+     * @param file The file to 'convert' from dos linefeeds to unix linefeeds
+     * @throws IOException If something I/O like goes wrong
+     */
+    @Deprecated
     public static void dos2unix(File file) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -457,7 +475,6 @@ public final class FileUtils {
         f.write(changed);
         f.setLength(changed.length);
         f.close();
-        changed = null;
     }
     
 	public static void cleanDirectory(File dir, String ignoreFolder) {
@@ -537,7 +554,7 @@ public final class FileUtils {
 	}
 	/**
 	 * Internally used method to close anything that's closable
-	 * @param closable
+	 * @param closable The closeable thingy to close
 	 */
 	private static void close(Closeable closable) {
 		if (closable != null) {
@@ -553,7 +570,7 @@ public final class FileUtils {
 	 * large files to this method.
 	 * @param fileName The file to 'convert' to a String
 	 * @param sizeLimit give a limit so we don't read all of a HUGE file into a String
-	 * @return
+	 * @return The contents of the file, as a String. Beware of scalability here with big files
 	 */
 	public static String fileToString(String fileName, int sizeLimit) {
 		return fileToString(fileName, null, sizeLimit);
@@ -565,7 +582,7 @@ public final class FileUtils {
 	 * @param fileName The file to 'convert' to a String
 	 * @param logMessagePrefix An optional prefix to the content
 	 * @param sizeLimit give a limit so we don't read all of a HUGE file into a String
-	 * @return
+	 * @return The contents of the file, as a String. Beware of scalability here with big files
 	 */
 	public static String fileToString(String fileName, String logMessagePrefix, int sizeLimit) {
 		if (logMessagePrefix == null) {
@@ -600,10 +617,12 @@ public final class FileUtils {
 
     /**
       * Attempts to delete a file.
+     * @deprecated Should not be used. It's a useless copy of deletePath and
+     * does not even use the Scheduler that's passed in
 	 * @param scheduler Used to schedule retries after a failure.
 	 * @param dir The directory or file to delete.
-	 * @return Whether the file could be deleted immediately, without any errors
      */
+    @Deprecated
     public static void deleteFile(ScheduledExecutorService scheduler, Path dir) {
         log.debug("Will try to delete a file... {}", dir);
         if (!Files.isDirectory(dir) && Files.exists(dir)) {
