@@ -33,10 +33,9 @@ public interface ModuleConfigurationRepository extends CrudRepository<ModuleConf
 
     List<ModuleConfiguration> findAllBy();
 
-    @Query(value = "select * " +
+    @Query(value = "select mc.* " +
             "from docshifter.module_configuration mc " +
             "join docshifter.module m on mc.module_id = m.id " +
             "where m.name in (:moduleNameList)", nativeQuery = true)
     List<ModuleConfiguration> findAllByModuleNameList(@Param("moduleNameList") List<String> moduleNameList);
-
 }
