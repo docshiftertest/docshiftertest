@@ -356,18 +356,19 @@ public final class ConfigUtils {
 			if (negate) {
 				entry = entry.substring(1);
 			}
-
-			String[] rangeArr = entry.split("-", 2);
+			// Split on all hyphens that are not contained within parentheses. Limit on 3, so we can detect an invalid
+			// entry with more elements than expected.
+			String[] rangeArr = entry.split("-(?![^(]*\\))", 3);
 			if (rangeArr.length > 2) {
 				throw new IllegalArgumentException("A range entry cannot contain more than 2 elements (lower and " +
 						"upper bound)! Evaluated range entry: " + entry);
 			}
-			int lower = tryParseInt(rangeArr[0], min, max);
+			int lower = parseDynamicInt(rangeArr[0], min, max);
 			int upper = lower;
 			if (rangeArr.length == 2) {
-				upper = tryParseInt(rangeArr[1], lower, max);
+				upper = parseDynamicInt(rangeArr[1], lower, max);
 				// Revalidate against upper now that we know it
-				lower = tryParseInt(rangeArr[0], min, upper);
+				lower = parseDynamicInt(rangeArr[0], min, upper);
 			}
 
 			if (reversed) {
@@ -518,24 +519,33 @@ public final class ConfigUtils {
 		}
 	}
 
-	private static int tryParseInt(String entry, int min, int max) {
-		if (!entry.startsWith("(") || !entry.endsWith(")")) {
-			int parsed = parseOperand(entry, min, max);
-			if (parsed < min) {
-				throw new IllegalArgumentException("The value " + parsed + " is located below the global minimum (" + min + ")!" +
-						" If you are unsure of the minimum, you can let the value get interpreted safely by putting " +
-						"it between parentheses.");
-			}
-			if (parsed > max) {
-				throw new IllegalArgumentException("The value " + parsed + " is located above the global maximum (" + max + ")!" +
-						" If you are unsure of the maximum, you can let the value get interpreted safely by putting " +
-						"it between parentheses.");
-			}
-			return parsed;
+	/**
+	 * Parses an {@code int} and makes sure that its value sits between a specified min/max range, but with a twist!
+	 * Instead of normal, boring ints, this method also accepts what we call "dynamic" ints, meaning special keywords
+	 * such as {@code FIRST} and {@code LAST} which refer to the provided minimum and maximum values respectively.
+	 * Additionally, an entry can also contain one of the four basic arithmetic operations: +, -, *, /. The consequence
+	 * of that is that it is possible to perform calculations using the special keywords, such as LAST-1 or LAST/2.
+	 * Finally, by default this method will enforce the min/max bounds strictly, meaning that if the final result is outside
+	 * the requested range, an {@link IllegalArgumentException} will be thrown. This strict mode can be turned off by putting
+	 * the entry between parentheses however, such as (3) or (LAST-5). In that case the result will always be clamped between
+	 * the min/max bounds.
+	 * @param entry The dynamic {@code int} entry to parse.
+	 * @param min The minimum value that should be allowed for the integer.
+	 * @param max The maximum value that should be allowed for the integer.
+	 * @return The parsed {@code int}.
+	 * @throws IllegalArgumentException The {@code entry} could not be parsed, either because it is supplied in a bad format
+	 * or because the min/max constraints are not met (and we are enforcing those bounds strictly).
+	 */
+	public static int parseDynamicInt(String entry, int min, int max) {
+		final boolean strictMode;
+		if (entry.startsWith("(") && entry.endsWith(")")) {
+			entry = entry.substring(1, entry.length() - 1);
+			strictMode = false;
+		} else {
+			strictMode = true;
 		}
 
-		entry = entry.substring(1, entry.length() - 1);
-		String[] operands = entry.split("[*/+-]", 2);
+		String[] operands = entry.split("[*/+-]", 3);
 		char operator;
 		if (operands.length == 1) {
 			operator = '+';
@@ -557,7 +567,7 @@ public final class ConfigUtils {
 				.map(Float.class::cast)
 				.reduce(operatorFn)
 				.map(Integer.class::cast)
-				.map(val -> Math.max(min, Math.min(max, val)))
+				.map(val -> clampResult(val, min, max, strictMode))
 				.orElseThrow(() -> new IllegalStateException("Found no operands, this should not happen as we " +
 						"have checked it before!"));
 	}
@@ -578,5 +588,23 @@ public final class ConfigUtils {
 		}
 
 		return Integer.parseInt(operand);
+	}
+
+	private static int clampResult(int result, int min, int max, boolean strictMode) {
+		if (!strictMode) {
+			return Math.max(min, Math.min(max, result));
+		}
+
+		if (result < min) {
+			throw new IllegalArgumentException("The value " + result + " is located below the global minimum (" + min + ")!" +
+					" If you are unsure of the minimum, you can let the value get interpreted safely by putting " +
+					"it between parentheses.");
+		}
+		if (result > max) {
+			throw new IllegalArgumentException("The value " + result + " is located above the global maximum (" + max + ")!" +
+					" If you are unsure of the maximum, you can let the value get interpreted safely by putting " +
+					"it between parentheses.");
+		}
+		return result;
 	}
 }
