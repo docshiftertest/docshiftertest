@@ -564,9 +564,9 @@ public final class ConfigUtils {
 		};
 		return Arrays.stream(operands)
 				.map(op -> parseOperand(op, min, max))
-				.map(Float.class::cast)
+				.map(Integer::floatValue)
 				.reduce(operatorFn)
-				.map(Integer.class::cast)
+				.map(Float::intValue)
 				.map(val -> clampResult(val, min, max, strictMode))
 				.orElseThrow(() -> new IllegalStateException("Found no operands, this should not happen as we " +
 						"have checked it before!"));
