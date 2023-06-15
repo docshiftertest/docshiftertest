@@ -1,6 +1,7 @@
 package com.docshifter.core.config.repositories;
 
 import com.docshifter.core.config.entities.GlobalSettings;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 /**
@@ -8,5 +9,8 @@ import org.springframework.data.repository.CrudRepository;
  */
 
 public interface GlobalSettingsRepository extends CrudRepository<GlobalSettings, Long> {
+
+    @Query(value = "select environment from docshifter.global_settings", nativeQuery = true)
+    String findEnvironment();
 
 }

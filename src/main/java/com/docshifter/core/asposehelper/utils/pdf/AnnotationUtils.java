@@ -12,6 +12,7 @@ import com.aspose.pdf.PdfAction;
 import com.aspose.pdf.XYZExplicitDestination;
 import lombok.extern.log4j.Log4j2;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 @Log4j2
@@ -43,12 +44,7 @@ public final class AnnotationUtils {
 	 * @return The retrieved {@link ExplicitDestination} or null if it couldn't be casted or retrieved.
 	 */
 	public static ExplicitDestination extractExplicitDestinationSoft(IDocument doc, LinkAnnotation annotation) {
-		IAppointment annotationDest = extractAppointment(annotation);
-		ExplicitDestination dest = AppointmentUtils.asExplicitDestinationSoft(doc, annotationDest);
-		if (dest != null) {
-			log.debug("Appropriate link found referring to page {}", dest.getPageNumber());
-		}
-		return dest;
+		return extractExplicitDestination(annotation, doc);
 	}
 
 	/**
@@ -61,11 +57,51 @@ public final class AnnotationUtils {
 	 * @return The retrieved {@link ExplicitDestination} or null if it couldn't be casted or retrieved.
 	 */
 	public static ExplicitDestination extractExplicitDestinationHard(LinkAnnotation annotation) {
-		IAppointment annotationDest = extractAppointment(annotation);
-		ExplicitDestination dest = AppointmentUtils.asExplicitDestinationHard(annotationDest);
+		return extractExplicitDestination(annotation, null);
+	}
+
+	/**
+	 * Extracts an {@link IAppointment} from a {@link LinkAnnotation} entirely and tries to cast the result as an
+	 * {@link ExplicitDestination}. Will return null if it is not an {@link ExplicitDestination}.
+	 * @param doc The document containing the {@link LinkAnnotation} and {@link NamedDestination}s.
+	 * @param annotation The object to extract the destination from.
+	 * @return The retrieved {@link ExplicitDestination} or null if it couldn't be cast or retrieved.
+	 */
+	private static ExplicitDestination extractExplicitDestination(LinkAnnotation annotation, @Nullable IDocument doc) {
+
+		// First we try to get directly from the destination
+		IAppointment annotationDest = annotation.getDestination();
+
+		// If we don't have a doc, it means this method was called by extractExplicitDestinationHard
+		boolean isHard = doc == null;
+
+		ExplicitDestination dest = null;
+
+		if (annotationDest != null) {
+			dest = isHard
+					? AppointmentUtils.asExplicitDestinationHard(annotationDest)
+					: AppointmentUtils.asExplicitDestinationSoft(doc, annotationDest);
+		}
+
+		// If the dest is null or the page inside the destination is null, we should try to get the action
+		// We learned with DSB-2141 - DocShifter keeps crashing at Dexcom
+		// That even when we have a destination, the page can be null
+		// In this case we have the page in the action
+		if (dest == null || dest.getPage() == null) {
+
+			annotationDest = annotation.getAction();
+
+			if (annotationDest != null) {
+				dest = isHard
+						? AppointmentUtils.asExplicitDestinationHard(annotationDest)
+						: AppointmentUtils.asExplicitDestinationSoft(doc, annotationDest);
+			}
+		}
+
 		if (dest != null) {
 			log.debug("Appropriate link found referring to page {}", dest.getPageNumber());
 		}
+
 		return dest;
 	}
 

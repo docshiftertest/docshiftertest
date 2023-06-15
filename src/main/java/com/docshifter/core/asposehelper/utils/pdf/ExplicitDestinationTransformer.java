@@ -344,4 +344,22 @@ public class ExplicitDestinationTransformer {
 				.toArray();
 		return ExplicitDestination.createDestination(newPageNum, type, values);
 	}
+
+	/**
+	 * Changes the page of the {@link ExplicitDestination} that was passed to this transformer.
+	 * @param page The new page
+	 * @return An {@link ExplicitDestination} of the same type and with the same values, but that has a different page.
+	 * @throws IllegalStateException The {@link ExplicitDestination} is of type {@code Custom}, which does not support
+	 * page numbers.
+	 */
+	public ExplicitDestination changePage(Page page) {
+		if (type == null) {
+			throw new IllegalStateException("Cannot change page of a Custom explicit destination type.");
+		}
+		double[] values = Stream.of(left, top, bottom, right, zoom)
+				.filter(Objects::nonNull)
+				.mapToDouble(d -> d)
+				.toArray();
+		return ExplicitDestination.createDestination(page, type, values);
+	}
 }

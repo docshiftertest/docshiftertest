@@ -44,13 +44,7 @@ public final class OutlineUtils {
 	 * @return The retrieved {@link ExplicitDestination} or null if it couldn't be casted or retrieved.
 	 */
 	public static ExplicitDestination extractExplicitDestinationSoft(IDocument doc, OutlineItemCollection outline) {
-		IAppointment outlineDest = extractAppointment(outline);
-		ExplicitDestination bookmark = AppointmentUtils.asExplicitDestinationSoft(doc, outlineDest);
-		if (bookmark != null) {
-			log.debug("Appropriate level {} bookmark found referring to page {}", outline.getLevel(),
-					bookmark.getPageNumber());
-		}
-		return bookmark;
+		return extractExplicitDestination(outline, doc);
 	}
 
 	/**
@@ -63,12 +57,52 @@ public final class OutlineUtils {
 	 * @return The retrieved {@link ExplicitDestination} or null if it couldn't be casted or retrieved.
 	 */
 	public static ExplicitDestination extractExplicitDestinationHard(OutlineItemCollection outline) {
-		IAppointment outlineDest = extractAppointment(outline);
-		ExplicitDestination bookmark = AppointmentUtils.asExplicitDestinationHard(outlineDest);
-		if (bookmark != null) {
-			log.debug("Appropriate level {} bookmark found referring to page {}", outline.getLevel(),
-					bookmark.getPageNumber());
+		return extractExplicitDestination(outline, null);
+	}
+
+	/**
+	 * Extracts an {@link IAppointment} from an {@link OutlineItemCollection} entirely and tries to cast the result
+	 * as an {@link ExplicitDestination}. Will return null if it is not an {@link ExplicitDestination}.
+	 * @param doc The document containing the {@link OutlineItemCollection} and {@link NamedDestination}s.
+	 * @param outline The object to extract the destination from.
+	 * @return The retrieved {@link ExplicitDestination} or null if it couldn't be cast or retrieved.
+	 */
+	private static ExplicitDestination extractExplicitDestination(OutlineItemCollection outline, IDocument doc) {
+
+		// First we try to get directly from the destination
+		IAppointment outlineDest = outline.getDestination();
+
+		// If we don't have a doc, it means this method was called by extractExplicitDestinationHard
+		boolean isHard = doc == null;
+
+		ExplicitDestination bookmark = null;
+
+		if (outlineDest != null) {
+			bookmark = isHard
+					? AppointmentUtils.asExplicitDestinationHard(outlineDest)
+					: AppointmentUtils.asExplicitDestinationSoft(doc, outlineDest);
 		}
+
+		// If the bookmark is null or the page inside the destination is null, we should try to get the action
+		// We learned with DSB-2141 - DocShifter keeps crashing at Dexcom
+		// That even when we have a destination, the page can be null
+		// In this case we have the page in the action
+		if (bookmark == null || bookmark.getPage() == null) {
+
+			outlineDest = outline.getAction();
+
+			if (outlineDest != null) {
+				bookmark = isHard
+						? AppointmentUtils.asExplicitDestinationHard(outlineDest)
+						: AppointmentUtils.asExplicitDestinationSoft(doc, outlineDest);
+			}
+		}
+
+		if (bookmark != null) {
+			log.debug("Appropriate level {} bookmark found referring to page {}",
+					outline.getLevel(), bookmark.getPageNumber());
+		}
+
 		return bookmark;
 	}
 

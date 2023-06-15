@@ -23,6 +23,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -292,47 +293,46 @@ public class NalpeironHelper {
 
 
     public enum LicenseStatus {
-        //SHOWERRORS(0x01, ""),
-        // [Description("Undetermined")]
-        PRODUNDETERMINED(0, ""),
-        // [Description("Authorized")]
-        PROD_AUTHORIZED(1, "", true),
-        // [Description("InTrial")]
-        PROD_INTRIAL(2, "", true),
-        // [Description("Product has expired")]
-        PROD_CONCURRENT(3, ""),
-        // [Description("ActivatedNetwork")]
-        PROD_NETWORK(14, "", true),
-        // [Description("ActivatedNetworkLTCO")]
-        PROD_NETWORK_LTCO(15, "", true),
-        // [Description("ActivatedConcurrent")]
-        PROD_PRODEXPIRED(-1, ""),
-        // [Description("Backtime Counter Tripped")]
-        PROD_BTCOUNTER(-2, ""),
-        // [Description("Feature not Authorised")]
-        PROD_FEATURESWICHEDOFF(-3, ""),
-        // [Description("Feature/Product not Found")]
-        PROD_PRODFEATNOTFOUND(-4, ""),
-        // [Description("License doesn't verify")]
-        PROD_LICENSE_DOESNT_VERIFY(-5, ""),
-        // [Description("Returned license to server")]
-        PROD_RETURNED_LICENSE(-6, ""),
-        // [Description("Date set back too far")]
-        PROD_DATE_SET_BACK_TOO_FAR(-7, ""),
-        // [Description("Product is InActive")]
-        PROD_PRODINACTIVE(-110, ""),
-        // [Description("Invalid Trial Period")]
-        PROD_INVALIDTRIAL(-111, ""),
-        // [Description("ComputerID has already been activated")]
-        PROD_COMPUTERIDALREADYACTIVE(-112, ""),
-        // [Description("Trial Expired")]
-        PROD_EXPIRED(-113, ""),
-        // [Description("LicenseCode is inactive")]
-        PROD_LCINACTIVE(-114, ""),
-        //[Description("Number of Allowed Activations Exceeded")]
-        PROD_NOT_AUTHORIZED(-115, ""),
-        //[Description("Subscription Expired")]
-        PROD_SUBSCRIPTION_EXPIRED(-116, "");
+        ACC_CONCURRENT_LTCO_ACTIVATED(55, "Account-based Concurrent LTCO License Activated", true),
+        ACC_NORMAL_LTCO__ACTIVATED(54, "Account-based Normal LTCO License Activated ", true),
+        CONCURRENT_LTCO_ACTIVATED(53, "Concurrent LTCO License Activated", true),
+        NORMAL_LTCO__ACTIVATED(51, "Normal LTCO License Activated ", true),
+        DAEMON_SLAVE_LICENSE(17, "Daemon Slave License (backup license, - to be implemented.)", true),
+        DAEMON_MASTER_LICENSE(16, "Daemon Master License", true),
+        DAEMON_LTCO_LICENSE(15, "Daemon LTCO License", true),
+        DAEMON_OEM_LICENSE(14, "Daemon OEM License", true),
+        PROD_ACCOUNT_BASED_CONCURRENT(5, "Account-based Concurrent license", true),
+        PROD_ACCOUNT_BASED(4, "Account-Based license ", true),
+        PROD_CONCURRENT(3, "Concurrent License Activated", true),
+        PROD_IN_TRIAL(2, "Trial Activated", true),
+        PROD_AUTHORIZED(1, "Authorized", true),
+        PROD_UNDETERMINED(0, "Undetermined"),
+        PROD_EXPIRED(-1, "Product has Expired"),
+	    BT_COUNTER_TRIPPED(-2, "Backtime Counter Tripped"),
+        FEATURE_NOT_AUTHORIZED(-3, "Feature not Authorised"),
+        FEATURE_PROD_NOT_FOUND(-4, "Feature/Product not Found"),
+        LICENSE_DOESNT_VERIFY(-5, "License doesn't verify"),
+        RETURNED_LICENCE_TO_SERVER(-6, "Returned license to server"),
+        DATE_SET_BACK_TOO_FAR(-7, "Date set back too far"),
+        PROD_INVALID_STATE(-8, "Product in Invalid State"),
+        PROD_IN_MIDST_OFFLINE(-9, "Product in midst of offline licensing. Has created an activation request but hasn't yet imported a license."),
+	    NO_LICENSES_AVAILABLE(-50, "No Available Licenses"),
+	    DAEMON_FAILED_VERIFY(-51, "Daemon Failed to Verify"),
+	    DAEMON_SYSTEM_ID_FAILURE(-52, "Daemon System ID Failure"),
+	    DAEMON_NO_FIND_METADATA(-53, "Daemon didn't find metadata"),
+	    BD_LIST_TIMES_NO_MATCH(-54, "DB time and license list time don't match"),
+	    FULL_V10_NO_PSV(-60, "Full V10 installed. Passive license invalid"),
+	    LICENSE_WITH_ABL_NEED_CREDENTIALS(-70, "License was obtained with ABL. Need credential verification"),
+        PROD_INACTIVE(-110, "Product is InActive"),
+        INVALID_TRIAL_PERIOD(-111, "Invalid Trial Period"),
+        COMPUTER_ID_ALREADY_ACTIVE(-112, "A Trial cannot be requested for a ComputerID that has already been activated"),
+        TRIAL_EXPIRED(-113, "Trial Expired"),
+        LICENSE_CODE_INACTIVE(-114, "LicenseCode is inactive"),
+        ALLOWED_ACTIVATIONS_EXCEEDED(-115, "Number of Allowed Activations Exceeded"),
+        PROD_SUBSCRIPTION_EXPIRED(-116, "Subscription Expired"),
+        DUPLICATE_DEVICE_ID(-117, "Duplicate Device ID"),
+        TOO_MANY_HEARTBEATS_MISSED(-200, "Too Many Heartbeats Missed (Network)"),
+        DAEMON_REVOKED_SEAT(-201, "Seat Revoked By Daemon");
 
         private final int value;
         private final String message;
@@ -761,8 +761,12 @@ public class NalpeironHelper {
         try {
             int i = nsl.callNSLReturnLicense(licenseNo);
 
-            if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLReturnLicense"), new NalpError(i, resolveNalpErrorMsg(i)));
+            if (i == LicenseStatus.RETURNED_LICENCE_TO_SERVER.getValue()) {
+                log.debug("License successfully returned!");
+            }
+            else {
+                log.warn("Nobody expects the status of the License to be: {}, meaning: {}",
+                        i, LicenseStatus.getLicenseStatus(i));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
