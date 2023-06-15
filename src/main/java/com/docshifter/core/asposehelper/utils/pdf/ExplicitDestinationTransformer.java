@@ -14,6 +14,7 @@ import com.aspose.pdf.Page;
 import com.aspose.pdf.Point;
 import com.aspose.pdf.Rectangle;
 import com.aspose.pdf.XYZExplicitDestination;
+import lombok.Getter;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
 /**
  * Utility class, mainly used to transform from one {@link ExplicitDestination} to another.
  */
+@Getter
 public class ExplicitDestinationTransformer {
 	private final ExplicitDestination origDest;
 	private final Page page;
@@ -161,7 +163,7 @@ public class ExplicitDestinationTransformer {
 	 * two, centering the bounding box within the window in the other dimension.
 	 */
 	public FitBExplicitDestination toFitB() {
-		if (type == ExplicitDestinationType.FitB) {
+		if (Objects.equals(type, ExplicitDestinationType.FitB)) {
 			return (FitBExplicitDestination) origDest;
 		}
 		return new FitBExplicitDestination(page);
@@ -172,7 +174,7 @@ public class ExplicitDestinationTransformer {
 	 * enough to fit the entire width of its bounding box within the window.
 	 */
 	public FitBHExplicitDestination toFitBH() {
-		if (type == ExplicitDestinationType.FitBH) {
+		if (Objects.equals(type, ExplicitDestinationType.FitBH)) {
 			return (FitBHExplicitDestination) origDest;
 		}
 		return new FitBHExplicitDestination(page, Objects.requireNonNullElse(top, page.getRect().getHeight()));
@@ -183,7 +185,7 @@ public class ExplicitDestinationTransformer {
 	 * just enough to fit the entire height of its bounding box within the window.
 	 */
 	public FitBVExplicitDestination toFitBV() {
-		if (type == ExplicitDestinationType.FitBV) {
+		if (Objects.equals(type, ExplicitDestinationType.FitBV)) {
 			return (FitBVExplicitDestination) origDest;
 		}
 		return new FitBVExplicitDestination(page, Objects.requireNonNullElse(left, 0d));
@@ -195,7 +197,7 @@ public class ExplicitDestinationTransformer {
 	 * the page within the window in the other dimension.
 	 */
 	public FitExplicitDestination toFit() {
-		if (type == ExplicitDestinationType.Fit) {
+		if (Objects.equals(type, ExplicitDestinationType.Fit)) {
 			return (FitExplicitDestination) origDest;
 		}
 		return new FitExplicitDestination(page);
@@ -206,7 +208,7 @@ public class ExplicitDestinationTransformer {
 	 * enough to fit the entire width of the page within the window.
 	 */
 	public FitHExplicitDestination toFitH() {
-		if (type == ExplicitDestinationType.FitH) {
+		if (Objects.equals(type, ExplicitDestinationType.FitH)) {
 			return (FitHExplicitDestination) origDest;
 		}
 		return new FitHExplicitDestination(page, Objects.requireNonNullElse(top, page.getRect().getHeight()));
@@ -219,7 +221,7 @@ public class ExplicitDestinationTransformer {
 	 * other dimension.
 	 */
 	public FitRExplicitDestination toFitR() {
-		if (type == ExplicitDestinationType.FitR) {
+		if (Objects.equals(type, ExplicitDestinationType.FitR)) {
 			return (FitRExplicitDestination) origDest;
 		}
 		return new FitRExplicitDestination(page, Objects.requireNonNullElse(left, 0d),
@@ -232,7 +234,7 @@ public class ExplicitDestinationTransformer {
 	 * just enough to fit the entire height of the page within the window.
 	 */
 	public FitVExplicitDestination toFitV() {
-		if (type == ExplicitDestinationType.FitV) {
+		if (Objects.equals(type, ExplicitDestinationType.FitV)) {
 			return (FitVExplicitDestination) origDest;
 		}
 		return new FitVExplicitDestination(page, Objects.requireNonNullElse(left, 0d));
@@ -243,7 +245,7 @@ public class ExplicitDestinationTransformer {
 	 * magnified by the factor zoom.
 	 */
 	public XYZExplicitDestination toXYZ() {
-		if (type == ExplicitDestinationType.XYZ) {
+		if (Objects.equals(type, ExplicitDestinationType.XYZ)) {
 			return (XYZExplicitDestination) origDest;
 		}
 		return new XYZExplicitDestination(page, Objects.requireNonNullElse(left, 0d),
@@ -332,7 +334,7 @@ public class ExplicitDestinationTransformer {
 	 * page numbers.
 	 */
 	public ExplicitDestination changePage(int newPageNum) {
-		if (page.getNumber() == newPageNum) {
+		if (page != null && page.getNumber() == newPageNum) {
 			return origDest;
 		}
 		if (type == null) {
@@ -353,6 +355,9 @@ public class ExplicitDestinationTransformer {
 	 * page numbers.
 	 */
 	public ExplicitDestination changePage(Page page) {
+		if (this.page != null && this.page.equals(page)) {
+			return origDest;
+		}
 		if (type == null) {
 			throw new IllegalStateException("Cannot change page of a Custom explicit destination type.");
 		}
