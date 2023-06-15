@@ -17,6 +17,8 @@ import com.aspose.pdf.XYZExplicitDestination;
 import lombok.Getter;
 
 import java.util.Objects;
+import java.util.function.Supplier;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 /**
@@ -26,11 +28,16 @@ import java.util.stream.Stream;
 public class ExplicitDestinationTransformer {
 	private final ExplicitDestination origDest;
 	private final Page page;
-	private Double left;
-	private Double top;
-	private Double bottom;
-	private Double right;
-	private Double zoom;
+	private Supplier<Rectangle> bbox;
+	private final Double left;
+	private final boolean leftSet;
+	private final Double top;
+	private final boolean topSet;
+	private final Double bottom;
+	private final boolean bottomSet;
+	private final Double right;
+	private final boolean rightSet;
+	private final Double zoom;
 	private final Integer type;
 
 	public static ExplicitDestinationTransformer create(ExplicitDestination dest) {
@@ -73,6 +80,7 @@ public class ExplicitDestinationTransformer {
 	 * @param zoom The (optional) zoom.
 	 */
 	public ExplicitDestinationTransformer(Page page, Double left, Double top, Double bottom, Double right, Double zoom) {
+		this(null, page, null, left, top, bottom, right, zoom);
 		if (left != null && right != null && left > right) {
 			throw new IllegalArgumentException("Left coordinate cannot be greater than the right one.");
 		}
@@ -82,79 +90,83 @@ public class ExplicitDestinationTransformer {
 		if (zoom != null && zoom < 0) {
 			throw new IllegalArgumentException("Zoom factor cannot be negative.");
 		}
-		origDest = null;
-		type = null;
+	}
+
+	private ExplicitDestinationTransformer(ExplicitDestination origDest, Integer type, Double left, Double top,
+										   Double bottom, Double right, Double zoom) {
+		this(origDest, origDest.getPage(), type, left, top, bottom, right, zoom);
+	}
+
+	private ExplicitDestinationTransformer(ExplicitDestination origDest, Page page, Integer type, Double left, Double top,
+										   Double bottom, Double right, Double zoom) {
+		this.origDest = origDest;
+		this.type = type;
 		this.page = page;
-		this.left = left;
-		this.top = top;
-		this.bottom = bottom;
-		this.right = right;
-		this.zoom = zoom;
+		// Potentially expensive operation, so defer initialization until/if it's really needed and cache the result
+		this.bbox = () -> {
+			Rectangle bbox = page == null ? null : page.calculateContentBBox();
+			this.bbox = () -> bbox;
+			return bbox;
+		};
+		leftSet = left != null;
+		this.left = leftSet ? left : calculateEdge(Rectangle::getLLX);
+		topSet = top != null;
+		this.top = topSet ? top : calculateEdge(Rectangle::getURY);
+		bottomSet = bottom != null;
+		this.bottom = bottomSet ? bottom : calculateEdge(Rectangle::getLLY);
+		rightSet = right != null;
+		this.right = rightSet ? right : calculateEdge(Rectangle::getURX);
+		this.zoom = zoom != null ? zoom : (page == null ? null : 0d);
+	}
+
+	private Double calculateEdge(ToDoubleFunction<Rectangle> fn) {
+		if (page == null) {
+			return null;
+		}
+
+		Rectangle rect;
+		if (type != null && (type == ExplicitDestinationType.FitB || type == ExplicitDestinationType.FitBV || type == ExplicitDestinationType.FitBH)) {
+			rect = bbox.get();
+		} else {
+			rect = page.getRect();
+		}
+		return fn.applyAsDouble(rect);
 	}
 
 	public ExplicitDestinationTransformer(CustomExplicitDestination dest) {
-		origDest = dest;
-		page = dest.getPage();
-		type = null;
+		this(dest, null, null, null, null, null, null);
 	}
 
 	public ExplicitDestinationTransformer(FitBExplicitDestination dest) {
-		origDest = dest;
-		page = dest.getPage();
-		type = ExplicitDestinationType.FitB;
+		this(dest, ExplicitDestinationType.FitB, null, null, null, null, null);
 	}
 
 	public ExplicitDestinationTransformer(FitBHExplicitDestination dest) {
-		origDest = dest;
-		page = dest.getPage();
-		top = dest.getTop();
-		type = ExplicitDestinationType.FitBH;
+		this(dest, ExplicitDestinationType.FitBH, null, dest.getTop(), null, null, null);
 	}
 
 	public ExplicitDestinationTransformer(FitBVExplicitDestination dest) {
-		origDest = dest;
-		page = dest.getPage();
-		left = dest.getLeft();
-		type = ExplicitDestinationType.FitBV;
+		this(dest, ExplicitDestinationType.FitBV, dest.getLeft(), null, null, null, null);
 	}
 
 	public ExplicitDestinationTransformer(FitExplicitDestination dest) {
-		origDest = dest;
-		page = dest.getPage();
-		type = ExplicitDestinationType.Fit;
+		this(dest, ExplicitDestinationType.Fit, null, null, null, null, null);
 	}
 
 	public ExplicitDestinationTransformer(FitHExplicitDestination dest) {
-		origDest = dest;
-		page = dest.getPage();
-		top = dest.getTop();
-		type = ExplicitDestinationType.FitH;
+		this(dest, ExplicitDestinationType.FitH, null, dest.getTop(), null, null, null);
 	}
 
 	public ExplicitDestinationTransformer(FitRExplicitDestination dest) {
-		origDest = dest;
-		page = dest.getPage();
-		left = dest.getLeft();
-		top = dest.getTop();
-		bottom = dest.getBottom();
-		right = dest.getRight();
-		type = ExplicitDestinationType.FitR;
+		this(dest, ExplicitDestinationType.FitR, dest.getLeft(), dest.getTop(), dest.getBottom(), dest.getRight(), null);
 	}
 
 	public ExplicitDestinationTransformer(FitVExplicitDestination dest) {
-		origDest = dest;
-		page = dest.getPage();
-		left = dest.getLeft();
-		type = ExplicitDestinationType.FitV;
+		this(dest, ExplicitDestinationType.FitV, dest.getLeft(), null, null, null, null);
 	}
 
 	public ExplicitDestinationTransformer(XYZExplicitDestination dest) {
-		origDest = dest;
-		page = dest.getPage();
-		left = dest.getLeft();
-		top = dest.getTop();
-		zoom = dest.getZoom();
-		type = ExplicitDestinationType.XYZ;
+		this(dest, ExplicitDestinationType.XYZ, dest.getLeft(), dest.getTop(), null, null, dest.getZoom());
 	}
 
 	/**
@@ -177,7 +189,7 @@ public class ExplicitDestinationTransformer {
 		if (Objects.equals(type, ExplicitDestinationType.FitBH)) {
 			return (FitBHExplicitDestination) origDest;
 		}
-		return new FitBHExplicitDestination(page, Objects.requireNonNullElse(top, page.getRect().getHeight()));
+		return new FitBHExplicitDestination(page, top);
 	}
 
 	/**
@@ -188,7 +200,7 @@ public class ExplicitDestinationTransformer {
 		if (Objects.equals(type, ExplicitDestinationType.FitBV)) {
 			return (FitBVExplicitDestination) origDest;
 		}
-		return new FitBVExplicitDestination(page, Objects.requireNonNullElse(left, 0d));
+		return new FitBVExplicitDestination(page, left);
 	}
 
 	/**
@@ -211,7 +223,7 @@ public class ExplicitDestinationTransformer {
 		if (Objects.equals(type, ExplicitDestinationType.FitH)) {
 			return (FitHExplicitDestination) origDest;
 		}
-		return new FitHExplicitDestination(page, Objects.requireNonNullElse(top, page.getRect().getHeight()));
+		return new FitHExplicitDestination(page, top);
 	}
 
 	/**
@@ -224,9 +236,9 @@ public class ExplicitDestinationTransformer {
 		if (Objects.equals(type, ExplicitDestinationType.FitR)) {
 			return (FitRExplicitDestination) origDest;
 		}
-		return new FitRExplicitDestination(page, Objects.requireNonNullElse(left, 0d),
-				Objects.requireNonNullElse(bottom, 0d), Objects.requireNonNullElse(right, page.getRect().getWidth()),
-				Objects.requireNonNullElse(top, page.getRect().getHeight()));
+		// NOTE: Stoopid Asspose can't even seem to document their stoopid code right!!!
+		// The 3rd argument is actually top, not bottom!
+		return new FitRExplicitDestination(page, left, top, right, bottom);
 	}
 
 	/**
@@ -237,7 +249,7 @@ public class ExplicitDestinationTransformer {
 		if (Objects.equals(type, ExplicitDestinationType.FitV)) {
 			return (FitVExplicitDestination) origDest;
 		}
-		return new FitVExplicitDestination(page, Objects.requireNonNullElse(left, 0d));
+		return new FitVExplicitDestination(page, left);
 	}
 
 	/**
@@ -248,23 +260,22 @@ public class ExplicitDestinationTransformer {
 		if (Objects.equals(type, ExplicitDestinationType.XYZ)) {
 			return (XYZExplicitDestination) origDest;
 		}
-		return new XYZExplicitDestination(page, Objects.requireNonNullElse(left, 0d),
-				Objects.requireNonNullElse(top, page.getRect().getHeight()), Objects.requireNonNullElse(zoom, 0d));
+		return new XYZExplicitDestination(page, left, top, zoom);
 	}
 
 	/**
 	 * Converts to an appropriate Fit (page edges) {@link ExplicitDestination}.
 	 */
 	public ExplicitDestination toFitWithPosition() {
-		if (bottom != null || right != null || (left != null && top != null)) {
+		if (bottomSet || rightSet || (leftSet && topSet)) {
 			return toFitR();
 		}
 
-		if (left != null) {
+		if (leftSet) {
 			return toFitV();
 		}
 
-		if (top != null) {
+		if (topSet) {
 			return toFitH();
 		}
 
@@ -276,45 +287,41 @@ public class ExplicitDestinationTransformer {
 	 * @return
 	 */
 	public ExplicitDestination toFitVisibleWithPosition() {
-		if (bottom != null || right != null || (left != null && top != null)) {
-			Rectangle bbox = page.calculateContentBBox();
-			double visibleLeft = clampXBetweenBBox(bbox, left, 0d);
-			double visibleRight = clampXBetweenBBox(bbox, right, page.getRect().getWidth());
-			double visibleBottom = clampYBetweenBBox(bbox, bottom, 0d);
-			double visibleTop = clampYBetweenBBox(bbox, top, page.getRect().getHeight());
+		if (bottomSet || rightSet || (leftSet && topSet)) {
+			double visibleLeft = clampXBetweenBBox(left);
+			double visibleRight = clampXBetweenBBox(right);
+			double visibleBottom = clampYBetweenBBox(bottom);
+			double visibleTop = clampYBetweenBBox(top);
 			return new FitRExplicitDestination(page, visibleLeft, visibleBottom, visibleRight, visibleTop);
 		}
 
-		if (left != null) {
+		if (leftSet) {
 			return toFitBV();
 		}
 
-		if (top != null) {
+		if (topSet) {
 			return toFitBH();
 		}
 
 		return toFitB();
 	}
 
-	private double clampXBetweenBBox(Rectangle bbox, Double value, double defaultValueIfNull) {
-		return Math.max(bbox.getLLX(), Math.min(bbox.getURX(), Objects.requireNonNullElse(value, defaultValueIfNull)));
+	private double clampXBetweenBBox(double value) {
+		return Math.max(bbox.get().getLLX(), Math.min(bbox.get().getURX(), value));
 	}
 
-	private double clampYBetweenBBox(Rectangle bbox, Double value, double defaultValueIfNull) {
-		return Math.max(bbox.getLLY(), Math.min(bbox.getURY(), Objects.requireNonNullElse(value, defaultValueIfNull)));
+	private double clampYBetweenBBox(double value) {
+		return Math.max(bbox.get().getLLY(), Math.min(bbox.get().getURY(), value));
 	}
 
 	public XYZExplicitDestination toCustomZoom(double zoom) {
-		if (this.zoom != null && this.zoom == zoom) {
+		if (Objects.equals(this.zoom, zoom)) {
 			return toXYZ();
 		}
-		Point topLeft = getTopLeft();
-		return new XYZExplicitDestination(page, topLeft.getX(), topLeft.getY(), zoom);
+		return new XYZExplicitDestination(page, left, top, zoom);
 	}
 
 	public Point getTopLeft() {
-		double left = this.left == null ? 0 : this.left;
-		double top = this.top == null ? page.getRect().getHeight() : this.top;
 		return new Point(left, top);
 	}
 
@@ -334,7 +341,7 @@ public class ExplicitDestinationTransformer {
 	 * page numbers.
 	 */
 	public ExplicitDestination changePage(int newPageNum) {
-		if (page != null && page.getNumber() == newPageNum) {
+		if (origDest != null && page != null && page.getNumber() == newPageNum) {
 			return origDest;
 		}
 		if (type == null) {
@@ -355,7 +362,7 @@ public class ExplicitDestinationTransformer {
 	 * page numbers.
 	 */
 	public ExplicitDestination changePage(Page page) {
-		if (this.page != null && this.page.equals(page)) {
+		if (origDest != null && this.page != null && this.page.equals(page)) {
 			return origDest;
 		}
 		if (type == null) {
