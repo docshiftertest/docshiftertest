@@ -106,7 +106,7 @@ public enum DestinationZoom {
         for (Page page : doc.getPages()) {
             StreamSupport.stream(page.getAnnotations().spliterator(), false)
                     .filter(annot -> annot.getAnnotationType() == AnnotationType.Link)
-                    .map(annot -> (LinkAnnotation) annot)
+                    .map(LinkAnnotation.class::cast)
                     .forEach(annot -> {
 
                         ExplicitDestination dest = AnnotationUtils.extractExplicitDestinationHard(annot);
