@@ -23,9 +23,9 @@ public enum DocShifterFontStyling {
 
     /**
      * Validates of a {@link DocShifterFontStyling} option matches with the {@link Font} provided
-     * @param styling
-     * @param runNodeFont
-     * @return
+     * @param styling the {@link DocShifterFontStyling} to be used
+     * @param runNodeFont the {@link Font} to validate
+     * @return if the {@link Font} provided has the {@link DocShifterFontStyling}
      */
     public static boolean validateStyling(DocShifterFontStyling styling, Font runNodeFont) {
 
@@ -33,8 +33,8 @@ public enum DocShifterFontStyling {
                 || (ITALIC.equals(styling)  && runNodeFont.getItalic())
                 || (UNDERLINE.equals(styling) && runNodeFont.getUnderline() != Underline.NONE)
                 || (REGULAR.equals(styling)
-                && runNodeFont.getUnderline() == Underline.NONE
-                && !runNodeFont.getItalic()
-                && !runNodeFont.getBold());
+                    && runNodeFont.getUnderline() == Underline.NONE
+                    && !runNodeFont.getItalic()
+                    && !runNodeFont.getBold());
     }
 }
