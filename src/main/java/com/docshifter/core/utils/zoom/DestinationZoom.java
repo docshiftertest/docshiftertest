@@ -1,7 +1,12 @@
 package com.docshifter.core.utils.zoom;
 
+import com.aspose.pdf.AnnotationType;
 import com.aspose.pdf.ExplicitDestination;
+import com.aspose.pdf.IDocument;
+import com.aspose.pdf.LinkAnnotation;
 import com.aspose.pdf.OutlineItemCollection;
+import com.aspose.pdf.Page;
+import com.docshifter.core.asposehelper.utils.pdf.AnnotationUtils;
 import com.docshifter.core.asposehelper.utils.pdf.ExplicitDestinationTransformer;
 import com.docshifter.core.asposehelper.utils.pdf.OutlineUtils;
 import com.docshifter.core.exceptions.InvalidConfigException;
@@ -9,6 +14,7 @@ import org.apache.commons.lang3.EnumUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
+import java.util.stream.StreamSupport;
 
 /**
  * Special PDF zoom presets and an extra field to signal that zoom values should not be changed.
@@ -87,6 +93,29 @@ public enum DestinationZoom {
             }
 
             updateOutlineDestinations(oic, operation);
+        }
+    }
+
+    /**
+     * Updates the destination of the annotation links
+     * @param doc the {@link IDocument} to iterate and update
+     * @param operation the function using as argument an {@link ExplicitDestinationTransformer} and as result an {@link ExplicitDestination}
+     */
+    public static void updateAnnotationLink(IDocument doc, Function<ExplicitDestinationTransformer, ExplicitDestination> operation) {
+
+        for (Page page : doc.getPages()) {
+            StreamSupport.stream(page.getAnnotations().spliterator(), false)
+                    .filter(annot -> annot.getAnnotationType() == AnnotationType.Link)
+                    .map(LinkAnnotation.class::cast)
+                    .forEach(annot -> {
+
+                        ExplicitDestination dest = AnnotationUtils.extractExplicitDestinationHard(annot);
+
+                        if (dest != null) {
+                            dest = operation.apply(ExplicitDestinationTransformer.create(dest));
+                            annot.setDestination(dest);
+                        }
+                    });
         }
     }
 
