@@ -1,25 +1,30 @@
 package com.docshifter.core.config.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.io.Serializable;
-import java.util.Optional;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A parameter is a configurable property within a {@link Module}. The entity that stores all parameters for a given
@@ -45,16 +50,10 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	@Column(columnDefinition = "jsonb")
 	private String valuesJson;
 	private String parameterGroup;
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	@ManyToOne
-	@Nullable
+	@OneToMany(cascade= CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "parameter")
+	@Nonnull
 	@ToString.Exclude
-	private Parameter dependsOn;
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	@ManyToOne
-	@Nullable
-	@ToString.Exclude
-	private Parameter expendableBy;
+	private Set<ParameterDependency> dependencies = new HashSet<>();
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne
 	@Nullable
@@ -84,25 +83,19 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	 *                      potential values should be suggested to the user, this JSON can be used to specify all of
 	 *                      the different options.
 	 * @param parameterGroup The name of the group this {@link Parameter} should be a part of.
-	 * @param dependsOn Another {@link Parameter} that the current one should depend on, if applicable. This means that
-	 *                     if the other {@link Parameter} has a value set, the current one should become required.
-	 * @param expendableBy Another {@link Parameter} that the current one should be expendable by, if applicable. This
-	 *                        means that if the other {@link Parameter} has a value set, the current one should become
-	 *                        not available.
+	 * @param dependencies The {@link Set} of {@link ParameterDependency dependencies} for this {@link Parameter}.
 	 */
 	public Parameter(String name, String description, ParameterTypes type, Boolean required, String valuesJson,
-					 String parameterGroup, @Nullable Parameter dependsOn, @Nullable Parameter expendableBy) {
+					 String parameterGroup, @Nullable Set<ParameterDependency> dependencies) {
 		this.name = name;
 		this.description = description;
 		this.type = type.toString();
 		this.required = required;
 		this.valuesJson = valuesJson;
 		this.parameterGroup = parameterGroup;
-		if (dependsOn != null && dependsOn.equals(expendableBy)) {
-			throw new IllegalArgumentException("Conflicting dependency detected: dependsOn cannot be the same as expendableBy (" + dependsOn.name + ")!");
+		if (dependencies != null) {
+			setDependencies(dependencies);
 		}
-		this.dependsOn = dependsOn;
-		this.expendableBy = expendableBy;
 	}
 
 	/**
@@ -121,19 +114,19 @@ public class Parameter implements Comparable<Parameter>, Serializable
 
 	public Parameter(String name, String description, ParameterTypes type, Boolean required, String valuesJson,
 					 String parameterGroup) {
-		this(name, description, type, required, valuesJson, parameterGroup, null, null);
+		this(name, description, type, required, valuesJson, parameterGroup, null);
 	}
 
     public Parameter(String name, String description, ParameterTypes type, Boolean required) {
-	    this(name, description, type, required, null, null, null, null);
+	    this(name, description, type, required, null, null, null);
     }
 	
 	public Parameter(String name, String description, ParameterTypes type) {
-		this(name, description, type, false, null, null, null, null);
+		this(name, description, type, false, null, null, null);
 	}
 
 	public Parameter(String name, ParameterTypes type) {
-		this(name, null, type, false, null, null, null, null);
+		this(name, null, type, false, null, null, null);
 	}
 
 	public void setId(long id)
@@ -240,80 +233,34 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		this.parameterGroup = parameterGroup;
 	}
 
-	/**
-	 * Gets the {@link Parameter} that the current {@link Parameter} (or the actual {@link Parameter} it is pointing to if
-	 * the current one is an alias) depends on, if applicable. This means that if the other {@link Parameter} has a
-	 * value set, the current one should become required.
-	 */
-	@Nullable
-	@JsonIgnore
-	public Parameter getDependsOn() {
-		return getRealParameter().dependsOn;
+	@Nonnull
+	public Set<ParameterDependency> getDependencies() {
+		return Collections.unmodifiableSet(getRealParameter().dependencies);
 	}
 
-	@Nullable
-	@JsonProperty("dependsOn")
-	public Long getDependsOnId() {
-		return Optional.ofNullable(getDependsOn()).map(Parameter::getRawId).orElse(null);
+	public void setDependencies(@Nonnull Set<ParameterDependency> dependencies) {
+		this.dependencies = new HashSet<>();
+		dependencies.forEach(this::addDependency);
 	}
 
-	/**
-	 * Sets the {@link Parameter} that the current {@link Parameter} depends on. This means that if the other
-	 * {@link Parameter} has a value set, the current one should become required. Use {@code null} if it should not
-	 * depend on anything else.
-	 */
-	public void setDependsOn(@Nullable Parameter dependsOn) {
-		if (dependsOn != null) {
-			if (equals(dependsOn)) {
-				throw new IllegalArgumentException("The dependsOn cannot point to itself (" + name + ")!");
-			}
-			if (equals(dependsOn.getDependsOn())) {
-				throw new IllegalArgumentException("Circular dependsOn dependency detected: the targeted parameter "
-						+ dependsOn.name + " is already pointing to this one (" + name + ")!");
-			}
-			if (dependsOn.equals(expendableBy)) {
-				throw new IllegalArgumentException("Conflicting dependency detected: dependsOn cannot be the same as expendableBy (" + dependsOn.name + ")!");
-			}
+	public void addDependency(@Nonnull ParameterDependency dependency) {
+		Parameter old = dependency.getRawParameter();
+		// Update the parameter first because it will influence the hash to be calculated for the HashSet
+		dependency.setParameter(this);
+		if (dependencies.contains(dependency.opposite())) {
+			dependency.setParameter(old);
+			throw new IllegalArgumentException("Circular dependency detected: the targeted parameter "
+					+ dependency.getDependee().getName() + " is already pointing to this one (" + name + ")!");
 		}
-		this.dependsOn = dependsOn;
-	}
-
-	/**
-	 * Gets the {@link Parameter} that the current {@link Parameter} (or the actual {@link Parameter} it is pointing to if
-	 * the current one is an alias) is expendable by, if applicable. This means that if the other {@link Parameter} has a
-	 * value set, the current one should become not available.
-	 */
-	@Nullable
-	@JsonIgnore
-	public Parameter getExpendableBy() {
-		return getRealParameter().expendableBy;
-	}
-
-	@Nullable
-	@JsonProperty("expendableBy")
-	public Long getExpendableById() {
-		return Optional.ofNullable(getExpendableBy()).map(Parameter::getRawId).orElse(null);
-	}
-
-	/**
-	 * Sets the {@link Parameter} that the current {@link Parameter} is expendable by. This means that if the other
-	 * {@link Parameter} has a value set, the current one should become not available. Use {@code null} if it should not
-	 * be expendable by anything else.
-	 */
-	public void setExpendableBy(@Nullable Parameter expendableBy) {
-		if (expendableBy != null) {
-			if (equals(expendableBy)) {
-				throw new IllegalArgumentException("The expendableBy cannot point to itself (" + name + ")!");
-			}
-			if (equals(expendableBy.getExpendableBy())) {
-				throw new IllegalArgumentException("Circular expendableBy dependency detected: the targeted parameter "
-						+ expendableBy.name + " is already pointing to this one (" + name + ")!");
-			}
-			if (expendableBy.equals(dependsOn)) {
-				throw new IllegalArgumentException("Conflicting dependency detected: dependsOn cannot be the same as expendableBy (" + dependsOn.name + ")!");
-			}
+		if (!dependencies.add(dependency)) {
+			dependency.setParameter(old);
+			throw new IllegalArgumentException("Conflicting dependency detected for parameter " + name +
+					". The duplicate dependee is " + dependency.getDependee().getName() + "!");
 		}
-		this.expendableBy = expendableBy;
+	}
+
+	public boolean removeDependency(@Nonnull ParameterDependency dependency) {
+		return dependencies.remove(dependency);
 	}
 
 	/**
@@ -346,8 +293,7 @@ public class Parameter implements Comparable<Parameter>, Serializable
 			this.required = null;
 			this.valuesJson = null;
 			this.parameterGroup = null;
-			this.dependsOn = null;
-			this.expendableBy = null;
+			this.dependencies = new HashSet<>();
 		}
 		this.aliasOf = aliasOf;
 	}
@@ -374,6 +320,7 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	 * {@link Parameter} that is being pointed to if it is.
 	 */
 	@JsonIgnore
+	@Nonnull
 	public Parameter getRealParameter() {
 		if (aliasOf == null) {
 			return this;
