@@ -247,10 +247,19 @@ public class Parameter implements Comparable<Parameter>, Serializable
 		Parameter old = dependency.getRawParameter();
 		// Update the parameter first because it will influence the hash to be calculated for the HashSet
 		dependency.setParameter(this);
-		if (dependencies.contains(dependency.opposite())) {
-			dependency.setParameter(old);
-			throw new IllegalArgumentException("Circular dependency detected: the targeted parameter "
-					+ dependency.getDependee().getName() + " is already pointing to this one (" + name + ")!");
+		if (dependency.getType() == ParameterDependency.Type.DEPENDS_ON) {
+			ParameterDependency opposite = dependency.opposite();
+			Set<ParameterDependency> oppositeParamDeps = dependency.getDependee().getDependencies();
+			if (oppositeParamDeps.contains(opposite) && oppositeParamDeps.stream()
+					.filter(opposite::equals)
+					.findAny()
+					.orElseThrow()
+					.getType() == ParameterDependency.Type.DEPENDS_ON) {
+				dependency.setParameter(old);
+				throw new IllegalArgumentException("Circular DEPENDS_ON dependency detected: the targeted parameter "
+						+ dependency.getDependee().getName() + " is already pointing to this one (" + name + ")! It makes " +
+						"no sense for a parameter to depend on another one, if the latter parameter already depends on the current one.");
+			}
 		}
 		if (!dependencies.add(dependency)) {
 			dependency.setParameter(old);
