@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -16,15 +15,22 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+/**
+ * A module functions as a core processing unit within DocShifter workflows. Each module contains logic that handles
+ * documents in its own unique manner and can be customized through {@link Parameter}s. A set of {@link Parameter} for
+ * a given module is called a {@link ModuleConfiguration}.
+ */
 @Entity
 @Log4j2
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -47,43 +53,43 @@ public class Module implements Serializable {
 	private String code;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	@ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade= CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinTable(name = "moduleparams",
 			joinColumns = {	@JoinColumn(name = "module") },
 			inverseJoinColumns = { @JoinColumn(name = "param") })
-	private Set<Parameter> parameters = new HashSet<Parameter>();
+	private Set<Parameter> parameters = new HashSet<>();
 
 	public Module() {
 	}
-	public Module(int id, String description, String name, String classname, String type, String condition, Set<Parameter> parameters) {
+	public Module(int id, String description, String name, String classname, String type, String condition, Collection<Parameter> parameters) {
 		this.id = id;
 		this.description = description;
 		this.name = name;
 		this.classname = classname;
 		this.type = type;
 		this.condition = condition;
-		this.parameters = parameters;
+		this.parameters.addAll(parameters);
 	}
-	public Module(String description, String name, String classname, String type, String condition, Set<Parameter> parameters) {
+	public Module(String description, String name, String classname, String type, String condition, Collection<Parameter> parameters) {
 		this.description = description;
 		this.name = name;
 		this.classname = classname;
 		this.type = type;
 		this.condition = condition;
-		this.parameters = parameters;
+		this.parameters.addAll(parameters);
 	}
 
-	public Module(int id, String description, String name, String classname, String type, Set<Parameter> parameters) {
+	public Module(int id, String description, String name, String classname, String type, Collection<Parameter> parameters) {
 		this.id = id;
 		this.description = description;
 		this.name = name;
 		this.classname = classname;
 		this.type = type;
-		this.parameters = parameters;
+		this.parameters.addAll(parameters);
 	}
 
 	public Module(long id, String name, String classname, String description, String type, String condition,
-				  String inputFiletype, String outputFileType, String code, Set<Parameter> parameters) {
+				  String inputFiletype, String outputFileType, String code, Collection<Parameter> parameters) {
 		this.id = id;
 		this.name = name;
 		this.classname = classname;
@@ -93,18 +99,26 @@ public class Module implements Serializable {
 		this.inputFiletype = inputFiletype;
 		this.outputFileType = outputFileType;
 		this.code = code;
-		this.parameters = parameters;
+		this.parameters.addAll(parameters);
 	}
 
 	public Module(Module module) {
-		this(module.getDescription(), module.getName(), module.getClassname(), module.getType(), module.getCondition(), new HashSet<Parameter>(module.getParameters()));
+		this(module.getDescription(), module.getName(), module.getClassname(), module.getType(), module.getCondition(), module.parameters);
 	}
 
+	/**
+	 * Adds a {@link Parameter} to this module.
+	 * @param param The {@link Parameter} to add.
+	 */
 	public void addToParameters(Parameter param) {
-		this.getParameters().add(param);
+		parameters.add(param);
 	}
 
-	public void addToParameters(Set<Parameter> params) {
+	/**
+	 * Adds one or more {@link Parameter}s to this module.
+	 * @param params The {@link Parameter}s to add.
+	 */
+	public void addToParameters(Iterable<Parameter> params) {
 		for (Parameter param : params) {
 			this.addToParameters(param);
 		}
@@ -122,23 +136,47 @@ public class Module implements Serializable {
 		return name;
 	}
 
-
-
-	public Set<Parameter> getParameters() {
-		return parameters;
+	/**
+	 * Gets a {@link Stream} of all actual {@link Parameter}s. These are {@link Parameter}s that do not function as aliases.
+	 */
+	private Stream<Parameter> getFilteredParameterStream() {
+		return parameters.stream()
+				.filter(parameter -> parameter.getAliasOf() == null);
 	}
 
+	/**
+	 * Gets a {@link Set} of all actual {@link Parameter}s. These are {@link Parameter}s that do not function as aliases.
+	 */
+	public Set<Parameter> getParameters() {
+		return getFilteredParameterStream().collect(Collectors.toUnmodifiableSet());
+	}
+
+	/**
+	 * Gets a {@link Set} of ALL {@link Parameter}s. This includes ones function as aliases.
+	 */
+	@JsonIgnore
+	@Transient
+	public Set<Parameter> getRawParameters() {
+		return Collections.unmodifiableSet(parameters);
+	}
+
+	/**
+	 * Gets a sorted {@link List} of all actual {@link Parameter}s. These are {@link Parameter}s that do not function as aliases.
+	 */
 	@JsonIgnore
 	@Transient
 	public List<Parameter> getParametersAsList() {
-		List<Parameter> paramList = new ArrayList<>(this.getParameters());
-		Collections.sort(paramList);
-		return paramList;
+		return getFilteredParameterStream().sorted().toList();
 	}
 
-	@JsonIgnore
-	@Transient
-	public Parameter getParameter(String name) {
+	/**
+	 * Gets a {@link Parameter} by name.
+	 * @param name The name to look for.
+	 * @param raw {@code true} if you always want the raw {@link Parameter} even if it is an alias, {@code false}
+	 *                           if you always want to get the actual {@link Parameter}, so to redirect aliases.
+	 * @return The {@link Parameter} that was found, or {@code null} if nothing was found.
+	 */
+	private Parameter getParameter(String name, boolean raw) {
 		log.debug("Getting parameter for name: {}", name);
 		for (Parameter param : parameters) {
 			if (param == null) {
@@ -150,22 +188,58 @@ public class Module implements Serializable {
 							param.getDescription());
 				}
 				if (name.equals(param.getName())) {
-					return param;
+					if (raw) {
+						return param;
+					}
+					return param.getRealParameter();
 				}
 			}
 		}
 		return null;
 	}
 
+	/**
+	 * Gets an actual {@link Parameter} by name. So if the provided name points to an alias, it will be redirected to
+	 * the {@link Parameter} it is referring to.
+	 * @param name The name to look for.
+	 * @return The {@link Parameter} that was found, or {@code null} if nothing was found.
+	 */
+	@JsonIgnore
+	@Transient
+	public Parameter getParameter(String name) {
+		return getParameter(name, false);
+	}
+
+	/**
+	 * Gets a raw {@link Parameter} by name. So you will always get the exact {@link Parameter} with that name if it
+	 * exists, even if it merely functions as an alias.
+	 * @param name The name to look for.
+	 * @return The {@link Parameter} that was found, or {@code null} if nothing was found.
+	 */
+	@JsonIgnore
+	@Transient
+	public Parameter getRawParameter(String name) {
+		return getParameter(name, true);
+	}
+
 	public String getType() {
 		return type;
 	}
 
+	/**
+	 * Removes a {@link Parameter} from this module.
+	 * @param param The {@link Parameter} to remove.
+	 * @return {@code true} it was found and therefore removed, {@code false} otherwise.
+	 */
 	public boolean removeFromParameters(Parameter param) {
-		return this.getParameters().remove(param);
+		return parameters.remove(param);
 	}
 
-	public void removeFromParameters(Set<Parameter> params) {
+	/**
+	 * Removes one or more {@link Parameter}s from this module.
+	 * @param params The {@link Parameter}s to remove.
+	 */
+	public void removeFromParameters(Iterable<Parameter> params) {
 		for (Parameter param : params) {
 			this.removeFromParameters(param);
 		}
