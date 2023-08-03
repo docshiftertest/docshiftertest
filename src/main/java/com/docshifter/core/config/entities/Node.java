@@ -76,18 +76,24 @@ public class Node implements Serializable {
 
 	private Double yPosition;
 
+	private boolean lockedVersion;
+
+	private Integer version;
+
 	public Node() {
 		childNodes = new HashSet<>();
 		parentNodes = new HashSet<>();
 	}
 	
-	public Node(@Nonnull Set<Node> parentNodes, @Nullable ModuleConfiguration moduleConfiguration, Double xPosition,
-				Double yPosition){
+	public Node(@Nonnull Set<Node> parentNodes, @Nullable ModuleConfiguration moduleConfiguration,
+				Double xPosition, Double yPosition, boolean lockedVersion, Integer version){
 		this();
 		setParentNodes(parentNodes);
 		this.moduleConfiguration = moduleConfiguration;
 		this.xPosition = xPosition;
 		this.yPosition = yPosition;
+		this.lockedVersion = lockedVersion;
+		this.version = version;
 	}
 
 	/**
@@ -111,7 +117,7 @@ public class Node implements Serializable {
 		if (isRoot()) {
 			// Root nodes have no parents, so use that specific constructor overload
 			// Just need to copy this node
-			copied = new Node(new HashSet<>(), moduleConfiguration, xPosition, yPosition);
+			copied = new Node(new HashSet<>(), moduleConfiguration, xPosition, yPosition, lockedVersion, version);
 			// Make sure to track our copied root if it's necessary
 			if (copiedRoots != null) {
 				copiedRoots.add(copied);
@@ -122,7 +128,7 @@ public class Node implements Serializable {
 			// Make sure to recurse and copy the entire parent hierarchy first, before copying this node
 			copied = new Node(parentNodes.stream()
 					.map(n -> n.deepCopy(alreadyEncountered, encounteringChildren, copiedRoots))
-					.collect(Collectors.toUnmodifiableSet()), moduleConfiguration, xPosition, yPosition);
+					.collect(Collectors.toUnmodifiableSet()), moduleConfiguration, xPosition, yPosition, lockedVersion, version);
 			// Done copying this node, so we can remove it
 			encounteringChildren.remove(this);
 		}
@@ -274,6 +280,34 @@ public class Node implements Serializable {
 	 */
 	public void setYPosition(Double yPosition) {
 		this.yPosition = yPosition;
+	}
+
+	/**
+	 * Since version 8.1, it is possible to lock the version of a module configuration. This delivers if the version is locked.
+	 */
+	public boolean getLockedVersion() {
+		return lockedVersion;
+	}
+
+	/**
+	 * Since version 8.1, it is possible to lock the version of a module configuration. This set if the version is locked.
+	 */
+	public void setLockedVersion(boolean lockedVersion) {
+		this.lockedVersion = lockedVersion;
+	}
+
+	/**
+	 * Since version 8.1, it is possible to lock the version of a module configuration. This delivers the version for the module configuration.
+	 */
+	public Integer getVersion() {
+		return version;
+	}
+
+	/**
+	 * Since version 8.1, it is possible to lock the version of a module configuration. This set the version for the module configuration.
+	 */
+	public void setVersion(Integer version) {
+		this.version = version;
 	}
 
 	/**

@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -209,18 +209,26 @@ public class ModuleConfiguration implements Serializable {
 				.map(m -> {
 					try {
 						long paramId = Long.parseLong(String.valueOf(m.get("id")));
-						Parameter param = module.getParameters().stream()
+
+						Optional<Parameter> optionalParam = module.getParameters().stream()
 								.filter(p -> p.getId() == paramId)
-								.findAny()
-								.orElseThrow(() -> new NoSuchElementException("No parameter found with ID " + paramId +
-										" in module: " + module.getName() + " (ID: " + module.getId() + ")"));
-						return new AbstractMap.SimpleImmutableEntry<>(
-								param,
-								String.valueOf(m.get("value")));
-					} catch (Exception ex) {
+								.findAny();
+
+						// In case we are using / restoring an old version with some deprecated parameter
+						// It can be empty
+						return optionalParam.map(
+								parameter -> new AbstractMap.SimpleImmutableEntry<>(
+										parameter,
+										String.valueOf(m.get("value"))))
+								.orElse(null);
+
+					}
+					catch (Exception ex) {
 						throw new IllegalArgumentException("Unable to deserialize parameter JSON.", ex);
 					}
-				}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+				})
+				.filter(Objects::nonNull)
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	@Transient
