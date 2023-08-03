@@ -3,10 +3,10 @@ package com.docshifter.core.utils.nalpeiron;
 import com.docshifter.core.exceptions.DocShifterLicenseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nalpeiron.NalpError;
 import com.nalpeiron.nalplibrary.NALP;
 import com.nalpeiron.nalplibrary.NSA;
 import com.nalpeiron.nalplibrary.NSL;
-import com.nalpeiron.NalpError;
 import com.nalpeiron.passlibrary.PSL;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +23,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -70,6 +69,11 @@ public class NalpeironHelper {
     public static final String LICENSING_IDENTIFIER = "licensing";
     public static final String EXPIRY_DATE_UDF_KEY = "pslExpiryDate";
     public static final String MAX_RECEIVERS_UDF_KEY = "maxReceivers";
+
+    /**
+     * Token used for consumption-based license
+     */
+    public static final String TOKEN_FEATURE_ID = "C0001";
 
     //These private ints are unique to your product and must
     // be set here to the values corresponding to your product.
@@ -204,7 +208,7 @@ public class NalpeironHelper {
     }
 
     public void sendAnalyticsAndInitiatePeriodicReporting() {
-       sendAnalyticsAndInitiatePeriodicReporting(null);
+        sendAnalyticsAndInitiatePeriodicReporting(null);
     }
 
 
@@ -308,7 +312,7 @@ public class NalpeironHelper {
         PROD_AUTHORIZED(1, "Authorized", true),
         PROD_UNDETERMINED(0, "Undetermined"),
         PROD_EXPIRED(-1, "Product has Expired"),
-	    BT_COUNTER_TRIPPED(-2, "Backtime Counter Tripped"),
+        BT_COUNTER_TRIPPED(-2, "Backtime Counter Tripped"),
         FEATURE_NOT_AUTHORIZED(-3, "Feature not Authorised"),
         FEATURE_PROD_NOT_FOUND(-4, "Feature/Product not Found"),
         LICENSE_DOESNT_VERIFY(-5, "License doesn't verify"),
@@ -316,13 +320,13 @@ public class NalpeironHelper {
         DATE_SET_BACK_TOO_FAR(-7, "Date set back too far"),
         PROD_INVALID_STATE(-8, "Product in Invalid State"),
         PROD_IN_MIDST_OFFLINE(-9, "Product in midst of offline licensing. Has created an activation request but hasn't yet imported a license."),
-	    NO_LICENSES_AVAILABLE(-50, "No Available Licenses"),
-	    DAEMON_FAILED_VERIFY(-51, "Daemon Failed to Verify"),
-	    DAEMON_SYSTEM_ID_FAILURE(-52, "Daemon System ID Failure"),
-	    DAEMON_NO_FIND_METADATA(-53, "Daemon didn't find metadata"),
-	    BD_LIST_TIMES_NO_MATCH(-54, "DB time and license list time don't match"),
-	    FULL_V10_NO_PSV(-60, "Full V10 installed. Passive license invalid"),
-	    LICENSE_WITH_ABL_NEED_CREDENTIALS(-70, "License was obtained with ABL. Need credential verification"),
+        NO_LICENSES_AVAILABLE(-50, "No Available Licenses"),
+        DAEMON_FAILED_VERIFY(-51, "Daemon Failed to Verify"),
+        DAEMON_SYSTEM_ID_FAILURE(-52, "Daemon System ID Failure"),
+        DAEMON_NO_FIND_METADATA(-53, "Daemon didn't find metadata"),
+        BD_LIST_TIMES_NO_MATCH(-54, "DB time and license list time don't match"),
+        FULL_V10_NO_PSV(-60, "Full V10 installed. Passive license invalid"),
+        LICENSE_WITH_ABL_NEED_CREDENTIALS(-70, "License was obtained with ABL. Need credential verification"),
         PROD_INACTIVE(-110, "Product is InActive"),
         INVALID_TRIAL_PERIOD(-111, "Invalid Trial Period"),
         COMPUTER_ID_ALREADY_ACTIVE(-112, "A Trial cannot be requested for a ComputerID that has already been activated"),
@@ -463,7 +467,7 @@ public class NalpeironHelper {
             return message;
         }
 
-        public static ActivationType getActivationType(int value) throws DocShifterLicenseException{
+        public static ActivationType getActivationType(int value) throws DocShifterLicenseException {
             for (ActivationType p : ActivationType.values()) {
                 if (p.value == value) {
                     return p;
@@ -763,8 +767,7 @@ public class NalpeironHelper {
 
             if (i == LicenseStatus.RETURNED_LICENCE_TO_SERVER.getValue()) {
                 log.debug("License successfully returned!");
-            }
-            else {
+            } else {
                 log.warn("Nobody expects the status of the License to be: {}, meaning: {}",
                         i, LicenseStatus.getLicenseStatus(i));
             }
@@ -858,11 +861,14 @@ public class NalpeironHelper {
      * Performs some extra processing on a returned license status integer. Mainly convert it to a
      * {@link LicenseStatus} enum and properly simulate license expiration functionality if we're using passive
      * licensing.
+     *
      * @param i The license status integer as provided by the Nalpeiron lib
+     *
      * @return The appropriate {@link LicenseStatus} for the provided integer. Will simulate license expiration when
      * working with a passive activation.
+     *
      * @throws DocShifterLicenseException Something went wrong while converting the integer to a proper
-     * {@link LicenseStatus} value or while invoking the Nalpeiron lib for a passive license.
+     *                                    {@link LicenseStatus} value or while invoking the Nalpeiron lib for a passive license.
      */
     private LicenseStatus postProcessLicenseStatus(int i) throws DocShifterLicenseException {
         LicenseStatus licStatus = LicenseStatus.getLicenseStatus(i);
@@ -1263,7 +1269,7 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSASendCache"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
                     error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
@@ -1280,7 +1286,7 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAApStart"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
                     error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
@@ -1298,7 +1304,7 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAApStop"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
                     error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
@@ -1312,7 +1318,7 @@ public class NalpeironHelper {
             int i = nsa.callNSAGetPrivacy();
             return PrivacyValue.getPrivacyValue(i);
         } catch (NalpError error) {
-                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
                     error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
@@ -1329,7 +1335,7 @@ public class NalpeironHelper {
                 throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSASetPrivacy"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
-                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
                     error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
@@ -1343,7 +1349,7 @@ public class NalpeironHelper {
             String i = nsa.callNSAGetStats();
             return i;
         } catch (NalpError error) {
-                        log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
+            log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
                     error.getErrorCode(), error.getErrorMessage(), error);
             throw new DocShifterLicenseException(error);
         }
@@ -1432,6 +1438,69 @@ public class NalpeironHelper {
             Files.write(outputFilePath, bytes, StandardOpenOption.CREATE);
         } catch (Exception e) {
             throw new DocShifterLicenseException("Could not write the licenseActivationRequest code to file", e);
+        }
+    }
+
+    /**
+     * Withdraws a specified number of tokens from a token pool on the Nalpeiron Zentitle server.
+     *
+     * @param tokenAmount the number of tokens to withdraw from the pool
+     */
+    public void checkoutToken(int tokenAmount) {
+        log.info("Attempting to checkout {} tokens from license {}", tokenAmount, licenseCode);
+        int status = nsl.callNSLCheckoutTokens(NalpeironHelper.TOKEN_FEATURE_ID, licenseCode, tokenAmount);
+        handleStatusCode(status);
+    }
+
+    /**
+     * Consumes a specified number of tokens from a token pool on the Nalpeiron Zentitle server.
+     *
+     * @param tokenAmount the number of tokens to consume from the pool.
+     */
+    public void consumeToken(int tokenAmount) throws NalpError {
+        log.info("Attempting to consume {} tokens from license {}", tokenAmount, licenseCode);
+        int status = nsl.callNSLConsumeTokens(NalpeironHelper.TOKEN_FEATURE_ID, licenseCode, tokenAmount);
+        handleStatusCode(status);
+    }
+
+    /**
+     * Returns a specified number of tokens from a token pool on the Nalpeiron Zentitle server.
+     *
+     * @param tokenAmount the number of tokens to return to the pool.
+     */
+    public void returnToken(int tokenAmount) throws NalpError {
+        log.info("Attempting to return {} tokens to license {}", tokenAmount, licenseCode);
+        int status = nsl.callNSLReturnTokens(NalpeironHelper.TOKEN_FEATURE_ID, licenseCode, tokenAmount);
+        handleStatusCode(status);
+    }
+
+    /**
+     * Get information about tokens checked out from the named pool.
+     *
+     * @return An integer representing the status of the tokens or the number of tokens currently held by the system.
+     */
+    public ConsumptionTokenInfo getTokenInfo() throws NalpError {
+        log.info("Getting token information for license {}", licenseCode);
+        int[] tokenMax = new int[1];
+        int[] tokenAmt = new int[1];
+        int[] tokenStatus = new int[1];
+        int status = nsl.getTokenInfo(NalpeironHelper.TOKEN_FEATURE_ID, tokenMax, tokenAmt, tokenStatus);
+        handleStatusCode(status);
+        return new ConsumptionTokenInfo(tokenMax[0], tokenAmt[0], tokenStatus[0], status);
+    }
+
+    /**
+     * Handles the status code returned by the Nalpeiron server.
+     * Logs the corresponding status message, and throws an exception for error status codes.
+     *
+     * @param statusCode the status code returned by the server
+     */
+    private void handleStatusCode(int statusCode) {
+        String statusMessage = TokenPoolStatus.fromErrorCode(statusCode).getMessage();
+        log.info("Token operation returned status code {}, corresponding to message {}", statusCode, statusMessage);
+
+        if (statusCode < 0) {
+            throw new NalpError(statusCode,"Token operation failed with status code " + statusCode + ": " + statusMessage);
         }
     }
 }
