@@ -30,7 +30,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @IdClass(ParameterDependency.CompositeId.class)
-public class ParameterDependency {
+public class ParameterDependency implements Serializable {
     @Data
     public static class CompositeId implements Serializable {
         private Parameter parameter;
