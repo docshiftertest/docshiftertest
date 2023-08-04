@@ -47,17 +47,17 @@ public interface IModuleConfigurationVersionSharedService {
     ModuleConfigurationVersion getVersionByModuleConfigurationUuid(UUID uuid, Integer version) throws NotFoundException;
 
     /**
-     * Gets the {@link ModuleConfiguration} by its UUID and specific version
-     * @param uuid unique UUID for the {@link ModuleConfigurationVersion}
+     * Gets the {@link ModuleConfiguration} for a specific version
+     * @param mcLatestVersion {@link ModuleConfiguration} in the latest version
      * @param version version of the {@link ModuleConfiguration}
      * @return the {@link ModuleConfiguration} corresponding to the version
      */
-    ModuleConfiguration getModuleConfigurationByUuidAndVersion(UUID uuid, Integer version) throws NotFoundException;
+    ModuleConfiguration getMcByVersion(ModuleConfiguration mcLatestVersion, Integer version) throws NotFoundException;
 
     /**
      * Deserializes a {@link ModuleConfigurationVersion}
      * @param mcVersion {@link ModuleConfigurationVersion} to deserialize
      * @return the {@link ModuleConfiguration}
      */
-    ModuleConfiguration deserializeVersionJson(ModuleConfigurationVersion mcVersion);
+    ModuleConfiguration deserializeVersionJson(ModuleConfiguration mcLatestVersion, ModuleConfigurationVersion mcVersion);
 }
