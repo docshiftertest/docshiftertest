@@ -1,6 +1,7 @@
 package com.docshifter.core.config.services;
 
 
+import com.docshifter.core.audit.services.inter.IModuleConfigurationVersionSharedService;
 import com.docshifter.core.config.wrapper.SenderConfigurationWrapper;
 
 import lombok.extern.log4j.Log4j2;
@@ -43,15 +44,22 @@ public class ConfigurationService {
 	private ModuleRepository moduleRepository;
 	private ModuleConfigurationRepository moduleConfigurationRepository;
 	private GeneralConfigService generalConfigService;
+	private IModuleConfigurationVersionSharedService moduleConfigurationVersionSharedService;
 
 
 	@Autowired
-	public ConfigurationService(NodeRepository nodeRepository, ChainConfigurationRepository chainConfigurationRepository, ModuleRepository moduleRepository, ModuleConfigurationRepository moduleConfigurationRepository, GeneralConfigService generalConfigService) {
+	public ConfigurationService(NodeRepository nodeRepository,
+								ChainConfigurationRepository chainConfigurationRepository,
+								ModuleRepository moduleRepository,
+								ModuleConfigurationRepository moduleConfigurationRepository,
+								GeneralConfigService generalConfigService,
+								IModuleConfigurationVersionSharedService moduleConfigurationVersionSharedService) {
 		this.nodeRepository = nodeRepository;
 		this.chainConfigurationRepository = chainConfigurationRepository;
 		this.moduleRepository = moduleRepository;
 		this.moduleConfigurationRepository = moduleConfigurationRepository;
 		this.generalConfigService = generalConfigService;
+		this.moduleConfigurationVersionSharedService = moduleConfigurationVersionSharedService;
 	}
 
 	public GeneralConfigService getGeneralConfiguration() {
@@ -70,7 +78,7 @@ public class ConfigurationService {
 		//TODO is this working?
 		List<Node> list = nodeRepository.getEnabledSenderConfigurations();
 
-
+		list.forEach(node -> moduleConfigurationVersionSharedService.setCorrectMcVersionInNode(node));
 
 		for(Node n : list)
 			set.add(new SenderConfigurationWrapper(n, chainConfigurationRepository));

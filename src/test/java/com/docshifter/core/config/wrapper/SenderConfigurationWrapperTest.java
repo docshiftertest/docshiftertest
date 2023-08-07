@@ -193,7 +193,7 @@ public class SenderConfigurationWrapperTest {
 		// Manually build the ModuleConfiguration with a custom ParamMap
 		ModuleConfiguration moduleConfiguration = new ModuleConfiguration(new Module(), "Some Module", "Indescribable", UUID.randomUUID(), paramMap);
 		// Since 8.0 we store the x and y positions of a config in a Workflow...
-		Node node = new Node(new HashSet<>(), moduleConfiguration, 0d, 0d);
+		Node node = new Node(new HashSet<>(), moduleConfiguration, 0d, 0d, false, 1);
 		when(chainConfigRepo.findByRootNodes(any(Node.class))).thenReturn(chainConfig);
 		SenderConfigurationWrapper config = new SenderConfigurationWrapper(node, chainConfigRepo);
 		return config;
