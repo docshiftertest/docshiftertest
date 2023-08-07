@@ -1,6 +1,7 @@
 package com.docshifter.core.monitoring.services;
 
 import com.docshifter.core.AbstractSpringTest;
+import com.docshifter.core.audit.repositories.ModuleConfigurationVersionRepository;
 import com.docshifter.core.monitoring.dtos.ConfigurationDto;
 import com.docshifter.core.monitoring.dtos.MailConfigurationItemDto;
 import com.docshifter.core.monitoring.dtos.SnmpConfigurationItemDto;
@@ -26,6 +27,9 @@ public abstract class AbstractServiceTest extends AbstractSpringTest {
 
     @Autowired
     protected ConfigurationService configurationService;
+
+    @Autowired
+    protected ModuleConfigurationVersionRepository moduleConfigurationVersionRepository;
 
     @Before
     public void beforeTest() {
