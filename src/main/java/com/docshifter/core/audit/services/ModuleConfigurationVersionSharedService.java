@@ -86,9 +86,24 @@ public class ModuleConfigurationVersionSharedService implements IModuleConfigura
             return mcLatestVersion;
         }
 
+        return getCorrectMcVersion(
+                mcLatestVersion,
+                node.getVersion()
+        );
+    }
+
+    /**
+     * Gets the correct {@link ModuleConfiguration} for the {@link Node}
+     * @param mcLatestVersion {@link ModuleConfiguration} in the latest version
+     * @param version version to use
+     * @return the corresponding {@link ModuleConfiguration} for the {@link Node}
+     */
+    @Override
+    public ModuleConfiguration getCorrectMcVersion(ModuleConfiguration mcLatestVersion, Integer version) {
+
         boolean isTheLatestVersion = checkIfItIsTheLatestVersion(
                 mcLatestVersion.getUuid(),
-                node.getVersion()
+                version
         );
 
         if (isTheLatestVersion) {
@@ -98,11 +113,11 @@ public class ModuleConfigurationVersionSharedService implements IModuleConfigura
         }
 
         log.debug("The module configuration [{}] is in the version [{}].",
-                mcLatestVersion.getName(), node.getVersion());
+                mcLatestVersion.getName(), version);
 
         return getMcByVersion(
                 mcLatestVersion,
-                node.getVersion()
+                version
         );
     }
 
@@ -206,6 +221,7 @@ public class ModuleConfigurationVersionSharedService implements IModuleConfigura
 
         // Setting the id, name and description
         moduleConfiguration.setId(mcLatestVersion.getId());
+        moduleConfiguration.setUuid(mcLatestVersion.getUuid());
         moduleConfiguration.setName(String.valueOf(moduleConfigurationMap.get("name")));
         moduleConfiguration.setDescription(String.valueOf(moduleConfigurationMap.get("description")));
 
