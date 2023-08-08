@@ -23,6 +23,14 @@ public interface IModuleConfigurationVersionSharedService {
     ModuleConfiguration getCorrectMcVersionForNode(Node node);
 
     /**
+     * Gets the correct {@link ModuleConfiguration} for the {@link Node}
+     * @param mcLatestVersion {@link ModuleConfiguration} in the latest version
+     * @param version to use
+     * @return the corresponding {@link ModuleConfiguration} for the {@link Node}
+     */
+    ModuleConfiguration getCorrectMcVersion(ModuleConfiguration mcLatestVersion, Integer version);
+
+    /**
      * Checks if the {@link ModuleConfiguration} is in the last version
      * @param uuid unique UUID for the {@link ModuleConfigurationVersion}
      * @param version version to be validated
