@@ -28,10 +28,11 @@ public class CleanDumpFilesScheduleJob {
     @Value("${docshifter.component.home}")
     private String docShifterComponentPath;
 
-    @Value("${jvm_logs_dir}")
-    private String jvmLogsDir;
-
     private final InstallationType installationType;
+
+    @Value("${jvm_logs_dir}")
+    private String JVM_LOGS_DIR = "/opt/DocShifter/message-broker/persistence/logs";
+
 
     public CleanDumpFilesScheduleJob(ScheduledExecutorService scheduler, InstallationType installationType) {
         this.installationType = installationType;
@@ -41,7 +42,7 @@ public class CleanDumpFilesScheduleJob {
     @Scheduled(cron = "${docshifter.cleanup.dump.schedule:-}")
     public void cleanDumpFiles() {
         if(installationType.isContainerized()){
-            clean(Path.of(jvmLogsDir));
+            clean(Path.of(JVM_LOGS_DIR));
         } else {
             clean(Path.of(docShifterComponentPath));
         }
