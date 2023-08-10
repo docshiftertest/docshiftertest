@@ -1,15 +1,21 @@
 package com.docshifter.core.config.jobs;
 
+import com.docshifter.core.config.InstallationType;
 import com.docshifter.core.utils.FileUtils;
 import lombok.extern.log4j.Log4j2;
-import org.aspectj.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Configuration
@@ -22,13 +28,24 @@ public class CleanDumpFilesScheduleJob {
     @Value("${docshifter.component.home}")
     private String docShifterComponentPath;
 
-    public CleanDumpFilesScheduleJob(ScheduledExecutorService scheduler) {
+    private final InstallationType installationType;
+
+    @Value("${jvm_logs_dir:}")
+    private String JVM_LOGS_DIR;
+
+
+    public CleanDumpFilesScheduleJob(ScheduledExecutorService scheduler, InstallationType installationType) {
+        this.installationType = installationType;
         this.scheduler = scheduler;
     }
 
     @Scheduled(cron = "${docshifter.cleanup.dump.schedule:-}")
     public void cleanDumpFiles() {
-        clean(Path.of(docShifterComponentPath));
+        if(installationType.isContainerized()){
+            clean(Path.of(JVM_LOGS_DIR));
+        } else {
+            clean(Path.of(docShifterComponentPath));
+        }
     }
 
     /**
@@ -39,18 +56,23 @@ public class CleanDumpFilesScheduleJob {
         log.info("Starting scheduled cleanup of files in path {}", path);
 
         // Gets all the files and apply the filters
-        File[] files = FileUtil.listFiles(new File(path.toString()), pathname -> {
-            // The file can't be a directory
-            if(pathname.isDirectory()){
-                return false;
-            }
+        List<Path> files = new ArrayList<>();
+        try {
+            Files.walkFileTree(path, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path walkingFilePath, BasicFileAttributes attrs) {
+                    if (!attrs.isDirectory() && FileUtils.getExtension(walkingFilePath).equalsIgnoreCase("dmp") || FileUtils.getExtension(walkingFilePath).equalsIgnoreCase("trc")) {
+                        files.add(walkingFilePath);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            log.error("Wasn't possible to walk in the file tree {}", path);
+        }
 
-            // the file needs to be dmp or trc
-            return FileUtils.getExtension(pathname.getPath()).equalsIgnoreCase("dmp") || FileUtils.getExtension(pathname.getPath()).equalsIgnoreCase("trc");
-        });
-
-        for(File file: files) {
-            FileUtils.deleteFile(scheduler, Path.of(file.getPath()));
+        for(Path filePath: files) {
+            FileUtils.deletePath(scheduler, filePath, true);
         }
     }
 }
