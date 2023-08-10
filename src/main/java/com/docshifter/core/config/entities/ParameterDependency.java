@@ -130,7 +130,7 @@ public class ParameterDependency implements Serializable {
     }
 
     @Nonnull
-    @JsonProperty("dependee")
+    @JsonIgnore
     public Long getDependeeId() {
         return getDependee().getRawId();
     }

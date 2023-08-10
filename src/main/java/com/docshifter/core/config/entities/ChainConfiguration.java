@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -282,6 +283,19 @@ public class ChainConfiguration implements Serializable {
 	 * @param action The action to perform.
 	 */
 	public void forEachNode(Consumer<? super Node> action) {
+		forEachNode(n -> {
+			action.accept(n);
+			return true;
+		});
+	}
+
+	/**
+	 * Performs an action on all the nodes for this workflow. The specified {@link Predicate} may return {@code false} to
+	 * indicate an early exit.
+	 * @param action The action to perform. {@link Predicate} should return {@code true} in order to continue,
+	 * {@code false} in order to abort.
+	 */
+	public void forEachNode(Predicate<? super Node> action) {
 		rootNodes.stream()
 				.findAny()
 				.ifPresent(n -> n.iterateOverNode(action));
