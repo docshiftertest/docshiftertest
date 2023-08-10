@@ -1,6 +1,7 @@
 package com.docshifter.core.config.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -22,9 +23,12 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A parameter is a configurable property within a {@link Module}. The entity that stores all parameters for a given
@@ -138,10 +142,12 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	 * Gets the ID of this {@link Parameter}, or the actual {@link Parameter} it is pointing to if the current one is an
 	 * alias.
 	 */
+	@JsonIgnore
 	public long getId() {
 		return getRealParameter().id;
 	}
 
+	@JsonProperty("id")
 	/**
 	 * Gets the ID of this {@link Parameter}.
 	 */
@@ -158,11 +164,13 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	 * Gets the name of this {@link Parameter}, or the actual {@link Parameter} it is pointing to if the current one is an
 	 * alias.
 	 */
+	@JsonIgnore
 	public String getName()
 	{
 		return getRealParameter().name;
 	}
 
+	@JsonProperty("name")
 	/**
 	 * Gets the name of this {@link Parameter}.
 	 */
@@ -234,8 +242,17 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	}
 
 	@Nonnull
+	@JsonIgnore
 	public Set<ParameterDependency> getDependencies() {
 		return Collections.unmodifiableSet(getRealParameter().dependencies);
+	}
+
+	@Nonnull
+	@JsonProperty("dependencies")
+	public Map<Long, ParameterDependency> getDependenciesByDependeeId() {
+		return getDependencies().stream()
+				.map(dep -> new AbstractMap.SimpleImmutableEntry<>(dep.getDependeeId(), dep))
+				.collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	public void setDependencies(@Nonnull Set<ParameterDependency> dependencies) {

@@ -2,6 +2,7 @@ package com.docshifter.core.config.entities;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -254,6 +255,7 @@ public class Node implements Serializable {
 	 * Since version 8.0, we need to store the visual positions of each node, so they can be rendered correctly in the
 	 * brand-new workflow editor... So this delivers you the X coordinate.
 	 */
+	@JsonProperty("xPosition")
 	public Double getXPosition() {
 		return xPosition;
 	}
@@ -270,6 +272,7 @@ public class Node implements Serializable {
 	 * Since version 8.0, we need to store the visual positions of each node, so they can be rendered correctly in the
 	 * brand-new workflow editor... So this delivers you the Y coordinate.
 	 */
+	@JsonProperty("yPosition")
 	public Double getYPosition() {
 		return yPosition;
 	}
