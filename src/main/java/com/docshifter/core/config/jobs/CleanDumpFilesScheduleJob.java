@@ -30,7 +30,7 @@ public class CleanDumpFilesScheduleJob {
 
     private final InstallationType installationType;
 
-    @Value("${jvm_logs_dir:-}")
+    @Value("${jvm_logs_dir:}")
     private String JVM_LOGS_DIR;
 
 
