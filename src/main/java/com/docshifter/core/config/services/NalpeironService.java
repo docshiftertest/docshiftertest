@@ -5,10 +5,12 @@ import com.docshifter.core.licensing.dtos.LicensingDto;
 import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.utils.NetworkUtils;
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
+import com.docshifter.core.utils.nalpeiron.TokenPoolStatus;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -39,8 +41,10 @@ import java.util.stream.Stream;
 @Service
 @Profile(NalpeironHelper.LICENSING_IDENTIFIER)
 public class NalpeironService implements ILicensingService {
+
     private static final String LICENSE_MANAGEMENT_API_KEY = "3626307e-3592-4180-b9df-1b5ceb663e90";
     private static final long[] ANALYTICS_TRANSACTION_ID = {0L};
+
     /**
      * The directory pointing to the persistent licensing files managed by DocShifter itself for the purposes of
      * ghost activation cleanup (after a previous instance crashed). Only used in a containerized environment.
@@ -162,7 +166,6 @@ public class NalpeironService implements ILicensingService {
         }
 
         log.info("|===========================| LICENSING SERVICE INIT FINISHED |===========================|");
-
     }
 
     /**
@@ -519,6 +522,24 @@ public class NalpeironService implements ILicensingService {
         return helper.getFeatureStatus(moduleId) == NalpeironHelper.FeatureStatus.AUTHORIZED;
     }
 
+    @Cacheable("isConsumptionBasedLicense")
+    @Override
+    public boolean isConsumptionBasedLicense() {
+        try {
+            return hasModuleAccess(NalpeironHelper.TOKEN_FEATURE_ID);
+        } catch (DocShifterLicenseException dLEp) {
+            TokenPoolStatus errorCode = TokenPoolStatus.fromErrorCode(dLEp.getNalpErrorCode());
+            if (errorCode == TokenPoolStatus.NOT_CONSUMPTION_BASED_LICENSE) {
+                log.debug("Not a Consumption based license");
+            } else {
+                log.fatal("Error in DocShifter license processing, exiting application.", dLEp);
+                // We need to exit with zero or yajsw will restart the service
+                System.exit(0);
+            }
+        }
+        return false;
+    }
+
     /**
      * Checks if the license is permanent
      * @return if the license is permanent or not
@@ -622,6 +643,10 @@ public class NalpeironService implements ILicensingService {
      */
     public String getLicenseCode() {
         return helper.getLicenseCode();
+    }
+
+    public NalpeironHelper getNalpeironHelper() {
+        return this.helper;
     }
 
     @PreDestroy

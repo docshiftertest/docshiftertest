@@ -21,9 +21,11 @@ package com.nalpeiron.nalplibrary;
 
 import com.docshifter.core.utils.nalpeiron.NalpeironHelper;
 import com.nalpeiron.NalpError;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 @Log4j2(topic = NalpeironHelper.LICENSING_IDENTIFIER)
@@ -1699,177 +1701,94 @@ public class NSL
 		return 0;
 	}
 
-/**
- * @brief Get information about tokens checked out from the named pool.
- * See NSLGetTokenInfo().
- *
- * @param tokenName a string containing the five (5) character code
- * of the token pool to be withdrawn from.
- *
- * @return > 0 The number of elements from the tokens currently held by the system.
- * @return < 0 The status of the tokesn.
- *
- * @throws NalpError:	If there was a problem calling the NSL function,
- * 	this error will be thrown (\ref V10ERROR)
- */
-	public int callNSLGetTokenInfo(String tokenName)
-	throws NalpError
-	{
+	/**
+	 * Calls the NSLCheckoutTokens function of the Nalpeiron library.
+	 *
+	 * @param tokenName The name of the token to check out.
+	 * @param licenseNo The license number to check out.
+	 * @param amt       The amount of the token to check out.
+	 * @return The status code from the Nalpeiron library.
+	 */
+	public int callNSLCheckoutTokens(String tokenName, String licenseNo, int amt) {
+		byte[] tokenNameBytes = (tokenName + '\0').getBytes(StandardCharsets.UTF_8);
+		byte[] licenseNoBytes = (licenseNo + '\0').getBytes(StandardCharsets.UTF_8);
+
 		int[] tokenStatus = new int[1];
-		int[] tokenAmt = new int[1];
-		int[] tokenMax = new int[1];
-		int	i;
 
+		int resultCode = NSLCheckoutTokens(tokenNameBytes, licenseNoBytes, amt, tokenStatus, offset);
 
-		try
-		{
-			i = NSLGetTokenInfo((tokenName + '\000').getBytes("UTF-8"),
-				tokenMax, tokenAmt, tokenStatus, offset);
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			throw new NalpError(-9006, "Invalid Encoding");
+		if (resultCode < 0) {
+			throw new NalpError(resultCode, nalp.callNalpGetErrorMsg(resultCode));
 		}
 
-		if (i < 0)
-		{
-			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-		}
-
-		if (tokenStatus[0] < 0)
-		{
-			return tokenStatus[0];
-		}
-
-		return tokenAmt[0];
-	}
-
-/**
- * @brief Withdraws a specified number of tokens from an 
- * token pool. See NSLCheckoutTokens().
- *
- * @param tokenName a string containing the five (5) character code
- * of the token pool to be withdrawn from.
- *
- * @param licenseNo the license number of the current, valid system license
- *
- * @param amt the number of elements to withdraw from the pool
- *
- * @return The status of the token (\ref FEATSTATUS)
- *
- * @throws NalpError:	If there was a problem calling the NSL function,
- * 	this error will be thrown (\ref V10ERROR)
- */
-	public int callNSLCheckoutTokens(String tokenName, String licenseNo, int amt)
-	throws NalpError
-	{
-		int[] tokenStatus = new int[1];
-		int	i;
-
-
-		try
-		{
-			//the library will vet the amt.
-			i = NSLCheckoutTokens((tokenName + '\000').getBytes("UTF-8"),
-				(licenseNo + '\000').getBytes("UTF-8"),
-				amt, tokenStatus, offset);
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			throw new NalpError(-9006, "Invalid Encoding");
-		}
-
-		if (i < 0)
-		{
-			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-		}
-
-		if (tokenStatus[0] < 0)
-		{
-			return tokenStatus[0];
-		}
-		
 		return tokenStatus[0];
 	}
 
-/**
- * @brief Consumes the specified number of tokens from an tokens 
- *  checkedout by NSLCheckoutTokens onto local machine.
- *
- * @param tokenName a string containing the five (5) character code
- * of the token pool to be consumed from.
- *
- * @param licenseNo the license number of the current, valid system license
- *
- * @param amt the number of elements to consume.
- *
- * @throws NalpError:	If there was a problem calling the NSL function,
- * 	this error will be thrown (\ref V10ERROR)
- */
-	public int callNSLConsumeTokens(String tokenName, String licenseNo, int amt)
-	throws NalpError
-	{
-		int[] tokenStatus = new int[1];
-		int	i;
+	/**
+	 * Consumes the specified number of tokens from tokens checked out by NSLCheckoutTokens onto the local machine.
+	 *
+	 * @param tokenName the five character code of the token pool to be consumed from.
+	 * @param licenseNo the license number of the current, valid system license.
+	 * @param amt       the number of elements to consume.
+	 * @return the status code from the Nalpeiron library.
+	 * @throws NalpError If there was a problem calling the NSL function.
+	 */
+	public int callNSLConsumeTokens(@NonNull String tokenName, @NonNull String licenseNo, int amt) throws NalpError {
 
+		byte[] tokenNameBytes = (tokenName + '\0').getBytes(StandardCharsets.UTF_8);
+		byte[] licenseNoBytes = (licenseNo + '\0').getBytes(StandardCharsets.UTF_8);
 
-		try
-		{
-			//the library will vet the amt.
-			i = NSLConsumeTokens((tokenName + '\000').getBytes("UTF-8"),
-				(licenseNo + '\000').getBytes("UTF-8"), amt, offset);
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			throw new NalpError(-9006, "Invalid Encoding");
+		int resultCode = NSLConsumeTokens(tokenNameBytes, licenseNoBytes, amt, offset);
+
+		if (resultCode < 0) {
+			throw new NalpError(resultCode, nalp.callNalpGetErrorMsg(resultCode));
 		}
 
-		if (i < 0)
-		{
-			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
-		}
-		
-		return i;
+		return resultCode;
 	}
 
-/**
- * @brief Returns the specified number of tokens from the local machine
- *  to the Nalpeiron server.
- *
- * @param tokenName a string containing the five (5) character code
- * of the token pool to be consumed from.
- *
- * @param licenseNo the license number of the current, valid system license
- *
- * @param amt the number of elements to return.
- *
- * @throws NalpError:	If there was a problem calling the NSL function,
- * 	this error will be thrown (\ref V10ERROR)
- */
-	public int callNSLReturnTokens(String tokenName, String licenseNo, int amt)
-	throws NalpError
-	{
-		int[] tokenStatus = new int[1];
-		int	i;
+	/**
+	 * Returns the specified number of tokens from the local machine to the Nalpeiron server.
+	 *
+	 * @param tokenName the five character code of the token pool to be consumed from.
+	 * @param licenseNo the license number of the current, valid system license.
+	 * @param amt       the number of elements to return.
+	 *
+	 * @return the status code from the Nalpeiron library.
+	 *
+	 * @throws NalpError If there was a problem calling the NSL function.
+	 */
+	public int callNSLReturnTokens(@NonNull String tokenName, @NonNull String licenseNo, int amt) throws NalpError {
 
+		byte[] tokenNameBytes = (tokenName + '\0').getBytes(StandardCharsets.UTF_8);
+		byte[] licenseNoBytes = (licenseNo + '\0').getBytes(StandardCharsets.UTF_8);
 
-		try
-		{
-			//the library will vet the amt.
-			i = NSLReturnTokens((tokenName + '\000').getBytes("UTF-8"),
-				(licenseNo + '\000').getBytes("UTF-8"), amt, offset);
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			throw new NalpError(-9006, "Invalid Encoding");
+		int resultCode = NSLReturnTokens(tokenNameBytes, licenseNoBytes, amt, offset);
+
+		if (resultCode < 0) {
+			throw new NalpError(resultCode, nalp.callNalpGetErrorMsg(resultCode));
 		}
 
-		if (i < 0)
-		{
-			throw new NalpError(i, nalp.callNalpGetErrorMsg(i));
+		return resultCode;
+	}
+
+	/**
+	 * Get information about tokens checked out from the named pool.
+	 *
+	 * @param tokenName the five character code of the token pool to be withdrawn from.
+	 * @return The number of elements from the tokens currently held by the system, or the status of the tokens if less than 0.
+	 * @throws NalpError If there was a problem calling the NSL function.
+	 */
+	public int getTokenInfo(@NonNull String tokenName, int[] tokenMax, int[] tokenAmt, int[] tokenStatus) throws NalpError {
+		byte[] tokenNameBytes = (tokenName + '\0').getBytes(StandardCharsets.UTF_8);
+
+		int resultCode = NSLGetTokenInfo(tokenNameBytes, tokenMax, tokenAmt, tokenStatus, offset);
+
+		if (resultCode < 0) {
+			throw new NalpError(resultCode, nalp.callNalpGetErrorMsg(resultCode));
 		}
-		
-		return i;
+
+		return resultCode;
 	}
 
 /**
