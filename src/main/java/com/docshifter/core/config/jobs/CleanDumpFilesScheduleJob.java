@@ -31,7 +31,7 @@ public class CleanDumpFilesScheduleJob {
     private final InstallationType installationType;
 
     @Value("${jvm_logs_dir:-}")
-    private String JVM_LOGS_DIR = "/opt/DocShifter/message-broker/persistence/logs";
+    private String JVM_LOGS_DIR;
 
 
     public CleanDumpFilesScheduleJob(ScheduledExecutorService scheduler, InstallationType installationType) {
