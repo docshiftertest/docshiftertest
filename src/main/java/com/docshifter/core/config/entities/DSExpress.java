@@ -34,7 +34,7 @@ public class DSExpress implements Serializable {
 
     @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
     @Column(columnDefinition = "jsonb")
-    private String taskData;
+    private String parameterValues;
 
     public DSExpress() {}
 
@@ -43,25 +43,25 @@ public class DSExpress implements Serializable {
                      String description,
                      boolean enabled,
                      @Nonnull ChainConfiguration chainConfiguration,
-                     String taskData) {
+                     String parameterValues) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.enabled = enabled;
         this.chainConfiguration = chainConfiguration;
-        this.taskData = taskData;
+        this.parameterValues = parameterValues;
     }
 
     public DSExpress(String name,
                      String description,
                      boolean enabled,
                      @Nonnull ChainConfiguration chainConfiguration,
-                     String taskData) {
+                     String parameterValues) {
         this.name = name;
         this.description = description;
         this.enabled = enabled;
         this.chainConfiguration = chainConfiguration;
-        this.taskData = taskData;
+        this.parameterValues = parameterValues;
     }
 
     public long getId() {
@@ -110,11 +110,11 @@ public class DSExpress implements Serializable {
         this.chainConfiguration = chainConfiguration;
     }
 
-    public String getTaskData() {
-        return taskData;
+    public String getParameterValues() {
+        return parameterValues;
     }
 
-    public void setTaskData(String taskData) {
-        this.taskData = taskData;
+    public void setParameterValues(String taskData) {
+        this.parameterValues = taskData;
     }
 }
