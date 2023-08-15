@@ -1458,7 +1458,6 @@ public class NalpeironHelper {
      * @param tokenAmount the number of tokens to consume from the pool.
      */
     public void consumeToken(int tokenAmount) throws NalpError {
-        log.info("Attempting to consume {} tokens from license {}", tokenAmount, licenseCode);
         int status = nsl.callNSLConsumeTokens(NalpeironHelper.TOKEN_FEATURE_ID, licenseCode, tokenAmount);
         handleStatusCode(status);
     }
@@ -1469,7 +1468,6 @@ public class NalpeironHelper {
      * @param tokenAmount the number of tokens to return to the pool.
      */
     public void returnToken(int tokenAmount) throws NalpError {
-        log.info("Attempting to return {} tokens to license {}", tokenAmount, licenseCode);
         int status = nsl.callNSLReturnTokens(NalpeironHelper.TOKEN_FEATURE_ID, licenseCode, tokenAmount);
         handleStatusCode(status);
     }
@@ -1497,7 +1495,7 @@ public class NalpeironHelper {
      */
     private void handleStatusCode(int statusCode) {
         String statusMessage = TokenPoolStatus.fromErrorCode(statusCode).getMessage();
-        log.info("Token operation returned status code {}, corresponding to message {}", statusCode, statusMessage);
+        log.debug("Token operation returned status code {}, corresponding to message {}", statusCode, statusMessage);
 
         if (statusCode < 0) {
             throw new NalpError(statusCode,"Token operation failed with status code " + statusCode + ": " + statusMessage);
