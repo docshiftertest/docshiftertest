@@ -22,6 +22,12 @@ public interface ModuleRepository extends CrudRepository<Module, Long> {
     @Query("SELECT distinct name FROM Module order by name")
     List<String> findAllModulesName();
 
+    @Query(value = "SELECT distinct m.name " +
+            "FROM docshifter.module m " +
+            "inner join docshifter.module_configuration mc on mc.module_id = m.id " +
+            "order by m.name", nativeQuery = true)
+    List<String> findAllUsedModulesName();
+
     @Query("SELECT distinct name FROM Module WHERE id IN :ids order by name")
     List<String> findModulesNameById(long[] ids);
 }
