@@ -213,7 +213,10 @@ public class NalpeironHelper {
 
 
     public enum FeatureStatus {
-        //SHOWERRORS(0x01, ""),
+        /**
+         * Has been enabled, but the total number of tokens in the pool, without any having been checked out, is zero.
+         */
+        ZERO_POOL_SIZE(-6, "Pool size is zero"),
         EXPIRED(-5, "Feature request but license expired"),
         UNAUTHORIZED(-4, "Feature not authorized for use"),
         DENIED(-3, "Feature request denied"),
@@ -260,7 +263,6 @@ public class NalpeironHelper {
 
 
     public enum PoolStatus {
-        //SHOWERRORS(0x01, ""),
         EXPIRED(-5, "Element request but license expired"),
         UNAUTHORIZED(-4, "Element not authorized for use"),
         DENIED(-3, "Element request denied"),
@@ -1478,7 +1480,6 @@ public class NalpeironHelper {
      * @return An integer representing the status of the tokens or the number of tokens currently held by the system.
      */
     public ConsumptionTokenInfo getTokenInfo() throws NalpError {
-        log.info("Getting token information for license {}", licenseCode);
         int[] tokenMax = new int[1];
         int[] tokenAmt = new int[1];
         int[] tokenStatus = new int[1];
