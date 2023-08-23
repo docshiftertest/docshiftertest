@@ -522,11 +522,13 @@ public class NalpeironService implements ILicensingService {
         return helper.getFeatureStatus(moduleId) == NalpeironHelper.FeatureStatus.AUTHORIZED;
     }
 
-    @Cacheable("isConsumptionBasedLicense")
+    @Cacheable(value = "isConsumptionBasedLicense",condition = "@cachingDecisionByAppName.shouldCache()")
     @Override
     public boolean isConsumptionBasedLicense() {
         try {
-            return hasModuleAccess(NalpeironHelper.TOKEN_FEATURE_ID);
+            var featureStatus = helper.getFeatureStatus(NalpeironHelper.TOKEN_FEATURE_ID);
+            return featureStatus == NalpeironHelper.FeatureStatus.AUTHORIZED ||
+                    featureStatus == NalpeironHelper.FeatureStatus.ZERO_POOL_SIZE;
         } catch (DocShifterLicenseException dLEp) {
             TokenPoolStatus errorCode = TokenPoolStatus.fromErrorCode(dLEp.getNalpErrorCode());
             if (errorCode == TokenPoolStatus.NOT_CONSUMPTION_BASED_LICENSE) {
