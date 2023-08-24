@@ -9,7 +9,8 @@ public enum DocShifterFontStyling {
     REGULAR(0),
     BOLD(1),
     ITALIC(2),
-    UNDERLINE(3);
+    UNDERLINE(3),
+    BOLD_ITALIC(4);
 
     private final int value;
 
