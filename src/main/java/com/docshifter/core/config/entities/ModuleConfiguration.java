@@ -183,14 +183,17 @@ public class ModuleConfiguration implements Serializable {
 	public List<Map> jsonParameterValues()
 	{
 		List<Map> parameters = new ArrayList<>();
-		Map<String, String> parameter = null;
+		Map<String, String> parameter;
+
 
 		for(Map.Entry<Parameter, String> entry: parameterValues.entrySet())
 		{
 			parameter = new HashMap<>();
+
+			parameter.put("type", entry.getKey().getName());
 			parameter.put("id", String.valueOf(entry.getKey().getId()));
 			parameter.put("value", entry.getValue());
-			
+
 			parameters.add(parameter);
 		}
 
