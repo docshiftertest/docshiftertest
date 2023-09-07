@@ -26,6 +26,8 @@ public class ConfigurationAuditDB {
 
     @Value("${spring.datasource.audit.url}")
     private String url;
+    @Value("${spring.datasource.audit.password}")
+    private String password;
     @Value("${spring.jpa.database-platform}")
     private String dialect;
 
@@ -34,7 +36,7 @@ public class ConfigurationAuditDB {
         return DataSourceBuilder.create()
                 .url(url)
                 .username("ds_audit")
-                .password("aae4d1b46100a43119b6c43eacff8f74")
+                .password(password)
                 .build();
     }
 

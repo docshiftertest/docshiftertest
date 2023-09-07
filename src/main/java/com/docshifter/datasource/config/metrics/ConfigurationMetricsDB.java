@@ -25,6 +25,8 @@ public class ConfigurationMetricsDB {
 
     @Value( "${spring.datasource.metrics.url}" )
     private String url;
+    @Value("${spring.datasource.metrics.password}")
+    private String password;
     @Value("${spring.jpa.database-platform}")
     private String dialect;
     @Value("${spring.jpa.hibernate.ddl-auto}")
@@ -35,9 +37,7 @@ public class ConfigurationMetricsDB {
        return DataSourceBuilder.create()
         .url(url)
         .username("metrics_system")
-        .password("mb282wu7nvDkbQRkfXvA") // make it at least slightly less obvious that this is the password
-               //make a new string from a byte array
-               //.password(somestring);
+        .password(password)
         .build();
     }
 
