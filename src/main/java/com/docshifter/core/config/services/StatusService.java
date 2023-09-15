@@ -1,10 +1,12 @@
 package com.docshifter.core.config.services;
 
+import com.docshifter.core.config.Constants;
 import com.docshifter.core.metrics.dtos.ServiceHeartbeatDTO;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpSubscription;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
@@ -30,6 +32,7 @@ public class StatusService {
     private final Set<Supplier<Set<ServiceHeartbeatDTO>>> heartbeatDTOSuppliers;
     public static final String STOMP_DESTINATION = "/topic/serviceHeartbeats";
     public static final String RESTART_SERVICE_JMS_QUEUE = "/queue/restartService";
+    public static final String GLOBAL_RESTART_SERVICE_JMS_TOPIC = "/topic/globalRestartService";
 
     public StatusService(SimpMessagingTemplate websocketTemplate,
                          SimpUserRegistry websocketUserRegistry,
@@ -68,6 +71,16 @@ public class StatusService {
     @EventListener
     public void onAppReady(HealthManagementService.FirstCorrectFiredEvent event) {
         appReadyTime = Instant.now();
+    }
+
+    @JmsListener(destination = GLOBAL_RESTART_SERVICE_JMS_TOPIC + "/${spring.application.name:unknown}", containerFactory = Constants.TOPIC_LISTENER)
+    public void globalRestartService(@Payload boolean force) {
+        if (!force && (appReadyTime == null || appReadyTime.plusSeconds(30).isAfter(Instant.now()))) {
+            log.info("Received a component-wide restart command, but application has recently started up, so will ignore it!");
+            return;
+        }
+        log.info("Exiting the current application in 1 second after having received a component-wide restart command.");
+        scheduler.schedule(() -> System.exit(1), 1, TimeUnit.SECONDS);
     }
 
     @JmsListener(destination = RESTART_SERVICE_JMS_QUEUE + "/#{T(com.docshifter.core.metrics.dtos.ServiceHeartbeatDTO)" +

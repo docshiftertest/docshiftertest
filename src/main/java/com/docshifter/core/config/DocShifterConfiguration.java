@@ -113,6 +113,12 @@ public class DocShifterConfiguration {
 
 	@Bean
 	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
+	public JmsTemplate shortLivedJmsTemplate() {
+		return jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY, queueReplyTimeout, 30_000);
+	}
+
+	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	public JmsTemplate metricsJmsTemplate() {
 		JmsTemplate template = jmsTemplateFactory().create(IJmsTemplateFactory.DEFAULT_PRIORITY,
 				queueReplyTimeout,metricsTimeToLive);
@@ -128,22 +134,29 @@ public class DocShifterConfiguration {
 	@Bean
 	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	@DependsOn("defaultJmsTemplate")
-	public JmsMessagingTemplate defaultMessagingTemplate () {
+	public JmsMessagingTemplate defaultMessagingTemplate() {
 		return new JmsMessagingTemplate(defaultJmsTemplate());
 	}
 
 	@Bean
 	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	@DependsOn("metricsJmsTemplate")
-	public JmsMessagingTemplate metricsMessagingTemplate () {
+	public JmsMessagingTemplate metricsMessagingTemplate() {
 		return new JmsMessagingTemplate(metricsJmsTemplate());
 	}
 
 	@Bean
 	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
 	@DependsOn("ongoingTaskJmsTemplate")
-	public JmsMessagingTemplate ongoingTaskMessagingTemplate () {
+	public JmsMessagingTemplate ongoingTaskMessagingTemplate() {
 		return new JmsMessagingTemplate(ongoingTaskJmsTemplate());
+	}
+
+	@Bean
+	@ConditionalOnMissingClass("com.docshifter.mq.DocshifterMQApplication")
+	@DependsOn("shortLivedJmsTemplate")
+	public JmsMessagingTemplate shortLivedMessagingTemplate() {
+		return new JmsMessagingTemplate(shortLivedJmsTemplate());
 	}
 
 	@Bean
