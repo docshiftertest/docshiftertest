@@ -14,14 +14,17 @@ class PdfTocTest {
         LicenseHelper.getLicenseHelper();
     }
 
+    /**
+     * Gets Table of Contents from a pdf file
+     */
     @Test
-    void toxicology() {
+    void getTocFromPdfFile() {
         try (Document doc = new Document("target/test-classes/266-toxicology-written.pdf")) {
             PdfToc[] tocs = PdfToc.findAll(doc, "Contents", 0, 12, 60, 60)
                     .toArray(PdfToc[]::new);
             // TODO
             assertEquals(1, tocs.length);
-            assertEquals(1, tocs[0].getElements().size());
+            assertEquals(22, tocs[0].getElements().size());
         }
     }
 }
