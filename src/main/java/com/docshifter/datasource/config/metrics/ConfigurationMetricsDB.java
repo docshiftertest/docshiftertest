@@ -1,5 +1,6 @@
 package com.docshifter.datasource.config.metrics;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -22,15 +23,21 @@ import java.util.Properties;
         basePackages = "com.docshifter.core.metrics.repositories"
 )
 public class ConfigurationMetricsDB {
+    private final String url;
+    private final String password;
+    private final String dialect;
+    private final String schemaCreation;
 
-    @Value( "${spring.datasource.metrics.url}" )
-    private String url;
-    @Value("${spring.datasource.metrics.password}")
-    private String password;
-    @Value("${spring.jpa.database-platform}")
-    private String dialect;
-    @Value("${spring.jpa.hibernate.ddl-auto}")
-    private String schemaCreation;
+    public ConfigurationMetricsDB(@Value("${spring.datasource.metrics.url}") String url,
+                                  @Value("${spring.datasource.metrics.password:}") String password,
+                                  @Value("${spring.jpa.database-platform}") String dialect,
+                                  @Value("${spring.jpa.hibernate.ddl-auto}") String schemaCreation) {
+        this.url = url;
+        // Backwards compatibility with older installations: the metrics password used to be hardcoded
+        this.password = StringUtils.isEmpty(password) ? "mb282wu7nvDkbQRkfXvA" : password;
+        this.dialect = dialect;
+        this.schemaCreation = schemaCreation;
+    }
 
     @Bean
     public DataSource metricsDataSource(){
