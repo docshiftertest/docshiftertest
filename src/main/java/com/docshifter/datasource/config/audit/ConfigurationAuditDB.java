@@ -1,5 +1,6 @@
 package com.docshifter.datasource.config.audit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.AvailableSettings;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,13 +24,18 @@ import java.util.Properties;
         transactionManagerRef = "auditTransactionManager",
         basePackages = "com.docshifter.core.audit.repositories")
 public class ConfigurationAuditDB {
+    private final String url;
+    private final String password;
+    private final String dialect;
 
-    @Value("${spring.datasource.audit.url}")
-    private String url;
-    @Value("${spring.datasource.audit.password}")
-    private String password;
-    @Value("${spring.jpa.database-platform}")
-    private String dialect;
+    public ConfigurationAuditDB(@Value("${spring.datasource.audit.url}") String url,
+                                @Value("${spring.datasource.audit.password:}") String password,
+                                @Value("${spring.jpa.database-platform}") String dialect) {
+        this.url = url;
+        // Backwards compatibility with older installations: the audit password used to be hardcoded
+        this.password = StringUtils.isEmpty(password) ? "aae4d1b46100a43119b6c43eacff8f74" : password;
+        this.dialect = dialect;
+    }
 
     @Bean
     public DataSource auditDataSource() {
