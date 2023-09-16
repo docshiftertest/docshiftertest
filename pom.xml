@@ -203,7 +203,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
-            <version>5.7.8</version>
+            <version>5.7.10</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.security</groupId>
@@ -214,7 +214,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
-            <version>5.7.8</version>
+            <version>5.7.10</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.security</groupId>
@@ -225,7 +225,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-messaging</artifactId>
-            <version>5.7.8</version>
+            <version>5.7.10</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.security</groupId>
