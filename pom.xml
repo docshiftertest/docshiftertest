@@ -71,6 +71,9 @@
         </repository>
     </repositories>
 
+    <!-- PROBLEM: dependencyManagement is not transitive! Only having this section in the parent POM would cause compilation issues! -->
+    <!-- See https://stackoverflow.com/questions/28312975/maven-dependencymanagement-version-ignored-in-transitive-dependencies -->
+    <!-- And https://issues.apache.org/jira/browse/MNG-5761 -->
     <dependencyManagement>
         <dependencies>
             <dependency>
