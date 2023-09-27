@@ -54,7 +54,6 @@
         <aspose.barcode.version>22.11</aspose.barcode.version>
         <aspose.barcode.classifier>jdk18</aspose.barcode.classifier>
         <artemis.version>2.23.1</artemis.version>
-        <kubernetes-client.version>6.8.1</kubernetes-client.version>
         <failBuildOnCVSS>8</failBuildOnCVSS>
     </properties>
 
@@ -71,18 +70,6 @@
             </snapshots>
         </repository>
     </repositories>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.fabric8</groupId>
-                <artifactId>kubernetes-client-bom</artifactId>
-                <version>${kubernetes-client.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -468,7 +455,6 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
-            <version>${kubernetes-client.version}</version>
         </dependency>
 
         <dependency>
