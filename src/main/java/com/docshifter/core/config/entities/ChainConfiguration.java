@@ -81,7 +81,7 @@ public class ChainConfiguration implements Serializable {
 	private FailureLevel failureLevel;
 
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinTable(
 			name = "chain_configuration_root_node",
 			joinColumns = {@JoinColumn(name = "chain_configuration_id")},
