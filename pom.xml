@@ -421,7 +421,9 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.7.1</version>
+            <!-- Bumping the version solves the CVE-2023-36415 issue, but the CPE is comparing the java version that fixes the issue (1.10.2) with the python version (1.14.1) -->
+            <!-- https://github.com/jeremylong/DependencyCheck/issues/5992 -->
+            <version>1.10.3</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
