@@ -54,7 +54,7 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	@Column(columnDefinition = "jsonb")
 	private String valuesJson;
 	private String parameterGroup;
-	@OneToMany(cascade= CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "parameter")
+	@OneToMany(cascade= CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "parameter", orphanRemoval = true)
 	@Nonnull
 	@ToString.Exclude
 	private Set<ParameterDependency> dependencies = new HashSet<>();
