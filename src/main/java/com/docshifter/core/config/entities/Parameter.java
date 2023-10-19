@@ -256,7 +256,7 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	}
 
 	public void setDependencies(@Nonnull Set<ParameterDependency> dependencies) {
-		this.dependencies = new HashSet<>();
+		this.dependencies.clear();
 		dependencies.forEach(this::addDependency);
 	}
 
@@ -319,7 +319,7 @@ public class Parameter implements Comparable<Parameter>, Serializable
 			this.required = null;
 			this.valuesJson = null;
 			this.parameterGroup = null;
-			this.dependencies = new HashSet<>();
+			this.dependencies.clear();
 		}
 		this.aliasOf = aliasOf;
 	}
