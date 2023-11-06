@@ -524,7 +524,13 @@ public class NalpeironService implements ILicensingService {
 
     @Cacheable(value = "isConsumptionBasedLicense",condition = "@cachingDecisionByAppName.shouldCache()")
     @Override
-    public boolean isConsumptionBasedLicense() {
+    public boolean isConsumptionBasedLicense() throws DocShifterLicenseException {
+
+        if (helper.getActivationType().equals(NalpeironHelper.ActivationType.OFFLINE)) {
+            log.debug("Consumption token is not supported on Offline activation");
+            return false;
+        }
+
         try {
             var featureStatus = helper.getFeatureStatus(NalpeironHelper.TOKEN_FEATURE_ID);
             return featureStatus == NalpeironHelper.FeatureStatus.AUTHORIZED ||
