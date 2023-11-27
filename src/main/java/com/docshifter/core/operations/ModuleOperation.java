@@ -17,6 +17,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Objects.nonNull;
+
 /**
  * Created by michiel.vandriessche on 15/03/17.
  */
@@ -183,6 +185,7 @@ public abstract class ModuleOperation {
 	private boolean setModuleValue(ParamType paramType, Field field, Object moduleValue, boolean supportPlaceholder) {
 		try {
 			logger.trace("modulevalue is === " + moduleValue);
+
 			if (moduleValue == null) {
 				if (paramType == ParamType.BOOLEAN) {
 					field.set(this, false);
@@ -192,75 +195,93 @@ public abstract class ModuleOperation {
 				}
 				return false;
 			}
+
 			String moduleValueStr = moduleValue.toString();
+
 			if (supportPlaceholder) {
-				moduleValueStr = processPlaceHolders(task, moduleValueStr);
+
+				// If it is an option module and it started from DSExpress,
+				// we just need to remove the initial ${ and the } at the end,
+				// Otherwise we change the value of the parameter here and later on it will not match the possible options
+				//
+				// e.g.:
+				// Using TaskDataOption as example to compare the regular workflow and DSExpress
+				//
+				// Using a regular workflow:
+				// TaskDataParam -> pdfa
+				// Inside taskData we have the pdfa=2B
+				//
+				// Later on while running the option module, we will try to find in taskData the key pdfa,
+				// We will have the 2B value, and we will try to match the options configured
+				//
+				// Using DSExpress:
+				// TaskDataParam -> ${pdfa}
+				// Inside taskData we have the pdfa=2B
+				//
+				// If we change it here, it will be TaskDataParam -> 2B
+				// Later on while running the option module, we will try to find in taskData the key 2B,
+				// it won't be possible to find it, and then it won't match any option configured
+
+				moduleValueStr = checkIfIsDSExpressAndOption(task, moduleWrapper)
+						? moduleValueStr.replaceAll("\\$\\{|}", "")
+						: processPlaceHolders(task, moduleValueStr);
 			}
+
 			switch (paramType) {
-				case INTEGER:
+				case INTEGER -> {
 					if (moduleValue instanceof Integer) {
 						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
+					} else if (StringUtils.isNotBlank(moduleValueStr)) {
 						field.set(this, Integer.parseInt(moduleValueStr));
 					}
-					break;
-				case BOOLEAN:
+				}
+				case BOOLEAN -> {
 					if (moduleValue instanceof Boolean) {
 						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
+					} else if (StringUtils.isNotBlank(moduleValueStr)) {
 						field.set(this, Boolean.parseBoolean(moduleValueStr));
 					}
-					break;
-				case LONG:
+				}
+				case LONG -> {
 					if (moduleValue instanceof Long) {
 						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
+					} else if (StringUtils.isNotBlank(moduleValueStr)) {
 						field.set(this, Long.parseLong(moduleValueStr));
 					}
-					break;
-				case DOUBLE:
+				}
+				case DOUBLE -> {
 					if (moduleValue instanceof Double) {
 						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
+					} else if (StringUtils.isNotBlank(moduleValueStr)) {
 						field.set(this, Double.parseDouble(moduleValueStr));
 					}
-					break;
-				case FLOAT:
+				}
+				case FLOAT -> {
 					if (moduleValue instanceof Float) {
 						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
+					} else if (StringUtils.isNotBlank(moduleValueStr)) {
 						field.set(this, Float.parseFloat(moduleValueStr));
 					}
-					break;
-				case BYTE:
+				}
+				case BYTE -> {
 					if (moduleValue instanceof Byte) {
 						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
+					} else if (StringUtils.isNotBlank(moduleValueStr)) {
 						field.set(this, Byte.parseByte(moduleValueStr));
 					}
-					break;
-				case SHORT:
+				}
+				case SHORT -> {
 					if (moduleValue instanceof Short) {
 						field.set(this, moduleValue);
-					} 
-					else if (StringUtils.isNotBlank(moduleValueStr)) {
+					} else if (StringUtils.isNotBlank(moduleValueStr)) {
 						field.set(this, Short.parseShort(moduleValueStr));
 					}
-					break;
-				case STRING:
-					field.set(this, moduleValueStr);
-					break;
-				case UNKNOWN:
-				default:
+				}
+				case STRING -> field.set(this, moduleValueStr);
+				default -> {
 					logger.warn("Got an UNKNOWN type: [" + field.getType().getSimpleName() + "] for field: " + field + ". Setting value to: " + moduleValue);
 					field.set(this, moduleValue);
-					break;
+				}
 			}
 		} catch (IllegalAccessException ex) {
 			logger.error("Illegal access of field", ex);
@@ -338,6 +359,28 @@ public abstract class ModuleOperation {
 			}
 		}
 		return text;
+	}
+
+	/**
+	 * Checks if it is from DSExpress and the type of module is Option
+	 * @param task the actual {@link Task}
+	 * @param moduleWrapper the module in use
+	 * @return either if it is from DSExpress and the type of the module or not
+	 */
+	private static boolean checkIfIsDSExpressAndOption(Task task, ModuleWrapper moduleWrapper) {
+
+		boolean isFromDSExpressAndIsOption = false;
+
+		boolean isFromDSExpress = nonNull(task.getData())
+				&& task.getData().containsKey("isFromDSExpress")
+				&& ((boolean) task.getData().get("isFromDSExpress"));
+
+		if (moduleWrapper != null) {
+			isFromDSExpressAndIsOption = isFromDSExpress && moduleWrapper.getType().equalsIgnoreCase("option");
+			logger.trace("Module type: " + moduleWrapper.getType() + ", isFromDSExpress: " + isFromDSExpress);
+		}
+
+		return isFromDSExpressAndIsOption;
 	}
 
 	protected static ModuleOperation getModuleOperation(String opClassName) throws EmptyOperationException {
