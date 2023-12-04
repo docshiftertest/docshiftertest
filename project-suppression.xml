@@ -32,4 +32,7 @@
     <suppress>
         <cve>CVE-2023-36415</cve>
     </suppress>
+    <suppress>
+        <cve>CVE-2023-36052</cve>
+    </suppress>
 </suppressions>
