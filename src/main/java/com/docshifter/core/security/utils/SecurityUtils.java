@@ -19,6 +19,9 @@ import java.util.Set;
  */
 @Log4j2
 public class SecurityUtils {
+	/**
+	 * Some known {@link IOException} messages that hint to us that the message is already in plaintext when trying to decrypt.
+	 */
 	private static final Set<String> PLAINTEXT_EX_MSG_INDICATORS = Set.of("Invalid lenByte", "Too short");
 
 	/**
