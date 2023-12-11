@@ -104,11 +104,17 @@ public class SecurityUtils {
 		delegate.setSaltGenerator(new RandomSaltGenerator());
 		delegate.setIterations(1000);
 
-		boolean isAlreadyEncrypted = false;
+		boolean isAlreadyEncrypted;
 		try {
 			isAlreadyEncrypted = !decryptMessage(message, algorithm, secret, logClass).equals(message);
 		} catch (Exception ex) {
-			log.warn("Caught exception trying to check if password is already encrypted, will assume it is not the case...", ex);
+			// If this exception occurs, check the exception handling in the decryptMessage method above!
+			// If the supplied message is plaintext, then there might be a case/exception we haven't taken into account yet.
+			// We wrap and rethrow an exception here because we prefer giving the user an error message over the potential to
+			// double encrypt messages/passwords...
+			EncryptionOperationNotPossibleException eonpe = new EncryptionOperationNotPossibleException("Ran into an error while trying to check if password is already encrypted");
+			eonpe.initCause(ex);
+			throw eonpe;
 		}
 
 		String encryptedMessage;
