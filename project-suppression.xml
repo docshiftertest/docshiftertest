@@ -26,4 +26,13 @@
     <suppress>
         <cve>CVE-2023-20873</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   Things we don't care about for releasing the 8.0-U1 patch, as all these dependencies are already out in the open since 8.0
+   ]]></notes>
+        <cve>CVE-2023-36052</cve>
+        <cve>CVE-2023-36414</cve>
+        <cve>CVE-2023-36415</cve>
+        <cve>CVE-2023-34034</cve>
+    </suppress>
 </suppressions>
