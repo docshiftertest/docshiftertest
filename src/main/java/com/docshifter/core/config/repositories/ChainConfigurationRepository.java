@@ -38,6 +38,11 @@ public interface ChainConfigurationRepository extends CrudRepository<ChainConfig
     @Query("update ChainConfiguration cc set cc.enabled = ?1 where cc.id in ?2 and (?1 = false or cc.brokenRules is null or cc.brokenRules = '')")
     void enableWorkflowsById(boolean enable, Set<Long> ids);
 
+    // Only enable (true) DSExpress if the workflow has no broken rules, for disabling (false) we don't care
+    @Modifying(flushAutomatically = true)
+    @Query("update ChainConfiguration cc set cc.dsexpressEnabled = ?1 where cc.id in ?2 and (?1 = false or cc.brokenRules is null or cc.brokenRules = '')")
+    void enableDSExpress(boolean enable, Set<Long> ids);
+
     // Only enable (true) the workflow if it has no broken rules, for disabling (false) we don't care
     @Modifying(flushAutomatically = true)
     @Query("update ChainConfiguration cc set cc.enabled = ?1 where cc.id = ?2 and (?1 = false or cc.brokenRules is null or cc.brokenRules = '')")
@@ -53,6 +58,13 @@ public interface ChainConfigurationRepository extends CrudRepository<ChainConfig
 
     @Query("select cc.name FROM ChainConfiguration cc where cc.enabled = :enabled")
     List<String> findAllWorkflowNameByEnabled(@Param("enabled") boolean enabled);
+
+    @Query("select cc.name FROM ChainConfiguration cc where cc.dsexpressEnabled = :enabled")
+    List<String> findAllWorkflowNameByDSExpressEnabledDisabled(@Param("enabled") boolean enabled);
+
+    @Modifying(flushAutomatically = true)
+    @Query("update ChainConfiguration cc set cc.dsexpressEnabled = ?1 where ?1 = false or cc.brokenRules is null or cc.brokenRules = ''")
+    void enableOrDisableAllWorkFlowsDSExpress(boolean enable);
 
     List<ChainConfigurationSample> findAllBy();
 }
