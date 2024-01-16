@@ -79,7 +79,7 @@ public class TocIterator implements Iterator<FieldStart> {
 				if (hasNext) {
 					Paragraph newPara = ((Paragraph) para.getNextSibling());
 					Node origFirstChild = newPara.getFirstChild();
-					for (Node child : para.getChildNodes().toArray()) {
+					for (Node child : para.getChildNodes(NodeType.ANY, false).toArray()) {
 						newPara.insertBefore(child, origFirstChild);
 					}
 					para.remove();
