@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.docshifter.core.work.WorkFolder;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
@@ -24,6 +26,9 @@ public class Task implements Serializable {
 	protected final Map<String, Object> data = new HashMap<>();
 	protected final List<String> extraFilesList = new ArrayList<>();
 	protected final List<String> configFilesList = new ArrayList<>();
+	@Getter
+	@Setter
+	protected List<FileMetadataDTO> fileMetadataDTO = new ArrayList<>();
 
 	public List<String> getExtraFilesList() {
 		return extraFilesList;

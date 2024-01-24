@@ -38,7 +38,8 @@ public enum TaskDataKey {
 	EMAIL_RECEIVERS,
 	EMAIL_CC,
 	EMAIL_BCC,
-	EMAIL_SUBJECT;
+	EMAIL_SUBJECT,
+	DB_FILE_STORAGE_ENABLED("DB_FILE_STORAGE_ENABLED");
 
 	private final String alias;
 

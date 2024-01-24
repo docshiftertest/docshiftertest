@@ -3,25 +3,30 @@ package com.docshifter.core.messaging.sender;
 import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.services.IJmsTemplateFactory;
 import com.docshifter.core.config.services.OngoingTaskService;
+import com.docshifter.core.messaging.LargeObjectService;
 import com.docshifter.core.messaging.dto.DocShifterMessageDTO;
 import com.docshifter.core.messaging.message.DocShifterMetricsSenderMessage;
 import com.docshifter.core.messaging.message.DocshifterMessage;
 import com.docshifter.core.messaging.message.DocshifterMessageType;
 import com.docshifter.core.messaging.queue.sender.IMessageSender;
 import com.docshifter.core.task.DctmTask;
+import com.docshifter.core.task.FileMetadataDTO;
 import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.TaskStatus;
 import com.docshifter.core.task.VeevaTask;
 import com.docshifter.core.utils.NetworkUtils;
+import com.docshifter.core.utils.TaskDataKey;
 import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQMessage;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
 import javax.jms.Message;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
@@ -41,11 +46,15 @@ public class AMQPSender implements IMessageSender {
 	private final IJmsTemplateFactory jmsTemplateFactory;
 	private final int queueReplyTimeout;
 	private final OngoingTaskService ongoingTaskService;
+	private final LargeObjectService largeObjectService;
+
+	@Value("${application.database.file-storage-enabled:false}")
+	private boolean dbFileStorageEnabled;
 
 	public AMQPSender(JmsTemplate defaultJmsTemplate, JmsTemplate metricsJmsTemplate,
-					  IJmsTemplateFactory jmsTemplateFactory,
-					  ActiveMQQueue docshifterQueue, ActiveMQQueue docshifterMetricsQueue,
-					  int queueReplyTimeout, OngoingTaskService ongoingTaskService) {
+                      IJmsTemplateFactory jmsTemplateFactory,
+                      ActiveMQQueue docshifterQueue, ActiveMQQueue docshifterMetricsQueue,
+                      int queueReplyTimeout, OngoingTaskService ongoingTaskService, LargeObjectService largeObjectService) {
 		this.defaultJmsTemplate = defaultJmsTemplate;
 		this.metricsJmsTemplate = metricsJmsTemplate;
 		this.jmsTemplateFactory = jmsTemplateFactory;
@@ -53,7 +62,8 @@ public class AMQPSender implements IMessageSender {
 		this.docshifterMetricsQueue = docshifterMetricsQueue;
 		this.queueReplyTimeout = queueReplyTimeout;
 		this.ongoingTaskService = ongoingTaskService;
-	}
+        this.largeObjectService = largeObjectService;
+    }
 
 	private SyncTask sendSyncTask(String queue, ChainConfiguration chainConfiguration, Task task) {
 
@@ -66,14 +76,12 @@ public class AMQPSender implements IMessageSender {
 			return (SyncTask) task;
 		}
 		
-		if (!(response instanceof DocshifterMessage)) {
+		if (!(response instanceof DocshifterMessage message)) {
 			//TODO: update to good exception message
 			throw new IllegalArgumentException("Return is not of the type 'DocshifterMessage', effective type is: " + response.getClass().getSimpleName());
 		}
-		
-		DocshifterMessage message = (DocshifterMessage) response;
-		
-		if (message.getType() != DocshifterMessageType.RETURN) {
+
+        if (message.getType() != DocshifterMessageType.RETURN) {
 			//TODO: update to good exception message
 			throw new IllegalArgumentException("Message type not supported: " + message.getType());
 		}
@@ -82,6 +90,20 @@ public class AMQPSender implements IMessageSender {
 			throw new IllegalArgumentException("Message is returnMessage but task is not a SyncTask, it is NULL!!");
 		}
 		if (message.getTask() instanceof  SyncTask) {
+
+			if (dbFileStorageEnabled) {
+				String destinationBasePath = task.getWorkFolder().getFolder().toString();
+				task.getFileMetadataDTO().stream().findAny().ifPresent(m -> {
+                    try {
+                        this.largeObjectService.processLargeObject(m.lobId(), Path.of(destinationBasePath,m.relativePath()));
+						this.largeObjectService.deleteLargeObject(m.lobId());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+				task.setSourceFilePath(destinationBasePath);
+			}
+
 			return (SyncTask) message.getTask();
 		} else {
 			throw new IllegalArgumentException("Message is returnMessage but task is not a SyncTask, task class is of class: " + task.getClass().getSimpleName());
@@ -92,6 +114,11 @@ public class AMQPSender implements IMessageSender {
 							ChainConfiguration chainConfiguration, Task task) {
 		if (task == null) {
 			throw new IllegalArgumentException("The task to send cannot be NULL!");
+		}
+
+		if (dbFileStorageEnabled) {
+			task.addData(TaskDataKey.DB_FILE_STORAGE_ENABLED.toString(), true);
+			task.setFileMetadataDTO(this.largeObjectService.saveLargeObject(task.getSourceFilePath()));
 		}
 
 		log.debug("Creating metrics message in Sender...");
