@@ -4,7 +4,7 @@ import com.docshifter.core.monitoring.dtos.NotificationDto;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;

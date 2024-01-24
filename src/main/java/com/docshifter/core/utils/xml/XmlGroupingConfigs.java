@@ -1,6 +1,6 @@
 package com.docshifter.core.utils.xml;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 import java.util.*;
 
 @XmlRootElement(name = "groupingConfigs")

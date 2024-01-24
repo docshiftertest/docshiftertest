@@ -22,8 +22,8 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,7 +59,7 @@ public class EmailServiceImpl implements EmailService {
             }
         }
         catch (Exception ex) {
-            log.error(String.format("Unknown exception: %s", ex.getMessage()), ex);
+            log.error("Unknown exception: %s".formatted(ex.getMessage()), ex);
         }
     }
 
@@ -263,10 +263,10 @@ public class EmailServiceImpl implements EmailService {
         if (notification.getAttachments() != null) {
             for (File attachment : notification.getAttachments()) {
                 try {
-                    log.debug(String.format("Adding attachment: %s", attachment.getName()));
+                    log.debug("Adding attachment: %s".formatted(attachment.getName()));
                     helper.addAttachment(attachment.getName(), attachment);
                 } catch (Exception ex) {
-                    log.error(String.format("Unknown exception: %s", ex.getMessage()), ex);
+                    log.error("Unknown exception: %s".formatted(ex.getMessage()), ex);
                     ex.printStackTrace();
                 }
             }

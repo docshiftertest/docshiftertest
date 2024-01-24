@@ -111,9 +111,9 @@ public class ModuleClassLoader {
                 context = createModuleContext(type);
             }
             bean = getBean(context, type);
-            if (bean != null && bean instanceof AbstractOperation
-                    && ((AbstractOperation) bean).cacheContext()) {
-                logger.debug(String.format("Caching Spring context for %s", name));
+            if (bean != null && bean instanceof AbstractOperation operation
+                    && operation.cacheContext()) {
+                logger.debug("Caching Spring context for %s".formatted(name));
                 contextCache.put(type, context);
             }
         } catch (Exception ex) {
@@ -128,7 +128,7 @@ public class ModuleClassLoader {
         AnnotationConfigApplicationContext moduleContext = new AnnotationConfigApplicationContext();
         moduleContext.setClassLoader(type.getClassLoader());
         moduleContext.setParent(ApplicationContextProvider.getApplicationContext());
-        logger.debug(String.format("Scanning package %s", packageName));
+        logger.debug("Scanning package %s".formatted(packageName));
         moduleContext.scan(packageName);
         moduleContext.refresh();
         logger.debug("Created module context");
@@ -140,7 +140,7 @@ public class ModuleClassLoader {
         try {
             bean = context.getBean(type);
         } catch (Exception ex) {
-            logger.warn(String.format("Cannot find bean of type %s", type.getName()));
+            logger.warn("Cannot find bean of type %s".formatted(type.getName()));
             logger.debug(ex);
         }
         return bean;

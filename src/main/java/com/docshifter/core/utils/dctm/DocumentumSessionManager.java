@@ -82,8 +82,8 @@ public class DocumentumSessionManager implements ISessionManager<IDfSession> {
 	}
 
 	public void release(IDfSession session) throws DfException {
-		if (session instanceof DctmSession) {
-			sMgr.release(((DctmSession)session).getSession());
+		if (session instanceof DctmSession dctmSession) {
+			sMgr.release(dctmSession.getSession());
 		} else {
 			sMgr.release(session);
 		}

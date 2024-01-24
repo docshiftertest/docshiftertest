@@ -257,8 +257,8 @@ public abstract class AbstractOperation extends ModuleOperation {
         	log.debug("operation is: {}", operation);
         }
 
-        if (operation instanceof AbstractOperation) {
-            return (AbstractOperation) operation;
+        if (operation instanceof AbstractOperation abstractOperation) {
+            return abstractOperation;
         } else {
             log.error("Incorrect operation [{}], please check your configuration", op);
             throw new EmptyOperationException();

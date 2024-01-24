@@ -5,8 +5,8 @@ import com.docshifter.core.monitoring.dtos.DbConfigurationItemDto;
 import com.docshifter.core.monitoring.dtos.NotificationDto;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -22,7 +22,7 @@ public class DbNotificationServiceTest extends AbstractSpringTest {
 
     private DbConfigurationItemDto configurationItem;
 
-   @Before
+   @BeforeEach
     public void setUp() {
        //TODO: Update when the metrics user and pass are finalized
        configurationItem = new DbConfigurationItemDto();

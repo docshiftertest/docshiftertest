@@ -100,8 +100,7 @@ public class FontsUtil {
             // To test 1 slide should use getSlides().get_item(index)
             ppt.getSlides().forEach(slide -> {
                 for (Object shape : slide.getShapes()) {
-                    if (shape instanceof IAutoShape) {
-                        IAutoShape autoShape = (IAutoShape) shape;
+                    if (shape instanceof IAutoShape autoShape) {
                         for (IParagraph paragraph : autoShape.getTextFrame().getParagraphs()) {
                             // you can read paragraph format options (margin, space, tab, etc..):
 //                        IParagraphFormatEffectiveData paragraphFormat = paragraph.getParagraphFormat().getEffective();

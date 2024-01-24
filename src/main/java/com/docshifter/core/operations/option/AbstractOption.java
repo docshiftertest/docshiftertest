@@ -349,8 +349,8 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 
 	protected boolean evaluateExpression(T result, String condition) {
 
-		if (result instanceof String) {
-			result = (T)((String)result).toUpperCase();
+		if (result instanceof String string) {
+			result = (T)string.toUpperCase();
 		}
 
 		StandardEvaluationContext context = new StandardEvaluationContext();
@@ -374,8 +374,8 @@ public abstract class AbstractOption<T> extends ModuleOperation {
 	public static AbstractOption<?> getOption(String op) throws EmptyOperationException {
 		ModuleOperation operation = ModuleOperation.getModuleOperation(op);
 
-		if (operation instanceof AbstractOption) {
-			return (AbstractOption<?>) operation;
+		if (operation instanceof AbstractOption abstractOption) {
+			return abstractOption;
 		} else {
 			log.error("Incorrect operation, please check your configuration");
 			throw new EmptyOperationException();

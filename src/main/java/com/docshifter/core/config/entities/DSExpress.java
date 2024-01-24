@@ -1,13 +1,14 @@
 package com.docshifter.core.config.entities;
 
+import io.hypersistence.utils.hibernate.type.json.JsonType;
+import jakarta.annotation.Nonnull;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
-import javax.annotation.Nonnull;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -32,7 +33,7 @@ public class DSExpress implements Serializable {
     @DiffIgnore
     private ChainConfiguration chainConfiguration;
 
-    @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
+    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private String parameterValues;
 

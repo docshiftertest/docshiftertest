@@ -33,7 +33,7 @@ public class MailConfigurationItemService extends AbstractConfigurationItemServi
 
     public void delete(long configurationId, long id) {
         Optional<MailConfigurationItem> entityOptional = repository.findById(id);
-        if (!entityOptional.isPresent()) {
+        if (entityOptional.isEmpty()) {
         	log.info("Just FYI, could not find MailConfigurationItem to delete for Id: " + id);
         }
         else {

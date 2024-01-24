@@ -1,8 +1,8 @@
 package com.docshifter.core.dctm;
 
 import com.docshifter.core.utils.dctm.DctmConnectionDetails;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class DctmConnectionDetailsTest {
 	@Test
@@ -10,9 +10,9 @@ public class DctmConnectionDetailsTest {
 		
 		DctmConnectionDetails details = DctmConnectionDetails.fromProperties("connDetailTest.properties");
 		
-		Assert.assertEquals("ThisIsTheRepo", details.getRepository());
-		Assert.assertEquals("ThisIsTheUsername", details.getUsername());
-		Assert.assertEquals("ThisIsThePassword", details.getPassword());
+		Assertions.assertEquals("ThisIsTheRepo", details.getRepository());
+		Assertions.assertEquals("ThisIsTheUsername", details.getUsername());
+		Assertions.assertEquals("ThisIsThePassword", details.getPassword());
 		
 		
 	}

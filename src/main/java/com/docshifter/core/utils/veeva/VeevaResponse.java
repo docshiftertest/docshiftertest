@@ -212,10 +212,9 @@ public class VeevaResponse {
 		log.debug("Into checkResponse...with Veeva Response: {}, Veeva User: {} and Veeva Password length: {}",
 				veevaResponse, veevaUser, (veevaPass == null) ? "NULL!" : veevaPass.length());
 		String responseStatus = SUCCESS;
-		if (veevaResponse instanceof VeevaBadResponse) {
+		if (veevaResponse instanceof VeevaBadResponse badResponse) {
 			log.debug("It's a BAD Response, go stand in the corner!");
 			// See if we have an expired session id
-			VeevaBadResponse badResponse  = (VeevaBadResponse) veevaResponse;
 			if (badResponse.getErrors() != null &&
 					badResponse.getErrors().size() == 1 &&
 					badResponse.getErrors().get(0).getType().equalsIgnoreCase("INVALID_SESSION_ID")) {

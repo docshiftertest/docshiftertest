@@ -1,18 +1,18 @@
 package com.docshifter.core.config.services;
 
 import com.docshifter.core.exceptions.DocShifterLicenseException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class NalpeironServiceTest {
 
     @MockBean

@@ -1,12 +1,12 @@
 package com.docshifter.core.config.services;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.availability.AvailabilityChangeEvent;
 import org.springframework.boot.availability.LivenessState;
 import org.springframework.context.ApplicationContext;
@@ -18,18 +18,18 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class HealthManagementServiceTest {
 
 	@Mock
@@ -38,7 +38,7 @@ public class HealthManagementServiceTest {
 	private ApplicationEventMulticaster appEventMulticaster;
 	private HealthManagementService sut;
 
-	@Before
+	@BeforeEach
 	public void before() {
 		sut = new HealthManagementService(appContext, appEventMulticaster);
 	}
@@ -168,7 +168,7 @@ public class HealthManagementServiceTest {
 	}
 
 	@Test
-	@Ignore("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
+	@Disabled("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
 	public void onAppReady_cancelOutDistinct_doesNotPublishEarlyEvents() {
 		sut.reportEvent(HealthManagementService.Event.MEMORY_SHORTAGE);
 		sut.resolveEvent(HealthManagementService.Event.MEMORY_SHORTAGE, "some data");
@@ -352,7 +352,7 @@ public class HealthManagementServiceTest {
 	}
 
 	@Test
-	@Ignore("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
+	@Disabled("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
 	public void resolveEvent_multipleDistinct_sameType_fixesAppState() {
 		fireOnAppReady();
 		sut.reportEvent(HealthManagementService.Event.MEMORY_SHORTAGE);
@@ -376,7 +376,7 @@ public class HealthManagementServiceTest {
 	}
 
 	@Test
-	@Ignore("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
+	@Disabled("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
 	public void resolveEvent_multipleDistinct_sameTypeNoData_fixesAppState() {
 		fireOnAppReady();
 		sut.reportEvent(HealthManagementService.Event.MEMORY_SHORTAGE, "some data");
@@ -399,7 +399,7 @@ public class HealthManagementServiceTest {
 	}
 
 	@Test
-	@Ignore("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
+	@Disabled("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
 	public void resolveEvent_multipleDistinct_sameTypeDifferentData_fixesAppState() {
 		fireOnAppReady();
 		sut.reportEvent(HealthManagementService.Event.MEMORY_SHORTAGE, "some data");
@@ -469,7 +469,7 @@ public class HealthManagementServiceTest {
 	}
 
 	@Test
-	@Ignore("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
+	@Disabled("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
 	public void getEventCount_distinct_one() {
 		fireOnAppReady();
 		sut.reportEvent(HealthManagementService.Event.MEMORY_SHORTAGE);
@@ -512,7 +512,7 @@ public class HealthManagementServiceTest {
 	}
 
 	@Test
-	@Ignore("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
+	@Disabled("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
 	public void containsData_overwriteWithMatch_returnsTrue() {
 		fireOnAppReady();
 		sut.reportEvent(HealthManagementService.Event.MEMORY_SHORTAGE);
@@ -521,7 +521,7 @@ public class HealthManagementServiceTest {
 	}
 
 	@Test
-	@Ignore("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
+	@Disabled("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
 	public void containsData_overwriteWithNoMatch_returnsFalse() {
 		fireOnAppReady();
 		sut.reportEvent(HealthManagementService.Event.MEMORY_SHORTAGE, "some data");
@@ -530,7 +530,7 @@ public class HealthManagementServiceTest {
 	}
 
 	@Test
-	@Ignore("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
+	@Disabled("No distinct health events exist at the moment (MEMORY_SHORTAGE was changed to non-distinct)")
 	public void containsData_overwriteEmpty_returnsFalse() {
 		fireOnAppReady();
 		sut.reportEvent(HealthManagementService.Event.MEMORY_SHORTAGE, "some data");

@@ -16,7 +16,6 @@ import com.docshifter.core.config.repositories.ModuleRepository;
 import com.docshifter.core.config.entities.Node;
 import com.docshifter.core.config.repositories.NodeRepository;
 import org.hibernate.HibernateException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +46,6 @@ public class ConfigurationService {
 	private IModuleConfigurationVersionSharedService moduleConfigurationVersionSharedService;
 
 
-	@Autowired
 	public ConfigurationService(NodeRepository nodeRepository,
 								ChainConfigurationRepository chainConfigurationRepository,
 								ModuleRepository moduleRepository,

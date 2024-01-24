@@ -95,27 +95,27 @@ public class ConfigurationConverter implements Serializable {
     }
 
     public AbstractConfigurationItemDto convertItemToDto(AbstractConfigurationItem entity) {
-        if (entity instanceof MailConfigurationItem) {
-            return mailConfigurationItemConverter.convertToDto((MailConfigurationItem) entity);
-        } else if (entity instanceof WebhookConfigurationItem) {
-            return webhookConfigurationItemConverter.convertToDto((WebhookConfigurationItem) entity);
-        } else if (entity instanceof SnmpConfigurationItem) {
-            return snmpConfigurationItemConverter.convertToDto((SnmpConfigurationItem) entity);
-        } else if (entity instanceof DbConfigurationItem) {
-            return dbConfigurationItemConverter.convertToDto((DbConfigurationItem) entity);
+        if (entity instanceof MailConfigurationItem item) {
+            return mailConfigurationItemConverter.convertToDto(item);
+        } else if (entity instanceof WebhookConfigurationItem item) {
+            return webhookConfigurationItemConverter.convertToDto(item);
+        } else if (entity instanceof SnmpConfigurationItem item) {
+            return snmpConfigurationItemConverter.convertToDto(item);
+        } else if (entity instanceof DbConfigurationItem item) {
+            return dbConfigurationItemConverter.convertToDto(item);
         }
         return null;
     }
 
     public void convertItemToDto(AbstractConfigurationItem entity, AbstractConfigurationItemDto dto) {
-        if (entity instanceof MailConfigurationItem && dto instanceof MailConfigurationItemDto) {
-            mailConfigurationItemConverter.convertToDto((MailConfigurationItem) entity, (MailConfigurationItemDto) dto);
-        } else if (entity instanceof WebhookConfigurationItem  && dto instanceof WebhookConfigurationItemDto) {
-            webhookConfigurationItemConverter.convertToDto((WebhookConfigurationItem) entity, (WebhookConfigurationItemDto) dto);
-        } else if (entity instanceof SnmpConfigurationItem && dto instanceof SnmpConfigurationItemDto) {
-            snmpConfigurationItemConverter.convertToDto((SnmpConfigurationItem) entity, (SnmpConfigurationItemDto) dto);
-        } else if (entity instanceof DbConfigurationItem && dto instanceof DbConfigurationItemDto) {
-            dbConfigurationItemConverter.convertToDto((DbConfigurationItem) entity, (DbConfigurationItemDto) dto);
+        if (entity instanceof MailConfigurationItem item && dto instanceof MailConfigurationItemDto itemDto) {
+            mailConfigurationItemConverter.convertToDto(item, itemDto);
+        } else if (entity instanceof WebhookConfigurationItem item  && dto instanceof WebhookConfigurationItemDto itemDto) {
+            webhookConfigurationItemConverter.convertToDto(item, itemDto);
+        } else if (entity instanceof SnmpConfigurationItem item && dto instanceof SnmpConfigurationItemDto itemDto) {
+            snmpConfigurationItemConverter.convertToDto(item, itemDto);
+        } else if (entity instanceof DbConfigurationItem item && dto instanceof DbConfigurationItemDto itemDto) {
+            dbConfigurationItemConverter.convertToDto(item, itemDto);
         }
     }
 
@@ -170,27 +170,27 @@ public class ConfigurationConverter implements Serializable {
     }
 
     public AbstractConfigurationItem convertItemToEntity(AbstractConfigurationItemDto dto) {
-        if (dto instanceof MailConfigurationItemDto) {
-            return mailConfigurationItemConverter.convertToEntity((MailConfigurationItemDto) dto);
-        } else if (dto instanceof WebhookConfigurationItemDto) {
-            return webhookConfigurationItemConverter.convertToEntity((WebhookConfigurationItemDto) dto);
-        } else if(dto instanceof SnmpConfigurationItemDto) {
-            return snmpConfigurationItemConverter.convertToEntity((SnmpConfigurationItemDto) dto);
-        } else if (dto instanceof  DbConfigurationItemDto) {
-            return dbConfigurationItemConverter.convertToEntity((DbConfigurationItemDto) dto);
+        if (dto instanceof MailConfigurationItemDto itemDto) {
+            return mailConfigurationItemConverter.convertToEntity(itemDto);
+        } else if (dto instanceof WebhookConfigurationItemDto itemDto) {
+            return webhookConfigurationItemConverter.convertToEntity(itemDto);
+        } else if(dto instanceof SnmpConfigurationItemDto itemDto) {
+            return snmpConfigurationItemConverter.convertToEntity(itemDto);
+        } else if (dto instanceof  DbConfigurationItemDto itemDto) {
+            return dbConfigurationItemConverter.convertToEntity(itemDto);
         }
         return null;
     }
 
     public void convertItemToEntity(AbstractConfigurationItemDto dto, AbstractConfigurationItem entity) {
-        if (entity instanceof MailConfigurationItem && dto instanceof MailConfigurationItemDto) {
-            mailConfigurationItemConverter.convertToEntity((MailConfigurationItemDto) dto, (MailConfigurationItem) entity);
-        } else if (entity instanceof WebhookConfigurationItem  && dto instanceof WebhookConfigurationItemDto) {
-            webhookConfigurationItemConverter.convertToEntity((WebhookConfigurationItemDto) dto, (WebhookConfigurationItem) entity);
-        } else if (entity instanceof SnmpConfigurationItem && dto instanceof SnmpConfigurationItemDto) {
-            snmpConfigurationItemConverter.convertToEntity((SnmpConfigurationItemDto) dto, (SnmpConfigurationItem) entity);
-        } else if (entity instanceof DbConfigurationItem && dto instanceof DbConfigurationItemDto) {
-            dbConfigurationItemConverter.convertToEntity((DbConfigurationItemDto) dto, (DbConfigurationItem) entity);
+        if (entity instanceof MailConfigurationItem item && dto instanceof MailConfigurationItemDto itemDto) {
+            mailConfigurationItemConverter.convertToEntity(itemDto, item);
+        } else if (entity instanceof WebhookConfigurationItem item  && dto instanceof WebhookConfigurationItemDto itemDto) {
+            webhookConfigurationItemConverter.convertToEntity(itemDto, item);
+        } else if (entity instanceof SnmpConfigurationItem item && dto instanceof SnmpConfigurationItemDto itemDto) {
+            snmpConfigurationItemConverter.convertToEntity(itemDto, item);
+        } else if (entity instanceof DbConfigurationItem item && dto instanceof DbConfigurationItemDto itemDto) {
+            dbConfigurationItemConverter.convertToEntity(itemDto, item);
         }
     }
 

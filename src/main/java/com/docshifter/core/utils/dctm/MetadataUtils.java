@@ -107,7 +107,7 @@ public class MetadataUtils {
 					try {
 						object.setRepeatingBoolean(name, i, DataUtils.tryParseBoolean(value));
 					} catch (ParseException e) {
-						throw new IllegalArgumentException(String.format("Value for %s can not be parsed to boolean", name));
+						throw new IllegalArgumentException("Value for %s can not be parsed to boolean".formatted(name));
 					}
 					break;
 				case IDfAttr.DM_DOUBLE:
@@ -225,8 +225,8 @@ public class MetadataUtils {
 			int i = document.getValueCount(attrName);
 			//no need to increment count = latest index
 			
-			if (attrValue instanceof Iterable) {
-				Iterator array = ((Iterable) attrValue).iterator();
+			if (attrValue instanceof Iterable iterable) {
+				Iterator array = iterable.iterator();
 				while (array.hasNext()) {
 					setRepeatingValue(document, document.getAttrDataType(attrName), attrName, i, array.next());
 					i++;
@@ -258,8 +258,8 @@ public class MetadataUtils {
 			
 			if (attrValue == null) {
 				setNull(document, document.getAttrDataType(attrName), attrName);
-			} else if (attrValue instanceof Iterable) {
-				setRepeatingValues(document, document.getAttrDataType(attrName), attrName, (Iterable) attrValue);
+			} else if (attrValue instanceof Iterable iterable) {
+				setRepeatingValues(document, document.getAttrDataType(attrName), attrName, iterable);
 				
 			} else if (attrValue.getClass().isArray()) {
 				
@@ -278,7 +278,7 @@ public class MetadataUtils {
 			if (continueWhenUnknown) {
 				return true;
 			} else {
-				throw new IllegalArgumentException(String.format("Attribute %s does not exist on type %s ", attrName, document.getString(MetadataConsts.OBJECT_TYPE)));
+				throw new IllegalArgumentException("Attribute %s does not exist on type %s ".formatted(attrName, document.getString(MetadataConsts.OBJECT_TYPE)));
 			}
 			
 		}
@@ -298,26 +298,26 @@ public class MetadataUtils {
 					try {
 						object.setBoolean(name, DataUtils.tryParseBoolean(value));
 					} catch (ParseException e) {
-						throw new IllegalArgumentException(String.format("Value for %s can not be parsed to boolean", name));
+						throw new IllegalArgumentException("Value for %s can not be parsed to boolean".formatted(name));
 					}
 				case IDfAttr.DM_DOUBLE:
-					if (value instanceof Double) {
-						object.setDouble(name, (Double) value);
-					} else if (value instanceof Integer) {
-						object.setDouble(name, (Integer) value);
-					} else if (value instanceof String && ((String) value).matches("[0-9.,]*")) {
-						object.setDouble(name, (Double.parseDouble((String) value)));
+					if (value instanceof Double d) {
+						object.setDouble(name, d);
+					} else if (value instanceof Integer i) {
+						object.setDouble(name, i);
+					} else if (value instanceof String str && str.matches("[0-9.,]*")) {
+						object.setDouble(name, (Double.parseDouble(str)));
 					} else {
-						throw new IllegalArgumentException(String.format("Failed to parse value %s for %s to double", value.toString(), name));
+						throw new IllegalArgumentException("Failed to parse value %s for %s to double".formatted(value.toString(), name));
 					}
 					break;
 				case IDfAttr.DM_INTEGER:
-					if (value instanceof Integer) {
-						object.setInt(name, (Integer) value);
-					} else if (value instanceof String && ((String) value).matches("[0-9]*")) {
-						object.setInt(name, (Integer.parseInt((String) value)));
+					if (value instanceof Integer i) {
+						object.setInt(name, i);
+					} else if (value instanceof String str && str.matches("[0-9]*")) {
+						object.setInt(name, (Integer.parseInt(str)));
 					} else {
-						throw new IllegalArgumentException(String.format("Failed to parse value %s for %s to integer", value.toString(), name));
+						throw new IllegalArgumentException("Failed to parse value %s for %s to integer".formatted(value.toString(), name));
 					}
 					break;
 				case IDfAttr.DM_STRING:
@@ -412,8 +412,7 @@ public class MetadataUtils {
 			throws DfException {
 		
 		Set<String> paths = new HashSet<>();
-		if (object instanceof IDfFolder) {
-			IDfFolder folder = (IDfFolder) object;
+		if (object instanceof IDfFolder folder) {
 			int pathCount = folder.getFolderPathCount();
 			for (int i = 0; i < pathCount; i++)
 				paths.add(folder.getFolderPath(i));

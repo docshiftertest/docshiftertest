@@ -2,8 +2,8 @@ package com.docshifter.core;
 
 import com.docshifter.core.utils.RoundRobinList;
 import lombok.extern.log4j.Log4j2;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -29,7 +29,7 @@ public class RoundRobinListTest {
         for (int i = 0; i < 6; i++) {
             var next = list.iterator().next();
             log.info(next);
-            Assert.assertTrue(mqUrlAddresses.contains(next));
+            Assertions.assertTrue(mqUrlAddresses.contains(next));
         }
     }
 

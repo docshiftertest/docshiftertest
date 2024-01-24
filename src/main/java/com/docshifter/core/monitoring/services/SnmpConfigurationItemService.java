@@ -31,7 +31,7 @@ public class SnmpConfigurationItemService extends AbstractConfigurationItemServi
 
     public void delete(long configurationId, long id) {
         Optional<SnmpConfigurationItem> entityOptional = repository.findById(id);
-        if (!entityOptional.isPresent()) {
+        if (entityOptional.isEmpty()) {
          	log.info("Just FYI, could not find SnmpConfigurationItem to delete for Id: " + id);
         }
         else {

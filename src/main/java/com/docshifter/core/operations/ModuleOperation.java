@@ -303,8 +303,8 @@ public abstract class ModuleOperation {
 	 */
 	private Optional<ModuleParam> extractModuleParamAnnotation(Annotation[] annotations) {
 		for (Annotation annie : annotations) {
-			if (annie instanceof ModuleParam) {
-				return Optional.of((ModuleParam) annie);
+			if (annie instanceof ModuleParam param) {
+				return Optional.of(param);
 			}
 		}
 		return Optional.empty();
@@ -416,8 +416,8 @@ public abstract class ModuleOperation {
 
 		if (obj == null) {
 			throw new EmptyOperationException("Module Loader returned null");
-		} else if (obj instanceof ModuleOperation) {
-			operation = (ModuleOperation) obj;
+		} else if (obj instanceof ModuleOperation moduleOperation) {
+			operation = moduleOperation;
 		} else {
 			logger.error("Incorrect operation, please check your configuration");
 			throw new EmptyOperationException();

@@ -2,9 +2,8 @@ package com.docshifter.core.monitoring.services;
 
 import com.docshifter.core.monitoring.dtos.NotificationDto;
 import com.docshifter.core.monitoring.dtos.WebhookConfigurationItemDto;
-import com.docshifter.core.monitoring.services.WebhookNotificationService;
 import com.docshifter.core.monitoring.utils.TemplateUtils;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -18,8 +17,8 @@ import java.util.Arrays;
  * Created by blazejm on 16.05.2017.
  */
 @Service
+@Log4j2
 public class WebhookNotificationServiceImpl implements WebhookNotificationService {
-    private static final Logger log = Logger.getLogger(com.docshifter.core.monitoring.services.WebhookNotificationServiceImpl.class.getName());
 
     @Autowired
     private RestTemplate restTemplate;
@@ -45,17 +44,17 @@ public class WebhookNotificationServiceImpl implements WebhookNotificationServic
                 log.info("sendNotification to rest API: " + webhookConfigItem.getUrl()
                         + "with message: " + notification.getMessage() + " successful");
             } else {
-                log.error(String.format("Status code %s returned with body %s", response.getStatusCode(), response.getBody()));
+                log.error("Status code {} returned with body {}", response.getStatusCode(), response.getBody());
             }
             
             
         } catch (HttpClientErrorException ex) {
-            log.error(String.format("Client exception: %s", ex.getMessage()), ex);
+            log.error("Client exception: {}", ex.getMessage(), ex);
             log.debug(ex.getResponseBodyAsString());
             
             ex.printStackTrace();
         }catch (Exception ex) {
-            log.error(String.format("Unknown exception: %s", ex.getMessage()), ex);
+            log.error("Unknown exception: {}", ex.getMessage(), ex);
     
             ex.printStackTrace();
         }

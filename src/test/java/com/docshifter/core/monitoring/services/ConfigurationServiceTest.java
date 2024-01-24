@@ -1,13 +1,13 @@
 package com.docshifter.core.monitoring.services;
 
 import com.docshifter.core.monitoring.dtos.ConfigurationDto;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Created by blazejm on 30.05.2017.

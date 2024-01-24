@@ -78,7 +78,7 @@ public class ConfigurationServiceImpl implements Serializable, ConfigurationServ
         log.info("getConfigurationItems for configurationId: {}", configurationId);
 
         Optional<Configuration> entity = configurationRepository.findById(configurationId);
-        if (!entity.isPresent()) {
+        if (entity.isEmpty()) {
             return new ArrayList<>();
         }
         List<AbstractConfigurationItemDto> dtos = configurationConverter.convertItemsToDtos(entity.get().getConfigurationItems());
