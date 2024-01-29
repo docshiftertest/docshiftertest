@@ -13,7 +13,9 @@ import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.TaskStatus;
 import com.docshifter.core.task.VeevaTask;
+import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.utils.NetworkUtils;
+import com.docshifter.core.work.WorkFolder;
 import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQMessage;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
@@ -22,8 +24,12 @@ import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
 import javax.jms.Message;
-import java.util.Collections;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -101,7 +107,8 @@ public class AMQPSender implements IMessageSender {
 				.hostName(NetworkUtils.getLocalHostName())
 				.senderPickedUp(System.currentTimeMillis())
 				.workflowName(chainConfiguration.getName())
-				.documentPathList(Collections.singletonList(task.getSourceFilePath()))
+				.documentPathList(List.of(copySourceFilePath(task)))
+				.workFolder(task.getWorkFolder())
 				.build();
 
 		log.debug("...about to send it...");
@@ -111,7 +118,8 @@ public class AMQPSender implements IMessageSender {
 		DocshifterMessage message = new DocshifterMessage(
 				type,
 				task,
-				chainConfiguration.getId());
+				chainConfiguration.getId()
+		);
 
 		log.debug("task.Id={}", task.getId());
 		log.debug("task.class={}", () -> task.getClass().getSimpleName());
@@ -176,6 +184,73 @@ public class AMQPSender implements IMessageSender {
 
 			return null;
 		}
+	}
+
+	/**
+	 * Copies the source file path for the {@link Task}
+	 * @param task the {@link Task} being processed
+	 * @return the path to the copied file or folder
+	 */
+	private String copySourceFilePath(Task task) {
+
+		String sourceFilePathCopy = null;
+
+		if (StringUtils.isBlank(task.getSourceFilePath())) {
+			log.debug("The sourceFilePath is empty for taskId: [{}].",
+					task.getId());
+			return sourceFilePathCopy;
+		}
+
+		File source = new File(task.getSourceFilePath());
+
+		if (!source.exists()) {
+			log.debug("The sourceFilePath does not exist for taskId: [{}].",
+					task.getId());
+			return sourceFilePathCopy;
+		}
+
+		WorkFolder workFolder = task.getWorkFolder();
+
+		try {
+
+			if (source.isDirectory()) {
+
+				File sourceCopy = workFolder.getNewFolderPath(source.getName()).toFile();
+
+				FileUtils.copyFolder(
+						source,
+						sourceCopy
+				);
+
+				log.warn("Folder copied to send to metrics for the taskId: [{}].", task.getId());
+
+				sourceFilePathCopy = sourceCopy.getAbsolutePath();
+			}
+			else {
+
+				String fileName = source.getName();
+
+				Path newFilePath = workFolder.getNewFilePath(
+						FileUtils.getNameWithoutExtension(fileName),
+						FileUtils.getExtension(fileName)
+				);
+
+				FileUtils.copyFile(
+						source,
+						newFilePath.toFile()
+				);
+
+				log.debug("The file was copied to send to metrics for the taskId: [{}].",
+						task.getId());
+
+				sourceFilePathCopy = newFilePath.toFile().getAbsolutePath();
+			}
+		}
+		catch(IOException ioe) {
+			log.warn("There was an error while coping the file to send to metrics.", ioe);
+		}
+
+		return sourceFilePathCopy;
 	}
 
 	@Override

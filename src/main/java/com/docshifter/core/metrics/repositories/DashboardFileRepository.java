@@ -1,5 +1,6 @@
 package com.docshifter.core.metrics.repositories;
 
+import com.docshifter.core.metrics.samples.FilePageCountDistributionSample;
 import com.docshifter.core.metrics.samples.FileSizeDistributionSample;
 import com.docshifter.core.metrics.samples.FileTypeDistributionSample;
 import com.docshifter.core.metrics.entities.DashboardFile;
@@ -21,6 +22,8 @@ FROM (SELECT dbf.file_name,
       FROM metrics.dashboard_file dbf
       INNER JOIN metrics.dashboard db ON dbf.task_id = db.task_id
       WHERE db.is_licensed = true
+             AND (dbf.page_count > 0 OR dbf.page_count IS NULL)
+             AND dbf.input = :isInput
              AND (db.workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
              AND db.on_message_hit BETWEEN :startDate AND :endDate) processed
 GROUP BY extension
@@ -28,7 +31,8 @@ ORDER BY extension""", nativeQuery = true) // Needs to be native because subquer
                                            // (yet)
     List<FileTypeDistributionSample> findAllFileTypeDistribution(@Param("workflowNameList") Set<String> workflowNameList,
                                                                  @Param("startDate") long startDate,
-                                                                 @Param("endDate") long endDate);
+                                                                 @Param("endDate") long endDate,
+                                                                 @Param("isInput") boolean isInput);
 
     @Query(value = """
 SELECT t.range[2], count(*)
@@ -43,6 +47,8 @@ FROM (SELECT dbf.file_name, CASE WHEN dbf.file_size < 100 THEN array['0', 'Small
       FROM metrics.dashboard_file dbf
       INNER JOIN metrics.dashboard db ON dbf.task_id = db.task_id
       WHERE db.is_licensed = true
+             AND (dbf.page_count > 0 OR dbf.page_count IS NULL)
+             AND dbf.input = :isInput
              AND (db.workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
              AND db.on_message_hit BETWEEN :startDate AND :endDate) t
 GROUP BY t.range
@@ -54,5 +60,30 @@ ORDER BY t.range""", nativeQuery = true) // Needs to be native because subquerie
                                          // arrays)
     List<FileSizeDistributionSample> findAllFileSizeDistribution(@Param("workflowNameList") Set<String> workflowNameList,
                                                                  @Param("startDate") long startDate,
-                                                                 @Param("endDate") long endDate);
+                                                                 @Param("endDate") long endDate,
+                                                                 @Param("isInput") boolean isInput);
+
+    @Query(
+            value = """
+SELECT
+    CASE WHEN processed.file_name = processed.ext THEN NULL
+        ELSE processed.ext
+    END as extension, sum(processed.page_count)
+FROM (SELECT dbf.file_name,
+             substring(dbf.file_name, '[^.]*$') as ext,
+             dbf.page_count as page_count
+      FROM metrics.dashboard_file dbf
+          INNER JOIN metrics.dashboard db ON dbf.task_id = db.task_id
+      WHERE db.is_licensed = true
+        AND (dbf.page_count > 0 OR dbf.page_count IS NULL)
+        AND dbf.input = :isInput
+        AND (db.workflow_name in (:workflowNameList) OR 'ALL' in (:workflowNameList))
+        AND db.on_message_hit BETWEEN :startDate AND :endDate) processed
+GROUP BY extension
+ORDER BY extension""", nativeQuery = true)
+    List<FilePageCountDistributionSample> findAllFilePageCountDistribution(@Param("workflowNameList") Set<String> workflowNameList,
+                                                                           @Param("startDate") long startDate,
+                                                                           @Param("endDate") long endDate,
+                                                                           @Param("isInput") boolean isInput);
+
 }
