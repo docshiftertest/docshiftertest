@@ -107,7 +107,12 @@ public class AMQPSender implements IMessageSender {
 				.hostName(NetworkUtils.getLocalHostName())
 				.senderPickedUp(System.currentTimeMillis())
 				.workflowName(chainConfiguration.getName())
-				.documentPathList(List.of(copySourceFilePath(task)))
+				.documentPathList(
+						FileUtils.copySourceFilePathToList(
+								task.getSourceFilePath(),
+								task.getWorkFolder()
+						)
+				)
 				.workFolder(task.getWorkFolder())
 				.build();
 
@@ -184,73 +189,6 @@ public class AMQPSender implements IMessageSender {
 
 			return null;
 		}
-	}
-
-	/**
-	 * Copies the source file path for the {@link Task}
-	 * @param task the {@link Task} being processed
-	 * @return the path to the copied file or folder
-	 */
-	private String copySourceFilePath(Task task) {
-
-		String sourceFilePathCopy = null;
-
-		if (StringUtils.isBlank(task.getSourceFilePath())) {
-			log.debug("The sourceFilePath is empty for taskId: [{}].",
-					task.getId());
-			return sourceFilePathCopy;
-		}
-
-		File source = new File(task.getSourceFilePath());
-
-		if (!source.exists()) {
-			log.debug("The sourceFilePath does not exist for taskId: [{}].",
-					task.getId());
-			return sourceFilePathCopy;
-		}
-
-		WorkFolder workFolder = task.getWorkFolder();
-
-		try {
-
-			if (source.isDirectory()) {
-
-				File sourceCopy = workFolder.getNewFolderPath(source.getName()).toFile();
-
-				FileUtils.copyFolder(
-						source,
-						sourceCopy
-				);
-
-				log.warn("Folder copied to send to metrics for the taskId: [{}].", task.getId());
-
-				sourceFilePathCopy = sourceCopy.getAbsolutePath();
-			}
-			else {
-
-				String fileName = source.getName();
-
-				Path newFilePath = workFolder.getNewFilePath(
-						FileUtils.getNameWithoutExtension(fileName),
-						FileUtils.getExtension(fileName)
-				);
-
-				FileUtils.copyFile(
-						source,
-						newFilePath.toFile()
-				);
-
-				log.debug("The file was copied to send to metrics for the taskId: [{}].",
-						task.getId());
-
-				sourceFilePathCopy = newFilePath.toFile().getAbsolutePath();
-			}
-		}
-		catch(IOException ioe) {
-			log.warn("There was an error while coping the file to send to metrics.", ioe);
-		}
-
-		return sourceFilePathCopy;
 	}
 
 	@Override

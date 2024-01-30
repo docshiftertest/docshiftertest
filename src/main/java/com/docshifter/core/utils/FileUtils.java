@@ -1,5 +1,6 @@
 package com.docshifter.core.utils;
 
+import com.docshifter.core.work.WorkFolder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.log4j.Log4j2;
@@ -7,6 +8,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nullable;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -41,6 +43,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.Objects.isNull;
 
 /**
  *
@@ -812,4 +816,81 @@ public final class FileUtils {
 
 		return !matchingLines.isEmpty();
 	}
+
+    /**
+     * Copies the folder/file from source path
+     * @param sourceFilePath the source path
+     * @param workFolder the {@link WorkFolder} to use
+     * @return a list with the path
+     */
+    public static List<String> copySourceFilePathToList(@Nullable String sourceFilePath,
+                                                        @Nullable WorkFolder workFolder) {
+
+        String sourceFilePathCopy = copySourceFilePath(sourceFilePath, workFolder);
+
+        return isNull(sourceFilePathCopy)
+                ? List.of()
+                : List.of(sourceFilePathCopy);
+    }
+
+    /**
+     * Copies the folder/file from source path
+     * @param sourceFilePath the source path
+     * @param workFolder the {@link WorkFolder} to use
+     * @return the string for the path of the copied source
+     */
+    public static String copySourceFilePath(@Nullable String sourceFilePath,
+                                            @Nullable WorkFolder workFolder) {
+
+        if (StringUtils.isBlank(sourceFilePath)
+                || checkFileExist(sourceFilePath)
+                || isNull(workFolder)) {
+            return null;
+        }
+
+        String sourceFilePathCopy = null;
+
+        File source = new File(sourceFilePath);
+
+        try {
+
+            if (source.isDirectory()) {
+
+                File sourceCopy = workFolder.getNewFolderPath(source.getName()).toFile();
+
+                FileUtils.copyFolder(
+                        source,
+                        sourceCopy
+                );
+
+                log.warn("The source folder [{}] was copied.", sourceFilePath);
+
+                sourceFilePathCopy = sourceCopy.getAbsolutePath();
+            }
+            else {
+
+                String fileName = source.getName();
+
+                Path newFilePath = workFolder.getNewFilePath(
+                        FileUtils.getNameWithoutExtension(fileName),
+                        FileUtils.getExtension(fileName)
+                );
+
+                FileUtils.copyFile(
+                        source,
+                        newFilePath.toFile()
+                );
+
+                log.debug("The source file [{}] was copied.", sourceFilePath);
+
+                sourceFilePathCopy = newFilePath.toFile().getAbsolutePath();
+            }
+        }
+        catch(IOException ioe) {
+            log.warn("There was an error while coping the source path.", ioe);
+        }
+
+        return sourceFilePathCopy;
+    }
+
 }
