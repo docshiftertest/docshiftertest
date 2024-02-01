@@ -114,12 +114,7 @@
             <artifactId>jakarta.mail-api</artifactId>
             <version>${jakarta-mail.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.icegreen</groupId>
-            <artifactId>greenmail-junit5</artifactId>
-            <version>${greenmail.version}</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
@@ -236,8 +231,22 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>
-            <!-- TODO: Bump to 2.0 once it's available! Since migrating from javax to jakarta it broke some of our tests... -->
+            <!-- TODO: Bump to 2.0 once it's available! Since migrating from javax to jakarta it broke some of our tests... after bumping remove the com.sun.mail dep  -->
             <version>1.6.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>${greenmail.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail-junit5</artifactId>
+            <version>${greenmail.version}</version>
             <scope>test</scope>
         </dependency>
 

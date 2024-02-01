@@ -6,18 +6,17 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetup;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import org.apache.commons.mail.util.MimeMessageParser;
+import jakarta.mail.BodyPart;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.mail.BodyPart;
-import jakarta.mail.Multipart;
-import jakarta.mail.Part;
-import jakarta.mail.Session;
-import jakarta.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -36,7 +35,7 @@ public class EmailServiceTest extends AbstractServiceTest {
     private EmailService emailService;
     
     @RegisterExtension
-    public final GreenMailExtension greenMail = new GreenMailExtension(new ServerSetup[]{ServerSetupTest.SMTP, ServerSetupTest.IMAP})
+    public static final GreenMailExtension greenMail = new GreenMailExtension(new ServerSetup[]{ServerSetupTest.SMTP, ServerSetupTest.IMAP})
             .withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication());
 
     private ClassLoader classLoader;
@@ -47,7 +46,6 @@ public class EmailServiceTest extends AbstractServiceTest {
         classLoader = getClass().getClassLoader();
         //greenMail = new GreenMail(ServerSetupTest.ALL);
         greenMail.setUser("blaze@localhost", "blaze@localhost", "secret");
-        greenMail.start();
         Session smtpSession = greenMail.getSmtp().createSession();
 
         mailConfigurationItem.setHost(smtpSession.getProperty("mail.smtp.host"));
