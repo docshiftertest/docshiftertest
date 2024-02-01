@@ -55,6 +55,7 @@
         <aspose.barcode.classifier>jdk18</aspose.barcode.classifier>
         <artemis.version>2.23.1</artemis.version>
         <greenmail.version>2.0.1</greenmail.version>
+        <jakarta-mail.version>2.1.2</jakarta-mail.version>
         <failBuildOnCVSS>8</failBuildOnCVSS>
     </properties>
 
@@ -109,21 +110,15 @@
         <!-- Needed for Artemis beans setup -->
 
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>1.4.7</version>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+            <version>${jakarta-mail.version}</version>
         </dependency>
         <dependency>
             <groupId>com.icegreen</groupId>
             <artifactId>greenmail-junit5</artifactId>
             <version>${greenmail.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

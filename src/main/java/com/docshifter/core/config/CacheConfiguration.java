@@ -1,12 +1,15 @@
 package com.docshifter.core.config;
 
 import lombok.extern.log4j.Log4j2;
-import net.sf.ehcache.CacheManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.JmsListener;
+
+import java.util.Objects;
 
 /**
  * @author Juan Marques created on 28/01/2021
@@ -28,9 +31,12 @@ public class CacheConfiguration {
 	 */
 	@JmsListener(destination = Constants.RELOAD_QUEUE, containerFactory = Constants.TOPIC_LISTENER)
 	@CacheEvict(value = Constants.SENDER_CONFIGURATION_CACHE, allEntries = true)
-	public void cacheCleaner() {
+	public void cacheCleaner(CacheManager cm) {
 		log.info("Cleaning cache config....");
-		CacheManager.ALL_CACHE_MANAGERS.forEach(CacheManager::clearAll);
+		cm.getCacheNames().stream()
+				.map(cm::getCache)
+				.filter(Objects::nonNull)
+				.forEach(Cache::clear);
 	}
 
 }
