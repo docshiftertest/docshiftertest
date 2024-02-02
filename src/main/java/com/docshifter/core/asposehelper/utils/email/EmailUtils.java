@@ -1,16 +1,25 @@
 package com.docshifter.core.asposehelper.utils.email;
 
-import com.docshifter.core.asposehelper.utils.image.ImageUtils;
-import com.aspose.email.*;
+import com.aspose.email.AlternateView;
+import com.aspose.email.ContentType;
+import com.aspose.email.HeaderCollection;
+import com.aspose.email.LinkedResource;
+import com.aspose.email.LinkedResourceCollection;
+import com.aspose.email.MailMessage;
+import com.aspose.pdf.Document;
+import com.aspose.pdf.HorizontalAlignment;
 import com.aspose.pdf.Rectangle;
-import com.aspose.pdf.*;
+import com.aspose.pdf.Stamp;
+import com.aspose.pdf.TextStamp;
+import com.aspose.pdf.VerticalAlignment;
 import com.aspose.pdf.facades.EncodingType;
 import com.aspose.pdf.facades.FormattedText;
+import com.docshifter.core.asposehelper.utils.image.ImageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import java.awt.Color;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

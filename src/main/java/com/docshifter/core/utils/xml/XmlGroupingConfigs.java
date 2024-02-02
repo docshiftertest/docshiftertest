@@ -1,7 +1,15 @@
 package com.docshifter.core.utils.xml;
 
-import javax.xml.bind.annotation.*;
-import java.util.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @XmlRootElement(name = "groupingConfigs")
 @XmlAccessorType(XmlAccessType.FIELD)

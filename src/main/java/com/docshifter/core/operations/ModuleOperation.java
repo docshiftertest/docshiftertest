@@ -2,8 +2,8 @@ package com.docshifter.core.operations;
 
 import com.docshifter.core.config.wrapper.ModuleWrapper;
 import com.docshifter.core.exceptions.EmptyOperationException;
-import com.docshifter.core.task.Task;
 import com.docshifter.core.operations.annotations.ModuleParam;
+import com.docshifter.core.task.Task;
 import com.docshifter.core.utils.ModuleClassLoader;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -13,7 +13,15 @@ import org.apache.log4j.Logger;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

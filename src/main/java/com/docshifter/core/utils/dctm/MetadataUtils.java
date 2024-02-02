@@ -1,7 +1,11 @@
 package com.docshifter.core.utils.dctm;
 
 
-import com.documentum.fc.client.*;
+import com.documentum.fc.client.IDfCollection;
+import com.documentum.fc.client.IDfFolder;
+import com.documentum.fc.client.IDfSession;
+import com.documentum.fc.client.IDfSysObject;
+import com.documentum.fc.client.IDfTypedObject;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfTime;
 import com.documentum.fc.common.IDfAttr;
@@ -9,7 +13,14 @@ import com.documentum.fc.common.IDfValue;
 import lombok.extern.log4j.Log4j2;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Log4j2
 public class MetadataUtils {
