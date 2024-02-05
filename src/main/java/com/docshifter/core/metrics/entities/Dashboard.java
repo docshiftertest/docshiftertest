@@ -1,6 +1,7 @@
 package com.docshifter.core.metrics.entities;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,9 +16,10 @@ import java.util.List;
  */
 @Entity
 @Getter
-@Setter // these do Gets and Sets automatically
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Dashboard {
 
     @Id

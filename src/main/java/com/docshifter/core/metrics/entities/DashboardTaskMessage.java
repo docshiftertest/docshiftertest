@@ -1,6 +1,7 @@
 package com.docshifter.core.metrics.entities;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,11 +13,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.SequenceGenerator;
 
 /**
  * Created by Julian Isaac on 02.08.2021
  */
+@Builder
 @Entity
 @Getter
 @Setter // these do Gets and Sets automatically
