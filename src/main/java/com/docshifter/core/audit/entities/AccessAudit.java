@@ -27,13 +27,11 @@ public class AccessAudit{
     private String details;
     private String oldValue;
     private String newValue;
-    private String eventType;
 
-    public AccessAudit(UUID id, String username, long eventDateTime, String details, String eventType) {
+    public AccessAudit(UUID id, String username, long eventDateTime, String details) {
         this.id = id;
         this.username = username;
         this.eventDateTime = eventDateTime;
         this.details = details;
-        this.eventType = eventType;
     }
 }
