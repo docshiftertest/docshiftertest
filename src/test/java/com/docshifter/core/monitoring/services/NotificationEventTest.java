@@ -66,7 +66,7 @@ public class NotificationEventTest extends AbstractSpringTest {
 	private ConfigurationDto configuration;
 
 	@RegisterExtension
-	public final GreenMailExtension greenMail = new GreenMailExtension(new ServerSetup[]{ServerSetupTest.SMTP, ServerSetupTest.IMAP})
+	static final GreenMailExtension greenMail = new GreenMailExtension(new ServerSetup[]{new ServerSetup(0, null, ServerSetup.PROTOCOL_SMTP), new ServerSetup(0, null, ServerSetup.PROTOCOL_IMAP)})
 			.withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication());
 
 	@Test

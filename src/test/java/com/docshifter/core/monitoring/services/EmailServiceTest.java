@@ -33,9 +33,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class EmailServiceTest extends AbstractServiceTest {
     @Autowired
     private EmailService emailService;
-    
+
     @RegisterExtension
-    public static final GreenMailExtension greenMail = new GreenMailExtension(new ServerSetup[]{ServerSetupTest.SMTP, ServerSetupTest.IMAP})
+    static final GreenMailExtension greenMail = new GreenMailExtension(new ServerSetup[]{new ServerSetup(0, null, ServerSetup.PROTOCOL_SMTP), new ServerSetup(0, null, ServerSetup.PROTOCOL_IMAP)})
             .withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication());
 
     private ClassLoader classLoader;
