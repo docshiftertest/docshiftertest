@@ -107,25 +107,25 @@ public class NotificationServiceImpl implements Serializable, NotificationServic
 			return;
 		}
 
-        if (item instanceof MailConfigurationItemDto) {
+        if (item instanceof MailConfigurationItemDto dto) {
         	log.debug("Sending email notification(s)... item Id: {} Item Type: {}",
 					item.getId(), item.getType());
-            sendEmails((MailConfigurationItemDto)item, notification);
+            sendEmails(dto, notification);
         }
-        if (item instanceof WebhookConfigurationItemDto) {
+        if (item instanceof WebhookConfigurationItemDto dto) {
         	log.debug("Sending webhook notification(s)... item Id: {} Item Type: {}",
 					item.getId(), item.getType());
-        	sendWebhookNotifications((WebhookConfigurationItemDto)item, notification);
+        	sendWebhookNotifications(dto, notification);
         }
-        if (item instanceof SnmpConfigurationItemDto) {
+        if (item instanceof SnmpConfigurationItemDto dto) {
         	log.debug("Sending snmp notification(s)... Item Id: {} Item Type: {}",
 					item.getId(), item.getType());
-            sendSnmpNotifications((SnmpConfigurationItemDto)item, notification);
+            sendSnmpNotifications(dto, notification);
         }
-        if (item instanceof DbConfigurationItemDto) {
+        if (item instanceof DbConfigurationItemDto dto) {
         	log.debug("Sending db notification(s)... Item Id: {} Item Type: {}",
 					item.getId(), item.getType());
-        	sendDbNotifications((DbConfigurationItemDto)item, notification);
+        	sendDbNotifications(dto, notification);
         }
     }
 

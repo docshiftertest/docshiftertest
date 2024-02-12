@@ -3,9 +3,10 @@ package com.docshifter.core.dctm;
 import com.docshifter.core.utils.dctm.*;
 import com.documentum.fc.client.IDfSysObject;
 import com.documentum.fc.common.DfId;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
 import java.util.Arrays;
 import java.util.Map;
 
@@ -18,20 +19,20 @@ public class DataUtilsTest {
     @Test
     public void testQueryInterpretation() {
 		FieldInfo fieldInfo = DataUtils.extractFieldInfo("dm_user.description(dm_document.authors=dm_user.user_name)");
-        Assert.assertEquals("dm_user.description", fieldInfo.getFieldDefinition());
-        Assert.assertEquals("dm_user.description", fieldInfo.getReturnName());
-		Assert.assertEquals("dm_document.authors=dm_user.user_name", fieldInfo.getClause());
+        Assertions.assertEquals("dm_user.description", fieldInfo.getFieldDefinition());
+        Assertions.assertEquals("dm_user.description", fieldInfo.getReturnName());
+		Assertions.assertEquals("dm_document.authors=dm_user.user_name", fieldInfo.getClause());
 	
 		fieldInfo = DataUtils.extractFieldInfo("object_name");
-		Assert.assertEquals("object_name", fieldInfo.getFieldDefinition());
-		Assert.assertEquals("object_name", fieldInfo.getReturnName());
-		Assert.assertEquals("", fieldInfo.getClause());
+		Assertions.assertEquals("object_name", fieldInfo.getFieldDefinition());
+		Assertions.assertEquals("object_name", fieldInfo.getReturnName());
+		Assertions.assertEquals("", fieldInfo.getClause());
 		
 	
 	
 	
-		Assert.assertEquals("dm_document", DataUtils.getObjectTypeFromFieldDef("dm_document.authors"));
-		Assert.assertEquals("dm_user", DataUtils.getObjectTypeFromFieldDef("dm_user.user_name"));
+		Assertions.assertEquals("dm_document", DataUtils.getObjectTypeFromFieldDef("dm_document.authors"));
+		Assertions.assertEquals("dm_user", DataUtils.getObjectTypeFromFieldDef("dm_user.user_name"));
 
     
     }
@@ -44,17 +45,17 @@ public class DataUtilsTest {
 	
 		FieldInfo fieldInfo = DataUtils.extractFieldInfo(field);
 
-        Assert.assertEquals("dm_user.description", fieldInfo.getFieldDefinition());
-        Assert.assertEquals("creator.description", fieldInfo.getReturnName());
-        Assert.assertEquals("dm_document.r_creator_name=dm_user.user_name", fieldInfo.getClause());
+        Assertions.assertEquals("dm_user.description", fieldInfo.getFieldDefinition());
+        Assertions.assertEquals("creator.description", fieldInfo.getReturnName());
+        Assertions.assertEquals("dm_document.r_creator_name=dm_user.user_name", fieldInfo.getClause());
 	
-		Assert.assertEquals("dm_document", DataUtils.getObjectTypeFromFieldDef("dm_document.r_creator_name"));
-		Assert.assertEquals("dm_user", DataUtils.getObjectTypeFromFieldDef("dm_user.user_name"));
+		Assertions.assertEquals("dm_document", DataUtils.getObjectTypeFromFieldDef("dm_document.r_creator_name"));
+		Assertions.assertEquals("dm_user", DataUtils.getObjectTypeFromFieldDef("dm_user.user_name"));
 	
 	
 	}
 
-	@Ignore("There's no Dctm repo to talk to right now")
+	@Disabled("There's no Dctm repo to talk to right now")
     @Test
     public void getValuesByQuery() throws Exception {
         String fieldQuery = "dm_user.user_address|author.mail(dm_document.authors=dm_user.user_name)";
@@ -69,7 +70,7 @@ public class DataUtilsTest {
         }
     }
 
-	@Ignore("There's no Dctm repo to talk to right now")
+	@Disabled("There's no Dctm repo to talk to right now")
     @Test
     public void getData() throws Exception {
     	try (DctmSession session = DctmSessionUtils.getInstance().createSession( DctmConnectionDetails.fromProperties("repoTest.properties"))) {

@@ -292,10 +292,10 @@ public class DataUtils {
 	}
 
 	protected static Boolean tryParseBoolean(Object value) throws ParseException {
-		if (value instanceof Boolean) {
-			return (Boolean) value;
-		} else if (value instanceof String) {
-			return Boolean.parseBoolean((String) value);
+		if (value instanceof Boolean bool) {
+			return bool;
+		} else if (value instanceof String string) {
+			return Boolean.parseBoolean(string);
 		} else {
 			throw new ParseException("Value can not be parsed to boolean", 0);
 		}

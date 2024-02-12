@@ -31,7 +31,7 @@ public class DbConfigurationItemService extends AbstractConfigurationItemService
 
     public void delete(long configurationId, long id) {
         Optional<DbConfigurationItem> entityOptional = repository.findById(id);
-        if (!entityOptional.isPresent()) {
+        if (entityOptional.isEmpty()) {
          	log.info("Just FYI, could not find DbConfigurationItem to delete for Id: " + id);
         }
         else {

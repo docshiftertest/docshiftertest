@@ -12,7 +12,7 @@ public abstract class EurekaAware implements SmartLifecycle {
 	}
 
 	/**
-	 * Do not use the {@link EurekaClient} in a {@link javax.annotation.PostConstruct} method or in a
+	 * Do not use the {@link EurekaClient} in a {@link jakarta.annotation.PostConstruct} method or in a
 	 * {@link org.springframework.scheduling.annotation.Scheduled} method (or anywhere where the
 	 * {@link org.springframework.context.ApplicationContext} might not be started yet). It is initialized in a
 	 * {@link SmartLifecycle} (with {@code phase=0}), so the earliest you can rely on it being available is in

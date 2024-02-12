@@ -25,6 +25,7 @@ import org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
+import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
@@ -41,7 +42,7 @@ import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import javax.jms.ConnectionFactory;
+import jakarta.jms.ConnectionFactory;
 import javax.sql.DataSource;
 import java.util.List;
 
@@ -185,7 +186,7 @@ public class DocShifterConfiguration {
 		// the JMS connection might be perfectly recoverable
 
 		// This one arose sporadically in a NVS PROD environment (DPS-447)
-		if (t instanceof javax.jms.IllegalStateException && "Session is closed".equals(t.getMessage())) {
+		if (t instanceof jakarta.jms.IllegalStateException && "Session is closed".equals(t.getMessage())) {
 			log.error("Caught an unrecoverable error related to the message queue:", t);
 			healthManagementService.reportEvent(HealthManagementService.Event.CRITICAL_MQ_ERROR);
 		} else {
@@ -278,6 +279,7 @@ public class DocShifterConfiguration {
 	}
 
 	@Bean
+	@DependsOnDatabaseInitialization
 	public DataSourceHealthIndicator dataSourceHealthIndicator(DataSource dataSource) {
 		return new DataSourceHealthIndicator(dataSource);
 	}

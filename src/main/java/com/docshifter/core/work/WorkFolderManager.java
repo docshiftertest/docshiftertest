@@ -4,7 +4,6 @@ import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.services.GeneralConfigService;
 import com.docshifter.core.utils.FileUtils;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.naming.ConfigurationException;
 import java.io.File;
@@ -26,7 +25,6 @@ public class WorkFolderManager {
 	private Path errorfolder;
 	private final ScheduledExecutorService scheduler;
 
-	@Autowired
 	public WorkFolderManager(GeneralConfigService generalConfiguration, ScheduledExecutorService scheduler) throws ConfigurationException {
 		this.scheduler = scheduler;
 		String applicationName = System.getProperty("program.name");

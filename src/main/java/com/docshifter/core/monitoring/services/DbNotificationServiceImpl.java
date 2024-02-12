@@ -24,10 +24,10 @@ public class DbNotificationServiceImpl implements DbNotificationService {
     @Override
     public void sendNotification(DbConfigurationItemDto dbConfigurationItem, NotificationDto notification) throws SQLException {
 
-        String insertTableSQL = String.format("INSERT INTO %s"
-                + "(timestamp, level, task_id, message, attachments) VALUES"
-                + "(?,?,?,?,?)",
-                dbConfigurationItem.getTableName());
+        String insertTableSQL = ("INSERT INTO %s"
+				+ "(timestamp, level, task_id, message, attachments) VALUES"
+				+ "(?,?,?,?,?)").formatted(
+				dbConfigurationItem.getTableName());
 
         try (Connection dbConnection = getDBConnection(dbConfigurationItem);
              PreparedStatement preparedStatement = dbConnection.prepareStatement(insertTableSQL)) {

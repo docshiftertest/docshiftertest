@@ -3,12 +3,12 @@ package com.docshifter.core.dctm;
 import com.docshifter.core.utils.dctm.DctmConnectionDetails;
 import com.docshifter.core.utils.dctm.DctmSession;
 import com.docshifter.core.utils.dctm.DctmSessionUtils;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class DctmSessionUtilsTest {
-	@Ignore("There's no Dctm repo to talk to right now")
+	@Disabled("There's no Dctm repo to talk to right now")
 	@Test
 	public void createSession() throws Exception {
 		DctmSession session = null;
@@ -16,14 +16,14 @@ public class DctmSessionUtilsTest {
 		try {
 			session = DctmSessionUtils.getInstance().createSession(DctmConnectionDetails.fromProperties("repoTest.properties"));
 			
-			Assert.assertNotNull(session);
-			Assert.assertTrue(session.isConnected());
+			Assertions.assertNotNull(session);
+			Assertions.assertTrue(session.isConnected());
 		} finally {
 			if (session != null)
 				session.close();
 		}
 		
-		Assert.assertNotNull(session);
-		Assert.assertFalse(session.isConnected());
+		Assertions.assertNotNull(session);
+		Assertions.assertFalse(session.isConnected());
 	}
 }

@@ -5,7 +5,6 @@ import com.docshifter.core.config.Constants;
 import com.docshifter.core.config.entities.GlobalSettings;
 import com.docshifter.core.config.repositories.GlobalSettingsRepository;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +33,6 @@ public class GeneralConfigService {
 	 *
 	 * @param globalSettingsRepository
 	 */
-	@Autowired
 	public GeneralConfigService(GlobalSettingsRepository globalSettingsRepository) {
 		params = new HashMap<>();
 

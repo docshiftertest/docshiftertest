@@ -4,8 +4,8 @@ import com.docshifter.core.AbstractSpringTest;
 import com.docshifter.core.monitoring.dtos.NotificationDto;
 import com.docshifter.core.monitoring.dtos.WebhookConfigurationItemDto;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -32,11 +32,11 @@ public class WebhookNotificationServiceTest extends AbstractSpringTest {
 
     private WebhookConfigurationItemDto webhookConfigItem;
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         mockServer = MockRestServiceServer.createServer(restTemplate);
         mockServer.expect(requestTo(url))
-                .andRespond(MockRestResponseCreators.withSuccess("{ \"result\" : \"OK\"}", MediaType.APPLICATION_JSON_UTF8));
+                .andRespond(MockRestResponseCreators.withSuccess("{ \"result\" : \"OK\"}", MediaType.APPLICATION_JSON));
 
         webhookConfigItem = new WebhookConfigurationItemDto();
         webhookConfigItem.setUrl(url);

@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
-import javax.jms.Message;
+import jakarta.jms.Message;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;

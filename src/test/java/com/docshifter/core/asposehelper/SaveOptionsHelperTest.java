@@ -4,9 +4,9 @@ import com.aspose.email.MailMessageSaveType;
 import com.aspose.tasks.SaveFileFormat;
 import com.aspose.words.SaveFormat;
 import com.docshifter.core.asposehelper.SaveOptionsHelper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SaveOptionsHelperTest {
 

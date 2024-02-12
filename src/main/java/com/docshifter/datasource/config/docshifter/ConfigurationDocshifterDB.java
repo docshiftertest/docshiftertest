@@ -1,11 +1,11 @@
 package com.docshifter.datasource.config.docshifter;
 
+import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
-import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -40,7 +40,7 @@ public class ConfigurationDocshifterDB {
     private String secondLevelCache;
     @Value("${spring.jpa.properties.hibernate.cache.region.factory_class}")
     private String cacheRegionFactory;
-    @Value("${spring.jpa.properties.javax.persistence.sharedCache.mode}")
+    @Value("${spring.jpa.properties.jakarta.persistence.sharedCache.mode}")
     private String sharedCacheMode;
     @Value("${spring.jpa.properties.hibernate.cache.ehcache.missing_cache_strategy}")
     private String missingCacheStrat;
@@ -72,7 +72,7 @@ public class ConfigurationDocshifterDB {
 
         properties.setProperty(Environment.DIALECT, dialect);
         properties.setProperty(Environment.DEFAULT_SCHEMA, defaultSchema);
-        properties.put(Environment.PHYSICAL_NAMING_STRATEGY, SpringPhysicalNamingStrategy.class.getName());
+        properties.put(Environment.PHYSICAL_NAMING_STRATEGY, CamelCaseToUnderscoresNamingStrategy.class.getName());
         properties.put(Environment.IMPLICIT_NAMING_STRATEGY, SpringImplicitNamingStrategy.class.getName());
         properties.put( Environment.USE_SECOND_LEVEL_CACHE, secondLevelCache);
 

@@ -3,8 +3,8 @@ package com.docshifter.core.monitoring.entities;
 import com.docshifter.core.monitoring.enums.ConfigurationTypes;
 import com.docshifter.core.security.Encrypted;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 /**
  * Created by blazejm on 29.09.2017.

@@ -4,12 +4,12 @@ import com.docshifter.core.AbstractSpringTest;
 import com.docshifter.core.monitoring.dtos.DbConfigurationItemDto;
 import com.docshifter.core.monitoring.entities.DbConfigurationItem;
 import com.docshifter.core.monitoring.mappings.DbConfigurationItemConverter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class DbConfigItemServiceTest extends AbstractSpringTest {
     @Autowired
@@ -20,7 +20,7 @@ public class DbConfigItemServiceTest extends AbstractSpringTest {
 
     private DbConfigurationItemDto configurationItem;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         configurationItem = new DbConfigurationItemDto();
         configurationItem.setDriver("org.hsqldb.jdbc.JDBCDriver");

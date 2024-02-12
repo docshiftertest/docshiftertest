@@ -59,7 +59,7 @@ public class SnmpNotificationServiceImpl implements SnmpNotificationService {
             log.info("sendNotification to: " + snmpConfigurationItem.getIpAddress()
                     + " with message: " + notification.getMessage() + " successful");
         } catch (Exception ex) {
-            log.error(String.format("Unknown exception: %s", ex.getMessage()), ex);
+            log.error("Unknown exception: %s".formatted(ex.getMessage()), ex);
             ex.printStackTrace();
         }
     }

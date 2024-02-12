@@ -9,8 +9,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -31,7 +31,7 @@ public abstract class AbstractConfigurationItemService
         log.info("getById with Id: " + configurationId + " and id: " + id);
 
         Optional<Configuration> configurationOptional = getConfigurationById(configurationId);
-        if (!configurationOptional.isPresent()) {
+        if (configurationOptional.isEmpty()) {
         	log.error("Could not get Configuration for Id: " + configurationId);
         	return null;
         }
@@ -71,7 +71,7 @@ public abstract class AbstractConfigurationItemService
         log.info("update with configurationId: " + configurationId + " and id: " + id);
 
         Optional<Configuration> configurationOptional = getConfigurationById(configurationId);
-        if (!configurationOptional.isPresent()) {
+        if (configurationOptional.isEmpty()) {
         	log.error("Could not find Configuration for Id: " + configurationId);
         	return null;
         }
@@ -102,8 +102,8 @@ public abstract class AbstractConfigurationItemService
             return (TEntity) abstractEntity;
         } catch (Exception ex) {
             throw new IllegalArgumentException(
-                    String.format("Wrong configuration item type: %s",
-                            abstractEntity.getClass().getSimpleName()), ex);
+					"Wrong configuration item type: %s".formatted(
+							abstractEntity.getClass().getSimpleName()), ex);
         }
     }
 }

@@ -17,49 +17,44 @@ public class ConfigurationController {
     @Autowired
     private ConfigurationService configurationService;
 
-    @RequestMapping(path = "/configurations/{id}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            method = RequestMethod.GET)
+    @GetMapping(path = "/configurations/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ConfigurationDto getById(
-            @PathVariable("id") long id
+            @PathVariable long id
     ) {
         return configurationService.getById(id);
     }
 
-    @RequestMapping(path = "/configurations",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            method = RequestMethod.GET)
+    @GetMapping(path = "/configurations",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ConfigurationDto> getAll(
     ) {
         return configurationService.getAll();
     }
 
-    @RequestMapping(path = "/configurations",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            method = RequestMethod.POST)
+    @PostMapping(path = "/configurations",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ConfigurationDto addConfiguration(
             @RequestBody ConfigurationDto body
     ) {
         return configurationService.addConfiguration(body);
     }
 
-    @RequestMapping(path = "/configurations/{id}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            method = RequestMethod.PUT)
+    @PutMapping(path = "/configurations/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ConfigurationDto updateConfiguration(
-            @PathVariable("id") long id,
+            @PathVariable long id,
             @RequestBody ConfigurationDto body
     ) {
         return configurationService.updateConfiguration(id, body);
     }
 
-    @RequestMapping(path = "/configurations/{id}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            method = RequestMethod.DELETE)
+    @DeleteMapping(path = "/configurations/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public void deleteConfiguration(
-            @PathVariable("id") long id
+            @PathVariable long id
     ) {
         configurationService.deleteConfiguration(id);
     }

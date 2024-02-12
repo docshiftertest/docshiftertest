@@ -45,24 +45,24 @@ public class ExplicitDestinationTransformer {
 			throw new NullPointerException("Destination cannot be null.");
 		}
 
-		if (dest instanceof CustomExplicitDestination) {
-			return new ExplicitDestinationTransformer((CustomExplicitDestination) dest);
-		} else if (dest instanceof FitBExplicitDestination) {
-			return new ExplicitDestinationTransformer((FitBExplicitDestination) dest);
-		} else if (dest instanceof FitBHExplicitDestination) {
-			return new ExplicitDestinationTransformer((FitBHExplicitDestination) dest);
-		} else if (dest instanceof FitBVExplicitDestination) {
-			return new ExplicitDestinationTransformer((FitBVExplicitDestination) dest);
-		} else if (dest instanceof FitExplicitDestination) {
-			return new ExplicitDestinationTransformer((FitExplicitDestination) dest);
-		} else if (dest instanceof FitRExplicitDestination) {
-			return new ExplicitDestinationTransformer((FitRExplicitDestination) dest);
-		} else if (dest instanceof FitHExplicitDestination) {
-			return new ExplicitDestinationTransformer((FitHExplicitDestination) dest);
-		} else if (dest instanceof FitVExplicitDestination) {
-			return new ExplicitDestinationTransformer((FitVExplicitDestination) dest);
-		} else if (dest instanceof XYZExplicitDestination) {
-			return new ExplicitDestinationTransformer((XYZExplicitDestination) dest);
+		if (dest instanceof CustomExplicitDestination destination) {
+			return new ExplicitDestinationTransformer(destination);
+		} else if (dest instanceof FitBExplicitDestination destination) {
+			return new ExplicitDestinationTransformer(destination);
+		} else if (dest instanceof FitBHExplicitDestination destination) {
+			return new ExplicitDestinationTransformer(destination);
+		} else if (dest instanceof FitBVExplicitDestination destination) {
+			return new ExplicitDestinationTransformer(destination);
+		} else if (dest instanceof FitExplicitDestination destination) {
+			return new ExplicitDestinationTransformer(destination);
+		} else if (dest instanceof FitRExplicitDestination destination) {
+			return new ExplicitDestinationTransformer(destination);
+		} else if (dest instanceof FitHExplicitDestination destination) {
+			return new ExplicitDestinationTransformer(destination);
+		} else if (dest instanceof FitVExplicitDestination destination) {
+			return new ExplicitDestinationTransformer(destination);
+		} else if (dest instanceof XYZExplicitDestination destination) {
+			return new ExplicitDestinationTransformer(destination);
 		} else {
 			throw new IllegalArgumentException("Explicit destination subtype " + dest.getClass().getName() + " is not " +
 					"supported.");
