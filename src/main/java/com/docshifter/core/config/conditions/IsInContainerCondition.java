@@ -1,12 +1,12 @@
 package com.docshifter.core.config.conditions;
 
+import jakarta.annotation.Nonnull;
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
-import javax.annotation.Nonnull;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 

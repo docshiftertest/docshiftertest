@@ -1,6 +1,6 @@
 package com.docshifter.core;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class BeansApplicationTest extends AbstractSpringTest {
 	@Test

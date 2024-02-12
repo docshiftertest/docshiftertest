@@ -3,7 +3,7 @@
  */
 package com.docshifter.core.security;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
@@ -38,9 +38,7 @@ public class EncryptionBeanPostProcessor implements BeanPostProcessor {
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 
-		if (bean instanceof EntityManagerFactory) {
-
-			EntityManagerFactory entityManagerFactory = (EntityManagerFactory) bean;
+		if (bean instanceof EntityManagerFactory entityManagerFactory) {
 
 			SessionFactoryImplementor sessionFactoryImpl = entityManagerFactory.unwrap(SessionFactoryImplementor.class);
 

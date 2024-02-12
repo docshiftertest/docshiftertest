@@ -7,8 +7,8 @@ import com.docshifter.core.monitoring.dtos.MailConfigurationItemDto;
 import com.docshifter.core.monitoring.dtos.SnmpConfigurationItemDto;
 import com.docshifter.core.monitoring.dtos.WebhookConfigurationItemDto;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
@@ -31,7 +31,7 @@ public abstract class AbstractServiceTest extends AbstractSpringTest {
     @Autowired
     protected ModuleConfigurationVersionRepository moduleConfigurationVersionRepository;
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         mailConfigurationItem = new MailConfigurationItemDto();
         mailConfigurationItem.setToAddresses("test1@email.com, test2@email.com");
@@ -72,7 +72,7 @@ public abstract class AbstractServiceTest extends AbstractSpringTest {
         ));
     }
 
-    @After
+    @AfterEach
     public void clearDown() {
     	List<ConfigurationDto> configs = configurationService.getAll();
     	configs.forEach(config -> configurationService.deleteConfiguration(config.getId()));

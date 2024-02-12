@@ -4,10 +4,12 @@ import com.docshifter.core.monitoring.dtos.WebhookConfigurationItemDto;
 import com.docshifter.core.monitoring.services.WebhookConfigurationItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -19,45 +21,41 @@ public class WebhookController {
     @Autowired
     private WebhookConfigurationItemService webhookService;
 
-    @RequestMapping(path = "/configurations/{configurationId}/webhooks/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.GET)
+    @GetMapping(path = "/configurations/{configurationId}/webhooks/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public WebhookConfigurationItemDto getById(
-            @PathVariable("configurationId") long configurationId,
-            @PathVariable("id") long id
+            @PathVariable long configurationId,
+            @PathVariable long id
     ) {
         return webhookService.getById(configurationId, id);
     }
 
-    @RequestMapping(path = "/configurations/{configurationId}/webhooks",
+    @PostMapping(path = "/configurations/{configurationId}/webhooks",
             produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.POST)
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public WebhookConfigurationItemDto addWebhook(
-            @PathVariable("configurationId") long configurationId,
+            @PathVariable long configurationId,
             @RequestBody WebhookConfigurationItemDto body
     ) {
         return webhookService.add(configurationId, body);
     }
 
-    @RequestMapping(path = "/configurations/{configurationId}/webhooks/{id}",
+    @PutMapping(path = "/configurations/{configurationId}/webhooks/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.PUT)
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public WebhookConfigurationItemDto updateWebhook(
-            @PathVariable("configurationId") long configurationId,
-            @PathVariable("id") long id,
+            @PathVariable long configurationId,
+            @PathVariable long id,
             @RequestBody WebhookConfigurationItemDto body
     ) {
         return webhookService.update(configurationId, id, body);
     }
 
-    @RequestMapping(path = "/configurations/{configurationId}/webhooks/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.DELETE)
+    @DeleteMapping(path = "/configurations/{configurationId}/webhooks/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public void deleteWebhook(
-            @PathVariable("configurationId") long configurationId,
-            @PathVariable("id") long id
+            @PathVariable long configurationId,
+            @PathVariable long id
     ) {
         //TODO implent that
         //webhookService.delete(configurationId, id);

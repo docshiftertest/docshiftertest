@@ -96,8 +96,7 @@ public class DctmDTO<T> {
 			} else if (field.isAnnotationPresent(DctmLocation.class)) {
 				Set<String> paths;
 				
-				if (po instanceof IDfSysObject) {
-					IDfSysObject so = (IDfSysObject)po;
+				if (po instanceof IDfSysObject so) {
 					paths = MetadataUtils.getPaths(so);
 				} else {
 					throw new ParseException("Failed to parse PO to POJO. Location specified but not a SysObject", 0);
@@ -202,7 +201,7 @@ public class DctmDTO<T> {
 	}
 	
 	private <V> V getValueUsingGetter(Object object, String fieldName, Class<V> type) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-		String getterName = String.format("get%s", StringUtils.capitalize(fieldName));
+		String getterName = "get%s".formatted(StringUtils.capitalize(fieldName));
 		Method method = clazz.getDeclaredMethod(getterName, null);
 		return (V) method.invoke(object, null);
 		
@@ -210,7 +209,7 @@ public class DctmDTO<T> {
 	
 	
 	private <V> void setValueUsingSetter(Object pojo, String fieldName, Class<V> type, V value) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-		String setterName = String.format("set%s", StringUtils.capitalize(fieldName));
+		String setterName = "set%s".formatted(StringUtils.capitalize(fieldName));
 		Method method = clazz.getDeclaredMethod(setterName, type);
 		method.invoke(pojo, value);
 	}

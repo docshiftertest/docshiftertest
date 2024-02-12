@@ -154,13 +154,13 @@ public final class OutlineUtils {
 	public static void setDestinationOrActionHard(OutlineItemCollection outline, IAppointment dest,
 												  ActionHandling actionHandling) {
 		// If the replacement is a PdfAction, set or add the action to the outline.
-		if (dest instanceof PdfAction) {
+		if (dest instanceof PdfAction action) {
 			Optional<IAppointment> unwrapped = AppointmentUtils.unwrapIfGoToAction(dest);
-			if (!unwrapped.isPresent()) {
+			if (unwrapped.isEmpty()) {
 				if (outline.getAction() == null || actionHandling == ActionHandling.OVERWRITE) {
-					outline.setAction((PdfAction) dest);
+					outline.setAction(action);
 				} else {
-					outline.getAction().getNext().add((PdfAction) dest);
+					outline.getAction().getNext().add(action);
 				}
 				return;
 			}

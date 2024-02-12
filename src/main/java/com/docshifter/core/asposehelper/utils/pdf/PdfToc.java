@@ -10,11 +10,11 @@ import com.aspose.pdf.Rectangle;
 import com.aspose.pdf.TextFragment;
 import com.aspose.pdf.TextFragmentAbsorber;
 import com.aspose.pdf.TextSearchOptions;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

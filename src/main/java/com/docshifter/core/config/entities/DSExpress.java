@@ -1,21 +1,22 @@
 package com.docshifter.core.config.entities;
 
+import io.hypersistence.utils.hibernate.type.json.JsonType;
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.DiffInclude;
 
-import javax.annotation.Nonnull;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.io.Serializable;
 
 @Entity
@@ -40,7 +41,7 @@ public class DSExpress implements Serializable {
     @DiffIgnore
     private ChainConfiguration chainConfiguration;
 
-    @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
+    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private String parameterValues;
 

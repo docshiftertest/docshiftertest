@@ -3,7 +3,7 @@ package com.docshifter.core.config.services;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.destination.JmsDestinationAccessor;
 
-import javax.jms.ConnectionFactory;
+import jakarta.jms.ConnectionFactory;
 
 public class JmsTemplateFactory implements IJmsTemplateFactory {
 	private final ConnectionFactory connectionFactory;

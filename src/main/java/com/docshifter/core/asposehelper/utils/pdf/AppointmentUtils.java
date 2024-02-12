@@ -71,8 +71,8 @@ public final class AppointmentUtils {
 	 * @return The most inner {@link IAppointment}.
 	 */
 	public static IAppointment unwrap(IDocument doc, IAppointment appointment) {
-		if (appointment instanceof NamedDestination) {
-			return unwrap(doc, doc.getNamedDestinations().get_Item(((NamedDestination)appointment).getName()));
+		if (appointment instanceof NamedDestination destination) {
+			return unwrap(doc, doc.getNamedDestinations().get_Item(destination.getName()));
 		}
 
 		Optional<GoToAction> goToAction = getIfGoToAction(appointment);
@@ -85,10 +85,10 @@ public final class AppointmentUtils {
 
 	// TODO: was meant to be replaced by getIfGoToAction but ran into regressions in HiFi, so investigate why!
 	private static IAppointment unwrapGoToAction(IAppointment appointment) {
-		if (appointment instanceof GoToAction) {
-			IAppointment dest = ((GoToAction) appointment).getDestination();
+		if (appointment instanceof GoToAction action) {
+			IAppointment dest = action.getDestination();
 			if (dest != null) {
-				return unwrapGoToAction(((GoToAction) appointment).getDestination());
+				return unwrapGoToAction(action.getDestination());
 			}
 		}
 
@@ -102,11 +102,11 @@ public final class AppointmentUtils {
 	 * @return The {@link GoToAction}.
 	 */
 	public static Optional<GoToAction> getIfGoToAction(IAppointment appointment) {
-		if (appointment instanceof PdfAction) {
-			return expandActions((PdfAction) appointment)
-					.filter(action -> action instanceof GoToAction)
-					.map(action -> (GoToAction) action)
-					.filter(action -> action.getDestination() != null)
+		if (appointment instanceof PdfAction action) {
+			return expandActions(action)
+					.filter(act -> act instanceof GoToAction)
+					.map(GoToAction.class::cast)
+					.filter(act -> act.getDestination() != null)
 					.findFirst();
 		}
 
@@ -144,16 +144,16 @@ public final class AppointmentUtils {
 	 * theory never occur unless a custom class implementing {@link IAppointment} has been created and supplied.
 	 */
 	public static PdfAction wrapPdfAction(Document doc, IAppointment appointment) {
-		if (appointment instanceof ExplicitDestination) {
-			return new GoToAction((ExplicitDestination) appointment);
+		if (appointment instanceof ExplicitDestination destination) {
+			return new GoToAction(destination);
 		}
 
-		if (appointment instanceof NamedDestination) {
-			return new GoToAction(doc, ((NamedDestination)appointment).getName());
+		if (appointment instanceof NamedDestination destination) {
+			return new GoToAction(doc, destination.getName());
 		}
 
-		if (appointment instanceof PdfAction) {
-			return (PdfAction) appointment;
+		if (appointment instanceof PdfAction action) {
+			return action;
 		}
 
 		throw new IllegalArgumentException("Expected an existing PdfAction, ExplicitDestination or NamedDestination." +
@@ -170,8 +170,8 @@ public final class AppointmentUtils {
 			return true;
 		}
 
-		if (appointment instanceof GoToAction) {
-			return ((GoToAction)appointment).getDestination() != null;
+		if (appointment instanceof GoToAction action) {
+			return action.getDestination() != null;
 		}
 
 		return false;
@@ -195,8 +195,8 @@ public final class AppointmentUtils {
 	}
 
 	private static void replaceWrapped(IDocument doc, IAppointment source, IAppointment replacement) {
-		if (source instanceof NamedDestination) {
-			String destName = ((NamedDestination)source).getName();
+		if (source instanceof NamedDestination destination) {
+			String destName = destination.getName();
 			IAppointment wrapped = doc.getNamedDestinations().get_Item(destName);
 			if (isWrapper(wrapped)) {
 				replaceWrapped(doc, wrapped, replacement);
@@ -206,13 +206,13 @@ public final class AppointmentUtils {
 			return;
 		}
 
-		if (source instanceof GoToAction) {
-			IAppointment wrapped = ((GoToAction) source).getDestination();
+		if (source instanceof GoToAction action) {
+			IAppointment wrapped = action.getDestination();
 			if (isWrapper(wrapped)) {
 				replaceWrapped(doc, wrapped, replacement);
 				return;
 			}
-			((GoToAction) source).setDestination(replacement);
+			action.setDestination(replacement);
 		}
 	}
 }

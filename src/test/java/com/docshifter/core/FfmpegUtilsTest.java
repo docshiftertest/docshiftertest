@@ -2,12 +2,12 @@ package com.docshifter.core;
 
 import java.util.Map;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import com.docshifter.core.utils.ffmpeg.FfmpegUtils;
 
 public class FfmpegUtilsTest {
-	@Ignore("ffmpeg is unlikely to be on Team City, so Ignore this test for now")
+	@Disabled("ffmpeg is unlikely to be on Team City, so Ignore this test for now")
 	@Test
 	public void basicFFmpegTest() {
 		//

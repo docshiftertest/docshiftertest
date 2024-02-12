@@ -4,13 +4,13 @@ import com.docshifter.core.monitoring.dtos.NotificationDto;
 import com.docshifter.core.monitoring.dtos.SnmpConfigurationItemDto;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
 import com.docshifter.core.monitoring.snmp.SnmpTrapReceiver;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.snmp4j.CommandResponderEvent;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.VariableBinding;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.SocketUtils;
+import org.springframework.cloud.test.TestSocketUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -30,9 +30,9 @@ public class SnmpNotificationServiceTest extends AbstractServiceTest {
     private SnmpConfigurationItemDto snmpConfigurationItem;
 
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
-        int port = SocketUtils.findAvailableUdpPort();
+        int port = TestSocketUtils.findAvailableUdpPort();
         System.setProperty("snmp4j.listenAddress", "udp:0.0.0.0/" + port);
 
         snmpTrapReceiver = new SnmpTrapReceiver();

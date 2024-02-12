@@ -40,7 +40,7 @@ public class DctmRepository<T extends Object> {
 
 	
 	public T findByName(String name) throws DfException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, ParseException {
-		IDfPersistentObject po = session.getObjectByQualification(String.format("%s where object_name = '%s'", type, DataUtils.escapeForDql(name)));
+		IDfPersistentObject po = session.getObjectByQualification("%s where object_name = '%s'".formatted(type, DataUtils.escapeForDql(name)));
 		if (po == null) {
 			return null;
 		}
@@ -48,7 +48,7 @@ public class DctmRepository<T extends Object> {
 	}
 	
 	public T findWithQuery(String whereClause) throws DfException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, ParseException {
-		String query = String.format("%s %s", type, whereClause);
+		String query = "%s %s".formatted(type, whereClause);
 		
 		log.debug(query);
 		
@@ -119,7 +119,7 @@ public class DctmRepository<T extends Object> {
 	}
 	
 	public void deleteAll() throws DfException {
-		IDfQuery query = new DfQuery(String.format("delete %s (all) objects", type));
+		IDfQuery query = new DfQuery("delete %s (all) objects".formatted(type));
 		IDfCollection coll = null;
 		try {
 			coll = query.execute(session, IDfQuery.DF_EXEC_QUERY);

@@ -2,7 +2,7 @@ package com.docshifter.core.dctm;
 
 import com.docshifter.core.utils.FileUtils;
 import org.apache.commons.lang.SystemUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Created by pieter.vaneeckhout on 6/19/2017.

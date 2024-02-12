@@ -4,10 +4,12 @@ import com.docshifter.core.monitoring.dtos.ConfigurationDto;
 import com.docshifter.core.monitoring.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,49 +23,44 @@ public class ConfigurationController {
     @Autowired
     private ConfigurationService configurationService;
 
-    @RequestMapping(path = "/configurations/{id}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            method = RequestMethod.GET)
+    @GetMapping(path = "/configurations/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ConfigurationDto getById(
-            @PathVariable("id") long id
+            @PathVariable long id
     ) {
         return configurationService.getById(id);
     }
 
-    @RequestMapping(path = "/configurations",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            method = RequestMethod.GET)
+    @GetMapping(path = "/configurations",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ConfigurationDto> getAll(
     ) {
         return configurationService.getAll();
     }
 
-    @RequestMapping(path = "/configurations",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            method = RequestMethod.POST)
+    @PostMapping(path = "/configurations",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ConfigurationDto addConfiguration(
             @RequestBody ConfigurationDto body
     ) {
         return configurationService.addConfiguration(body);
     }
 
-    @RequestMapping(path = "/configurations/{id}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            method = RequestMethod.PUT)
+    @PutMapping(path = "/configurations/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ConfigurationDto updateConfiguration(
-            @PathVariable("id") long id,
+            @PathVariable long id,
             @RequestBody ConfigurationDto body
     ) {
         return configurationService.updateConfiguration(id, body);
     }
 
-    @RequestMapping(path = "/configurations/{id}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            method = RequestMethod.DELETE)
+    @DeleteMapping(path = "/configurations/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public void deleteConfiguration(
-            @PathVariable("id") long id
+            @PathVariable long id
     ) {
         configurationService.deleteConfiguration(id);
     }

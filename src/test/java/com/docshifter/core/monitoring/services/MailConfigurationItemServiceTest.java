@@ -1,12 +1,12 @@
 package com.docshifter.core.monitoring.services;
 
 import com.docshifter.core.monitoring.dtos.MailConfigurationItemDto;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class MailConfigurationItemServiceTest extends AbstractServiceTest {
 

@@ -3,8 +3,9 @@ package com.docshifter.core.veeva;
 import com.docshifter.core.utils.veeva.VeevaBadResponse;
 import com.docshifter.core.utils.veeva.VeevaLoginSuccess;
 import com.docshifter.core.utils.veeva.VeevaResponse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.extern.log4j.Log4j2;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Code moved from main() of VeevaSession
@@ -25,7 +26,7 @@ public class VeevaSessionTest {
 	private Map<String, List<String>> jsonHeaders;
 	private Map<String, List<String>> binaryHeaders;
 
-	@Before
+	@BeforeEach
 	public void setupHeaders() {
 		jsonHeaders = new HashMap<String, List<String>>();
 		List<String> contentTypes = new ArrayList<>();
@@ -54,17 +55,17 @@ public class VeevaSessionTest {
 		for (String responseData : responseDatas) {
 			Class<?> expectedClass = expectedClasses[idx];
 			response = VeevaResponse.getLoginResult(responseData);
-			assertTrue("Expected Classs mismatch", expectedClass == response.getClass());
+			assertTrue(expectedClass == response.getClass(), "Expected Classs mismatch");
 			String expectedStatus = expectedStatuses[idx];
-			assertTrue("Expected status: " + expectedStatus + " but got: " + response.getResponseStatus(),
-					expectedStatus.equals(response.getResponseStatus()));
+			assertTrue(expectedStatus.equals(response.getResponseStatus()),
+					"Expected status: " + expectedStatus + " but got: " + response.getResponseStatus());
 			if (expectedClass == VeevaLoginSuccess.class) {
 				String sessionId = ((VeevaLoginSuccess) response).getSessionId();
-				assertTrue("Session Id expected to be: " + 
+				assertTrue("F1C3850ABE3582CE3F0B45FA1523701BE0DCCC315B11179F3BF4417E46F050CB47C728DF750F9D20B16E0BF1E023AB239C0AD4AA81E1696A1CB2515CBB4AA880"
+						.equals(sessionId),
+						"Session Id expected to be: " + 
 						"F1C3850ABE3582CE3F0B45FA1523701BE0DCCC315B11179F3BF4417E46F050CB47C728DF750F9D20B16E0BF1E023AB239C0AD4AA81E1696A1CB2515CBB4AA880" + 
-						" but is: " + sessionId,
-						"F1C3850ABE3582CE3F0B45FA1523701BE0DCCC315B11179F3BF4417E46F050CB47C728DF750F9D20B16E0BF1E023AB239C0AD4AA81E1696A1CB2515CBB4AA880"
-						.equals(sessionId));
+						" but is: " + sessionId);
 			}
 			idx++;
 		}
@@ -108,9 +109,9 @@ public class VeevaSessionTest {
 			}
 			//log.info("Got response: " + response.toString());
 			String expectedSessionId = expectedSessionIds[idx];
-			assertTrue("Expected Session Id: " + expectedSessionId + " but got: " + actualSessionId,
-					(expectedSessionId == null && actualSessionId == null) ||
-					(expectedSessionId != null && expectedSessionId.equals(actualSessionId)));
+			assertTrue((expectedSessionId == null && actualSessionId == null) ||
+					(expectedSessionId != null && expectedSessionId.equals(actualSessionId)),
+					"Expected Session Id: " + expectedSessionId + " but got: " + actualSessionId);
 			idx++;
 		}
 	}

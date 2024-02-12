@@ -32,7 +32,7 @@ public class WebhookConfigurationItemService extends AbstractConfigurationItemSe
 
     public void delete(long configurationId, long id) {
     	Optional<WebhookConfigurationItem> entityOptional = repository.findById(id);
-    	if (!entityOptional.isPresent()) {
+    	if (entityOptional.isEmpty()) {
          	log.info("Just FYI, could not find WebhookConfigurationItem to delete for Id: " + id);
          	return;
         }

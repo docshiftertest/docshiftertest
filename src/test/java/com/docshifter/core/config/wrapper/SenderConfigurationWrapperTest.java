@@ -1,8 +1,8 @@
 package com.docshifter.core.config.wrapper;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.reset;
@@ -11,10 +11,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import javax.naming.ConfigurationException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import com.docshifter.core.config.entities.ChainConfiguration;
 import com.docshifter.core.config.repositories.ChainConfigurationRepository;
 import com.docshifter.core.config.entities.Module;
@@ -23,7 +23,7 @@ import com.docshifter.core.config.entities.Node;
 import com.docshifter.core.config.entities.Parameter;
 import com.docshifter.core.config.entities.ParameterTypes;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SenderConfigurationWrapperTest {
 
 	private static final String DCTM_USER = "dctm_user";
@@ -46,8 +46,8 @@ public class SenderConfigurationWrapperTest {
 		Map<Parameter, String> paramMap = new HashMap<Parameter, String>();
 		paramMap.put(new Parameter(DCTM_MIN_POLL, ParameterTypes.INTEGER), "");
 		SenderConfigurationWrapper config = setupForConfigTest(paramMap);
-		assertTrue("Min poll should be defaulted to 0", config.getInt(DCTM_MIN_POLL) == 0);
-		assertTrue("Min poll should be defaulted to 300", config.getInt(DCTM_MIN_POLL, 300) == 300);
+		assertTrue(config.getInt(DCTM_MIN_POLL) == 0, "Min poll should be defaulted to 0");
+		assertTrue(config.getInt(DCTM_MIN_POLL, 300) == 300, "Min poll should be defaulted to 300");
 		reset();
 	}
 
@@ -60,8 +60,8 @@ public class SenderConfigurationWrapperTest {
 		Map<Parameter, String> paramMap = new HashMap<Parameter, String>();
 		paramMap.put(new Parameter(DCTM_MAX_POLL, ParameterTypes.INTEGER), "QQWA");
 		SenderConfigurationWrapper config = setupForConfigTest(paramMap);
-		assertTrue("Max poll should be defaulted to 0", config.getInt(DCTM_MAX_POLL) == 0);
-		assertTrue("Max poll should be defaulted to 500", config.getInt(DCTM_MAX_POLL, 500) == 500);
+		assertTrue(config.getInt(DCTM_MAX_POLL) == 0, "Max poll should be defaulted to 0");
+		assertTrue(config.getInt(DCTM_MAX_POLL, 500) == 500, "Max poll should be defaulted to 500");
 		reset();
 	}
 
@@ -74,8 +74,8 @@ public class SenderConfigurationWrapperTest {
 		Map<Parameter, String> paramMap = new HashMap<Parameter, String>();
 		paramMap.put(new Parameter(DCTM_MIN_POLL, ParameterTypes.INTEGER), null);
 		SenderConfigurationWrapper config = setupForConfigTest(paramMap);
-		assertTrue("Min poll should be defaulted to 0", config.getInt(DCTM_MIN_POLL) == 0);
-		assertTrue("Min poll should be defaulted to 300", config.getInt(DCTM_MIN_POLL, 300) == 300);
+		assertTrue(config.getInt(DCTM_MIN_POLL) == 0, "Min poll should be defaulted to 0");
+		assertTrue(config.getInt(DCTM_MIN_POLL, 300) == 300, "Min poll should be defaulted to 300");
 		reset();
 	}
 
@@ -88,12 +88,12 @@ public class SenderConfigurationWrapperTest {
 		Map<Parameter, String> paramMap = new HashMap<Parameter, String>();
 		paramMap.put(new Parameter(DCTM_USER, ParameterTypes.STRING), DOCSHIFTER);
 		SenderConfigurationWrapper config = setupForConfigTest(paramMap);
-		assertTrue("Min poll should be defaulted to 0", config.getInt(DCTM_MIN_POLL) == 0);
-		assertTrue("Max poll should be defaulted to 0", config.getInt(DCTM_MAX_POLL) == 0);
-		assertTrue("Min poll should be defaulted to 300", config.getInt(DCTM_MIN_POLL, 300) == 300);
-		assertTrue("Max poll should be defaulted to 500", config.getInt(DCTM_MAX_POLL, 500) == 500);
-		assertTrue("DCTM User should be set to docshifter", config.getString(DCTM_USER).equals(DOCSHIFTER));
-		assertTrue("DCTM User should still be set to docshifter", config.getString(DCTM_USER, "some other default").equals(DOCSHIFTER));
+		assertTrue(config.getInt(DCTM_MIN_POLL) == 0, "Min poll should be defaulted to 0");
+		assertTrue(config.getInt(DCTM_MAX_POLL) == 0, "Max poll should be defaulted to 0");
+		assertTrue(config.getInt(DCTM_MIN_POLL, 300) == 300, "Min poll should be defaulted to 300");
+		assertTrue(config.getInt(DCTM_MAX_POLL, 500) == 500, "Max poll should be defaulted to 500");
+		assertTrue(config.getString(DCTM_USER).equals(DOCSHIFTER), "DCTM User should be set to docshifter");
+		assertTrue(config.getString(DCTM_USER, "some other default").equals(DOCSHIFTER), "DCTM User should still be set to docshifter");
 		reset();
 	}
 
@@ -107,8 +107,8 @@ public class SenderConfigurationWrapperTest {
 		paramMap.put(new Parameter(DCTM_USER, ParameterTypes.STRING), "");
 		SenderConfigurationWrapper config = setupForConfigTest(paramMap);
 		// TODO: Is this correct behaviour?
-		assertTrue("DCTM User should be set to empty String", config.getString(DCTM_USER).equals(""));
-		assertTrue("DCTM User should still be set to empty String", config.getString(DCTM_USER, "some other default").equals(""));
+		assertTrue(config.getString(DCTM_USER).equals(""), "DCTM User should be set to empty String");
+		assertTrue(config.getString(DCTM_USER, "some other default").equals(""), "DCTM User should still be set to empty String");
 		reset();
 	}
 
@@ -122,8 +122,8 @@ public class SenderConfigurationWrapperTest {
 		paramMap.put(new Parameter(DCTM_USER, ParameterTypes.STRING), null);
 		SenderConfigurationWrapper config = setupForConfigTest(paramMap);
 		// TODO: Is this correct behaviour?
-		assertTrue("DCTM User should be null", config.getString(DCTM_USER) == null);
-		assertTrue("DCTM User should still be null", config.getString(DCTM_USER, "some other default") == null);
+		assertTrue(config.getString(DCTM_USER) == null, "DCTM User should be null");
+		assertTrue(config.getString(DCTM_USER, "some other default") == null, "DCTM User should still be null");
 		reset();
 	}
 
@@ -137,13 +137,13 @@ public class SenderConfigurationWrapperTest {
 		paramMap.put(new Parameter(DCTM_MIN_POLL, ParameterTypes.INTEGER), "12");
 		paramMap.put(new Parameter(DCTM_MAX_POLL, ParameterTypes.INTEGER), "23");
 		SenderConfigurationWrapper config = setupForConfigTest(paramMap);
-		assertTrue("Min poll should be set to 12", config.getInt(DCTM_MIN_POLL) == 12);
-		assertTrue("Max poll should be set to 23", config.getInt(DCTM_MAX_POLL) == 23);
-		assertTrue("Min poll should still be set to 12", config.getInt(DCTM_MIN_POLL, 300) == 12);
-		assertTrue("Max poll should still be set to 23", config.getInt(DCTM_MAX_POLL, 500) == 23);
+		assertTrue(config.getInt(DCTM_MIN_POLL) == 12, "Min poll should be set to 12");
+		assertTrue(config.getInt(DCTM_MAX_POLL) == 23, "Max poll should be set to 23");
+		assertTrue(config.getInt(DCTM_MIN_POLL, 300) == 12, "Min poll should still be set to 12");
+		assertTrue(config.getInt(DCTM_MAX_POLL, 500) == 23, "Max poll should still be set to 23");
 		// TODO: Is this correct behaviour?
-		assertTrue("DCTM User should be NULL", config.getString(DCTM_USER) == null);
-		assertTrue("DCTM User should be set to some other default", config.getString(DCTM_USER, "some other default").equals("some other default"));
+		assertTrue(config.getString(DCTM_USER) == null, "DCTM User should be NULL");
+		assertTrue(config.getString(DCTM_USER, "some other default").equals("some other default"), "DCTM User should be set to some other default");
 		reset();
 	}
 
@@ -156,8 +156,8 @@ public class SenderConfigurationWrapperTest {
 		Map<Parameter, String> paramMap = new HashMap<>();
 		paramMap.put(new Parameter(DOCSHIFTER, ParameterTypes.STRING), null);
 		SenderConfigurationWrapper config = setupForConfigTest(paramMap);
-		assertNull("docshifter should be null", config.getString(DOCSHIFTER));
-		assertEquals("docshifter Should get default parameter", "docshifter", config.getStringParameterOrDefault(DOCSHIFTER, "docshifter"));
+		assertNull(config.getString(DOCSHIFTER), "docshifter should be null");
+		assertEquals("docshifter", config.getStringParameterOrDefault(DOCSHIFTER, "docshifter"), "docshifter Should get default parameter");
 		reset();
 	}
 
@@ -170,8 +170,8 @@ public class SenderConfigurationWrapperTest {
 		Map<Parameter, String> paramMap = new HashMap<>();
 		paramMap.put(new Parameter(DOCSHIFTER, ParameterTypes.STRING), "");
 		SenderConfigurationWrapper config = setupForConfigTest(paramMap);
-		assertEquals("docshifter should be empty", "", config.getString(DOCSHIFTER));
-		assertEquals("docshifter Should get default parameter", "docshifter", config.getStringParameterOrDefault(DOCSHIFTER, "docshifter"));
+		assertEquals("", config.getString(DOCSHIFTER), "docshifter should be empty");
+		assertEquals("docshifter", config.getStringParameterOrDefault(DOCSHIFTER, "docshifter"), "docshifter Should get default parameter");
 		reset();
 	}
 
@@ -184,8 +184,8 @@ public class SenderConfigurationWrapperTest {
 		Map<Parameter, String> paramMap = new HashMap<>();
 		paramMap.put(new Parameter(DOCSHIFTER, ParameterTypes.STRING), "someString");
 		SenderConfigurationWrapper config = setupForConfigTest(paramMap);
-		assertEquals("docshifter should be someString", "someString", config.getString(DOCSHIFTER));
-		assertEquals("docshifter Should get the input String parameter", "someString", config.getStringParameterOrDefault(DOCSHIFTER, "docshifter"));
+		assertEquals("someString", config.getString(DOCSHIFTER), "docshifter should be someString");
+		assertEquals("someString", config.getStringParameterOrDefault(DOCSHIFTER, "docshifter"), "docshifter Should get the input String parameter");
 		reset();
 	}
 

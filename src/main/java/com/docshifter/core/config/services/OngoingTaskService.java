@@ -14,8 +14,8 @@ import org.springframework.messaging.simp.user.SimpSubscription;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 
-import javax.jms.JMSException;
-import javax.jms.MessageFormatException;
+import jakarta.jms.JMSException;
+import jakarta.jms.MessageFormatException;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;

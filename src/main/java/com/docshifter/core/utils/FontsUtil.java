@@ -30,56 +30,6 @@ import java.util.UUID;
 @Log4j2
 public class FontsUtil {
 
-    public static List<DocumentFonts> extractDocumentFonts(List<String> documentPathList, boolean input, Dashboard dashboard) {
-
-
-        List<DocumentFonts> totalDocumentFontsList = new ArrayList<>();
-
-        documentPathList.forEach(documentPath -> {
-            String extension = FileUtils.getExtension(documentPath);
-
-            switch (extension.toLowerCase()) {
-                case "doc":
-                case "docm":
-                case "docx":
-                case "dot":
-                case "dotm":
-                case "dotx":
-                case "odt":
-                    log.debug("Identified a word document");
-                    totalDocumentFontsList.addAll(extractWordFonts(documentPath, input, dashboard));
-                    break;
-                case "xls":
-                case "xlsb":
-                case "xlsm":
-                case "xlsx":
-                case "xlt":
-                case "xltm":
-                case "xltx":
-                case "csv":
-                case "ods":
-                    log.debug("Identified an excel document");
-                    totalDocumentFontsList.addAll(extractExcelFonts(documentPath, input, dashboard));
-                    break;
-                case "ppt":
-                case "pptm":
-                case "pptx":
-                case "pot":
-                case "potm":
-                case "potx":
-                    log.debug("Identified a presentation document");
-                    totalDocumentFontsList.addAll(extractPptFonts(documentPath, input, dashboard));
-                    break;
-                case "pdf":
-                    log.debug("Identified a pdf document");
-                    totalDocumentFontsList.addAll(extractPDFFonts(documentPath, input, dashboard));
-                    break;
-            }
-        });
-
-        return totalDocumentFontsList;
-    }
-
     /**
      * Extracts the fonts from a ppt document
      *
@@ -100,8 +50,7 @@ public class FontsUtil {
             // To test 1 slide should use getSlides().get_item(index)
             ppt.getSlides().forEach(slide -> {
                 for (Object shape : slide.getShapes()) {
-                    if (shape instanceof IAutoShape) {
-                        IAutoShape autoShape = (IAutoShape) shape;
+                    if (shape instanceof IAutoShape autoShape) {
                         for (IParagraph paragraph : autoShape.getTextFrame().getParagraphs()) {
                             // you can read paragraph format options (margin, space, tab, etc..):
 //                        IParagraphFormatEffectiveData paragraphFormat = paragraph.getParagraphFormat().getEffective();

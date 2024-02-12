@@ -124,8 +124,8 @@ public class HealthManagementService {
 		}
 
 		// We only need this to fire once, so unsubscribe
-		appEventMulticaster.removeApplicationListeners(l -> l instanceof SmartApplicationListener
-				&& FIRST_CORRECT_FIRED_EVENT_ID.equals(((SmartApplicationListener)l).getListenerId()));
+		appEventMulticaster.removeApplicationListeners(l -> l instanceof SmartApplicationListener sal
+				&& FIRST_CORRECT_FIRED_EVENT_ID.equals(sal.getListenerId()));
 
 		// Sleep for a bit to make sure any other event listeners have captured this CORRECT event and are already
 		// processing it

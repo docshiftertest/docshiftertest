@@ -6,7 +6,7 @@ import com.docshifter.core.task.DctmTask;
 import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.VeevaTask;
-import javax.jms.JMSException;
+import jakarta.jms.JMSException;
 
 public interface IMessageSender {
 

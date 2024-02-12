@@ -4,7 +4,7 @@ package com.docshifter.core.utils.xml.adapters;
  * Created by samnang.nop on 11/02/2016.
  */
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import java.util.ArrayList;
 import java.util.Map;
 

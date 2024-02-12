@@ -13,7 +13,9 @@ import com.docshifter.core.task.SyncTask;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.task.TaskStatus;
 import com.docshifter.core.task.VeevaTask;
+import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.utils.NetworkUtils;
+import com.docshifter.core.work.WorkFolder;
 import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQMessage;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
@@ -21,9 +23,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
-import javax.jms.Message;
-import java.util.Collections;
+import jakarta.jms.Message;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -101,7 +107,13 @@ public class AMQPSender implements IMessageSender {
 				.hostName(NetworkUtils.getLocalHostName())
 				.senderPickedUp(System.currentTimeMillis())
 				.workflowName(chainConfiguration.getName())
-				.documentPathList(Collections.singletonList(task.getSourceFilePath()))
+				.documentPathList(
+						FileUtils.copySourceFilePathToList(
+								task.getSourceFilePath(),
+								task.getWorkFolder()
+						)
+				)
+				.workFolder(task.getWorkFolder())
 				.build();
 
 		log.debug("...about to send it...");
@@ -111,7 +123,8 @@ public class AMQPSender implements IMessageSender {
 		DocshifterMessage message = new DocshifterMessage(
 				type,
 				task,
-				chainConfiguration.getId());
+				chainConfiguration.getId()
+		);
 
 		log.debug("task.Id={}", task.getId());
 		log.debug("task.class={}", () -> task.getClass().getSimpleName());

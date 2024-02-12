@@ -1,5 +1,10 @@
 package com.docshifter.core.audit.entities;
 
+import io.hypersistence.utils.hibernate.type.json.JsonType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -7,10 +12,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -31,7 +32,7 @@ public class ApplicationAudit implements Serializable {
     private long eventDateTime;
     private String eventType;
     private String eventAction;
-    @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
+    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private Object details;
 }

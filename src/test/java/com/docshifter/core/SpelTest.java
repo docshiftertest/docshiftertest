@@ -1,8 +1,7 @@
 package com.docshifter.core;
 
 import lombok.extern.log4j.Log4j2;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;

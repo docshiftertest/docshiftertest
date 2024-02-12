@@ -29,7 +29,7 @@ public final class Constants {
 	
 	/**
 	 * This constant should reflect 
-	 * {@link DocShifterConfiguration#topicListener(javax.jms.ConnectionFactory, org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer)} method name.
+	 * {@link DocShifterConfiguration#topicListener(jakarta.jms.ConnectionFactory, org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer)} method name.
 	 */
 	public static final String TOPIC_LISTENER = "topicListener";
 

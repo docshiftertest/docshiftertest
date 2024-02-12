@@ -1,11 +1,11 @@
 package com.docshifter.datasource.config.metrics;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
-import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -62,7 +62,7 @@ public class ConfigurationMetricsDB {
         Properties properties = new Properties();
         properties.setProperty(Environment.DIALECT, dialect);
         properties.setProperty(Environment.DEFAULT_SCHEMA, "metrics");
-        properties.put(Environment.PHYSICAL_NAMING_STRATEGY, SpringPhysicalNamingStrategy.class.getName());
+        properties.put(Environment.PHYSICAL_NAMING_STRATEGY, CamelCaseToUnderscoresNamingStrategy.class.getName());
         properties.put(Environment.IMPLICIT_NAMING_STRATEGY, SpringImplicitNamingStrategy.class.getName());
         properties.setProperty(Environment.HBM2DDL_AUTO, schemaCreation);
 

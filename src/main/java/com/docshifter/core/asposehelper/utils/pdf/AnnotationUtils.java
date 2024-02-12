@@ -10,9 +10,9 @@ import com.aspose.pdf.NamedDestination;
 import com.aspose.pdf.Page;
 import com.aspose.pdf.PdfAction;
 import com.aspose.pdf.XYZExplicitDestination;
+import jakarta.annotation.Nullable;
 import lombok.extern.log4j.Log4j2;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 @Log4j2
@@ -142,13 +142,13 @@ public final class AnnotationUtils {
 	public static void setDestinationOrActionHard(LinkAnnotation annotation, IAppointment dest,
 												  ActionHandling actionHandling) {
 		// If the replacement is a PdfAction, set or add the action to the annotation.
-		if (dest instanceof PdfAction) {
+		if (dest instanceof PdfAction action) {
 			Optional<IAppointment> unwrapped = AppointmentUtils.unwrapIfGoToAction(dest);
-			if (!unwrapped.isPresent()) {
+			if (unwrapped.isEmpty()) {
 				if (annotation.getAction() == null || actionHandling == ActionHandling.OVERWRITE) {
-					annotation.setAction((PdfAction) dest);
+					annotation.setAction(action);
 				} else {
-					annotation.getAction().getNext().add((PdfAction) dest);
+					annotation.getAction().getNext().add(action);
 				}
 				return;
 			}

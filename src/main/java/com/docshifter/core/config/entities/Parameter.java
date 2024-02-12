@@ -2,26 +2,27 @@ package com.docshifter.core.config.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.Collections;
@@ -50,7 +51,7 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	private String type;
 	private Boolean required;
 
-	@Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
+	@Type(JsonType.class)
 	@Column(columnDefinition = "jsonb")
 	private String valuesJson;
 	private String parameterGroup;
@@ -62,7 +63,7 @@ public class Parameter implements Comparable<Parameter>, Serializable
 	@ManyToOne
 	@Nullable
 	private Parameter aliasOf;
-	@Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
+	@Type(JsonType.class)
 	@Column(columnDefinition = "jsonb")
 	@Nullable
 	private String aliasMappings;

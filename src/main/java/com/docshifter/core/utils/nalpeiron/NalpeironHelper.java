@@ -611,7 +611,7 @@ public class NalpeironHelper {
             }
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLGetLeaseExpSec"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSLGetLeaseExpSec"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
             return i;
         } catch (NalpError error) {
@@ -646,7 +646,7 @@ public class NalpeironHelper {
                 i = nsl.callNSLGetMaintExpSec();
             }
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLGetMaintExpSec"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSLGetMaintExpSec"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
             return i;
         } catch (NalpError error) {
@@ -682,7 +682,7 @@ public class NalpeironHelper {
             }
             int i = nsl.callNSLGetSubExpSec();
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLGetSubExpSec"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSLGetSubExpSec"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
             return i;
         } catch (NalpError error) {
@@ -723,7 +723,7 @@ public class NalpeironHelper {
         try {
             int i = nsl.callNSLGetTrialExpSec();
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLGetTrialExpSec"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSLGetTrialExpSec"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
             return i;
         } catch (NalpError error) {
@@ -834,7 +834,7 @@ public class NalpeironHelper {
             }
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLValidateLibrary"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSLValidateLibrary"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -946,7 +946,7 @@ public class NalpeironHelper {
             int i = nsl.callNSLGetTimeStamp();
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLGetTimeStamp"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSLGetTimeStamp"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
 
             return i;
@@ -1004,7 +1004,7 @@ public class NalpeironHelper {
         try {
             int i = nsl.callNSLReturnFeature(featureName, licenseNo);
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLReturnFeature"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSLReturnFeature"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -1036,7 +1036,7 @@ public class NalpeironHelper {
             int i = nsl.callNSLCheckoutPool(poolName, licenseNo, amt);
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLCheckoutPool"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSLCheckoutPool"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -1052,7 +1052,7 @@ public class NalpeironHelper {
         try {
             int i = nsl.callNSLReturnPool(poolName, licenseNo, amt);
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLReturnPool"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSLReturnPool"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -1082,7 +1082,7 @@ public class NalpeironHelper {
         try {
             int i = nsl.callNSLGetAvailProcs();
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLGetNumbAvailProc"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSLGetNumbAvailProc"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
             return i;
         } catch (NalpError error) {
@@ -1100,7 +1100,7 @@ public class NalpeironHelper {
             int i = nsl.callNSLRegister(licenseNo, xmlRegInfo);
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLRegister"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSLRegister"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -1117,7 +1117,7 @@ public class NalpeironHelper {
         try {
             int i = nsl.callNSLTestConnection2(connTO, transTO);
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSLTestConnection"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSLTestConnection"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -1149,7 +1149,7 @@ public class NalpeironHelper {
             int i = nsa.callNSALogin(Username, clientData, lid);
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSALogin"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSALogin"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -1167,7 +1167,7 @@ public class NalpeironHelper {
             int i = nsa.callNSALogout(Username, clientData, lid);
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSALogout"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSALogout"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -1198,7 +1198,7 @@ public class NalpeironHelper {
             int i = nsa.callNSAFeatureStart(Username, FeatureCode, clientData, fid);
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAFeatureStart"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSAFeatureStart"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -1216,7 +1216,7 @@ public class NalpeironHelper {
             int i = nsa.callNSAFeatureStop(Username, FeatureCode, new ObjectMapper().writeValueAsString(clientData), fid);
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAFeatureStop"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSAFeatureStop"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -1251,7 +1251,7 @@ public class NalpeironHelper {
             int i = nsa.callNSASysInfo(Username, Applang, Version, Edition, Build, LicenseStat, clientData);
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSASysInfo"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSASysInfo"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -1268,7 +1268,7 @@ public class NalpeironHelper {
             int i = nsa.callNSASendCache(Username);
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSASendCache"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSASendCache"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -1285,7 +1285,7 @@ public class NalpeironHelper {
             int i = nsa.callNSAApStart(username, clientData, aid);
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAApStart"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSAApStart"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -1303,7 +1303,7 @@ public class NalpeironHelper {
             int i = nsa.callNSAApStop(username, clientData, aid);
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSAApStop"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSAApStop"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
@@ -1334,7 +1334,7 @@ public class NalpeironHelper {
             int i = nsa.callNSASetPrivacy(privacy);
 
             if (i < 0) {
-                throw new DocShifterLicenseException(String.format("Error in Nalpeiron library: failed to execute %s.", "callNSASetPrivacy"), new NalpError(i, resolveNalpErrorMsg(i)));
+                throw new DocShifterLicenseException("Error in Nalpeiron library: failed to execute %s.".formatted("callNSASetPrivacy"), new NalpError(i, resolveNalpErrorMsg(i)));
             }
         } catch (NalpError error) {
             log.debug("NalpError was thrown in {} code={} message={}", error.getStackTrace()[0].getMethodName(),
