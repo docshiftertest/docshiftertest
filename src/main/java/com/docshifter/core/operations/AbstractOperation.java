@@ -13,15 +13,18 @@ import com.docshifter.core.config.wrapper.ModuleWrapper;
 import com.docshifter.core.exceptions.EmptyOperationException;
 import com.docshifter.core.task.Task;
 import com.docshifter.core.operations.annotations.ModuleParam;
+import com.docshifter.core.utils.TaskDataKey;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -183,14 +186,24 @@ public abstract class AbstractOperation extends ModuleOperation {
                                 // never have any modules following such a module and moving over files might result
                                 // in the output being moved to somewhere the user doesn't want it (e.g. in case of
                                 // FSExport).
-                                if (res.isSuccess() &&
-                                        (moduleWrapper == null
-                                                || !moduleWrapper.getType().equalsIgnoreCase("release"))) {
-                                    Path newGroupedPath = folder.resolve(groupedPath.getKey());
-                                    Files.createDirectories(newGroupedPath);
-                                    Files.move(res.getResultPath(), newGroupedPath.resolve(res.getResultPath().getFileName()));
+                                if (res.isSuccess()) {
+
+                                    if (moduleWrapper == null
+                                            || !moduleWrapper.getType().equalsIgnoreCase("release")) {
+                                        Path newGroupedPath = folder.resolve(groupedPath.getKey());
+                                        Files.createDirectories(newGroupedPath);
+                                        Files.move(res.getResultPath(), newGroupedPath.resolve(res.getResultPath().getFileName()));
+                                    }
+
+                                    try {
+                                        addOutputFilePath(task, res);
+                                    }
+                                    catch (Exception exception) {
+                                        log.warn("It was not possible to add the file path to the output file path list.", exception);
+                                    }
                                 }
-                            } catch (Exception ex) {
+                            }
+                            catch (Exception ex) {
                                 log.error("Got an exception while trying to process a nested operation.", ex);
                                 if (res == null) {
                                     res = fileOperationParams;
@@ -204,12 +217,40 @@ public abstract class AbstractOperation extends ModuleOperation {
                             return mergedResult;
                         }), mergedResult, failureLevel.isHigherThan(FailureLevel.FILE)); // No need to process other
                 // files if the failure level is higher.
-                    }), mergedResult, failureLevel.isHigherThan(FailureLevel.GROUP)); // No need to process other
+            }), mergedResult, failureLevel.isHigherThan(FailureLevel.GROUP)); // No need to process other
+
             // groups if the failure level is higher.
             if (result.isSuccess()) {
                 result.setResultPath(folder);
             }
             return result;
+        }
+    }
+
+    /**
+     * Adds the path to the file if in a release module to the outputFilePath set of files
+     *
+     * @param task the {@link Task} in use
+     * @param res the {@link OperationParams} result
+     */
+    private void addOutputFilePath(Task task, OperationParams res) {
+
+        // We just do it id it is a release module and the COUNT_ALLOWED option is true
+        if (moduleWrapper.getType().equalsIgnoreCase("release")
+                && task.getData().containsKey(TaskDataKey.COUNT_ALLOWED.toString())
+                && ((boolean) task.getData().get(TaskDataKey.COUNT_ALLOWED.toString()))) {
+
+            Map<String, Object> taskData = task.getData();
+
+            if (!taskData.containsKey(TaskDataKey.OUTPUT_FILE_PATH.toString())) {
+                taskData.put(TaskDataKey.OUTPUT_FILE_PATH.toString(), new HashSet<String>());
+            }
+
+            Set<String> outputFilePathSet = (Set<String>) taskData.get(TaskDataKey.OUTPUT_FILE_PATH.toString());
+
+            log.debug("Adding the file: [{}] to the outputFilePath", res.getSourcePath().toString());
+
+            outputFilePathSet.add(res.getSourcePath().toString());
         }
     }
 

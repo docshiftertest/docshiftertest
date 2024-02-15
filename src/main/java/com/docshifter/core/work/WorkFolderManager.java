@@ -213,6 +213,24 @@ public class WorkFolderManager {
 		}
 	}
 
+	/**
+	 * Gets a new {@link WorkFolder} or the default provided
+	 *
+	 * @param name name to the new {@link WorkFolder}
+	 * @param defaultWorkFolder the default {@link WorkFolder} to use
+	 * @return the {@link WorkFolder}
+	 */
+	public WorkFolder getNewWorkFolderOrDefault(String name, WorkFolder defaultWorkFolder) {
+		try {
+			return getNewWorkfolder(name);
+		}
+		catch (IOException ioException) {
+			log.error("There is an error while getting a new workfolder to send to metrics.",
+					ioException);
+
+			return defaultWorkFolder;
+		}
+	}
 
 	@Override
 	public String toString() {

@@ -16,6 +16,7 @@ import com.docshifter.core.task.VeevaTask;
 import com.docshifter.core.utils.FileUtils;
 import com.docshifter.core.utils.NetworkUtils;
 import com.docshifter.core.work.WorkFolder;
+import com.docshifter.core.work.WorkFolderManager;
 import lombok.extern.log4j.Log4j2;
 import org.apache.activemq.artemis.jms.client.ActiveMQMessage;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
@@ -24,12 +25,7 @@ import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
 import javax.jms.Message;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -47,11 +43,16 @@ public class AMQPSender implements IMessageSender {
 	private final IJmsTemplateFactory jmsTemplateFactory;
 	private final int queueReplyTimeout;
 	private final OngoingTaskService ongoingTaskService;
+	private final WorkFolderManager wfManager;
 
-	public AMQPSender(JmsTemplate defaultJmsTemplate, JmsTemplate metricsJmsTemplate,
+	public AMQPSender(JmsTemplate defaultJmsTemplate,
+					  JmsTemplate metricsJmsTemplate,
 					  IJmsTemplateFactory jmsTemplateFactory,
-					  ActiveMQQueue docshifterQueue, ActiveMQQueue docshifterMetricsQueue,
-					  int queueReplyTimeout, OngoingTaskService ongoingTaskService) {
+					  ActiveMQQueue docshifterQueue,
+					  ActiveMQQueue docshifterMetricsQueue,
+					  int queueReplyTimeout,
+					  OngoingTaskService ongoingTaskService,
+					  WorkFolderManager wfManager) {
 		this.defaultJmsTemplate = defaultJmsTemplate;
 		this.metricsJmsTemplate = metricsJmsTemplate;
 		this.jmsTemplateFactory = jmsTemplateFactory;
@@ -59,6 +60,7 @@ public class AMQPSender implements IMessageSender {
 		this.docshifterMetricsQueue = docshifterMetricsQueue;
 		this.queueReplyTimeout = queueReplyTimeout;
 		this.ongoingTaskService = ongoingTaskService;
+		this.wfManager = wfManager;
 	}
 
 	private SyncTask sendSyncTask(String queue, ChainConfiguration chainConfiguration, Task task) {
@@ -100,6 +102,10 @@ public class AMQPSender implements IMessageSender {
 			throw new IllegalArgumentException("The task to send cannot be NULL!");
 		}
 
+		// Creating a new Workfolder to send to metrics because when in metrics,
+		// the current workFolder will already be deleted
+		WorkFolder newWorkfolder = wfManager.getNewWorkFolderOrDefault(task.getId(), task.getWorkFolder());
+
 		log.debug("Creating metrics message in Sender...");
 		DocShifterMetricsSenderMessage metricsMessage = DocShifterMetricsSenderMessage
 				.builder()
@@ -110,10 +116,10 @@ public class AMQPSender implements IMessageSender {
 				.documentPathList(
 						FileUtils.copySourceFilePathToList(
 								task.getSourceFilePath(),
-								task.getWorkFolder()
+								newWorkfolder
 						)
 				)
-				.workFolder(task.getWorkFolder())
+				.workFolder(newWorkfolder)
 				.build();
 
 		log.debug("...about to send it...");
