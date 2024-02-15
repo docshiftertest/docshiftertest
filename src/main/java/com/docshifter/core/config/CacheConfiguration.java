@@ -1,5 +1,12 @@
 package com.docshifter.core.config;
 
+import com.docshifter.core.config.entities.ChainConfiguration;
+import com.docshifter.core.config.entities.ModuleConfiguration;
+import com.docshifter.core.config.entities.Node;
+import com.docshifter.core.config.entities.Parameter;
+import com.docshifter.core.config.entities.ParameterDependency;
+import com.docshifter.core.monitoring.entities.AbstractConfigurationItem;
+import com.docshifter.core.monitoring.entities.MonitoringFilter;
 import lombok.extern.log4j.Log4j2;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
@@ -14,6 +21,7 @@ import javax.cache.Caching;
 import javax.cache.configuration.MutableConfiguration;
 import javax.cache.expiry.CreatedExpiryPolicy;
 import javax.cache.expiry.Duration;
+import java.util.stream.Stream;
 
 /**
  * Central cache configuration responsible for configuring caches used throughout the application.
@@ -27,23 +35,28 @@ public class CacheConfiguration {
 
     private static final Duration CACHE_EXPIRY_DURATION = Duration.ETERNAL;
     private static final long HIBERNATE_CACHE_SIZE_MB = 1;
-    private static final String[] PREDEFINED_CACHE_NAMES = {
-            "com.docshifter.core.monitoring.entities.AbstractConfigurationItem",
-            "com.docshifter.core.config.entities.Parameter",
-            "com.docshifter.core.config.entities.Node",
-            "com.docshifter.core.monitoring.entities.MonitoringFilter",
-            "com.docshifter.core.config.entities.Node.childNodes",
-            "com.docshifter.core.monitoring.entities.AbstractConfigurationItem.notificationLevels",
-            "com.docshifter.core.config.entities.Module.parameters",
-            "com.docshifter.core.config.entities.Module",
-            "com.docshifter.core.config.entities.ChainConfiguration.rootNodes",
-            "com.docshifter.core.config.entities.ModuleConfiguration",
-            "com.docshifter.core.config.entities.ChainConfiguration",
-            "com.docshifter.core.monitoring.entities.Configuration",
-            "com.docshifter.core.config.entities.ParameterDependency",
-            "com.docshifter.core.config.entities.ModuleConfiguration.parameterValues",
-            "com.docshifter.core.config.entities.Node.parentNodes",
-    };
+
+    private static final String[] PREDEFINED_CACHE_NAMES = Stream.concat(
+            Stream.of(
+                    AbstractConfigurationItem.class,
+                    Parameter.class,
+                    Node.class,
+                    MonitoringFilter.class,
+                    Module.class,
+                    ChainConfiguration.class,
+                    ModuleConfiguration.class,
+                    com.docshifter.core.monitoring.entities.Configuration.class,
+                    ParameterDependency.class
+            ).map(Class::getCanonicalName),
+            Stream.of(
+                    "com.docshifter.core.config.entities.Node.childNodes",
+                    "com.docshifter.core.monitoring.entities.AbstractConfigurationItem.notificationLevels",
+                    "com.docshifter.core.config.entities.Module.parameters",
+                    "com.docshifter.core.config.entities.ChainConfiguration.rootNodes",
+                    "com.docshifter.core.config.entities.ModuleConfiguration.parameterValues",
+                    "com.docshifter.core.config.entities.Node.parentNodes"
+            )
+    ).toArray(String[]::new);
 
     @Bean
     public CacheManager ehCacheManager() {
