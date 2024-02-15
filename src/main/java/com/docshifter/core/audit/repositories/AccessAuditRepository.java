@@ -12,9 +12,7 @@ import java.util.List;
 public interface AccessAuditRepository extends JpaRepository<AccessAudit, String> {
 
 
-    @Query(value = "select aa.id, aa.username, " +
-            "aa.event_date_time, " +
-            "aa.details " +
+    @Query(value = "select aa.* " +
             "from audit.access_audit aa " +
             "where aa.event_date_time between :startTime and :endTime and (  'ALL' in (:authorList) or aa.username in ( :authorList ))", nativeQuery = true)
     List<AccessAudit> findAllChangesByDateAuthor(@Param("startTime") Long startTime, @Param("endTime") Long endTime, @Param("authorList") List<String> authorList);

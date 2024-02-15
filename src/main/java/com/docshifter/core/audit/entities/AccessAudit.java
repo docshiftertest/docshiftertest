@@ -1,6 +1,7 @@
 package com.docshifter.core.audit.entities;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AccessAudit{
 
     @Id
@@ -23,5 +25,13 @@ public class AccessAudit{
     private String username;
     private long eventDateTime;
     private String details;
+    private String oldValue;
+    private String newValue;
 
+    public AccessAudit(UUID id, String username, long eventDateTime, String details) {
+        this.id = id;
+        this.username = username;
+        this.eventDateTime = eventDateTime;
+        this.details = details;
+    }
 }

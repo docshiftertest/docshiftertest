@@ -1,11 +1,39 @@
 package com.docshifter.core.utils.dctm;
 
 
-import com.documentum.fc.client.*;
+import com.documentum.fc.client.DormantStatus;
+import com.documentum.fc.client.IDfACL;
+import com.documentum.fc.client.IDfAuditTrailManager;
+import com.documentum.fc.client.IDfBatchManager;
+import com.documentum.fc.client.IDfClient;
+import com.documentum.fc.client.IDfCollection;
+import com.documentum.fc.client.IDfEnumeration;
+import com.documentum.fc.client.IDfEventManager;
+import com.documentum.fc.client.IDfFolder;
+import com.documentum.fc.client.IDfFormat;
+import com.documentum.fc.client.IDfGetObjectOptions;
+import com.documentum.fc.client.IDfGroup;
+import com.documentum.fc.client.IDfLocalModuleRegistry;
+import com.documentum.fc.client.IDfLocalTransaction;
+import com.documentum.fc.client.IDfObjectPathsMap;
+import com.documentum.fc.client.IDfPersistentObject;
+import com.documentum.fc.client.IDfRelationType;
+import com.documentum.fc.client.IDfSession;
+import com.documentum.fc.client.IDfSessionManager;
+import com.documentum.fc.client.IDfSessionScopeManager;
+import com.documentum.fc.client.IDfType;
+import com.documentum.fc.client.IDfTypedObject;
+import com.documentum.fc.client.IDfUser;
+import com.documentum.fc.client.IDfVersionTreeLabels;
+import com.documentum.fc.client.IDfWorkflowBuilder;
 import com.documentum.fc.client.acs.IDfAcsTransferPreferences;
 import com.documentum.fc.client.fulltext.IDfFtConfig;
 import com.documentum.fc.client.mq.IDfMessageQueueManager;
-import com.documentum.fc.common.*;
+import com.documentum.fc.common.DfException;
+import com.documentum.fc.common.IDfId;
+import com.documentum.fc.common.IDfList;
+import com.documentum.fc.common.IDfLoginInfo;
+import com.documentum.fc.common.IDfTime;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.ByteArrayInputStream;

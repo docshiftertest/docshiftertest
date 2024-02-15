@@ -1,13 +1,20 @@
 package com.docshifter.core.monitoring.services;
 
-import com.docshifter.core.monitoring.utils.EmailPlaceHolderConsts;
-import com.docshifter.core.monitoring.dtos.*;
+import com.docshifter.core.monitoring.dtos.AbstractConfigurationItemDto;
+import com.docshifter.core.monitoring.dtos.ConfigurationDto;
+import com.docshifter.core.monitoring.dtos.DbConfigurationItemDto;
+import com.docshifter.core.monitoring.dtos.MailConfigurationItemDto;
+import com.docshifter.core.monitoring.dtos.NotificationDto;
+import com.docshifter.core.monitoring.dtos.SnmpConfigurationItemDto;
+import com.docshifter.core.monitoring.dtos.WebhookConfigurationItemDto;
 import com.docshifter.core.monitoring.enums.NotificationLevels;
+import com.docshifter.core.monitoring.utils.EmailPlaceHolderConsts;
 import com.docshifter.core.monitoring.utils.FilteringUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.io.Serializable;
 import java.sql.SQLException;

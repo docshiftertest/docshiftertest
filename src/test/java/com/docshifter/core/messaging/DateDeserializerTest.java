@@ -1,7 +1,7 @@
 package com.docshifter.core.messaging;
 
 import com.docshifter.core.AbstractSpringTest;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.time.Instant;
 import java.time.ZoneId;

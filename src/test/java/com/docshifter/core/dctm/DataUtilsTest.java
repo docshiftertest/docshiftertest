@@ -1,11 +1,15 @@
 package com.docshifter.core.dctm;
 
-import com.docshifter.core.utils.dctm.*;
+import com.docshifter.core.utils.dctm.DataUtils;
+import com.docshifter.core.utils.dctm.DctmConnectionDetails;
+import com.docshifter.core.utils.dctm.DctmSession;
+import com.docshifter.core.utils.dctm.DctmSessionUtils;
+import com.docshifter.core.utils.dctm.FieldInfo;
 import com.documentum.fc.client.IDfSysObject;
 import com.documentum.fc.common.DfId;
+import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Map;

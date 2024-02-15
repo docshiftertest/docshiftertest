@@ -2,7 +2,11 @@ package com.docshifter.core.utils.dctm;
 
 import com.documentum.com.DfClientX;
 import com.documentum.com.IDfClientX;
-import com.documentum.fc.client.*;
+import com.documentum.fc.client.DfServiceException;
+import com.documentum.fc.client.IDfClient;
+import com.documentum.fc.client.IDfEnumeration;
+import com.documentum.fc.client.IDfSessionManager;
+import com.documentum.fc.client.IDfSysObject;
 import com.documentum.fc.client.acs.IDfAcsRequest;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfLoginInfo;
