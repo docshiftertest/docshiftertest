@@ -235,8 +235,7 @@ public abstract class AbstractOperation extends ModuleOperation {
      */
     private void addOutputFilePath(Task task, OperationParams res) {
 
-        boolean isCountAllowed = task.getData().containsKey(TaskDataKey.COUNT_ALLOWED.toString())
-                && ((boolean) task.getData().get(TaskDataKey.COUNT_ALLOWED.toString()));
+        boolean isCountAllowed = (boolean) task.getData().getOrDefault(TaskDataKey.COUNT_ALLOWED.toString(),false);
 
         // We just do it id it is a release module and the COUNT_ALLOWED option is true
         if (moduleWrapper.getType().equalsIgnoreCase("release")
