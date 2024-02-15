@@ -38,7 +38,18 @@ public enum TaskDataKey {
 	EMAIL_RECEIVERS,
 	EMAIL_CC,
 	EMAIL_BCC,
-	EMAIL_SUBJECT;
+	EMAIL_SUBJECT,
+
+	/**
+	 * Used to check if we should count the pages and fonts in metrics
+	 */
+	COUNT_ALLOWED,
+
+
+	/**
+	 * Used to store all the output files for a task
+	 */
+	OUTPUT_FILE_PATH;
 
 	private final String alias;
 

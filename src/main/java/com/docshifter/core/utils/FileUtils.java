@@ -36,6 +36,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -819,8 +820,9 @@ public final class FileUtils {
 
     /**
      * Copies the folder/file from source path
+     *
      * @param sourceFilePath the source path
-     * @param workFolder the {@link WorkFolder} to use
+     * @param workFolder     the {@link WorkFolder} to use
      * @return a list with the path
      */
     public static List<String> copySourceFilePathToList(@Nullable String sourceFilePath,
@@ -834,16 +836,30 @@ public final class FileUtils {
     }
 
     /**
+     * Create a the list of paths using the {@link WorkFolder} provided
+     *
+     * @param paths 		the list of paths to copy
+     * @param workFolder 	the {@link WorkFolder} to use
+     * @return the list of copied paths
+     */
+    public static List<String> copySourceFilePathList(List<String> paths, WorkFolder workFolder) {
+        return paths.stream()
+                .map(path -> copySourceFilePath(path, workFolder))
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    /**
      * Copies the folder/file from source path
+     *
      * @param sourceFilePath the source path
-     * @param workFolder the {@link WorkFolder} to use
+     * @param workFolder     the {@link WorkFolder} to use
      * @return the string for the path of the copied source
      */
     public static String copySourceFilePath(@Nullable String sourceFilePath,
                                             @Nullable WorkFolder workFolder) {
 
         if (StringUtils.isBlank(sourceFilePath)
-                || checkFileExist(sourceFilePath)
                 || isNull(workFolder)) {
             return null;
         }
@@ -853,7 +869,6 @@ public final class FileUtils {
         File source = new File(sourceFilePath);
 
         try {
-
             if (source.isDirectory()) {
 
                 File sourceCopy = workFolder.getNewFolderPath(source.getName()).toFile();
@@ -887,7 +902,8 @@ public final class FileUtils {
             }
         }
         catch(IOException ioe) {
-            log.warn("There was an error while coping the source path.", ioe);
+            log.warn("There was an error while coping the source path [{}].",
+                    sourceFilePath, ioe);
         }
 
         return sourceFilePathCopy;

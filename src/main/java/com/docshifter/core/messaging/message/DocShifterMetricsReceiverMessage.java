@@ -32,6 +32,7 @@ public class DocShifterMetricsReceiverMessage extends DocShifterMetricsMessage {
 	@Builder.Default
 	private final List<TaskMessage> taskMessages = new ArrayList<>();
 	private Boolean success;
+	private boolean countAllowed;
 
 	public MessageSource getMessageSource() {
 		return MessageSource.RECEIVER;
