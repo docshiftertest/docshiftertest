@@ -1,5 +1,6 @@
 package com.docshifter.datasource.config.audit;
 
+import com.docshifter.datasource.config.DBUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.cfg.AvailableSettings;
@@ -26,15 +27,12 @@ import java.util.Properties;
 public class ConfigurationAuditDB {
     private final String url;
     private final String password;
-    private final String dialect;
 
     public ConfigurationAuditDB(@Value("${spring.datasource.audit.url}") String url,
-                                @Value("${spring.datasource.audit.password:}") String password,
-                                @Value("${spring.jpa.database-platform}") String dialect) {
+                                @Value("${spring.datasource.audit.password:}") String password) {
         this.url = url;
         // Backwards compatibility with older installations: the audit password used to be hardcoded
         this.password = StringUtils.isEmpty(password) ? "aae4d1b46100a43119b6c43eacff8f74" : password;
-        this.dialect = dialect;
     }
 
     @Bean
@@ -57,13 +55,6 @@ public class ConfigurationAuditDB {
         HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
         jpaVendorAdapter.setGenerateDdl(false);
 
-        Properties properties = new Properties();
-        properties.setProperty(AvailableSettings.DIALECT, dialect);
-        properties.setProperty(AvailableSettings.DEFAULT_SCHEMA, "audit");
-        properties.put(AvailableSettings.PHYSICAL_NAMING_STRATEGY, CamelCaseToUnderscoresNamingStrategy.class.getName());
-        properties.put(AvailableSettings.IMPLICIT_NAMING_STRATEGY, SpringImplicitNamingStrategy.class.getName());
-        properties.setProperty(AvailableSettings.HBM2DDL_AUTO, "none");
-
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 
         factoryBean.setDataSource(auditDataSource());
@@ -72,7 +63,7 @@ public class ConfigurationAuditDB {
                 "com.docshifter.core.audit.entities");
         factoryBean.setPersistenceUnitName("audit");
 
-        factoryBean.setJpaProperties(properties);
+        factoryBean.setJpaProperties(DBUtils.defaultProperties("audit",false));
 
         return factoryBean;
     }
