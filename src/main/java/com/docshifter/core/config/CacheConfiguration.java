@@ -1,6 +1,7 @@
 package com.docshifter.core.config;
 
 import com.docshifter.core.config.entities.ChainConfiguration;
+import com.docshifter.core.config.entities.Module;
 import com.docshifter.core.config.entities.ModuleConfiguration;
 import com.docshifter.core.config.entities.Node;
 import com.docshifter.core.config.entities.Parameter;
@@ -49,12 +50,13 @@ public class CacheConfiguration {
                     ParameterDependency.class
             ).map(Class::getCanonicalName),
             Stream.of(
-                    "com.docshifter.core.config.entities.Node.childNodes",
-                    "com.docshifter.core.monitoring.entities.AbstractConfigurationItem.notificationLevels",
-                    "com.docshifter.core.config.entities.Module.parameters",
-                    "com.docshifter.core.config.entities.ChainConfiguration.rootNodes",
-                    "com.docshifter.core.config.entities.ModuleConfiguration.parameterValues",
-                    "com.docshifter.core.config.entities.Node.parentNodes"
+                    "parentNodeCache",
+                    "childNodeCache",
+                    "notificationLevelsCache",
+                    "parametersCache",
+                    "rootNodesCache",
+                    "moduleCache",
+                    "parameterValuesCache"
             )
     ).toArray(String[]::new);
 

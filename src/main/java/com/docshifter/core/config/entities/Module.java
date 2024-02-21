@@ -52,7 +52,7 @@ public class Module implements Serializable {
 	@Column(unique = true)
 	private String code;
 
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE,region = "parametersCache")
 	@OneToMany(cascade= CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinTable(name = "moduleparams",
 			joinColumns = {	@JoinColumn(name = "module") },

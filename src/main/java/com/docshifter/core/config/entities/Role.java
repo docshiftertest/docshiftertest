@@ -15,8 +15,6 @@ import java.io.Serializable;
 
 @Entity
 @Data
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@Cacheable
 @AllArgsConstructor
 @NoArgsConstructor
 public class Role implements Serializable {

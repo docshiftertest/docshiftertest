@@ -80,7 +80,7 @@ public class ChainConfiguration implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private FailureLevel failureLevel;
 
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE,region = "rootNodesCache")
 	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinTable(
 			name = "chain_configuration_root_node",

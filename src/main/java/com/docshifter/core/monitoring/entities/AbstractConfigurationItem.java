@@ -50,7 +50,7 @@ public abstract class AbstractConfigurationItem {
     @JoinColumn(name="monitoring_config_item_id", nullable = false)
     private MonitoringFilter monitoringFilter;
 
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE , region = "notificationLevelsCache")
     @ElementCollection(targetClass = NotificationLevels.class)
     @JoinTable(name = "MonitoringNotificationLevels", joinColumns = @JoinColumn(name = "configurationItemId"))
     @Column(name = "level", nullable = false)

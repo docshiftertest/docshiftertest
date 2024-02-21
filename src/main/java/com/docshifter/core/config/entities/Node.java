@@ -48,7 +48,7 @@ public class Node implements Serializable {
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private long id;
 
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "parentNodeCache")
 	@ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "node_connection",
@@ -58,7 +58,7 @@ public class Node implements Serializable {
 	@JsonIgnore
 	private Set<Node> parentNodes;
 
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "childNodeCache")
 	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "parentNodes", cascade = CascadeType.ALL)
 	@Nonnull
 	private Set<Node> childNodes;

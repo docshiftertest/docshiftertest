@@ -24,8 +24,6 @@ import java.util.Set;
 
 @Entity
 @Data
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@Cacheable
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements Serializable {

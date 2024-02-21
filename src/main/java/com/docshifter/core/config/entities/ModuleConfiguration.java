@@ -39,7 +39,7 @@ public class ModuleConfiguration implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE,region = "moduleCache")
 	@ManyToOne
 	@Nonnull
 	private Module module;
@@ -47,7 +47,7 @@ public class ModuleConfiguration implements Serializable {
 	private String description;
 	private UUID uuid;
 
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE,region = "parameterValuesCache")
 	@JsonIgnore
 	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
 	@MapKeyClass(Parameter.class)
